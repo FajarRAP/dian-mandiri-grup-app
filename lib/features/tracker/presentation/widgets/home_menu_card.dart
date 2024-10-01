@@ -7,14 +7,16 @@ class HomeMenuCard extends StatelessWidget {
     required this.title,
     required this.route,
     required this.color,
-    this.icon = Icons.document_scanner_rounded,
+    required this.assetName,
+    // this.icon = Icons.document_scanner_rounded,
     this.size,
   });
 
   final String title;
   final String route;
   final MaterialColor color;
-  final IconData icon;
+  // final IconData icon;
+  final String assetName;
   final double? size;
 
   @override
@@ -37,10 +39,10 @@ class HomeMenuCard extends StatelessWidget {
                   color: color[100],
                 ),
                 padding: const EdgeInsets.all(6),
-                child: Icon(
-                  icon,
-                  color: color[500],
-                  size: 48,
+                child: Image.asset(
+                  assetName,
+                  width: 72,
+                  height: 72,
                 ),
               ),
               const SizedBox(height: 14),

@@ -27,6 +27,13 @@ const sendStage = 6;
 const returnStage = 7;
 
 const spreadsheetIcon = "assets/excel.png";
+const scanReceiptIcon = "assets/scan.png";
+const pickUpReceiptIcon = "assets/pick-up.png";
+const checkReceiptIcon = "assets/check.png";
+const packReceiptIcon = "assets/pack.png";
+const sendReceiptIcon = "assets/send.png";
+const returnReceiptIcon = "assets/return.png";
+const reportReceiptIcon = "assets/report.png";
 
 const successSound = "sounds/success.mp3";
 const skipSound = "sounds/skip.mp3";

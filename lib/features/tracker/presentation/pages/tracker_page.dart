@@ -39,6 +39,7 @@ class TrackerPage extends StatelessWidget {
           title: 'Scan Resi',
           route: scanReceiptRoute,
           color: Colors.blue,
+          assetName: scanReceiptIcon,
           size: 200,
         );
       case 3:
@@ -46,13 +47,15 @@ class TrackerPage extends StatelessWidget {
           title: 'Scan Ambil Resi',
           route: pickUpReceiptRoute,
           color: Colors.brown,
+          assetName: pickUpReceiptIcon,
           size: 200,
         );
       case 4:
         return const HomeMenuCard(
-          title: 'Scan Checking',
+          title: 'Scan Checker',
           route: checkReceiptRoute,
           color: Colors.red,
+          assetName: checkReceiptIcon,
           size: 200,
         );
       case 5:
@@ -60,6 +63,7 @@ class TrackerPage extends StatelessWidget {
           title: 'Scan Packing',
           route: packReceiptRoute,
           color: Colors.green,
+          assetName: packReceiptIcon,
           size: 200,
         );
       case 6:
@@ -67,13 +71,15 @@ class TrackerPage extends StatelessWidget {
           title: 'Scan Kirim',
           route: sendReceiptRoute,
           color: Colors.orange,
+          assetName: sendReceiptIcon,
           size: 200,
         );
       case 7:
         return const HomeMenuCard(
-          title: 'Scan Return',
+          title: 'Scan Retur',
           route: returnReceiptRoute,
           color: Colors.purple,
+          assetName: returnReceiptIcon,
           size: 200,
         );
       case 8:
@@ -81,14 +87,16 @@ class TrackerPage extends StatelessWidget {
           physics: NeverScrollableScrollPhysics(),
           children: <Widget>[
             HomeMenuCard(
+              title: 'Scan Ambil Resi',
+              route: pickUpReceiptRoute,
+              color: Colors.brown,
+              assetName: pickUpReceiptIcon,
+            ),
+            HomeMenuCard(
               title: 'Scan Packing',
               route: packReceiptRoute,
               color: Colors.green,
-            ),
-            HomeMenuCard(
-              title: 'Scan Kirim',
-              route: sendReceiptRoute,
-              color: Colors.orange,
+              assetName: packReceiptIcon,
             )
           ],
         );
@@ -100,11 +108,13 @@ class TrackerPage extends StatelessWidget {
               title: 'Scan Packing',
               route: packReceiptRoute,
               color: Colors.green,
+              assetName: packReceiptIcon,
             ),
             HomeMenuCard(
               title: 'Scan Kirim',
               route: sendReceiptRoute,
               color: Colors.orange,
+              assetName: sendReceiptIcon,
             )
           ],
         );
@@ -120,37 +130,43 @@ class TrackerPage extends StatelessWidget {
           title: 'Scan Resi',
           route: scanReceiptRoute,
           color: Colors.blue,
+          assetName: scanReceiptIcon,
         ),
         HomeMenuCard(
           title: 'Scan Ambil Resi',
           route: pickUpReceiptRoute,
           color: Colors.brown,
+          assetName: pickUpReceiptIcon,
         ),
         HomeMenuCard(
           title: 'Scan Checker',
           route: checkReceiptRoute,
           color: Colors.red,
+          assetName: checkReceiptIcon,
         ),
         HomeMenuCard(
           title: 'Scan Packing',
           route: packReceiptRoute,
           color: Colors.green,
+          assetName: packReceiptIcon,
         ),
         HomeMenuCard(
           title: 'Scan Kirim',
           route: sendReceiptRoute,
           color: Colors.orange,
+          assetName: sendReceiptIcon,
         ),
         HomeMenuCard(
           title: 'Scan Retur',
           route: returnReceiptRoute,
           color: Colors.purple,
+          assetName: returnReceiptIcon,
         ),
         HomeMenuCard(
           title: 'Laporan',
           route: reportRoute,
           color: Colors.teal,
-          icon: Icons.line_axis_rounded,
+          assetName: reportReceiptIcon,
         ),
       ],
     );
