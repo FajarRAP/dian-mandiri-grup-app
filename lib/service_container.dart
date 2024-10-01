@@ -47,8 +47,8 @@ void setup({required CameraDescription camera}) {
 
   // Ship
   getIt
-    ..registerLazySingleton<ShipRemoteDataSource>(
-        () => ShipRemoteDataSourceImpl(supabase: getIt.get()))
+    ..registerLazySingleton<ShipRemoteDataSource>(() =>
+        ShipRemoteDataSourceImpl(supabase: getIt.get(), environment: 'prod'))
     ..registerLazySingleton<ShipLocalDataSource>(
         () => ShipLocalDataSourceImpl())
     ..registerLazySingleton<ShipRepositories>(() =>

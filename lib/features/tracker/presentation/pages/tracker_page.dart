@@ -34,49 +34,49 @@ class TrackerPage extends StatelessWidget {
 
   Widget _buildTrackerPage(int? role) {
     switch (role) {
-      case 1:
+      case 2:
         return const HomeMenuCard(
           title: 'Scan Resi',
           route: scanReceiptRoute,
           color: Colors.blue,
           size: 200,
         );
-      case 6:
+      case 3:
         return const HomeMenuCard(
           title: 'Scan Ambil Resi',
           route: pickUpReceiptRoute,
           color: Colors.brown,
           size: 200,
         );
-      case 2:
+      case 4:
         return const HomeMenuCard(
           title: 'Scan Checking',
           route: checkReceiptRoute,
           color: Colors.red,
           size: 200,
         );
-      case 3:
+      case 5:
         return const HomeMenuCard(
           title: 'Scan Packing',
           route: packReceiptRoute,
           color: Colors.green,
           size: 200,
         );
-      case 4:
+      case 6:
         return const HomeMenuCard(
           title: 'Scan Kirim',
           route: sendReceiptRoute,
           color: Colors.orange,
           size: 200,
         );
-      case 5:
+      case 7:
         return const HomeMenuCard(
           title: 'Scan Return',
           route: returnReceiptRoute,
           color: Colors.purple,
           size: 200,
         );
-      case 7:
+      case 8:
         return const MyGridViewCount(
           physics: NeverScrollableScrollPhysics(),
           children: <Widget>[
@@ -92,7 +92,7 @@ class TrackerPage extends StatelessWidget {
             )
           ],
         );
-      case 8:
+      case 9:
         return const MyGridViewCount(
           physics: NeverScrollableScrollPhysics(),
           children: <Widget>[

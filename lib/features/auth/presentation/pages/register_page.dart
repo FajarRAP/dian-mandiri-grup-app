@@ -85,27 +85,27 @@ class _RegisterPageState extends State<RegisterPage> {
                             ),
                           ),
                           DropdownMenuItem(
-                            value: 1,
+                            value: 2,
                             child: Text('Scan Resi'),
                           ),
                           DropdownMenuItem(
-                            value: 6,
+                            value: 3,
                             child: Text('Scan Ambil Resi'),
                           ),
                           DropdownMenuItem(
-                            value: 2,
+                            value: 4,
                             child: Text('Scan Checker'),
                           ),
                           DropdownMenuItem(
-                            value: 3,
+                            value: 5,
                             child: Text('Scan Packing'),
                           ),
                           DropdownMenuItem(
-                            value: 4,
+                            value: 6,
                             child: Text('Scan Kirim'),
                           ),
                           DropdownMenuItem(
-                            value: 5,
+                            value: 7,
                             child: Text('Scan Retur'),
                           ),
                         ],
