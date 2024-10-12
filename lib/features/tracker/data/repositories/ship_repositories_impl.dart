@@ -3,10 +3,10 @@ import 'dart:io';
 import 'package:dartz/dartz.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:ship_tracker/core/common/constants.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:syncfusion_flutter_xlsio/xlsio.dart';
 
+import '../../../../core/common/constants.dart';
 import '../../../../core/exceptions/network_exception.dart';
 import '../../../../core/exceptions/receipt_exception.dart';
 import '../../../../core/failure/failure.dart';
@@ -28,7 +28,8 @@ class ShipRepositoriesImpl extends ShipRepositories {
   });
 
   @override
-  Future<Either<Failure, List<ShipEntity>>> getShips(int stageId) async {
+  Future<Either<Failure, List<ShipEntity>>> getShips(
+      int stageId, DateTime date) async {
     try {
       // final currentUserId = getIt.get<SupabaseClient>().auth.currentUser?.id;
       // return Right(datas
@@ -38,7 +39,7 @@ class ShipRepositoriesImpl extends ShipRepositories {
 
       if (!await isInternetConnected()) return throw NetworkException();
 
-      final datas = await shipRemote.getShipsByStageId(stageId);
+      final datas = await shipRemote.getShipsByStageId(stageId, date);
 
       return Right(datas.map((e) => ShipModel.fromJson(e)).toList());
     } on NetworkException catch (ne) {
@@ -118,9 +119,9 @@ class ShipRepositoriesImpl extends ShipRepositories {
   }
 
   @override
-  Future<Either<Failure, String>> createReport() async {
+  Future<Either<Failure, String>> createReport(DateTime date) async {
     try {
-      final ships = (await shipRemote.getAllShips())
+      final ships = (await shipRemote.getAllShips(date))
           .map((e) => ShipModel.fromJson(e))
           .toList();
 
@@ -197,7 +198,7 @@ class ShipRepositoriesImpl extends ShipRepositories {
       final directory = await getExternalStorageDirectory();
       final path = directory?.path;
       File file = File(
-          '$path/report_${DateFormat('d-M-y_H:mm:s').format(DateTime.now())}.xlsx'); // Add 7 hours to sync with WIB
+          '$path/report_${DateFormat('d-M-y_H:mm:s').format(DateTime.now())}.xlsx');
       await file.writeAsBytes(bytes, flush: true);
 
       return const Right('Berhasil Membuat Laporan');

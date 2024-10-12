@@ -2,16 +2,17 @@ import 'dart:io';
 
 import 'package:bloc/bloc.dart';
 import 'package:camera/camera.dart';
+import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
-import 'package:ship_tracker/features/tracker/domain/usecases/delete_ship_use_case.dart';
-import '../../domain/usecases/get_image_url_use_case.dart';
-import '../../domain/usecases/upload_image_use_case.dart';
 
 import '../../domain/entities/ship_entity.dart';
 import '../../domain/usecases/create_report_use_case.dart';
+import '../../domain/usecases/delete_ship_use_case.dart';
 import '../../domain/usecases/get_all_spreadsheet_files_use_case.dart';
+import '../../domain/usecases/get_image_url_use_case.dart';
 import '../../domain/usecases/get_ships_use_case.dart';
 import '../../domain/usecases/insert_ship_use_case.dart';
+import '../../domain/usecases/upload_image_use_case.dart';
 
 part 'ship_state.dart';
 
@@ -46,10 +47,10 @@ class ShipCubit extends Cubit<ShipState> {
     data.isEmpty ? emit(ShipEmpty()) : emit(ShipLoaded(data));
   }
 
-  Future<void> getShips(int stageId) async {
+  Future<void> getShips(int stageId, DateTime date) async {
     emit(ShipLoading());
 
-    final result = await getShipsUseCase(stageId);
+    final result = await getShipsUseCase(stageId, date);
 
     result.fold(
       (l) => emit(ShipError(l.message)),
@@ -77,10 +78,10 @@ class ShipCubit extends Cubit<ShipState> {
     );
   }
 
-  Future<void> createReport() async {
+  Future<void> createReport(DateTime date) async {
     emit(ReportLoading());
 
-    final result = await createReportUseCase();
+    final result = await createReportUseCase(date);
 
     result.fold(
       (l) => emit(ReportError(l.message)),

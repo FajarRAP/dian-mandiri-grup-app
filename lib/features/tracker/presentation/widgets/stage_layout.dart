@@ -29,6 +29,7 @@ class StageLayout extends StatefulWidget {
 
 class _StageLayoutState extends State<StageLayout> {
   final _controller = TextEditingController();
+  var date = DateUtils.dateOnly(DateTime.now());
 
   @override
   void dispose() {
@@ -39,6 +40,7 @@ class _StageLayoutState extends State<StageLayout> {
   @override
   Widget build(BuildContext context) {
     final shipCubit = context.read<ShipCubit>();
+    final dateFormat = DateFormat('d-M-y', 'id_ID');
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
 
@@ -50,18 +52,50 @@ class _StageLayoutState extends State<StageLayout> {
         children: [
           Container(
             color: theme.colorScheme.surface,
-            padding: const EdgeInsets.all(16),
-            child: TextField(
-              controller: _controller,
-              decoration: const InputDecoration(
-                hintText: 'Cari Resi',
-                suffixIcon: Icon(Icons.search),
-              ),
-              onChanged: shipCubit.filterShips,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Column(
+              children: [
+                const SizedBox(height: 16),
+                TextField(
+                  controller: _controller,
+                  decoration: const InputDecoration(
+                    hintText: 'Cari Resi',
+                    suffixIcon: Icon(Icons.search),
+                  ),
+                  onChanged: shipCubit.filterShips,
+                ),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: StatefulBuilder(
+                    builder: (context, setState) => TextButton.icon(
+                      onPressed: () async {
+                        final datePicked = await showDatePicker(
+                            context: context,
+                            firstDate: DateTime(2000),
+                            lastDate: DateTime(2100),
+                            locale: const Locale('id'));
+                        if (datePicked != null) {
+                          setState(() => date = datePicked);
+                          shipCubit.getShips(widget.stageId, date);
+                        }
+                      },
+                      iconAlignment: IconAlignment.end,
+                      icon: const Icon(Icons.calendar_month_outlined),
+                      label: Text(
+                        dateFormat.format(date),
+                        style: TextStyle(
+                          color: theme.colorScheme.primary,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
           BlocBuilder<ShipCubit, ShipState>(
-            bloc: shipCubit..getShips(widget.stageId),
+            bloc: shipCubit..getShips(widget.stageId, date),
             buildWhen: (previous, current) => current is GetShip,
             builder: (context, state) {
               if (state is ShipLoading) {
@@ -78,7 +112,8 @@ class _StageLayoutState extends State<StageLayout> {
                   child: Expanded(
                     child: RefreshIndicator(
                       displacement: 12,
-                      onRefresh: () async => shipCubit.getShips(widget.stageId),
+                      onRefresh: () async =>
+                          shipCubit.getShips(widget.stageId, date),
                       child: ListView.separated(
                         padding: const EdgeInsets.all(16),
                         separatorBuilder: (context, index) =>

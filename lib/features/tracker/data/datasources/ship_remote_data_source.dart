@@ -7,8 +7,9 @@ import '../../../../core/common/constants.dart';
 abstract class ShipRemoteDataSource {
   Future<List<Map<String, dynamic>>> getShipsByReceiptNumber(
       String receiptNumber);
-  Future<List<Map<String, dynamic>>> getShipsByStageId(int stageId);
-  Future<List<Map<String, dynamic>>> getAllShips();
+  Future<List<Map<String, dynamic>>> getShipsByStageId(
+      int stageId, DateTime date);
+  Future<List<Map<String, dynamic>>> getAllShips(DateTime date);
   Future<void> insertShip(String? currentUserId, String receiptNumber,
       String name, int stageId, int shipId);
   Future<void> deleteShip(int shipId);
@@ -35,12 +36,15 @@ class ShipRemoteDataSourceImpl extends ShipRemoteDataSource {
   }
 
   @override
-  Future<List<Map<String, dynamic>>> getShipsByStageId(int stageId) async {
+  Future<List<Map<String, dynamic>>> getShipsByStageId(
+      int stageId, DateTime date) async {
     return await supabase
         .from(environment == 'dev' ? 'ships_detail_dev' : 'ships_detail')
         .select(
             'name, receipt_number:ship_id(receipt_number, user_id, id), stage_name:stage_id(name), created_at')
-        .eq('stage_id', stageId);
+        .eq('stage_id', stageId)
+        .gt('created_at', date.toString())
+        .lt('created_at', date.add(const Duration(days: 1)).toString());
   }
 
   @override
@@ -78,11 +82,13 @@ class ShipRemoteDataSourceImpl extends ShipRemoteDataSource {
   }
 
   @override
-  Future<List<Map<String, dynamic>>> getAllShips() async {
+  Future<List<Map<String, dynamic>>> getAllShips(DateTime date) async {
     return await supabase
         .from(environment == 'dev' ? 'ships_detail_dev' : 'ships_detail')
         .select(
-            'name, receipt_number:ship_id(receipt_number, user_id, id), stage_name:stage_id(name), created_at');
+            'name, receipt_number:ship_id(receipt_number, user_id, id), stage_name:stage_id(name), created_at')
+        .gt('created_at', date.toString())
+        .lt('created_at', date.add(const Duration(days: 1)).toString());
   }
 
   @override

@@ -8,22 +8,6 @@ import '../../../../core/common/snackbar.dart';
 import '../../../auth/presentation/cubit/auth_cubit.dart';
 import '../cubit/ship_cubit.dart';
 
-// Future<void> insertDialog(
-//         {required BuildContext context,
-//         required String title,
-//         required String receipt,
-//         required Widget textContainer,
-//         required GlobalKey<FormState> formKey}) =>
-//     showDialog(
-//       context: context,
-//       builder: (context) {
-//         final audioPlayer = AudioPlayer();
-
-//         return InsertDataFromCameraAlertDialog(
-//             textTheme: textTheme, name: name, audioPlayer: audioPlayer);
-//       },
-//     );
-
 class InsertDataFromCameraAlertDialog extends StatelessWidget {
   const InsertDataFromCameraAlertDialog({
     super.key,
@@ -94,7 +78,7 @@ class InsertDataFromCameraAlertDialog extends StatelessWidget {
             listener: (context, state) async {
               if (state is InsertShipFinished) {
                 context.pop();
-                context.read<ShipCubit>().getShips(stageId);
+                context.read<ShipCubit>().getShips(stageId, DateTime.now());
                 flushbar(context, state.message);
                 await audioPlayer.play(AssetSource(successSound));
               }

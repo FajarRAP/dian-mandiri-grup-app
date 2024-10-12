@@ -36,7 +36,7 @@ class DeleteDataAlertDialog extends StatelessWidget {
               if (state is DeleteShipSuccess) {
                 context.pop();
                 flushbar(context, state.message);
-                shipCubit.getShips(stageId);
+                shipCubit.getShips(stageId, DateTime.now());
               }
               if (state is DeleteShipError) {
                 flushbar(context, state.message);

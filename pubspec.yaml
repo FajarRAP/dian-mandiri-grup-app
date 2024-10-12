@@ -50,6 +50,8 @@ dependencies:
   audioplayers: ^6.1.0
   connectivity_plus: ^6.0.5
   barcode_scan2: ^4.3.3
+  flutter_localizations:
+    sdk: flutter
 
 dev_dependencies:
   flutter_test:

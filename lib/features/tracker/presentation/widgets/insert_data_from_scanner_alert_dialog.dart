@@ -103,7 +103,7 @@ class _InsertDataFromScannerAlertDialogState
             listener: (context, state) async {
               if (state is InsertShipFinished) {
                 context.pop();
-                context.read<ShipCubit>().getShips(widget.stageId);
+                context.read<ShipCubit>().getShips(widget.stageId, DateTime.now());
                 flushbar(context, state.message);
                 await widget.audioPlayer.play(AssetSource(successSound));
               }
