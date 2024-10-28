@@ -12,5 +12,6 @@ abstract class ShipRepositories {
   Future<Either<Failure, String>> createReport(DateTime date);
   Future<Either<Failure, List<String>>> getAllSpreadsheetFiles();
   Future<Either<Failure, String>> uploadImage(String toPath, File file);
+  Future<Either<Failure, ShipEntity>> getReceiptStatus(String receiptNumber);
   Either<Failure, String> getImageUrl(String path);
 }

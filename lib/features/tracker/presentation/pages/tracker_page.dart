@@ -34,7 +34,7 @@ class TrackerPage extends StatelessWidget {
 
   Widget _buildTrackerPage(int? role) {
     switch (role) {
-      case 2:
+      case scanRole:
         return const HomeMenuCard(
           title: 'Scan Resi',
           route: scanReceiptRoute,
@@ -42,7 +42,7 @@ class TrackerPage extends StatelessWidget {
           assetName: scanReceiptIcon,
           size: 200,
         );
-      case 3:
+      case pickUpRole:
         return const HomeMenuCard(
           title: 'Scan Ambil Resi',
           route: pickUpReceiptRoute,
@@ -50,7 +50,7 @@ class TrackerPage extends StatelessWidget {
           assetName: pickUpReceiptIcon,
           size: 200,
         );
-      case 4:
+      case checkRole:
         return const HomeMenuCard(
           title: 'Scan Checker',
           route: checkReceiptRoute,
@@ -58,7 +58,7 @@ class TrackerPage extends StatelessWidget {
           assetName: checkReceiptIcon,
           size: 200,
         );
-      case 5:
+      case packRole:
         return const HomeMenuCard(
           title: 'Scan Packing',
           route: packReceiptRoute,
@@ -66,7 +66,7 @@ class TrackerPage extends StatelessWidget {
           assetName: packReceiptIcon,
           size: 200,
         );
-      case 6:
+      case sendRole:
         return const HomeMenuCard(
           title: 'Scan Kirim',
           route: sendReceiptRoute,
@@ -74,7 +74,7 @@ class TrackerPage extends StatelessWidget {
           assetName: sendReceiptIcon,
           size: 200,
         );
-      case 7:
+      case returnRole:
         return const HomeMenuCard(
           title: 'Scan Retur',
           route: returnReceiptRoute,
@@ -82,7 +82,7 @@ class TrackerPage extends StatelessWidget {
           assetName: returnReceiptIcon,
           size: 200,
         );
-      case 8:
+      case pickUpAndPackRole:
         return const MyGridViewCount(
           physics: NeverScrollableScrollPhysics(),
           children: <Widget>[
@@ -100,7 +100,7 @@ class TrackerPage extends StatelessWidget {
             )
           ],
         );
-      case 9:
+      case packAndSendRole:
         return const MyGridViewCount(
           physics: NeverScrollableScrollPhysics(),
           children: <Widget>[
@@ -166,6 +166,12 @@ class TrackerPage extends StatelessWidget {
           title: 'Laporan',
           route: reportRoute,
           color: Colors.teal,
+          assetName: reportReceiptIcon,
+        ),
+        HomeMenuCard(
+          title: 'Status Resi',
+          route: receiptStatusRoute,
+          color: Colors.indigo,
           assetName: reportReceiptIcon,
         ),
       ],

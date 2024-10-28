@@ -8,14 +8,12 @@ class HomeMenuCard extends StatelessWidget {
     required this.route,
     required this.color,
     required this.assetName,
-    // this.icon = Icons.document_scanner_rounded,
     this.size,
   });
 
   final String title;
   final String route;
   final MaterialColor color;
-  // final IconData icon;
   final String assetName;
   final double? size;
 

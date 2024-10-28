@@ -109,3 +109,15 @@ class UploadImageError extends UploadImage {
 
   UploadImageError(this.message);
 }
+
+class CheckReceiptStatusLoading extends ShipState {}
+class CheckReceiptStatusLoaded extends ShipState {
+  final ShipEntity ship;
+
+  CheckReceiptStatusLoaded(this.ship);
+}
+class CheckReceiptStatusError extends ShipState {
+  final String message;
+
+  CheckReceiptStatusError(this.message);
+}

@@ -2,13 +2,12 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:barcode_scan2/barcode_scan2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ship_tracker/core/common/constants.dart';
 
 import '../../features/auth/presentation/cubit/auth_cubit.dart';
 import '../../features/tracker/presentation/widgets/insert_data_from_camera_alert_dialog.dart';
 import '../../features/tracker/presentation/widgets/insert_data_from_scanner_alert_dialog.dart';
 import '../common/snackbar.dart';
-
-enum ScanType { camera, scannner }
 
 Future<void> onTapScan(
   BuildContext context,
@@ -18,8 +17,7 @@ Future<void> onTapScan(
   final String? name = context.read<AuthCubit>().user?.userMetadata?['name'];
 
   if (name == null) {
-    flushbar(context, 'Nama belum diisi, silakan isi di bagian profile');
-    return;
+    return flushbar(context, 'Nama belum diisi, silakan isi di bagian profile');
   }
 
   if (scanType == ScanType.camera) {

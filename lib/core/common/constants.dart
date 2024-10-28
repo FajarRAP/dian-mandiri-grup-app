@@ -10,6 +10,7 @@ const packReceiptRoute = "${trackerRoute}pack";
 const sendReceiptRoute = "${trackerRoute}send";
 const returnReceiptRoute = "${trackerRoute}return";
 const reportRoute = "${trackerRoute}report";
+const receiptStatusRoute = "${trackerRoute}status";
 const detailReceiptRoute = "${trackerRoute}detail";
 const cameraRoute = "${trackerRoute}camera";
 
@@ -38,3 +39,14 @@ const reportReceiptIcon = "assets/report.png";
 const successSound = "sounds/success.mp3";
 const skipSound = "sounds/skip.mp3";
 const repeatSound = "sounds/repeat.mp3";
+
+const scanRole = 2;
+const pickUpRole = 3;
+const checkRole = 4;
+const packRole = 5;
+const sendRole = 6;
+const returnRole = 7;
+const pickUpAndPackRole = 8;
+const packAndSendRole = 9;
+
+enum  ScanType { camera, scannner }

@@ -14,6 +14,7 @@ abstract class ShipRemoteDataSource {
       String name, int stageId, int shipId);
   Future<void> deleteShip(int shipId);
   Future<String> uploadImage(String path, File file);
+  Future<List<Map<String, dynamic>>> getReceiptStatus(String receiptNumber);
   String getImageUrl(String path);
 }
 
@@ -108,5 +109,14 @@ class ShipRemoteDataSourceImpl extends ShipRemoteDataSource {
         .from(environment == 'dev' ? 'ships_dev' : 'ships')
         .delete()
         .eq('id', shipId);
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> getReceiptStatus(
+      String receiptNumber) async {
+    return await supabase
+        .from(environment == 'dev' ? 'ships_dev' : 'ships')
+        .select()
+        .eq('receipt_number', receiptNumber);
   }
 }

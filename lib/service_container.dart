@@ -1,6 +1,7 @@
 import 'package:camera/camera.dart';
 import 'package:get_it/get_it.dart';
 import 'package:ship_tracker/features/tracker/domain/usecases/delete_ship_use_case.dart';
+import 'package:ship_tracker/features/tracker/domain/usecases/get_receipt_status_use_case.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'features/auth/data/datasources/auth_remote_data_source.dart';
@@ -62,5 +63,6 @@ void setup({required CameraDescription camera}) {
             GetAllSpreadsheetFilesUseCase(shipRepo: getIt.get()),
         getImageUrlUseCase: GetImageUrlUseCase(shipRepo: getIt.get()),
         uploadImageUseCase: UploadImageUseCase(shipRepo: getIt.get()),
+        getReceiptStatusUseCase: GetReceiptStatusUseCase(shipRepo: getIt.get()),
         camera: camera));
 }

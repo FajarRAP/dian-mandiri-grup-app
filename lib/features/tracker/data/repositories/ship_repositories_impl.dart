@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:dartz/dartz.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:ship_tracker/features/tracker/data/models/ship_from_ships_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:syncfusion_flutter_xlsio/xlsio.dart';
 
@@ -16,7 +17,7 @@ import '../../domain/entities/ship_entity.dart';
 import '../../domain/repositories/ship_repositories.dart';
 import '../datasources/ship_local_data_source.dart';
 import '../datasources/ship_remote_data_source.dart';
-import '../models/ship_model.dart';
+import '../models/ship_from_ships_detail_model.dart';
 
 class ShipRepositoriesImpl extends ShipRepositories {
   final ShipRemoteDataSource shipRemote;
@@ -31,17 +32,12 @@ class ShipRepositoriesImpl extends ShipRepositories {
   Future<Either<Failure, List<ShipEntity>>> getShips(
       int stageId, DateTime date) async {
     try {
-      // final currentUserId = getIt.get<SupabaseClient>().auth.currentUser?.id;
-      // return Right(datas
-      //     .where((e) => e['receipt_number']['user_id'] == currentUserId)
-      //     .map((e) => ShipModel.fromJson(e))
-      //     .toList());
-
-      if (!await isInternetConnected()) return throw NetworkException();
+      if (!await isInternetConnected()) throw NetworkException();
 
       final datas = await shipRemote.getShipsByStageId(stageId, date);
 
-      return Right(datas.map((e) => ShipModel.fromJson(e)).toList());
+      return Right(
+          datas.map((e) => ShipFromShipsDetailModel.fromJson(e)).toList());
     } on NetworkException catch (ne) {
       return Left(Failure(message: ne.message));
     } catch (e) {
@@ -53,7 +49,7 @@ class ShipRepositoriesImpl extends ShipRepositories {
   Future<Either<Failure, String>> insertShip(
       String receiptNumber, String name, int stageId) async {
     try {
-      if (!await isInternetConnected()) return throw NetworkException();
+      if (!await isInternetConnected()) throw NetworkException();
 
       final currentUserId = getIt.get<SupabaseClient>().auth.currentUser?.id;
 
@@ -122,7 +118,7 @@ class ShipRepositoriesImpl extends ShipRepositories {
   Future<Either<Failure, String>> createReport(DateTime date) async {
     try {
       final ships = (await shipRemote.getAllShips(date))
-          .map((e) => ShipModel.fromJson(e))
+          .map((e) => ShipFromShipsDetailModel.fromJson(e))
           .toList();
 
       final workbook = Workbook(7);
@@ -248,9 +244,36 @@ class ShipRepositoriesImpl extends ShipRepositories {
   @override
   Future<Either<Failure, String>> deleteShip(int shipId) async {
     try {
+      if (!await isInternetConnected()) throw NetworkException();
+
       await shipRemote.deleteShip(shipId);
       return const Right('Berhasil Menghapus Resi');
+    } on NetworkException catch (ne) {
+      return Left(Failure(message: ne.message));
     } catch (e) {
+      return Left(Failure());
+    }
+  }
+
+  @override
+  Future<Either<Failure, ShipEntity>> getReceiptStatus(
+      String receiptNumber) async {
+    try {
+      if (!await isInternetConnected()) throw NetworkException();
+
+      final data = await shipRemote.getReceiptStatus(receiptNumber);
+
+      if (data.isEmpty) {
+        return Left(Failure(message: 'Nomor resi tidak ditemukan'));
+      }
+
+      print(data);
+      return Right(ShipFromShipsModel.fromJson(data.first));
+    } on NetworkException catch (ne) {
+      return Left(Failure(message: ne.message));
+    } catch (e, s) {
+      print(e);
+      print(s);
       return Left(Failure(message: e.toString()));
     }
   }

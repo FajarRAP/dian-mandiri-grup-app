@@ -4,6 +4,7 @@ import 'package:bloc/bloc.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
+import 'package:ship_tracker/features/tracker/domain/usecases/get_receipt_status_use_case.dart';
 
 import '../../domain/entities/ship_entity.dart';
 import '../../domain/usecases/create_report_use_case.dart';
@@ -25,6 +26,7 @@ class ShipCubit extends Cubit<ShipState> {
     required this.getAllSpreadsheetFilesUseCase,
     required this.getImageUrlUseCase,
     required this.uploadImageUseCase,
+    required this.getReceiptStatusUseCase,
     required this.camera,
   }) : super(ShipInitial());
 
@@ -35,6 +37,7 @@ class ShipCubit extends Cubit<ShipState> {
   final GetAllSpreadsheetFilesUseCase getAllSpreadsheetFilesUseCase;
   final GetImageUrlUseCase getImageUrlUseCase;
   final UploadImageUseCase uploadImageUseCase;
+  final GetReceiptStatusUseCase getReceiptStatusUseCase;
   final CameraDescription camera;
 
   late ShipEntity ship;
@@ -131,6 +134,17 @@ class ShipCubit extends Cubit<ShipState> {
     result.fold(
       (l) => emit(DeleteShipError(l.message)),
       (r) => emit(DeleteShipSuccess('Berhasil menghapus resi')),
+    );
+  }
+
+  Future<void> getReceiptStatus(String receiptNumber) async {
+    emit(CheckReceiptStatusLoading());
+
+    final result = await getReceiptStatusUseCase(receiptNumber);
+
+    result.fold(
+      (l) => emit(CheckReceiptStatusError(l.message)),
+      (r) => emit(CheckReceiptStatusLoaded(r)),
     );
   }
 }
