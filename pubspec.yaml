@@ -52,6 +52,7 @@ dependencies:
   barcode_scan2: ^4.3.3
   flutter_localizations:
     sdk: flutter
+  dio: ^5.7.0
 
 dev_dependencies:
   flutter_test:

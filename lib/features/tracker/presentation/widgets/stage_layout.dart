@@ -71,6 +71,7 @@ class _StageLayoutState extends State<StageLayout> {
                       onPressed: () async {
                         final datePicked = await showDatePicker(
                             context: context,
+                            confirmText: 'Oke',
                             firstDate: DateTime(2000),
                             lastDate: DateTime(2100),
                             locale: const Locale('id'));

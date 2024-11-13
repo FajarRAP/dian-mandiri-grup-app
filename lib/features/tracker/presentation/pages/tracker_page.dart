@@ -172,7 +172,7 @@ class TrackerPage extends StatelessWidget {
           title: 'Status Resi',
           route: receiptStatusRoute,
           color: Colors.indigo,
-          assetName: reportReceiptIcon,
+          assetName: checkReceiptStatusIcon,
         ),
       ],
     );

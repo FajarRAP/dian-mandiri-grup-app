@@ -117,6 +117,7 @@ class _ReportPageState extends State<ReportPage> {
     final shipCubit = context.read<ShipCubit>();
     date = DateUtils.dateOnly(DateTime.now());
     _dateController.text = DateFormat('d-M-y', 'id_ID').format(DateTime.now());
+    
     await showDialog(
       context: context,
       builder: (context) => AlertDialog(

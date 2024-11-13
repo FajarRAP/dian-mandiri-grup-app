@@ -35,6 +35,7 @@ const packReceiptIcon = "assets/pack.png";
 const sendReceiptIcon = "assets/send.png";
 const returnReceiptIcon = "assets/return.png";
 const reportReceiptIcon = "assets/report.png";
+const checkReceiptStatusIcon = "assets/check-receipt.png";
 
 const successSound = "sounds/success.mp3";
 const skipSound = "sounds/skip.mp3";
@@ -49,4 +50,4 @@ const returnRole = 7;
 const pickUpAndPackRole = 8;
 const packAndSendRole = 9;
 
-enum  ScanType { camera, scannner }
+enum ScanType { camera, scannner }
