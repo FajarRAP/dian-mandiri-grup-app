@@ -3,10 +3,11 @@ import 'dart:io';
 import 'package:dartz/dartz.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:ship_tracker/core/common/constants.dart';
+import 'package:ship_tracker/features/tracker/data/models/ship_from_ships_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:syncfusion_flutter_xlsio/xlsio.dart';
 
+import '../../../../core/common/constants.dart';
 import '../../../../core/exceptions/network_exception.dart';
 import '../../../../core/exceptions/receipt_exception.dart';
 import '../../../../core/failure/failure.dart';
@@ -16,7 +17,7 @@ import '../../domain/entities/ship_entity.dart';
 import '../../domain/repositories/ship_repositories.dart';
 import '../datasources/ship_local_data_source.dart';
 import '../datasources/ship_remote_data_source.dart';
-import '../models/ship_model.dart';
+import '../models/ship_from_ships_detail_model.dart';
 
 class ShipRepositoriesImpl extends ShipRepositories {
   final ShipRemoteDataSource shipRemote;
@@ -28,19 +29,15 @@ class ShipRepositoriesImpl extends ShipRepositories {
   });
 
   @override
-  Future<Either<Failure, List<ShipEntity>>> getShips(int stageId) async {
+  Future<Either<Failure, List<ShipEntity>>> getShips(
+      int stageId, DateTime date) async {
     try {
-      // final currentUserId = getIt.get<SupabaseClient>().auth.currentUser?.id;
-      // return Right(datas
-      //     .where((e) => e['receipt_number']['user_id'] == currentUserId)
-      //     .map((e) => ShipModel.fromJson(e))
-      //     .toList());
+      if (!await isInternetConnected()) throw NetworkException();
 
-      if (!await isInternetConnected()) return throw NetworkException();
+      final datas = await shipRemote.getShipsByStageId(stageId, date);
 
-      final datas = await shipRemote.getShipsByStageId(stageId);
-
-      return Right(datas.map((e) => ShipModel.fromJson(e)).toList());
+      return Right(
+          datas.map((e) => ShipFromShipsDetailModel.fromJson(e)).toList());
     } on NetworkException catch (ne) {
       return Left(Failure(message: ne.message));
     } catch (e) {
@@ -52,7 +49,7 @@ class ShipRepositoriesImpl extends ShipRepositories {
   Future<Either<Failure, String>> insertShip(
       String receiptNumber, String name, int stageId) async {
     try {
-      if (!await isInternetConnected()) return throw NetworkException();
+      if (!await isInternetConnected()) throw NetworkException();
 
       final currentUserId = getIt.get<SupabaseClient>().auth.currentUser?.id;
 
@@ -62,7 +59,7 @@ class ShipRepositoriesImpl extends ShipRepositories {
       }
 
       if (stageId > scanStage) {
-        final datas = await shipRemote.getShips(receiptNumber);
+        final datas = await shipRemote.getShipsByReceiptNumber(receiptNumber);
 
         if (datas.isEmpty) {
           throw ReceiptException(
@@ -118,32 +115,41 @@ class ShipRepositoriesImpl extends ShipRepositories {
   }
 
   @override
-  Future<Either<Failure, String>> createReport() async {
+  Future<Either<Failure, String>> createReport(DateTime date) async {
     try {
-      final ships = (await shipRemote.getAllShips())
-          .map((e) => ShipModel.fromJson(e))
+      final ships = (await shipRemote.getAllShips(date))
+          .map((e) => ShipFromShipsDetailModel.fromJson(e))
           .toList();
 
-      final workbook = Workbook(6);
+      final workbook = Workbook(7);
       final sheet1 = workbook.worksheets[0];
       final sheet2 = workbook.worksheets[1];
       final sheet3 = workbook.worksheets[2];
       final sheet4 = workbook.worksheets[3];
       final sheet5 = workbook.worksheets[4];
       final sheet6 = workbook.worksheets[5];
+      final sheet7 = workbook.worksheets[6];
 
       sheet1.name = 'Semua';
       sheet2.name = 'Scan';
-      sheet3.name = 'Check';
-      sheet4.name = 'Pack';
-      sheet5.name = 'Kirim';
-      sheet6.name = 'Return';
+      sheet3.name = 'Ambil Barang';
+      sheet4.name = 'Check';
+      sheet5.name = 'Pack';
+      sheet6.name = 'Kirim';
+      sheet7.name = 'Return';
 
       generateSheetsData(
         isFirstSheet: true,
         sheet: sheet1,
         datas: ships,
-        title: ['Scan Resi', 'Check Resi', 'Packing', 'Kirim', 'Return'],
+        title: [
+          'Scan Resi',
+          'Ambil Barang',
+          'Check Resi',
+          'Packing',
+          'Kirim',
+          'Return',
+        ],
       );
       generateSheetsData(
         sheet: sheet2,
@@ -154,23 +160,29 @@ class ShipRepositoriesImpl extends ShipRepositories {
       generateSheetsData(
         sheet: sheet3,
         datas: ships,
+        title: ['Ambil Barang'],
+        stageName: 'Pick Up',
+      );
+      generateSheetsData(
+        sheet: sheet4,
+        datas: ships,
         title: ['Check Resi'],
         stageName: 'Check',
       );
       generateSheetsData(
-        sheet: sheet4,
+        sheet: sheet5,
         datas: ships,
         title: ['Packing'],
         stageName: 'Pack',
       );
       generateSheetsData(
-        sheet: sheet5,
+        sheet: sheet6,
         datas: ships,
         title: ['Kirim'],
         stageName: 'Send',
       );
       generateSheetsData(
-        sheet: sheet6,
+        sheet: sheet7,
         datas: ships,
         title: ['Return'],
         stageName: 'Return',
@@ -228,6 +240,43 @@ class ShipRepositoriesImpl extends ShipRepositories {
       return Left(Failure());
     }
   }
+
+  @override
+  Future<Either<Failure, String>> deleteShip(int shipId) async {
+    try {
+      if (!await isInternetConnected()) throw NetworkException();
+
+      await shipRemote.deleteShip(shipId);
+      return const Right('Berhasil Menghapus Resi');
+    } on NetworkException catch (ne) {
+      return Left(Failure(message: ne.message));
+    } catch (e) {
+      return Left(Failure());
+    }
+  }
+
+  @override
+  Future<Either<Failure, ShipEntity>> getReceiptStatus(
+      String receiptNumber) async {
+    try {
+      if (!await isInternetConnected()) throw NetworkException();
+
+      final data = await shipRemote.getReceiptStatus(receiptNumber);
+
+      if (data.isEmpty) {
+        return Left(Failure(message: 'Nomor resi tidak ditemukan'));
+      }
+
+      print(data);
+      return Right(ShipFromShipsModel.fromJson(data.first));
+    } on NetworkException catch (ne) {
+      return Left(Failure(message: ne.message));
+    } catch (e, s) {
+      print(e);
+      print(s);
+      return Left(Failure(message: e.toString()));
+    }
+  }
 }
 
 void generateSheetsData({
@@ -280,7 +329,7 @@ void generateSheetsData({
         '${i + 1}',
         receipts[i],
         ...names,
-        DateFormat('d-M-y').format(temp.last.createdAt)
+        DateFormat('d-M-y').format(temp.last.syncWithWIB)
       ];
 
       for (int j = 0; j < data.length; j++) {
@@ -301,8 +350,9 @@ void generateSheetsData({
         '${i + 1}',
         filtered[i].receipt,
         filtered[i].name,
-        DateFormat('d-M-y').format(filtered[i].createdAt),
-        DateFormat.Hms().format(filtered[i].createdAt)
+        DateFormat('d-M-y').format(filtered[i].syncWithWIB),
+        // Add 7 hours to sync with WIB
+        DateFormat.Hms().format(filtered[i].syncWithWIB)
       ];
 
       for (int j = 0; j < 5; j++) {

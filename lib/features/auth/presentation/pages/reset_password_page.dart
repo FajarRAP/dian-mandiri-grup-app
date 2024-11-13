@@ -67,6 +67,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                     decoration: const InputDecoration(
                       hintText: 'Email',
                     ),
+                    keyboardType: TextInputType.emailAddress,
                     validator: emailValidator,
                   ),
                   const SizedBox(height: 12),

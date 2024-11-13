@@ -1,5 +1,7 @@
 import 'package:camera/camera.dart';
 import 'package:get_it/get_it.dart';
+import 'package:ship_tracker/features/tracker/domain/usecases/delete_ship_use_case.dart';
+import 'package:ship_tracker/features/tracker/domain/usecases/get_receipt_status_use_case.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'features/auth/data/datasources/auth_remote_data_source.dart';
@@ -46,8 +48,8 @@ void setup({required CameraDescription camera}) {
 
   // Ship
   getIt
-    ..registerLazySingleton<ShipRemoteDataSource>(
-        () => ShipRemoteDataSourceImpl(supabase: getIt.get()))
+    ..registerLazySingleton<ShipRemoteDataSource>(() =>
+        ShipRemoteDataSourceImpl(supabase: getIt.get(), environment: 'dev'))
     ..registerLazySingleton<ShipLocalDataSource>(
         () => ShipLocalDataSourceImpl())
     ..registerLazySingleton<ShipRepositories>(() =>
@@ -55,10 +57,12 @@ void setup({required CameraDescription camera}) {
     ..registerLazySingleton(() => ShipCubit(
         getShipsUseCase: GetShipsUseCase(shipRepo: getIt.get()),
         insertShipUseCase: InsertShipUseCase(shipRepo: getIt.get()),
+        deleteShipUseCase: DeleteShipUseCase(shipRepo: getIt.get()),
         createReportUseCase: CreateReportUseCase(shipRepo: getIt.get()),
         getAllSpreadsheetFilesUseCase:
             GetAllSpreadsheetFilesUseCase(shipRepo: getIt.get()),
         getImageUrlUseCase: GetImageUrlUseCase(shipRepo: getIt.get()),
         uploadImageUseCase: UploadImageUseCase(shipRepo: getIt.get()),
+        getReceiptStatusUseCase: GetReceiptStatusUseCase(shipRepo: getIt.get()),
         camera: camera));
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ship_tracker/features/tracker/presentation/pages/pick_up_page.dart';
+import 'package:ship_tracker/features/tracker/presentation/pages/receipt_status_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../features/auth/presentation/pages/get_password_reset_token_page.dart';
@@ -81,6 +82,10 @@ final router = GoRouter(
                 GoRoute(
                   path: 'report',
                   builder: (context, state) => const ReportPage(),
+                ),
+                GoRoute(
+                  path: 'status',
+                  builder: (context, state) => const ReceiptStatusPage(),
                 ),
                 GoRoute(
                   path: 'detail',

@@ -1,10 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:ship_tracker/core/helpers/validators.dart';
 
 import '../../../../core/common/my_elevated_button.dart';
 import '../../../../core/common/snackbar.dart';
+import '../../../../core/helpers/validators.dart';
 import '../cubit/auth_cubit.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -19,6 +19,13 @@ class _RegisterPageState extends State<RegisterPage> {
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool isObsecure = true;
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +50,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     decoration: const InputDecoration(
                       hintText: 'Email',
                     ),
+                    keyboardType: TextInputType.emailAddress,
                     validator: emailValidator,
                   ),
                   const SizedBox(height: 12),
@@ -77,32 +85,34 @@ class _RegisterPageState extends State<RegisterPage> {
                             ),
                           ),
                           DropdownMenuItem(
-                            value: 1,
+                            value: 2,
                             child: Text('Scan Resi'),
                           ),
                           DropdownMenuItem(
-                            value: 2,
-                            child: Text('Scan Checking'),
-                          ),
-                          DropdownMenuItem(
                             value: 3,
-                            child: Text('Scan Packing'),
+                            child: Text('Scan Ambil Resi'),
                           ),
                           DropdownMenuItem(
                             value: 4,
-                            child: Text('Scan Kirim'),
+                            child: Text('Scan Checker'),
                           ),
                           DropdownMenuItem(
                             value: 5,
-                            child: Text('Scan Return'),
+                            child: Text('Scan Packing'),
+                          ),
+                          DropdownMenuItem(
+                            value: 6,
+                            child: Text('Scan Kirim'),
+                          ),
+                          DropdownMenuItem(
+                            value: 7,
+                            child: Text('Scan Retur'),
                           ),
                         ],
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyMedium
-                            ?.copyWith(fontSize: 15),
+                        style:
+                            theme.textTheme.bodyMedium?.copyWith(fontSize: 15),
                         value: authCubit.selectedRole,
-                        validator: (value) => value == 0 ? 'Harap Isi' : null,
+                        validator: dropdownValidator,
                       );
                     },
                   ),
@@ -145,18 +155,5 @@ class _RegisterPageState extends State<RegisterPage> {
         ),
       ),
     );
-  }
-
-  String? validator(String? value, String title) => value!.trim().isEmpty
-      ? 'Harap Isi'
-      : value.length < 6
-          ? '$title minimal 6 karakter'
-          : null;
-
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
   }
 }

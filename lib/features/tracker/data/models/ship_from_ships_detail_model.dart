@@ -1,15 +1,19 @@
 import '../../domain/entities/ship_entity.dart';
 
-class ShipModel extends ShipEntity {
-  ShipModel({
+class ShipFromShipsDetailModel extends ShipEntity {
+  ShipFromShipsDetailModel({
+    required super.id,
     required super.receipt,
-    required super.name,
     required super.stage,
+    required super.name,
     required super.userId,
     required super.createdAt,
   });
 
-  factory ShipModel.fromJson(Map<String, dynamic> json) => ShipModel(
+  
+
+  factory ShipFromShipsDetailModel.fromJson(Map<String, dynamic> json) => ShipFromShipsDetailModel(
+        id: json['receipt_number']['id'],
         receipt: json['receipt_number']['receipt_number'],
         name: json['name'],
         stage: json['stage_name']['name'],

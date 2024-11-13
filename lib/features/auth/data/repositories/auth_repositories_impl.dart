@@ -68,7 +68,7 @@ class AuthRepositoriesImpl implements AuthRepositories {
 
       final response =
           await authRemote.updateUser(UserAttributes(data: metadata));
-      print(response);
+
       return Right(UserModel.fromUser(response.user!));
     } on NetworkException catch (ne) {
       return Left(Failure(message: ne.message));
@@ -84,11 +84,10 @@ class AuthRepositoriesImpl implements AuthRepositories {
       if (!await isInternetConnected()) throw NetworkException();
 
       // Dibalik layar langsung login
-      final attempt = await authRemote.verifyOTP(email, token);
+      await authRemote.verifyOTP(email, token);
       final response =
           await authRemote.updateUser(UserAttributes(password: password));
-      print(attempt);
-      print(response);
+
       return Right(UserModel.fromUser(response.user!));
     } on NetworkException catch (ne) {
       return Left(Failure(message: ne.message));

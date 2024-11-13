@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ship_tracker/service_container.dart';
-import 'package:supabase_flutter/supabase_flutter.dart' as sp;
 
 import '../../../../core/common/constants.dart';
 import '../../../../core/common/snackbar.dart';
@@ -36,40 +34,89 @@ class TrackerPage extends StatelessWidget {
 
   Widget _buildTrackerPage(int? role) {
     switch (role) {
-      case 1:
+      case scanRole:
         return const HomeMenuCard(
           title: 'Scan Resi',
           route: scanReceiptRoute,
           color: Colors.blue,
+          assetName: scanReceiptIcon,
           size: 200,
         );
-      case 2:
+      case pickUpRole:
         return const HomeMenuCard(
-          title: 'Scan Checking',
+          title: 'Scan Ambil Resi',
+          route: pickUpReceiptRoute,
+          color: Colors.brown,
+          assetName: pickUpReceiptIcon,
+          size: 200,
+        );
+      case checkRole:
+        return const HomeMenuCard(
+          title: 'Scan Checker',
           route: checkReceiptRoute,
           color: Colors.red,
+          assetName: checkReceiptIcon,
           size: 200,
         );
-      case 3:
+      case packRole:
         return const HomeMenuCard(
           title: 'Scan Packing',
           route: packReceiptRoute,
           color: Colors.green,
+          assetName: packReceiptIcon,
           size: 200,
         );
-      case 4:
+      case sendRole:
         return const HomeMenuCard(
           title: 'Scan Kirim',
           route: sendReceiptRoute,
           color: Colors.orange,
+          assetName: sendReceiptIcon,
           size: 200,
         );
-      case 5:
+      case returnRole:
         return const HomeMenuCard(
-          title: 'Scan Return',
+          title: 'Scan Retur',
           route: returnReceiptRoute,
           color: Colors.purple,
+          assetName: returnReceiptIcon,
           size: 200,
+        );
+      case pickUpAndPackRole:
+        return const MyGridViewCount(
+          physics: NeverScrollableScrollPhysics(),
+          children: <Widget>[
+            HomeMenuCard(
+              title: 'Scan Ambil Resi',
+              route: pickUpReceiptRoute,
+              color: Colors.brown,
+              assetName: pickUpReceiptIcon,
+            ),
+            HomeMenuCard(
+              title: 'Scan Packing',
+              route: packReceiptRoute,
+              color: Colors.green,
+              assetName: packReceiptIcon,
+            )
+          ],
+        );
+      case packAndSendRole:
+        return const MyGridViewCount(
+          physics: NeverScrollableScrollPhysics(),
+          children: <Widget>[
+            HomeMenuCard(
+              title: 'Scan Packing',
+              route: packReceiptRoute,
+              color: Colors.green,
+              assetName: packReceiptIcon,
+            ),
+            HomeMenuCard(
+              title: 'Scan Kirim',
+              route: sendReceiptRoute,
+              color: Colors.orange,
+              assetName: sendReceiptIcon,
+            )
+          ],
         );
       default:
         return _buildAdminPage();
@@ -77,60 +124,81 @@ class TrackerPage extends StatelessWidget {
   }
 
   Widget _buildAdminPage() {
-    return GridView.count(
-      crossAxisCount: 2,
-      mainAxisSpacing: 16,
-      crossAxisSpacing: 10,
-      padding: const EdgeInsets.all(16),
-      children: const <Widget>[
+    return const MyGridViewCount(
+      children: <Widget>[
         HomeMenuCard(
           title: 'Scan Resi',
           route: scanReceiptRoute,
           color: Colors.blue,
+          assetName: scanReceiptIcon,
         ),
         HomeMenuCard(
           title: 'Scan Ambil Resi',
           route: pickUpReceiptRoute,
           color: Colors.brown,
+          assetName: pickUpReceiptIcon,
         ),
         HomeMenuCard(
           title: 'Scan Checker',
           route: checkReceiptRoute,
           color: Colors.red,
+          assetName: checkReceiptIcon,
         ),
         HomeMenuCard(
           title: 'Scan Packing',
           route: packReceiptRoute,
           color: Colors.green,
+          assetName: packReceiptIcon,
         ),
         HomeMenuCard(
           title: 'Scan Kirim',
           route: sendReceiptRoute,
           color: Colors.orange,
+          assetName: sendReceiptIcon,
         ),
         HomeMenuCard(
-          title: 'Scan Return',
+          title: 'Scan Retur',
           route: returnReceiptRoute,
           color: Colors.purple,
+          assetName: returnReceiptIcon,
         ),
         HomeMenuCard(
           title: 'Laporan',
           route: reportRoute,
           color: Colors.teal,
-          icon: Icons.line_axis_rounded,
+          assetName: reportReceiptIcon,
         ),
-        // ElevatedButton(
-        //   onPressed: () async {
-        //     final res = await getIt.get<sp.SupabaseClient>().auth.signUp(
-        //       password: '072489tk',
-        //       email: 'diandi.adm2@gmail.com',
-        //       data: {'is_admin': true},
-        //     );
-        //     print(res.user);
-        //   },
-        //   child: const Text('REG'),
-        // ),
+        HomeMenuCard(
+          title: 'Status Resi',
+          route: receiptStatusRoute,
+          color: Colors.indigo,
+          assetName: checkReceiptStatusIcon,
+        ),
       ],
+    );
+  }
+}
+
+class MyGridViewCount extends StatelessWidget {
+  const MyGridViewCount({
+    super.key,
+    required this.children,
+    this.physics,
+  });
+
+  final List<Widget> children;
+  final ScrollPhysics? physics;
+
+  @override
+  Widget build(BuildContext context) {
+    return GridView.count(
+      crossAxisCount: 2,
+      crossAxisSpacing: 10,
+      mainAxisSpacing: 16,
+      padding: const EdgeInsets.all(16),
+      physics: physics,
+      shrinkWrap: true,
+      children: children,
     );
   }
 }

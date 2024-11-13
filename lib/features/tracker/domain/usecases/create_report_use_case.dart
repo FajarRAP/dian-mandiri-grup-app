@@ -8,5 +8,5 @@ class CreateReportUseCase {
 
   CreateReportUseCase({required this.shipRepo});
 
-  Future<Either<Failure, String>> call() async => await shipRepo.createReport();
+  Future<Either<Failure, String>> call(DateTime date) async => await shipRepo.createReport(date);
 }

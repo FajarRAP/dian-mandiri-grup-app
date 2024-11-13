@@ -9,6 +9,6 @@ class GetShipsUseCase {
 
   GetShipsUseCase({required this.shipRepo});
 
-  Future<Either<Failure, List<ShipEntity>>> call(int stageId) async =>
-      await shipRepo.getShips(stageId);
+  Future<Either<Failure, List<ShipEntity>>> call(int stageId, DateTime date) async =>
+      await shipRepo.getShips(stageId, date);
 }

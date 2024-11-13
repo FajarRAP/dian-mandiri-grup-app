@@ -52,6 +52,7 @@ class _LoginPageState extends State<LoginPage> {
                     decoration: const InputDecoration(
                       hintText: 'Email',
                     ),
+                    keyboardType: TextInputType.emailAddress,
                     validator: emailValidator,
                   ),
                   const SizedBox(height: 12),

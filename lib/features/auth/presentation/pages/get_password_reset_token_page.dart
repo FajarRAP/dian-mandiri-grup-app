@@ -56,6 +56,7 @@ class _GetPasswordResetTokenPageState extends State<GetPasswordResetTokenPage> {
                 onChanged: (value) {
                   if (!_formKey.currentState!.validate()) return;
                 },
+                keyboardType: TextInputType.emailAddress,
                 validator: emailValidator,
               ),
             ),

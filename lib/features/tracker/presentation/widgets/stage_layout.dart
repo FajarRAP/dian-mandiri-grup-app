@@ -1,22 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
 import '../../../../core/common/constants.dart';
 import '../../../../core/helpers/courier_identifier.dart';
+import '../../../../core/helpers/on_tap_scan.dart';
+import '../../../auth/presentation/cubit/auth_cubit.dart';
+import '../../domain/entities/ship_entity.dart';
 import '../cubit/ship_cubit.dart';
+import 'action_button.dart';
+import 'delete_data_alert_dialog.dart';
+import 'expandable_fab.dart';
 
 class StageLayout extends StatefulWidget {
   const StageLayout({
     super.key,
     required this.appBarTitle,
     required this.stageId,
-    required this.onTap,
   });
 
   final String appBarTitle;
   final int stageId;
-  final Future<void> Function() onTap;
 
   @override
   State<StageLayout> createState() => _StageLayoutState();
@@ -24,6 +29,7 @@ class StageLayout extends StatefulWidget {
 
 class _StageLayoutState extends State<StageLayout> {
   final _controller = TextEditingController();
+  var date = DateUtils.dateOnly(DateTime.now());
 
   @override
   void dispose() {
@@ -34,6 +40,7 @@ class _StageLayoutState extends State<StageLayout> {
   @override
   Widget build(BuildContext context) {
     final shipCubit = context.read<ShipCubit>();
+    final dateFormat = DateFormat('d-M-y', 'id_ID');
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
 
@@ -45,18 +52,51 @@ class _StageLayoutState extends State<StageLayout> {
         children: [
           Container(
             color: theme.colorScheme.surface,
-            padding: const EdgeInsets.all(16),
-            child: TextField(
-              controller: _controller,
-              decoration: const InputDecoration(
-                hintText: 'Cari Resi',
-                suffixIcon: Icon(Icons.search),
-              ),
-              onChanged: shipCubit.filterShips,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Column(
+              children: [
+                const SizedBox(height: 16),
+                TextField(
+                  controller: _controller,
+                  decoration: const InputDecoration(
+                    hintText: 'Cari Resi',
+                    suffixIcon: Icon(Icons.search),
+                  ),
+                  onChanged: shipCubit.filterShips,
+                ),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: StatefulBuilder(
+                    builder: (context, setState) => TextButton.icon(
+                      onPressed: () async {
+                        final datePicked = await showDatePicker(
+                            context: context,
+                            confirmText: 'Oke',
+                            firstDate: DateTime(2000),
+                            lastDate: DateTime(2100),
+                            locale: const Locale('id'));
+                        if (datePicked != null) {
+                          setState(() => date = datePicked);
+                          shipCubit.getShips(widget.stageId, date);
+                        }
+                      },
+                      iconAlignment: IconAlignment.end,
+                      icon: const Icon(Icons.calendar_month_outlined),
+                      label: Text(
+                        dateFormat.format(date),
+                        style: TextStyle(
+                          color: theme.colorScheme.primary,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
           BlocBuilder<ShipCubit, ShipState>(
-            bloc: shipCubit..getShips(widget.stageId),
+            bloc: shipCubit..getShips(widget.stageId, date),
             buildWhen: (previous, current) => current is GetShip,
             builder: (context, state) {
               if (state is ShipLoading) {
@@ -73,7 +113,8 @@ class _StageLayoutState extends State<StageLayout> {
                   child: Expanded(
                     child: RefreshIndicator(
                       displacement: 12,
-                      onRefresh: () async => shipCubit.getShips(widget.stageId),
+                      onRefresh: () async =>
+                          shipCubit.getShips(widget.stageId, date),
                       child: ListView.separated(
                         padding: const EdgeInsets.all(16),
                         separatorBuilder: (context, index) =>
@@ -93,7 +134,8 @@ class _StageLayoutState extends State<StageLayout> {
                                 style: textTheme.titleLarge,
                               ),
                               Text(
-                                state.ships[index].formattedDate,
+                                DateFormat('d-MM-y')
+                                    .format(state.ships[index].syncWithWIB),
                                 style: textTheme.bodyMedium,
                               ),
                             ],
@@ -102,13 +144,7 @@ class _StageLayoutState extends State<StageLayout> {
                             state.ships[index].receipt,
                             style: textTheme.titleMedium,
                           ),
-                          trailing: GestureDetector(
-                            onTap: () {
-                              print(state.ships[index].userId);
-                              print('Hapus Resi ${state.ships[index].receipt}');
-                            },
-                            child: const Icon(Icons.delete),
-                          ),
+                          trailing: _buildDeleteButton(state.ships[index]),
                         ),
                         itemCount: state.ships.length,
                       ),
@@ -135,10 +171,43 @@ class _StageLayoutState extends State<StageLayout> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: widget.onTap,
-        child: const Icon(Icons.document_scanner_rounded),
+      floatingActionButton: ExpandableFabMine(
+        distance: 90,
+        children: [
+          ActionButton(
+            onPressed: () => onTapScan(
+              context,
+              widget.stageId,
+              ScanType.camera,
+            ),
+            icon: Icons.document_scanner_rounded,
+          ),
+          ActionButton(
+            onPressed: () => onTapScan(
+              context,
+              widget.stageId,
+              ScanType.scannner,
+            ),
+            icon: Icons.barcode_reader,
+          ),
+        ],
       ),
+    );
+  }
+
+  Widget _buildDeleteButton(ShipEntity ship) {
+    final bool isAdmin =
+        context.read<AuthCubit>().user?.userMetadata?['is_admin'] == true;
+
+    if (!isAdmin) return const SizedBox();
+
+    return GestureDetector(
+      onTap: () => showDialog(
+        context: context,
+        builder: (context) =>
+            DeleteDataAlertDialog(stageId: widget.stageId, shipId: ship.id),
+      ),
+      child: const Icon(Icons.delete),
     );
   }
 }

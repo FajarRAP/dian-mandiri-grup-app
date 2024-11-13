@@ -9,6 +9,8 @@ class GetShip extends ShipState {}
 
 class InsertShip extends ShipState {}
 
+class DeleteShip extends ShipState {}
+
 class ShipLoading extends GetShip {}
 
 class ShipLoaded extends GetShip {
@@ -38,6 +40,20 @@ class InsertShipError extends InsertShip {
   final String message;
 
   InsertShipError(this.statusCode, this.message);
+}
+
+class DeleteShipLoading extends DeleteShip {}
+
+class DeleteShipSuccess extends DeleteShip {
+  final String message;
+
+  DeleteShipSuccess(this.message);
+}
+
+class DeleteShipError extends DeleteShip {
+  final String message;
+
+  DeleteShipError(this.message);
 }
 
 class ReportLoading extends ShipState {}
@@ -92,4 +108,16 @@ class UploadImageError extends UploadImage {
   final String message;
 
   UploadImageError(this.message);
+}
+
+class CheckReceiptStatusLoading extends ShipState {}
+class CheckReceiptStatusLoaded extends ShipState {
+  final ShipEntity ship;
+
+  CheckReceiptStatusLoaded(this.ship);
+}
+class CheckReceiptStatusError extends ShipState {
+  final String message;
+
+  CheckReceiptStatusError(this.message);
 }

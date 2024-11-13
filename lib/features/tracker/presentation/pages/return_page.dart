@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/common/constants.dart';
-import '../../../../core/helpers/on_tap_scan.dart';
 import '../widgets/stage_layout.dart';
 
 class ReturnPage extends StatelessWidget {
@@ -9,10 +8,10 @@ class ReturnPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StageLayout(
+    return const StageLayout(
       appBarTitle: 'Scan Return',
       stageId: returnStage,
-      onTap: () async => await onTapScan(context, returnStage),
+      
     );
   }
 }

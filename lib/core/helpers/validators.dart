@@ -18,6 +18,14 @@ String? inputValidator(String? value) {
   return null;
 }
 
+String? dropdownValidator(dynamic value) {
+  if (value == 0) {
+    return 'Harap Isi';
+  }
+
+  return null;
+}
+
 String? tokenValidator(String? value) {
   if (value == null || value.isEmpty) {
     return 'Harap Isi Kode Reset';
