@@ -1,26 +1,22 @@
+import 'package:camera/camera.dart';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ship_tracker/features/tracker/presentation/pages/pick_up_page.dart';
-import 'package:ship_tracker/features/tracker/presentation/pages/receipt_status_page.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../features/auth/presentation/pages/get_password_reset_token_page.dart';
-import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/profile_page.dart';
-import '../../features/auth/presentation/pages/register_page.dart';
-import '../../features/auth/presentation/pages/reset_password_page.dart';
-import '../../features/tracker/presentation/cubit/ship_cubit.dart';
+import '../../features/auth/presentation/pages/sign_in_page.dart';
 import '../../features/tracker/presentation/pages/check_page.dart';
-import '../../features/tracker/presentation/pages/detail_ship_page.dart';
 import '../../features/tracker/presentation/pages/pack_page.dart';
+import '../../features/tracker/presentation/pages/pick_up_page.dart';
+import '../../features/tracker/presentation/pages/receipt_status_page.dart';
 import '../../features/tracker/presentation/pages/report_page.dart';
 import '../../features/tracker/presentation/pages/return_page.dart';
 import '../../features/tracker/presentation/pages/scan_page.dart';
 import '../../features/tracker/presentation/pages/send_page.dart';
+import '../../features/tracker/presentation/pages/shipment_detail_page.dart';
 import '../../features/tracker/presentation/pages/tracker_page.dart';
 import '../../features/tracker/presentation/pages/upload_page.dart';
 import '../../features/tracker/presentation/widgets/open_camera.dart';
-import '../../service_container.dart';
+import '../../main.dart';
 import '../common/constants.dart';
 import '../common/scaffold_with_bottom_navigation_bar.dart';
 
@@ -40,9 +36,7 @@ final _profileNavigatorKey = GlobalKey<NavigatorState>();
 
 final router = GoRouter(
   navigatorKey: _rootNavigatorkey,
-  initialLocation: getIt.get<SupabaseClient>().auth.currentSession == null
-      ? loginRoute
-      : trackerRoute,
+  initialLocation: initialLocation,
   routes: [
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) =>
@@ -89,7 +83,8 @@ final router = GoRouter(
                 ),
                 GoRoute(
                   path: 'detail',
-                  builder: (context, state) => const DetailShipPage(),
+                  builder: (context, state) =>
+                      ShipmentDetailPage(shipmentId: state.extra as String),
                 ),
               ],
             ),
@@ -101,12 +96,6 @@ final router = GoRouter(
             GoRoute(
               path: profileRoute,
               builder: (context, state) => const ProfilePage(),
-              routes: <RouteBase>[
-                GoRoute(
-                  path: 'register',
-                  builder: (context, state) => const RegisterPage(),
-                ),
-              ],
             ),
           ],
         ),
@@ -116,35 +105,21 @@ final router = GoRouter(
       path: loginRoute,
       pageBuilder: (context, state) => CustomTransitionPage(
           key: state.pageKey,
-          child: const LoginPage(),
-          transitionsBuilder: transitionsBuilder),
-    ),
-    GoRoute(
-      path: getTokenResetPasswordRoute,
-      pageBuilder: (context, state) => CustomTransitionPage(
-          key: state.pageKey,
-          child: const GetPasswordResetTokenPage(),
-          transitionsBuilder: transitionsBuilder),
-    ),
-    GoRoute(
-      path: resetPasswordRoute,
-      pageBuilder: (context, state) => CustomTransitionPage(
-          key: state.pageKey,
-          child: const ResetPasswordPage(),
+          child: const SignInPage(),
           transitionsBuilder: transitionsBuilder),
     ),
     GoRoute(
       path: cameraRoute,
       pageBuilder: (context, state) => CustomTransitionPage(
           key: state.pageKey,
-          child: TakePictureScreen(camera: getIt.get<ShipCubit>().camera),
+          child: TakePictureScreen(camera: cameras.first),
           transitionsBuilder: transitionsBuilder),
     ),
     GoRoute(
       path: displayPictureRoute,
       pageBuilder: (context, state) => CustomTransitionPage(
           key: state.pageKey,
-          child: const DisplayPictureScreen(),
+          child: DisplayPictureScreen(image: state.extra as XFile),
           transitionsBuilder: transitionsBuilder),
     )
   ],
