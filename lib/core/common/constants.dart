@@ -1,3 +1,5 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 const loginRoute = "/login";
 const getTokenResetPasswordRoute = "/get-token-reset-password";
 const resetPasswordRoute = "/reset-password";
@@ -20,12 +22,12 @@ const registerRoute = "$profileRoute/register";
 const barcodeScannerRoute = "/barcode-scanner";
 const displayPictureRoute = "/picture";
 
-const scanStage = 2;
-const pickUpStage = 3;
-const checkStage = 4;
-const packStage = 5;
-const sendStage = 6;
-const returnStage = 7;
+const scanStage = 'scan';
+const pickUpStage = 'pick_up';
+const checkStage = 'check';
+const packStage = 'pack';
+const sendStage = 'send';
+const returnStage = 'return';
 
 const spreadsheetIcon = "assets/excel.png";
 const scanReceiptIcon = "assets/scan.png";
@@ -36,6 +38,7 @@ const sendReceiptIcon = "assets/send.png";
 const returnReceiptIcon = "assets/return.png";
 const reportReceiptIcon = "assets/report.png";
 const checkReceiptStatusIcon = "assets/check-receipt.png";
+const googleIcon = "assets/google-icon.png";
 
 const successSound = "sounds/success.mp3";
 const skipSound = "sounds/skip.mp3";
@@ -50,4 +53,23 @@ const returnRole = 7;
 const pickUpAndPackRole = 8;
 const packAndSendRole = 9;
 
+const superAdminPermission = 'super_admin';
+const scanPermission = 'shipment:$scanStage';
+const pickUpPermission = 'shipment:$pickUpStage';
+const checkPermission = 'shipment:$checkStage';
+const packPermission = 'shipment:$packStage';
+const sendPermission = 'shipment:$sendStage';
+const returnPermission = 'shipment:$returnStage';
+
+const pendingReport = 'pending';
+const processingReport = 'processing';
+const completedReport = 'completed';
+const failedReport = 'failed';
+
 enum ScanType { camera, scannner }
+
+final shipmentEndpoint = dotenv.get('SHIPMENT_ENDPOINT');
+final authEndpoint = dotenv.get('AUTH_ENDPOINT');
+final accessTokenKey = dotenv.get('ACCESS_TOKEN_KEY');
+final refreshTokenKey = dotenv.get('REFRESH_TOKEN_KEY');
+final userKey = dotenv.get('USER_KEY');
