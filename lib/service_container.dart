@@ -48,8 +48,15 @@ void setup() {
             final refreshToken = await storage.read(key: refreshTokenKey);
             final authRepository = getIt.get<AuthRepository>();
 
-            if (error.response?.statusCode == 401) {
-              await authRepository.refreshToken(refreshToken: '$refreshToken');
+            if (error.requestOptions.path == '$authEndpoint/refresh') {
+              if (error.response?.statusCode == 401) {
+                await storage.deleteAll();
+              }
+            } else {
+              if (error.response?.statusCode == 401 && refreshToken != null) {
+                await authRepository.refreshToken(
+                    refreshToken: refreshToken);
+              }
             }
 
             return handler.next(error);
@@ -66,6 +73,14 @@ void setup() {
             }
 
             return handler.next(options);
+          },
+          onResponse: (response, handler) async {
+            final storage = getIt.get<FlutterSecureStorage>();
+            if (response.requestOptions.path == '$authEndpoint/refresh' &&
+                response.statusCode == 401) {
+              await storage.deleteAll();
+            }
+            return handler.next(response);
           },
         ),
       ),
