@@ -1,46 +1,57 @@
 import 'dart:io';
 
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/common/snackbar.dart';
-import '../cubit/ship_cubit.dart';
+import '../cubit/shipment_cubit.dart';
 
 class DisplayPictureScreen extends StatelessWidget {
-  const DisplayPictureScreen({super.key});
+  const DisplayPictureScreen({super.key, required this.image});
+
+  final XFile image;
 
   @override
   Widget build(BuildContext context) {
-    final shipCubit = context.read<ShipCubit>();
-    final file = File(shipCubit.picturePath);
-    final toPath = '${shipCubit.ship.receipt}-${shipCubit.ship.stage}';
+    final shipmentCubit = context.read<ShipmentCubit>();
+    final shipmentId = shipmentCubit.shipmentDetail.id;
+    final file = File(image.path);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Upload Gambar Resi'),
-      ),
+      appBar: AppBar(title: const Text('Upload Gambar Resi')),
       body: Column(
         children: [
           Image.file(file),
           const SizedBox(height: 24),
-          BlocConsumer<ShipCubit, ShipState>(
-            buildWhen: (previous, current) => current is UploadImage,
+          BlocConsumer<ShipmentCubit, ShipmentState>(
+            buildWhen: (previous, current) => current is InsertShipmentDocument,
             listener: (context, state) {
-              if (state is ImageUploaded) {
-                flushbar(context, 'Berhasil Upload Gambar');
+              if (state is InsertShipmentDocumentLoaded) {
+                flushbar(state.message);
+                shipmentCubit.fetchShipmentById(shipmentId: shipmentId);
+                context.pop();
+                context.pop();
               }
-              if (state is UploadImageError) {
-                flushbar(context, state.message);
+
+              if (state is InsertShipmentDocumentError) {
+                flushbar(state.message);
               }
             },
             builder: (context, state) {
-              if (state is ImageUploading) {
+              if (state is InsertShipmentDocumentLoading) {
                 return const CircularProgressIndicator();
               }
+
               return ElevatedButton(
                 onPressed: () async =>
-                    await shipCubit.uploadImage(toPath, file),
-                child: const Text('Upload'),
+                    await shipmentCubit.insertShipmentDocument(
+                  shipmentId: shipmentId,
+                  image: image,
+                  stage: shipmentCubit.shipmentDetail.stage,
+                ),
+                child: const Text('Unggah'),
               );
             },
           ),

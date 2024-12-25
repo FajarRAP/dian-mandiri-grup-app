@@ -10,8 +10,7 @@ class ReturnPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return const StageLayout(
       appBarTitle: 'Scan Return',
-      stageId: returnStage,
-      
+      stage: returnStage,
     );
   }
 }

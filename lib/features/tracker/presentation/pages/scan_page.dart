@@ -10,8 +10,7 @@ class ScanPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return const StageLayout(
       appBarTitle: 'Scan Resi',
-      stageId: scanStage,
-      
+      stage: scanStage,
     );
   }
 }

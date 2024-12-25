@@ -37,11 +37,7 @@ class HomeMenuCard extends StatelessWidget {
                   color: color[100],
                 ),
                 padding: const EdgeInsets.all(6),
-                child: Image.asset(
-                  assetName,
-                  width: 72,
-                  height: 72,
-                ),
+                child: Image.asset(assetName, height: 72, width: 72),
               ),
               const SizedBox(height: 14),
               Text(title, style: textTheme.titleLarge),
