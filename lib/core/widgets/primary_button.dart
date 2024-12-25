@@ -5,12 +5,12 @@ class MyElevatedButton extends StatelessWidget {
     super.key,
     required this.label,
     required this.icon,
-    required this.onPressed,
+    this.onPressed,
   });
 
   final Widget label;
   final IconData icon;
-  final Future<void> Function() onPressed;
+  final Future<void> Function()? onPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -20,6 +20,7 @@ class MyElevatedButton extends StatelessWidget {
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
         backgroundColor: theme.colorScheme.primary,
+        foregroundColor: theme.colorScheme.onPrimary,
         fixedSize: Size(MediaQuery.sizeOf(context).width, 64),
         padding: const EdgeInsets.symmetric(vertical: 14),
         shape: RoundedRectangleBorder(
