@@ -1,11 +1,13 @@
-import 'package:supabase_flutter/supabase_flutter.dart';
-
-class UserEntity extends User {
-  UserEntity({
-    required super.id,
-    required super.appMetadata,
-    required super.userMetadata,
-    required super.aud,
-    required super.createdAt,
+class UserEntity {
+  const UserEntity({
+    required this.id,
+    required this.name,
+    required this.email,
+    required this.permissions,
   });
+
+  final String id;
+  final String name;
+  final String email;
+  final List<String> permissions;
 }
