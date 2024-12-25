@@ -2,23 +2,23 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import '../../../auth/presentation/cubit/auth_cubit.dart';
 
 import '../../../../core/common/constants.dart';
 import '../../../../core/common/snackbar.dart';
+import '../../../../core/helpers/helpers.dart';
 import '../../../../core/helpers/validators.dart';
-import '../../../auth/presentation/cubit/auth_cubit.dart';
-import '../cubit/ship_cubit.dart';
+import '../cubit/shipment_cubit.dart';
 
 class InsertDataFromScannerAlertDialog extends StatefulWidget {
   const InsertDataFromScannerAlertDialog({
     super.key,
     required this.audioPlayer,
-    required this.stageId,
+    required this.stage,
   });
 
   final AudioPlayer audioPlayer;
-
-  final int stageId;
+  final String stage;
 
   @override
   State<InsertDataFromScannerAlertDialog> createState() =>
@@ -27,28 +27,26 @@ class InsertDataFromScannerAlertDialog extends StatefulWidget {
 
 class _InsertDataFromScannerAlertDialogState
     extends State<InsertDataFromScannerAlertDialog> {
-  final _controller = TextEditingController();
+  final _receiptController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
   @override
   void dispose() {
-    _controller.dispose();
+    _receiptController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final shipmentCubit = context.read<ShipmentCubit>();
+    final authCubit = context.read<AuthCubit>();
     final textTheme = Theme.of(context).textTheme;
-    final String name = context.read<AuthCubit>().user?.userMetadata?['name'] ??
-        'Tidak Diketahui';
 
     return AlertDialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       title: Text(
         'Silakan Scan',
-        style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+        style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
       ),
       content: Form(
         key: _formKey,
@@ -56,82 +54,69 @@ class _InsertDataFromScannerAlertDialogState
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Nomor Resi:',
-              style: textTheme.bodyMedium,
-            ),
+            Text('Nomor Resi:', style: textTheme.bodyMedium),
             const SizedBox(height: 4),
             TextFormField(
               autofocus: true,
-              controller: _controller,
-              decoration: const InputDecoration(
-                hintText: 'Hasil Scan',
-              ),
+              controller: _receiptController,
+              decoration: const InputDecoration(hintText: 'Hasil Scan'),
               focusNode: FocusNode(),
               validator: inputValidator,
             ),
             const SizedBox(height: 16),
+            Text('Nama Pemindai:', style: textTheme.bodyMedium),
             Text(
-              'Nama Pemindai:',
-              style: textTheme.bodyMedium,
-            ),
-            Text(
-              name,
-              style: textTheme.bodyLarge?.copyWith(
-                color: Colors.green,
-                fontWeight: FontWeight.w600,
-              ),
+              authCubit.user.name,
+              style: textTheme.bodyLarge
+                  ?.copyWith(color: Colors.green, fontWeight: FontWeight.w600),
             ),
           ],
         ),
       ),
       actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Batal'),
-        ),
+        TextButton(onPressed: context.pop, child: const Text('Batal')),
         TextButton(
           onPressed: () async {
-            if (_formKey.currentState!.validate()) {
-              await context
-                  .read<ShipCubit>()
-                  .insertShip(_controller.text.trim(), name, widget.stageId);
-            }
+            if (!_formKey.currentState!.validate()) return;
+
+            await shipmentCubit.insertShipment(
+                receiptNumber: _receiptController.text.trim(),
+                stage: widget.stage);
           },
-          child: BlocConsumer<ShipCubit, ShipState>(
-            buildWhen: (previous, current) => current is InsertShip,
+          child: BlocConsumer<ShipmentCubit, ShipmentState>(
+            buildWhen: (previous, current) => current is InsertShipment,
             listener: (context, state) async {
-              if (state is InsertShipFinished) {
+              if (state is InsertShipmentLoaded) {
                 context.pop();
-                context.read<ShipCubit>().getShips(widget.stageId, DateTime.now());
-                flushbar(context, state.message);
+                flushbar(state.message);
                 await widget.audioPlayer.play(AssetSource(successSound));
+                await shipmentCubit.fetchShipments(
+                    date: dateFormat.format(DateTime.now()),
+                    stage: widget.stage);
               }
-              if (state is InsertShipError) {
-                if (!context.mounted) return;
+              if (state is InsertShipmentError) {
+                flushbar(state.failure.message);
 
-                flushbar(context, state.message);
-
-                switch (state.statusCode) {
-                  case 400:
-                    await widget.audioPlayer.play(AssetSource(skipSound));
-                    break;
-                  case 401:
-                  case 23505:
-                    await widget.audioPlayer.play(AssetSource(repeatSound));
-                    break;
-                }
+                // Need requested
+                // switch (state.statusCode) {
+                //   case 400:
+                //     await widget.audioPlayer.play(AssetSource(skipSound));
+                //     break;
+                //   case 401:
+                //   case 23505:
+                //     await widget.audioPlayer.play(AssetSource(repeatSound));
+                //     break;
+                // }
               }
             },
             builder: (context, state) {
-              if (state is InsertShipLoading) {
+              if (state is InsertShipmentLoading) {
                 return const CircularProgressIndicator();
               }
+
               return const Text(
                 'Simpan',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontWeight: FontWeight.w700),
               );
             },
           ),

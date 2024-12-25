@@ -1,68 +1,133 @@
-import 'package:camera/camera.dart';
+import 'package:dio/dio.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
-import 'package:ship_tracker/features/tracker/domain/usecases/delete_ship_use_case.dart';
-import 'package:ship_tracker/features/tracker/domain/usecases/get_receipt_status_use_case.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
+import 'core/common/constants.dart';
 import 'features/auth/data/datasources/auth_remote_data_source.dart';
-import 'features/auth/data/repositories/auth_repositories_impl.dart';
-import 'features/auth/domain/repositories/auth_repositories.dart';
-import 'features/auth/domain/usecases/login_use_case.dart';
-import 'features/auth/domain/usecases/logout_use_case.dart';
-import 'features/auth/domain/usecases/register_use_case.dart';
-import 'features/auth/domain/usecases/reset_password_use_case.dart';
-import 'features/auth/domain/usecases/send_password_reset_token_use_case.dart';
-import 'features/auth/domain/usecases/update_user_use_case.dart';
+import 'features/auth/data/repositories/auth_repository_impl.dart';
+import 'features/auth/domain/repositories/auth_repository.dart';
+import 'features/auth/domain/usecases/fetch_user_from_storage_use_case.dart';
+import 'features/auth/domain/usecases/fetch_user_use_case.dart';
+import 'features/auth/domain/usecases/refresh_token_use_case.dart';
+import 'features/auth/domain/usecases/sign_in_use_case.dart';
+import 'features/auth/domain/usecases/sign_out_use_case.dart';
+import 'features/auth/domain/usecases/update_profile_use_case.dart';
 import 'features/auth/presentation/cubit/auth_cubit.dart';
-import 'features/tracker/data/datasources/ship_local_data_source.dart';
-import 'features/tracker/data/datasources/ship_remote_data_source.dart';
-import 'features/tracker/data/repositories/ship_repositories_impl.dart';
-import 'features/tracker/domain/repositories/ship_repositories.dart';
-import 'features/tracker/domain/usecases/create_report_use_case.dart';
-import 'features/tracker/domain/usecases/get_all_spreadsheet_files_use_case.dart';
-import 'features/tracker/domain/usecases/get_image_url_use_case.dart';
-import 'features/tracker/domain/usecases/get_ships_use_case.dart';
-import 'features/tracker/domain/usecases/insert_ship_use_case.dart';
-import 'features/tracker/domain/usecases/upload_image_use_case.dart';
-import 'features/tracker/presentation/cubit/ship_cubit.dart';
+import 'features/tracker/data/datasources/shipment_remote_data_source.dart';
+import 'features/tracker/data/repositories/shipment_repository_impl.dart';
+import 'features/tracker/domain/repositories/shipment_repository.dart';
+import 'features/tracker/domain/usecases/create_shipment_report_use_case.dart';
+import 'features/tracker/domain/usecases/delete_shipment_use_case.dart';
+import 'features/tracker/domain/usecases/download_shipment_report_use_case.dart';
+import 'features/tracker/domain/usecases/fetch_shipment_by_id_use_case.dart';
+import 'features/tracker/domain/usecases/fetch_shipment_by_receipt_number_use_case.dart';
+import 'features/tracker/domain/usecases/fetch_shipment_reports_use_case.dart';
+import 'features/tracker/domain/usecases/fetch_shipments_use_case.dart';
+import 'features/tracker/domain/usecases/insert_shipment_document_use_case.dart';
+import 'features/tracker/domain/usecases/insert_shipment_use_case.dart';
+import 'features/tracker/presentation/cubit/shipment_cubit.dart';
 
 final getIt = GetIt.instance;
 
-void setup({required CameraDescription camera}) {
-  getIt.registerLazySingleton<SupabaseClient>(() => Supabase.instance.client);
+void setup() {
+  getIt.registerLazySingleton<FlutterSecureStorage>(
+      () => const FlutterSecureStorage());
+
+  getIt.registerLazySingleton<Dio>(
+    () => Dio(
+      BaseOptions(
+        baseUrl: dotenv.get('API_URL'),
+        connectTimeout: const Duration(seconds: 5),
+      ),
+    )..interceptors.add(
+        InterceptorsWrapper(
+          onError: (error, handler) async {
+            final storage = getIt.get<FlutterSecureStorage>();
+            final refreshToken = await storage.read(key: refreshTokenKey);
+            final authRepository = getIt.get<AuthRepository>();
+
+            if (error.requestOptions.path == '$authEndpoint/refresh') {
+              if (error.response?.statusCode == 401) {
+                await storage.deleteAll();
+              }
+            } else {
+              if (error.response?.statusCode == 401 && refreshToken != null) {
+                await authRepository.refreshToken(
+                    refreshToken: refreshToken);
+              }
+            }
+
+            return handler.next(error);
+          },
+          onRequest: (options, handler) async {
+            final storage = getIt.get<FlutterSecureStorage>();
+            final accessToken = await storage.read(key: accessTokenKey);
+
+            if (options.path != '$authEndpoint/refresh') {
+              options.headers = {
+                'Accept': 'application/json',
+                'Authorization': 'Bearer $accessToken',
+              };
+            }
+
+            return handler.next(options);
+          },
+          onResponse: (response, handler) async {
+            final storage = getIt.get<FlutterSecureStorage>();
+            if (response.requestOptions.path == '$authEndpoint/refresh' &&
+                response.statusCode == 401) {
+              await storage.deleteAll();
+            }
+            return handler.next(response);
+          },
+        ),
+      ),
+  );
 
   // Auth
   getIt
-    ..registerLazySingleton<AuthRemoteDataSource>(
-        () => AuthRemoteDataSourceImpl(supabase: getIt.get()))
-    ..registerLazySingleton<AuthRepositories>(
-        () => AuthRepositoriesImpl(authRemote: getIt.get()))
-    ..registerLazySingleton(() => AuthCubit(
-        loginUseCase: LoginUseCase(authRepo: getIt.get()),
-        registerUseCase: RegisterUseCase(authRepo: getIt.get()),
-        logoutUseCase: LogoutUseCase(authRepo: getIt.get()),
-        updateUserUseCase: UpdateUserUseCase(getIt.get()),
-        sendPasswordResetTokenUseCase:
-            SendPasswordResetTokenUseCase(getIt.get()),
-        resetPasswordUseCase: ResetPasswordUseCase(getIt.get())));
+    ..registerLazySingleton<AuthRemoteDataSource<Response>>(
+        () => AuthRemoteDataSourceImpl(dio: getIt.get()))
+    ..registerLazySingleton<AuthRepository>(() => AuthRepositoryImpl(
+        authRemoteDataSource: getIt.get(),
+        googleSignIn: GoogleSignIn(),
+        storage: getIt.get()))
+    ..registerLazySingleton<AuthCubit>(() => AuthCubit(
+        fetchUserUseCase: FetchUserUseCase(authRepository: getIt.get()),
+        fetchUserFromStorageUseCase:
+            FetchUserFromStorageUseCase(authRepository: getIt.get()),
+        refreshTokenUseCase: RefreshTokenUseCase(authRepository: getIt.get()),
+        signInUseCase: SignInUseCase(authRepository: getIt.get()),
+        signOutUseCase: SignOutUseCase(authRepository: getIt.get()),
+        updateProfileUseCase:
+            UpdateProfileUseCase(authRepository: getIt.get())));
 
   // Ship
   getIt
-    ..registerLazySingleton<ShipRemoteDataSource>(() =>
-        ShipRemoteDataSourceImpl(supabase: getIt.get(), environment: 'dev'))
-    ..registerLazySingleton<ShipLocalDataSource>(
-        () => ShipLocalDataSourceImpl())
-    ..registerLazySingleton<ShipRepositories>(() =>
-        ShipRepositoriesImpl(shipRemote: getIt.get(), shipLocal: getIt.get()))
-    ..registerLazySingleton(() => ShipCubit(
-        getShipsUseCase: GetShipsUseCase(shipRepo: getIt.get()),
-        insertShipUseCase: InsertShipUseCase(shipRepo: getIt.get()),
-        deleteShipUseCase: DeleteShipUseCase(shipRepo: getIt.get()),
-        createReportUseCase: CreateReportUseCase(shipRepo: getIt.get()),
-        getAllSpreadsheetFilesUseCase:
-            GetAllSpreadsheetFilesUseCase(shipRepo: getIt.get()),
-        getImageUrlUseCase: GetImageUrlUseCase(shipRepo: getIt.get()),
-        uploadImageUseCase: UploadImageUseCase(shipRepo: getIt.get()),
-        getReceiptStatusUseCase: GetReceiptStatusUseCase(shipRepo: getIt.get()),
-        camera: camera));
+    ..registerLazySingleton<ShipmentRemoteDataSource<Response>>(
+        () => ShipmentRemoteDataSourceImpl(dio: getIt.get()))
+    ..registerLazySingleton<ShipmentRepository>(
+        () => ShipmentRepositoryImpl(shipmentRemoteDataSource: getIt.get()))
+    ..registerLazySingleton<ShipmentCubit>(() => ShipmentCubit(
+        createShipmentReportUseCase:
+            CreateShipmentReportUseCase(shipmentRepository: getIt.get()),
+        deleteShipmentUseCase:
+            DeleteShipmentUseCase(shipmentRepository: getIt.get()),
+        fetchShipmentByIdUseCase:
+            FetchShipmentByIdUseCase(shipmentRepository: getIt.get()),
+        fetchShipmentByReceiptNumberUseCase:
+            FetchShipmentByReceiptNumberUseCase(
+                shipmentRepository: getIt.get()),
+        fetchShipmentReportsUseCase:
+            FetchShipmentReportsUseCase(shipmentRepository: getIt.get()),
+        fetchShipmentsUseCase:
+            FetchShipmentsUseCase(shipmentRepository: getIt.get()),
+        insertShipmentDocumentUseCase:
+            InsertShipmentDocumentUseCase(shipmentRepository: getIt.get()),
+        insertShipmentUseCase:
+            InsertShipmentUseCase(shipmentRepository: getIt.get()),
+        downloadShipmentReportUseCase:
+            DownloadShipmentReportUseCase(shipmentRepository: getIt.get())));
 }

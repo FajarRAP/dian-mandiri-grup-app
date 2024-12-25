@@ -1,15 +1,5 @@
-import 'package:another_flushbar/flushbar.dart';
+import 'package:flashy_flushbar/flashy_flushbar.dart';
 import 'package:flutter/material.dart';
-
-Future<void> flushbar(
-  BuildContext context,
-  String message,
-) =>
-    Flushbar(
-      message: message,
-      animationDuration: const Duration(milliseconds: 1200),
-      duration: const Duration(seconds: 2),
-    ).show(context);
 
 ScaffoldFeatureController<SnackBar, SnackBarClosedReason> snackbar(
   BuildContext context,
@@ -21,3 +11,11 @@ ScaffoldFeatureController<SnackBar, SnackBarClosedReason> snackbar(
         duration: const Duration(milliseconds: 1500),
       ),
     );
+
+void flushbar(String message) {
+  return FlashyFlushbar(
+    animationDuration: const Duration(milliseconds: 400),
+    duration: const Duration(milliseconds: 1600),
+    message: message,
+  ).show();
+}

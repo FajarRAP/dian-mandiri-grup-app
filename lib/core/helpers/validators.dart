@@ -15,6 +15,7 @@ String? inputValidator(String? value) {
   if (value == null || value.isEmpty) {
     return 'Harap Isi';
   }
+  
   return null;
 }
 

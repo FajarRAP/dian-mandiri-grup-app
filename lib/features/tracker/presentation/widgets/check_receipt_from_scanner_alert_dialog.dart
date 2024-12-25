@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/common/snackbar.dart';
 import '../../../../core/helpers/validators.dart';
-import '../cubit/ship_cubit.dart';
+import '../cubit/shipment_cubit.dart';
 
 class CheckReceiptFromScannerAlertDialog extends StatefulWidget {
   const CheckReceiptFromScannerAlertDialog({super.key});
@@ -27,16 +27,15 @@ class _CheckReceiptFromScannerAlertDialogState
 
   @override
   Widget build(BuildContext context) {
+    final shipmentCubit = context.read<ShipmentCubit>();
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
 
     return AlertDialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       title: Text(
         'Silakan Scan',
-        style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+        style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
       ),
       content: Form(
         key: _formKey,
@@ -44,10 +43,7 @@ class _CheckReceiptFromScannerAlertDialogState
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Nomor Resi:',
-              style: textTheme.bodyMedium,
-            ),
+            Text('Nomor Resi:', style: textTheme.bodyMedium),
             const SizedBox(height: 4),
             TextFormField(
               autofocus: true,
@@ -62,36 +58,32 @@ class _CheckReceiptFromScannerAlertDialogState
         ),
       ),
       actions: [
-        TextButton(
-          onPressed: context.pop,
-          child: const Text('Batal'),
-        ),
+        TextButton(onPressed: context.pop, child: const Text('Batal')),
         TextButton(
           onPressed: () async {
             if (!_formKey.currentState!.validate()) return;
 
-            await context
-                .read<ShipCubit>()
-                .getReceiptStatus(_receiptController.text.trim());
+            await shipmentCubit.fetchShipmentByReceiptNumber(
+                receipNumber: _receiptController.text.trim());
           },
-          child: BlocConsumer<ShipCubit, ShipState>(
+          child: BlocConsumer<ShipmentCubit, ShipmentState>(
             listener: (context, state) {
-              if (state is CheckReceiptStatusError) {
-                flushbar(context, state.message);
+              if (state is FetchShipmentDetailError) {
+                flushbar(state.message);
               }
-              if (state is CheckReceiptStatusLoaded) {
+
+              if (state is FetchShipmentDetailLoaded) {
                 context.pop();
               }
             },
             builder: (context, state) {
-              if (state is CheckReceiptStatusLoading) {
+              if (state is FetchShipmentDetailLoading) {
                 return const CircularProgressIndicator();
               }
+
               return const Text(
                 'Cari',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontWeight: FontWeight.w700),
               );
             },
           ),

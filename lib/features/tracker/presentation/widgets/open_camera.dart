@@ -1,10 +1,8 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/common/constants.dart';
-import '../cubit/ship_cubit.dart';
 
 class TakePictureScreen extends StatefulWidget {
   const TakePictureScreen({
@@ -25,12 +23,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
   @override
   void initState() {
     super.initState();
-
-    _controller = CameraController(
-      widget.camera,
-      ResolutionPreset.medium,
-    );
-
+    _controller = CameraController(widget.camera, ResolutionPreset.medium);
     _initializeControllerFuture = _controller.initialize();
   }
 
@@ -50,9 +43,9 @@ class TakePictureScreenState extends State<TakePictureScreen> {
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.done) {
               return CameraPreview(_controller);
-            } else {
-              return const Center(child: CircularProgressIndicator());
             }
+
+            return const Center(child: CircularProgressIndicator());
           },
         ),
       ),
@@ -66,9 +59,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
 
             if (!context.mounted) return;
 
-            context.read<ShipCubit>().picturePath = image.path;
-
-            await context.push(displayPictureRoute);
+            await context.push(displayPictureRoute, extra: image);
           } catch (e) {
             debugPrint(e.toString());
           }

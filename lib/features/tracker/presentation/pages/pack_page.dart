@@ -10,7 +10,7 @@ class PackPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return const StageLayout(
       appBarTitle: 'Scan Packing',
-      stageId: packStage,
+      stage: packStage,
     );
   }
 }

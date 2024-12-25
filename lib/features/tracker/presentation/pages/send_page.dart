@@ -10,7 +10,7 @@ class SendPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return const StageLayout(
       appBarTitle: 'Scan Kirim',
-      stageId: sendStage,
+      stage: sendStage,
     );
   }
 }

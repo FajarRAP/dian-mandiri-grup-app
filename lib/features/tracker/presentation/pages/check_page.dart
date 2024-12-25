@@ -10,7 +10,7 @@ class CheckPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return const StageLayout(
       appBarTitle: 'Scan Checking',
-      stageId: checkStage,
+      stage: checkStage,
     );
   }
 }

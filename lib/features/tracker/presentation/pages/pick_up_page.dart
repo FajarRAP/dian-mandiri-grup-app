@@ -10,8 +10,7 @@ class PickUpPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return const StageLayout(
       appBarTitle: 'Scan Ambil Barang',
-      stageId: pickUpStage,
-      
+      stage: pickUpStage,
     );
   }
 }

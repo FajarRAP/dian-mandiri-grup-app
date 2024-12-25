@@ -1,29 +1,39 @@
 import 'dart:async';
 
 import 'package:camera/camera.dart';
+import 'package:flashy_flushbar/flashy_flushbar.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'core/routes/route.dart';
+import 'core/common/constants.dart';
+import 'core/routes/router.dart';
 import 'core/themes/theme.dart';
 import 'features/auth/presentation/cubit/auth_cubit.dart';
-import 'features/tracker/presentation/cubit/ship_cubit.dart';
+import 'features/tracker/presentation/cubit/shipment_cubit.dart';
 import 'service_container.dart';
+
+late List<CameraDescription> cameras;
+late String initialLocation;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final cameras = await availableCameras();
-  await dotenv.load();
-  await Supabase.initialize(
-    url: dotenv.get('supa_url'),
-    anonKey: dotenv.get('supa_anonkey'),
-  );
-  setup(camera: cameras.first);
+  cameras = await availableCameras();
   await initializeDateFormatting('id_ID', null);
+
+  const env = kReleaseMode ? '.env.prod' : '.env.stage';
+  await dotenv.load(fileName: env);
+
+  setup();
+
+  final storage = getIt.get<FlutterSecureStorage>();
+  final refreshToken = await storage.read(key: refreshTokenKey);
+  initialLocation = refreshToken != null ? trackerRoute : loginRoute;
+
   runApp(const MyApp());
 }
 
@@ -35,9 +45,10 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => getIt.get<AuthCubit>()),
-        BlocProvider(create: (context) => getIt.get<ShipCubit>()),
+        BlocProvider(create: (context) => getIt.get<ShipmentCubit>()),
       ],
       child: MaterialApp.router(
+        builder: FlashyFlushbarProvider.init(),
         localizationsDelegates: const [
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
