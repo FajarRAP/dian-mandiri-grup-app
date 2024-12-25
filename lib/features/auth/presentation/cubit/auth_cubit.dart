@@ -61,10 +61,15 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   Future<void> fetchUserFromStorage() async {
+    emit(FetchUserLoading());
     final userFromStorage = await _fetchUserFromStorageUseCase();
+
     userFromStorage.fold(
-      (l) {},
-      (r) => user = r,
+      (l) => emit(FetchUserError(message: l.message)),
+      (r) {
+        user = r;
+        emit(FetchUserLoaded());
+      },
     );
   }
 
