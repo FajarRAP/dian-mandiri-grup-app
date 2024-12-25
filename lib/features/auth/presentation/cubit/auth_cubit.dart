@@ -1,112 +1,123 @@
 import 'package:bloc/bloc.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:meta/meta.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../../core/common/constants.dart';
+import '../../../../core/exceptions/refresh_token.dart' as rt;
 import '../../../../service_container.dart';
-import '../../domain/usecases/login_use_case.dart';
-import '../../domain/usecases/logout_use_case.dart';
-import '../../domain/usecases/register_use_case.dart';
-import '../../domain/usecases/reset_password_use_case.dart';
-import '../../domain/usecases/send_password_reset_token_use_case.dart';
-import '../../domain/usecases/update_user_use_case.dart';
+import '../../domain/entities/user_entity.dart';
+import '../../domain/usecases/fetch_user_from_storage_use_case.dart';
+import '../../domain/usecases/fetch_user_use_case.dart';
+import '../../domain/usecases/refresh_token_use_case.dart';
+import '../../domain/usecases/sign_in_use_case.dart';
+import '../../domain/usecases/sign_out_use_case.dart';
+import '../../domain/usecases/update_profile_use_case.dart';
 
 part 'auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState> {
   AuthCubit({
-    required this.loginUseCase,
-    required this.registerUseCase,
-    required this.logoutUseCase,
-    required this.updateUserUseCase,
-    required this.sendPasswordResetTokenUseCase,
-    required this.resetPasswordUseCase,
-  }) : super(AuthInitial());
+    required FetchUserUseCase fetchUserUseCase,
+    required FetchUserFromStorageUseCase fetchUserFromStorageUseCase,
+    required RefreshTokenUseCase refreshTokenUseCase,
+    required SignInUseCase signInUseCase,
+    required SignOutUseCase signOutUseCase,
+    required UpdateProfileUseCase updateProfileUseCase,
+  })  : _fetchUserUseCase = fetchUserUseCase,
+        _fetchUserFromStorageUseCase = fetchUserFromStorageUseCase,
+        _refreshTokenUseCase = refreshTokenUseCase,
+        _signInUseCase = signInUseCase,
+        _signOutUseCase = signOutUseCase,
+        _updateProfileUseCase = updateProfileUseCase,
+        super(AuthInitial());
 
-  final LoginUseCase loginUseCase;
-  final RegisterUseCase registerUseCase;
-  final LogoutUseCase logoutUseCase;
-  final UpdateUserUseCase updateUserUseCase;
-  final SendPasswordResetTokenUseCase sendPasswordResetTokenUseCase;
-  final ResetPasswordUseCase resetPasswordUseCase;
+  final FetchUserUseCase _fetchUserUseCase;
+  final FetchUserFromStorageUseCase _fetchUserFromStorageUseCase;
+  final RefreshTokenUseCase _refreshTokenUseCase;
+  final SignInUseCase _signInUseCase;
+  final SignOutUseCase _signOutUseCase;
+  final UpdateProfileUseCase _updateProfileUseCase;
+  late UserEntity user;
 
-  User? user = getIt.get<SupabaseClient>().auth.currentUser;
-  int selectedRole = 0;
-
-  Future<void> login(String email, String password) async {
-    emit(AuthLoading());
-
-    final result = await loginUseCase(email, password);
+  Future<void> fetchUser() async {
+    emit(FetchUserLoading());
+    final refreshToken =
+        await getIt.get<FlutterSecureStorage>().read(key: refreshTokenKey);
+    final result = await _fetchUserUseCase();
 
     result.fold(
-      (l) => emit(AuthError(l.message)),
+      (l) {
+        if (l is rt.RefreshToken && refreshToken != null) {
+          fetchUser();
+        } else {
+          emit(FetchUserError(message: l.message));
+        }
+      },
       (r) {
         user = r;
-        emit(AuthLoaded());
+        emit(FetchUserLoaded());
       },
     );
   }
 
-  Future<void> register(String email, String password) async {
-    emit(AuthLoading());
-
-    final result = await registerUseCase(email, password, selectedRole);
-
-    result.fold(
-      (l) => emit(AuthError(l.message)),
-      (r) => emit(AuthLoaded()),
+  Future<void> fetchUserFromStorage() async {
+    final userFromStorage = await _fetchUserFromStorageUseCase();
+    userFromStorage.fold(
+      (l) {},
+      (r) => user = r,
     );
   }
 
-  Future<void> updateUser(Map<String, dynamic> metadata) async {
-    emit(UpdatingUser());
-
-    final result = await updateUserUseCase(metadata);
+  Future<void> refreshToken() async {
+    emit(RefreshTokenLoading());
+    final refreshToken =
+        await getIt.get<FlutterSecureStorage>().read(key: refreshTokenKey);
+    final result = await _refreshTokenUseCase('$refreshToken');
 
     result.fold(
-      (l) => emit(UpdateUserError(l.message)),
+      (l) => emit(RefreshTokenError(message: l.message)),
+      (r) => emit(RefreshTokenLoaded()),
+    );
+  }
+
+  Future<void> signIn() async {
+    emit(SignInLoading());
+    final result = await _signInUseCase();
+
+    result.fold(
+      (l) => emit(SignInError(message: l.message)),
       (r) {
         user = r;
-        emit(UserUpdated());
+        emit(SignInLoaded(message: 'Berhasil sign in'));
       },
     );
   }
 
-  Future<void> sendPasswordResetToken(String email) async {
-    emit(AuthLoading());
-
-    final result = await sendPasswordResetTokenUseCase(email);
+  Future<void> signOut() async {
+    emit(SignOutLoading());
+    final result = await _signOutUseCase();
 
     result.fold(
-      (l) => emit(AuthError(l.message)),
-      (r) => emit(TokenSended(r)),
+      (l) => emit(SignOutError(message: l.message)),
+      (r) => emit(SignOutLoaded(message: 'Berhasil sign out')),
     );
   }
 
-  Future<void> resetPassword(
-      String token, String email, String password) async {
-    emit(AuthLoading());
-
-    final result = await resetPasswordUseCase(token, email, password);
-
-    result.fold(
-      (l) => emit(AuthError(l.message)),
-      (r) => emit(
-          PasswordChanged('Password berhasil direset, silakan login kembali')),
-    );
-  }
-
-  Future<void> logout() async {
-    emit(AuthLoading());
-    final result = await logoutUseCase();
+  Future<void> updateProfile({required String name}) async {
+    emit(UpdateProfileLoading());
+    final refreshToken =
+        await getIt.get<FlutterSecureStorage>().read(key: refreshTokenKey);
+    final result = await _updateProfileUseCase(name);
 
     result.fold(
-      (l) => emit(AuthError(l.message)),
-      (r) => emit(AuthSignedOut(r)),
+      (l) {
+        if (l is rt.RefreshToken && refreshToken != null) {
+          updateProfile(name: name);
+        } else {
+          emit(UpdateProfileError(message: l.message));
+        }
+      },
+      (r) => emit(UpdateProfileLoaded(message: r)),
     );
-  }
-
-  void selectRole(dynamic role) {
-    selectedRole = role;
-    emit(AuthInitial());
   }
 }
