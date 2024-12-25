@@ -1,20 +1,16 @@
-import 'package:supabase_flutter/supabase_flutter.dart';
-
 import '../../domain/entities/user_entity.dart';
 
 class UserModel extends UserEntity {
-  UserModel({
+  const UserModel({
     required super.id,
-    required super.appMetadata,
-    required super.userMetadata,
-    required super.aud,
-    required super.createdAt,
+    required super.name,
+    required super.email,
+    required super.permissions,
   });
 
-  factory UserModel.fromUser(User user) => UserModel(
-      id: user.id,
-      appMetadata: user.appMetadata,
-      userMetadata: user.userMetadata,
-      aud: user.aud,
-      createdAt: user.createdAt);
+  factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
+      id: json['id'],
+      name: json['name'],
+      email: json['email'],
+      permissions: (json['permissions'] as List).map((e) => '$e').toList());
 }
