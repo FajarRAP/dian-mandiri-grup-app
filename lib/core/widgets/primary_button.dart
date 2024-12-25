@@ -21,7 +21,7 @@ class MyElevatedButton extends StatelessWidget {
       style: ElevatedButton.styleFrom(
         backgroundColor: theme.colorScheme.primary,
         foregroundColor: theme.colorScheme.onPrimary,
-        fixedSize: Size(MediaQuery.sizeOf(context).width, 64),
+        fixedSize: Size.fromHeight(48),
         padding: const EdgeInsets.symmetric(vertical: 14),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
