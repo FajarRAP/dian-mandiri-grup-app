@@ -1,41 +1,48 @@
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:dio/dio.dart';
 
-abstract class AuthRemoteDataSource {
-  Future<AuthResponse> register(String email, String password, int role);
-  Future<AuthResponse> login(String email, String password);
-  Future<AuthResponse> verifyOTP(String email, String token);
-  Future<UserResponse> updateUser(UserAttributes userAttr);
-  Future<void> sendPasswordResetToken(String email);
-  Future<void> logout();
+import '../../../../core/common/constants.dart';
+
+abstract class AuthRemoteDataSource<T> {
+  Future<T> signIn({required String googleAccessToken});
+  Future<T> signOut();
+  Future<T> fetchUser();
+  Future<T> refreshToken({required String refreshToken});
+  Future<T> updateProfile({required String name});
 }
 
-class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
-  final SupabaseClient supabase;
+class AuthRemoteDataSourceImpl implements AuthRemoteDataSource<Response> {
+  const AuthRemoteDataSourceImpl({required this.dio});
 
-  AuthRemoteDataSourceImpl({required this.supabase});
-  @override
-  Future<AuthResponse> login(String email, String password) async =>
-      await supabase.auth.signInWithPassword(email: email, password: password);
+  final Dio dio;
 
   @override
-  Future<AuthResponse> register(
-          String email, String password, int role) async =>
-      await supabase.auth
-          .signUp(email: email, password: password, data: {'role': role});
+  Future<Response> fetchUser() async {
+    return await dio.get('$authEndpoint/me');
+  }
 
   @override
-  Future<AuthResponse> verifyOTP(String email, String token) async =>
-      await supabase.auth
-          .verifyOTP(token: token, email: email, type: OtpType.recovery);
+  Future<Response> refreshToken({required String refreshToken}) async {
+    return await dio.post(
+      '$authEndpoint/refresh',
+      data: {'refresh_token': refreshToken},
+    );
+  }
 
   @override
-  Future<UserResponse> updateUser(UserAttributes userAttr) async =>
-      await supabase.auth.updateUser(userAttr);
+  Future<Response> signIn({required String googleAccessToken}) async {
+    return await dio.post(
+      '$authEndpoint/google',
+      data: {'access_token': googleAccessToken},
+    );
+  }
 
   @override
-  Future<void> sendPasswordResetToken(String email) async =>
-      await supabase.auth.resetPasswordForEmail(email);
+  Future<Response> signOut() async {
+    return await dio.post('$authEndpoint/logout');
+  }
 
   @override
-  Future<void> logout() async => await supabase.auth.signOut();
+  Future<Response> updateProfile({required String name}) async {
+    return await dio.put('$authEndpoint/profile', data: {'name': name});
+  }
 }
