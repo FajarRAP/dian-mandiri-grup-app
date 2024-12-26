@@ -71,7 +71,7 @@ class _ReceiptStatusPageState extends State<ReceiptStatusPage> {
                     const SizedBox(height: 8),
                     InfoItem(
                       label: 'Tanggal Scan',
-                      value: dateFormat.format(state.shipmentDetail.date),
+                      value: dateFormat.format(state.shipmentDetail.date.toLocal()),
                     ),
                   ],
                 ),

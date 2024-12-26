@@ -83,7 +83,7 @@ class _ReportPageState extends State<ReportPage> {
                   return ListTile(
                     contentPadding: const EdgeInsets.only(left: 16),
                     leading: Image.asset(spreadsheetIcon),
-                    title: Text('${filename}_${dateTimeFormat.format(date)}'),
+                    title: Text('${filename}_${dateTimeFormat.format(date.toLocal())}'),
                     trailing: PopupMenuButton<String>(
                       itemBuilder: (context) => <PopupMenuItem<String>>[
                         PopupMenuItem(

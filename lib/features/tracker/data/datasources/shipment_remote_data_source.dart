@@ -118,7 +118,7 @@ class ShipmentRemoteDataSourceImpl extends ShipmentRemoteDataSource<Response> {
 
     return await dio.download(
       shipmentReportModel.file,
-      '${directory?.path}/${shipmentReportModel.name}_${dateTimeFormat.format(shipmentReportModel.date)}.xlsx',
+      '${directory?.path}/${shipmentReportModel.name}_${dateTimeFormat.format(shipmentReportModel.date.toLocal())}.xlsx',
     );
   }
 }

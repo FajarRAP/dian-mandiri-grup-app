@@ -10,7 +10,10 @@ import '../widgets/detail_ship_info_item.dart';
 import '../widgets/image_not_found.dart';
 
 class ShipmentDetailPage extends StatelessWidget {
-  const ShipmentDetailPage({super.key, required this.shipmentId});
+  const ShipmentDetailPage({
+    super.key,
+    required this.shipmentId,
+  });
 
   final String shipmentId;
 
@@ -96,7 +99,7 @@ class ShipmentDetailPage extends StatelessWidget {
                   const SizedBox(height: 8),
                   InfoItem(
                     label: 'Tanggal Scan',
-                    value: dateTimeFormat.format(state.shipmentDetail.date),
+                    value: dateTimeFormat.format(state.shipmentDetail.date.toLocal()),
                   ),
                 ],
               ),
