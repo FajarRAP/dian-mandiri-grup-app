@@ -21,6 +21,8 @@ class CreateShipmentReport extends ShipmentState {}
 
 class DownloadShipmentReport extends ShipmentState {}
 
+class FetchReceiptStatus extends ShipmentState {}
+
 class FetchShipmentsLoading extends FetchShipments {}
 
 class FetchShipmentsLoaded extends FetchShipments {
@@ -137,4 +139,18 @@ class DownloadShipmentReportError extends DownloadShipmentReport {
   final String message;
 
   DownloadShipmentReportError({required this.message});
+}
+
+class FetchReceiptStatusLoading extends FetchReceiptStatus {}
+
+class FetchReceiptStatusLoaded extends FetchReceiptStatus {
+  final ShipmentDetailEntity shipmentDetail;
+
+  FetchReceiptStatusLoaded({required this.shipmentDetail});
+}
+
+class FetchReceiptStatusError extends FetchReceiptStatus {
+  final String message;
+
+  FetchReceiptStatusError({required this.message});
 }
