@@ -3,6 +3,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:meta/meta.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:ship_tracker/core/common/constants.dart';
 import 'package:ship_tracker/service_container.dart';
 
@@ -59,13 +60,19 @@ class ShipmentCubit extends Cubit<ShipmentState> {
   final DownloadShipmentReportUseCase _downloadShipmentReportUseCase;
 
   late ShipmentDetailEntity shipmentDetail;
+  late String externalPath;
   final shipments = <ShipmentEntity>[];
-  int _fetchShipmentsPage = 1;
-  bool isEndPage = false;
+  var _fetchShipmentsPage = 1;
+  var isEndPage = false;
+
+  Future<void> getExternalPath() async {
+    final dir = await getExternalStorageDirectory();
+    externalPath = '${dir?.path}';
+  }
 
   Future<void> fetchShipmentByReceiptNumber(
       {required String receipNumber}) async {
-    emit(FetchShipmentDetailLoading());
+    emit(FetchReceiptStatusLoading());
     final refreshToken =
         await getIt.get<FlutterSecureStorage>().read(key: refreshTokenKey);
     final result = await _fetchShipmentByReceiptNumberUseCase(receipNumber);
@@ -75,10 +82,10 @@ class ShipmentCubit extends Cubit<ShipmentState> {
         if (l is RefreshToken && refreshToken != null) {
           fetchShipmentByReceiptNumber(receipNumber: receipNumber);
         } else {
-          emit(FetchShipmentDetailError(message: l.message));
+          emit(FetchReceiptStatusError(message: l.message));
         }
       },
-      (r) => emit(FetchShipmentDetailLoaded(shipmentDetail: r)),
+      (r) => emit(FetchReceiptStatusLoaded(shipmentDetail: r)),
     );
   }
 

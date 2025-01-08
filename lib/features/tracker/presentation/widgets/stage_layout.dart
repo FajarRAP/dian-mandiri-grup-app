@@ -202,8 +202,9 @@ class _StageLayoutState extends State<StageLayout> {
                                     style: textTheme.titleLarge,
                                   ),
                                   Text(
-                                    dateTimeFormat.format(
-                                        shipmentCubit.shipments[index].date),
+                                    dateTimeFormat.format(shipmentCubit
+                                        .shipments[index].date
+                                        .toLocal()),
                                     style: textTheme.bodyMedium,
                                   ),
                                 ],

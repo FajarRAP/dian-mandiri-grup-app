@@ -1,5 +1,6 @@
 import 'package:intl/intl.dart';
 
-final dateFormat = DateFormat('y-M-d', 'id_ID');
-final dateTimeFormat = DateFormat('d-M-y HH:m:s', 'id_ID');
-final dMyFormat = DateFormat('d-M-y', 'id_ID');
+final dateFormat = DateFormat('y-MM-dd', 'id_ID');
+final dateTimeFormat = DateFormat('dd-MM-y HH:mm:ss', 'id_ID');
+final dMyFormat = DateFormat('dd-MM-y', 'id_ID');
+final timeFormat = DateFormat('HH:mm:ss', 'id_ID');

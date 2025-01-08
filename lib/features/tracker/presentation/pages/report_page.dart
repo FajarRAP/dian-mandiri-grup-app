@@ -20,14 +20,12 @@ class ReportPage extends StatefulWidget {
 }
 
 class _ReportPageState extends State<ReportPage> {
-  final _dateController = TextEditingController();
-  var date = DateTime.now();
-
-  @override
-  void dispose() {
-    _dateController.dispose();
-    super.dispose();
-  }
+  var _dateTimeRange = DateTimeRange(
+    start: DateTime.now(),
+    end: DateTime.now(),
+  );
+  var _status = completedReport;
+  var _dateTimeRangePicked = 'Pilih Range Tanggal';
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +37,10 @@ class _ReportPageState extends State<ReportPage> {
           PopupMenuButton(
             itemBuilder: (context) => <PopupMenuItem>[
               PopupMenuItem(
-                onTap: _showDialogToCreateReport,
+                onTap: () => showDialog(
+                  context: context,
+                  builder: (context) => DateRangePickerDialog(status: _status),
+                ),
                 child: const Text('Buat Laporan'),
               ),
             ],
@@ -47,154 +48,261 @@ class _ReportPageState extends State<ReportPage> {
         ],
         title: const Text('Laporan'),
       ),
-      body: BlocConsumer<ShipmentCubit, ShipmentState>(
-        bloc: shipmentCubit
-          ..fetchShipmentReports(
-              endDate: dateFormat.format(date),
-              startDate: dateFormat.format(date),
-              status: completedReport),
-        buildWhen: (previous, current) => current is FetchShipmentReports,
-        listenWhen: (previous, current) => current is DownloadShipmentReport,
-        listener: (context, state) {
-          if (state is DownloadShipmentReportLoaded) {
-            flushbar(state.message);
-          }
-
-          if (state is DownloadShipmentReportError) {
-            flushbar(state.message);
-          }
-        },
-        builder: (context, state) {
-          if (state is FetchShipmentReportsLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          if (state is FetchShipmentReportsLoaded) {
-            return RefreshIndicator(
-              onRefresh: () async => shipmentCubit.fetchShipmentReports(
-                  endDate: dateFormat.format(date),
-                  startDate: dateFormat.format(date),
-                  status: completedReport),
-              displacement: 10,
-              child: ListView.builder(
-                itemBuilder: (context, index) {
-                  final filename = state.shipmentReports[index].name;
-                  final date = state.shipmentReports[index].date;
-                  return ListTile(
-                    contentPadding: const EdgeInsets.only(left: 16),
-                    leading: Image.asset(spreadsheetIcon),
-                    title: Text('${filename}_${dateTimeFormat.format(date)}'),
-                    trailing: PopupMenuButton<String>(
-                      itemBuilder: (context) => <PopupMenuItem<String>>[
-                        PopupMenuItem(
-                          onTap: () async {
-                            final shipmentReport = state.shipmentReports[index];
-                            await shipmentCubit.downloadShipmentReport(
-                                shipmentReportEntity: shipmentReport);
-                          },
-                          child: const Text('Unduh'),
-                        ),
-                        PopupMenuItem(
-                          onTap: () async {
-                            final directory =
-                                await getExternalStorageDirectory();
-                            final file =
-                                File('${directory?.path}/$filename.xlsx');
-                            await OpenFilex.open(file.path);
-                          },
-                          child: const Text('Buka'),
-                        ),
-                        PopupMenuItem(
-                          onTap: () async {
-                            final directory =
-                                await getExternalStorageDirectory();
-                            final files = [
-                              XFile('${directory?.path}/$filename.xlsx'),
-                            ];
-                            await Share.shareXFiles(files);
-                          },
-                          child: const Text('Bagikan'),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-                itemCount: state.shipmentReports.length,
-              ),
-            );
-          }
-          return const SizedBox();
-        },
-      ),
-    );
-  }
-
-  void _showDialogToCreateReport() async {
-    final shipmentCubit = context.read<ShipmentCubit>();
-    _dateController.text = dMyFormat.format(DateTime.now());
-
-    await showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        actions: [
-          TextButton(onPressed: context.pop, child: const Text('Batal')),
-          TextButton(
-            onPressed: () async => await shipmentCubit.createShipmentReport(
-              startDate: dateFormat.format(date),
-              endDate: dateFormat.format(date),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          const SizedBox(height: 6),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                TextButton.icon(
+                  onPressed: _showDateRangePicker,
+                  label: Text(_dateTimeRangePicked),
+                  icon: const Icon(Icons.calendar_month_rounded),
+                ),
+                SizedBox(
+                  width: 150,
+                  child: DropdownButtonFormField<String>(
+                    onChanged: (value) {
+                      if (value == null) return;
+                      _status = value;
+                      shipmentCubit.fetchShipmentReports(
+                          endDate: dateFormat.format(_dateTimeRange.end),
+                          startDate: dateFormat.format(_dateTimeRange.start),
+                          status: _status);
+                    },
+                    items: <DropdownMenuItem<String>>[
+                      DropdownMenuItem(
+                        value: pendingReport,
+                        child: const Text('Pending'),
+                      ),
+                      DropdownMenuItem(
+                        value: processingReport,
+                        child: const Text('Processing'),
+                      ),
+                      DropdownMenuItem(
+                        value: completedReport,
+                        child: const Text('Compeleted'),
+                      ),
+                      DropdownMenuItem(
+                        value: failedReport,
+                        child: const Text('Failed'),
+                      ),
+                    ],
+                    value: _status,
+                  ),
+                ),
+              ],
             ),
+          ),
+          const SizedBox(height: 12),
+          Expanded(
             child: BlocConsumer<ShipmentCubit, ShipmentState>(
-              buildWhen: (previous, current) => current is CreateShipmentReport,
+              bloc: shipmentCubit
+                ..getExternalPath()
+                ..fetchShipmentReports(
+                    endDate: dateFormat.format(_dateTimeRange.end),
+                    startDate: dateFormat.format(_dateTimeRange.start),
+                    status: _status),
+              buildWhen: (previous, current) => current is FetchShipmentReports,
               listenWhen: (previous, current) =>
-                  current is CreateShipmentReport,
+                  current is DownloadShipmentReport,
               listener: (context, state) {
-                if (state is CreateShipmentReportLoaded) {
-                  context.pop();
+                if (state is DownloadShipmentReportLoaded) {
                   flushbar(state.message);
-                  shipmentCubit.fetchShipmentReports(
-                      startDate: dateFormat.format(date),
-                      endDate: dateFormat.format(date),
-                      status: completedReport);
                 }
 
-                if (state is CreateShipmentReportError) {
+                if (state is DownloadShipmentReportError) {
                   flushbar(state.message);
                 }
               },
               builder: (context, state) {
-                if (state is CreateShipmentReportLoading) {
-                  return const CircularProgressIndicator();
+                if (state is FetchShipmentReportsLoading) {
+                  return const Center(child: CircularProgressIndicator());
                 }
 
-                return const Text('Buat');
+                if (state is FetchShipmentReportsLoaded) {
+                  return RefreshIndicator(
+                    onRefresh: () async => shipmentCubit.fetchShipmentReports(
+                        endDate: dateFormat.format(_dateTimeRange.end),
+                        startDate: dateFormat.format(_dateTimeRange.start),
+                        status: _status),
+                    displacement: 10,
+                    child: ListView.builder(
+                      itemBuilder: (context, index) {
+                        final shipmentReport = state.shipmentReports[index];
+                        final filename = shipmentReport.name;
+                        final date = shipmentReport.date;
+                        final formattedDate = timeFormat.format(date.toLocal());
+                        final savedFilename = '${filename}_$formattedDate';
+                        final file = File(
+                            '${shipmentCubit.externalPath}/$savedFilename.xlsx');
+                        return ListTile(
+                          contentPadding: const EdgeInsets.only(left: 16),
+                          leading: Image.asset(spreadsheetIcon),
+                          title: Text(savedFilename),
+                          trailing: PopupMenuButton<String>(
+                            itemBuilder: (context) => <PopupMenuItem<String>>[
+                              PopupMenuItem(
+                                onTap: () async =>
+                                    await shipmentCubit.downloadShipmentReport(
+                                  shipmentReportEntity: shipmentReport,
+                                ),
+                                child: const Text('Unduh'),
+                              ),
+                              if (file.existsSync()) ...[
+                                PopupMenuItem(
+                                  onTap: () async {
+                                    final directory =
+                                        await getExternalStorageDirectory();
+                                    final file = File(
+                                        '${directory?.path}/$savedFilename.xlsx');
+                                    await OpenFilex.open(file.path);
+                                  },
+                                  child: const Text('Buka'),
+                                ),
+                                PopupMenuItem(
+                                  onTap: () async {
+                                    final directory =
+                                        await getExternalStorageDirectory();
+                                    final files = [
+                                      XFile(
+                                          '${directory?.path}/$savedFilename.xlsx'),
+                                    ];
+                                    await Share.shareXFiles(files);
+                                  },
+                                  child: const Text('Bagikan'),
+                                ),
+                              ]
+                            ],
+                          ),
+                        );
+                      },
+                      itemCount: state.shipmentReports.length,
+                    ),
+                  );
+                }
+                return const SizedBox();
               },
             ),
           ),
         ],
-        content: TextFormField(
-          onTap: _showDatePicker,
-          controller: _dateController,
-          decoration: const InputDecoration(
-            suffixIcon: Icon(Icons.calendar_month_outlined),
-          ),
-          readOnly: true,
-        ),
-        title: const Text('Pilih Tanggal'),
       ),
     );
   }
 
-  void _showDatePicker() async {
-    final datePicked = await showDatePicker(
+  void _showDateRangePicker() async {
+    final dateTimeRangePicked = await showDateRangePicker(
         context: context,
-        confirmText: 'Oke',
         firstDate: DateTime(2000),
         lastDate: DateTime(2100),
         locale: const Locale('id'));
 
-    if (datePicked != null) {
-      date = datePicked;
-      setState(() => _dateController.text = dMyFormat.format(datePicked));
-    }
+    if (dateTimeRangePicked == null) return;
+    _dateTimeRange = dateTimeRangePicked;
+    final startDate = dMyFormat.format(dateTimeRangePicked.start);
+    final endDate = dMyFormat.format(dateTimeRangePicked.end);
+    setState(() => _dateTimeRangePicked = '$startDate s.d.\n $endDate');
+  }
+}
+
+class DateRangePickerDialog extends StatefulWidget {
+  const DateRangePickerDialog({
+    super.key,
+    required this.status,
+  });
+
+  final String status;
+
+  @override
+  State<DateRangePickerDialog> createState() => _DateRangePickerDialogState();
+}
+
+class _DateRangePickerDialogState extends State<DateRangePickerDialog> {
+  final _dateController = TextEditingController();
+  var _dateTimeRange = DateTimeRange(
+    start: DateTime.now(),
+    end: DateTime.now(),
+  );
+
+  @override
+  void initState() {
+    super.initState();
+    final startDate = dMyFormat.format(_dateTimeRange.start);
+    final endDate = dMyFormat.format(_dateTimeRange.end);
+    _dateController.text = '$startDate - $endDate';
+  }
+
+  @override
+  void dispose() {
+    _dateController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final shipmentCubit = context.read<ShipmentCubit>();
+
+    return AlertDialog(
+      actions: [
+        TextButton(onPressed: context.pop, child: const Text('Batal')),
+        TextButton(
+          onPressed: () async => await shipmentCubit.createShipmentReport(
+            endDate: dateFormat.format(_dateTimeRange.end),
+            startDate: dateFormat.format(_dateTimeRange.start),
+          ),
+          child: BlocConsumer<ShipmentCubit, ShipmentState>(
+            buildWhen: (previous, current) => current is CreateShipmentReport,
+            listenWhen: (previous, current) => current is CreateShipmentReport,
+            listener: (context, state) {
+              if (state is CreateShipmentReportLoaded) {
+                context.pop();
+                flushbar(state.message);
+                shipmentCubit.fetchShipmentReports(
+                    endDate: dateFormat.format(_dateTimeRange.end),
+                    startDate: dateFormat.format(_dateTimeRange.start),
+                    status: widget.status);
+              }
+
+              if (state is CreateShipmentReportError) {
+                flushbar(state.message);
+              }
+            },
+            builder: (context, state) {
+              if (state is CreateShipmentReportLoading) {
+                return const CircularProgressIndicator();
+              }
+
+              return const Text('Buat');
+            },
+          ),
+        ),
+      ],
+      content: TextFormField(
+        onTap: _showDateRangePicker,
+        controller: _dateController,
+        decoration: const InputDecoration(
+          suffixIcon: Icon(Icons.calendar_month_outlined),
+        ),
+        readOnly: true,
+      ),
+      title: const Text('Pilih Range Tanggal'),
+    );
+  }
+
+  void _showDateRangePicker() async {
+    final dateTimeRangePicked = await showDateRangePicker(
+        context: context,
+        firstDate: DateTime(2000),
+        lastDate: DateTime(2100),
+        locale: const Locale('id'));
+
+    if (dateTimeRangePicked == null) return;
+    _dateTimeRange = dateTimeRangePicked;
+    final startDate = dMyFormat.format(dateTimeRangePicked.start);
+    final endDate = dMyFormat.format(dateTimeRangePicked.end);
+    setState(() => _dateController.text = '$startDate - $endDate');
   }
 }

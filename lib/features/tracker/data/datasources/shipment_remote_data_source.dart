@@ -115,10 +115,11 @@ class ShipmentRemoteDataSourceImpl extends ShipmentRemoteDataSource<Response> {
   Future<Response> downloadShipmentReport(
       {required ShipmentReportModel shipmentReportModel}) async {
     final directory = await getExternalStorageDirectory();
+    final formattedDate = timeFormat.format(shipmentReportModel.date.toLocal());
 
     return await dio.download(
       shipmentReportModel.file,
-      '${directory?.path}/${shipmentReportModel.name}_${dateTimeFormat.format(shipmentReportModel.date)}.xlsx',
+      '${directory?.path}/${shipmentReportModel.name}_$formattedDate.xlsx',
     );
   }
 }

@@ -9,14 +9,9 @@ import '../widgets/check_receipt_from_scanner_alert_dialog.dart';
 import '../widgets/detail_ship_info_item.dart';
 import '../widgets/expandable_fab.dart';
 
-class ReceiptStatusPage extends StatefulWidget {
+class ReceiptStatusPage extends StatelessWidget {
   const ReceiptStatusPage({super.key});
 
-  @override
-  State<ReceiptStatusPage> createState() => _ReceiptStatusPageState();
-}
-
-class _ReceiptStatusPageState extends State<ReceiptStatusPage> {
   @override
   Widget build(BuildContext context) {
     final shipmentCubit = context.read<ShipmentCubit>();
@@ -27,13 +22,13 @@ class _ReceiptStatusPageState extends State<ReceiptStatusPage> {
       appBar: AppBar(title: const Text('Status Resi')),
       body: Center(
         child: BlocBuilder<ShipmentCubit, ShipmentState>(
-          buildWhen: (previous, current) => current is FetchShipmentDetail,
+          buildWhen: (previous, current) => current is FetchReceiptStatus,
           builder: (context, state) {
-            if (state is FetchShipmentDetailLoading) {
+            if (state is FetchReceiptStatusLoading) {
               return const CircularProgressIndicator();
             }
 
-            if (state is FetchShipmentDetailLoaded) {
+            if (state is FetchReceiptStatusLoaded) {
               return Card(
                 margin: const EdgeInsets.all(16),
                 child: ListView(
@@ -71,14 +66,15 @@ class _ReceiptStatusPageState extends State<ReceiptStatusPage> {
                     const SizedBox(height: 8),
                     InfoItem(
                       label: 'Tanggal Scan',
-                      value: dateFormat.format(state.shipmentDetail.date),
+                      value: dateFormat
+                          .format(state.shipmentDetail.date.toLocal()),
                     ),
                   ],
                 ),
               );
             }
 
-            if (state is FetchShipmentDetailError) {
+            if (state is FetchReceiptStatusError) {
               return Text(state.message, style: textTheme.titleMedium);
             }
 

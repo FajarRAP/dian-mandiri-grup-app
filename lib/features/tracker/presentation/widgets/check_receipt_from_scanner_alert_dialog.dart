@@ -66,26 +66,20 @@ class _CheckReceiptFromScannerAlertDialogState
             await shipmentCubit.fetchShipmentByReceiptNumber(
                 receipNumber: _receiptController.text.trim());
           },
-          child: BlocConsumer<ShipmentCubit, ShipmentState>(
+          child: BlocListener<ShipmentCubit, ShipmentState>(
             listener: (context, state) {
-              if (state is FetchShipmentDetailError) {
+              if (state is FetchReceiptStatusError) {
                 flushbar(state.message);
               }
 
-              if (state is FetchShipmentDetailLoaded) {
+              if (state is FetchReceiptStatusLoading) {
                 context.pop();
               }
             },
-            builder: (context, state) {
-              if (state is FetchShipmentDetailLoading) {
-                return const CircularProgressIndicator();
-              }
-
-              return const Text(
-                'Cari',
-                style: TextStyle(fontWeight: FontWeight.w700),
-              );
-            },
+            child: const Text(
+              'Cari',
+              style: TextStyle(fontWeight: FontWeight.w700),
+            ),
           ),
         ),
       ],

@@ -156,7 +156,7 @@ const menus = <_Menu>[
     route: checkReceiptRoute,
     color: Colors.red,
     assetName: checkReceiptIcon,
-    permission: scanPermission,
+    permission: checkPermission,
   ),
   _Menu(
     title: 'Scan Packing',
