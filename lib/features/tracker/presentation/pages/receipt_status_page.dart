@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/helpers/helpers.dart';
+import '../../data/models/shipment_detail_status_model.dart';
 import '../cubit/shipment_cubit.dart';
 import '../widgets/action_button.dart';
 import '../widgets/check_receipt_from_scanner_alert_dialog.dart';
@@ -29,6 +30,8 @@ class ReceiptStatusPage extends StatelessWidget {
             }
 
             if (state is FetchReceiptStatusLoaded) {
+              final stages =
+                  (state.shipmentDetail as ShipmentDetailStatusModel).stages;
               return Card(
                 margin: const EdgeInsets.all(16),
                 child: ListView(
@@ -58,17 +61,54 @@ class ReceiptStatusPage extends StatelessWidget {
                       label: 'Nama Ekspedisi',
                       value: state.shipmentDetail.courier,
                     ),
-                    const SizedBox(height: 8),
-                    InfoItem(
-                      label: 'Status',
-                      value: state.shipmentDetail.stage,
+                    const SizedBox(height: 12),
+                    Text(
+                      'Riwayat Status',
+                      style: textTheme.titleMedium
+                          ?.copyWith(fontWeight: FontWeight.w700),
                     ),
                     const SizedBox(height: 8),
-                    InfoItem(
-                      label: 'Tanggal Scan',
-                      value: dateFormat
-                          .format(state.shipmentDetail.date.toLocal()),
+                    ListView.separated(
+                      itemBuilder: (context, index) {
+                        final stage = stages[index];
+                        return Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade100,
+                            borderRadius: BorderRadius.circular(8),
+                            boxShadow: [
+                              BoxShadow(
+                                blurRadius: 2,
+                                color: Colors.black.withOpacity(0.1),
+                                offset: const Offset(0, 1),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                stage.stage,
+                                style: textTheme.bodyLarge
+                                    ?.copyWith(fontWeight: FontWeight.w600),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                dateTimeFormat.format(stage.date.toLocal()),
+                                style: textTheme.bodySmall
+                                    ?.copyWith(color: Colors.grey.shade600),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                      separatorBuilder: (context, index) =>
+                          const SizedBox(height: 8),
+                      itemCount: stages.length,
+                      physics: const NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
                     ),
+                    const SizedBox(height: 12),
                   ],
                 ),
               );
