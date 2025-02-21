@@ -11,6 +11,7 @@ import '../../domain/entities/shipment_report_entity.dart';
 import '../../domain/repositories/shipment_repository.dart';
 import '../datasources/shipment_remote_data_source.dart';
 import '../models/shipment_detail_model.dart';
+import '../models/shipment_detail_status_model.dart';
 import '../models/shipment_model.dart';
 import '../models/shipment_report_model.dart';
 
@@ -94,7 +95,7 @@ class ShipmentRepositoryImpl extends ShipmentRepository {
     try {
       final response = await shipmentRemoteDataSource
           .fetchShipmentByReceiptNumber(receiptNumber: receiptNumber);
-      return Right(ShipmentDetailModel.fromJson(response.data['data']));
+      return Right(ShipmentDetailStatusModel.fromJson(response.data['data']));
     } on DioException catch (de) {
       switch (de.response?.statusCode) {
         case 401:

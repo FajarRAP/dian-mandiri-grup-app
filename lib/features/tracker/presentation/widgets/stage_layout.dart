@@ -63,7 +63,7 @@ class _StageLayoutState extends State<StageLayout> {
         if (state is InsertShipmentLoaded) {
           flushbar(state.message);
           await audioPlayer.play(AssetSource(successSound));
-          await shipmentCubit.fetchShipments(
+          await shipmentCubit.fetchShipmentsPaginate(
               date: dateFormat.format(DateTime.now()), stage: widget.stage);
         }
         if (state is InsertShipmentError) {

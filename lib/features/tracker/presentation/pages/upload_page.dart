@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/common/snackbar.dart';
+import '../../data/models/shipment_detail_model.dart';
 import '../cubit/shipment_cubit.dart';
 
 class DisplayPictureScreen extends StatelessWidget {
@@ -49,7 +50,9 @@ class DisplayPictureScreen extends StatelessWidget {
                     await shipmentCubit.insertShipmentDocument(
                   shipmentId: shipmentId,
                   image: image,
-                  stage: shipmentCubit.shipmentDetail.stage,
+                  stage: (shipmentCubit.shipmentDetail as ShipmentDetailModel)
+                      .stage
+                      .stage,
                 ),
                 child: const Text('Unggah'),
               );
