@@ -75,7 +75,7 @@ class TrackerPage extends StatelessWidget {
         assetName: scanReceiptIcon,
       ),
       HomeMenuCard(
-        title: 'Scan Ambil Resi',
+        title: 'Scan Ambil Barang',
         route: pickUpReceiptRoute,
         color: Colors.brown,
         assetName: pickUpReceiptIcon,
