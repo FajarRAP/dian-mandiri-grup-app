@@ -2,10 +2,8 @@ import 'dart:async';
 
 import 'package:camera/camera.dart';
 import 'package:flashy_flushbar/flashy_flushbar.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -24,9 +22,6 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   cameras = await availableCameras();
   await initializeDateFormatting('id_ID', null);
-
-  const env = kReleaseMode ? '.env.prod' : '.env.stage';
-  await dotenv.load(fileName: env);
 
   setup();
 

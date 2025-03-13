@@ -1,5 +1,3 @@
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-
 const loginRoute = "/login";
 const getTokenResetPasswordRoute = "/get-token-reset-password";
 const resetPasswordRoute = "/reset-password";
@@ -68,8 +66,9 @@ const failedReport = 'failed';
 
 enum ScanType { camera, scannner }
 
-final shipmentEndpoint = dotenv.get('SHIPMENT_ENDPOINT');
-final authEndpoint = dotenv.get('AUTH_ENDPOINT');
-final accessTokenKey = dotenv.get('ACCESS_TOKEN_KEY');
-final refreshTokenKey = dotenv.get('REFRESH_TOKEN_KEY');
-final userKey = dotenv.get('USER_KEY');
+const apiUrl = String.fromEnvironment('API_URL');
+const shipmentEndpoint = String.fromEnvironment('SHIPMENT_ENDPOINT');
+const authEndpoint = String.fromEnvironment('AUTH_ENDPOINT');
+const accessTokenKey = String.fromEnvironment('ACCESS_TOKEN_KEY');
+const refreshTokenKey = String.fromEnvironment('REFRESH_TOKEN_KEY');
+const userKey = String.fromEnvironment('USER_KEY');
