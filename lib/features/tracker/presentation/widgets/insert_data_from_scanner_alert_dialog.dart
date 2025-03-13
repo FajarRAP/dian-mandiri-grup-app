@@ -1,23 +1,17 @@
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import '../../../auth/presentation/cubit/auth_cubit.dart';
 
-import '../../../../core/common/constants.dart';
-import '../../../../core/common/snackbar.dart';
-import '../../../../core/helpers/helpers.dart';
 import '../../../../core/helpers/validators.dart';
+import '../../../auth/presentation/cubit/auth_cubit.dart';
 import '../cubit/shipment_cubit.dart';
 
 class InsertDataFromScannerAlertDialog extends StatefulWidget {
   const InsertDataFromScannerAlertDialog({
     super.key,
-    required this.audioPlayer,
     required this.stage,
   });
 
-  final AudioPlayer audioPlayer;
   final String stage;
 
   @override
@@ -43,10 +37,14 @@ class _InsertDataFromScannerAlertDialogState
     final textTheme = Theme.of(context).textTheme;
 
     return AlertDialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
       title: Text(
         'Silakan Scan',
-        style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+        style: textTheme.titleLarge?.copyWith(
+          fontWeight: FontWeight.w700,
+        ),
       ),
       content: Form(
         key: _formKey,
@@ -54,7 +52,10 @@ class _InsertDataFromScannerAlertDialogState
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Nomor Resi:', style: textTheme.bodyMedium),
+            Text(
+              'Nomor Resi:',
+              style: textTheme.bodyMedium,
+            ),
             const SizedBox(height: 4),
             TextFormField(
               autofocus: true,
@@ -64,17 +65,25 @@ class _InsertDataFromScannerAlertDialogState
               validator: inputValidator,
             ),
             const SizedBox(height: 16),
-            Text('Nama Pemindai:', style: textTheme.bodyMedium),
+            Text(
+              'Nama Pemindai:',
+              style: textTheme.bodyMedium,
+            ),
             Text(
               authCubit.user.name,
-              style: textTheme.bodyLarge
-                  ?.copyWith(color: Colors.green, fontWeight: FontWeight.w600),
+              style: textTheme.bodyLarge?.copyWith(
+                color: Colors.green,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ],
         ),
       ),
       actions: [
-        TextButton(onPressed: context.pop, child: const Text('Batal')),
+        TextButton(
+          onPressed: context.pop,
+          child: const Text('Batal'),
+        ),
         TextButton(
           onPressed: () async {
             if (!_formKey.currentState!.validate()) return;
@@ -85,28 +94,10 @@ class _InsertDataFromScannerAlertDialogState
           },
           child: BlocConsumer<ShipmentCubit, ShipmentState>(
             buildWhen: (previous, current) => current is InsertShipment,
-            listener: (context, state) async {
+            listenWhen: (previous, current) => current is InsertShipment,
+            listener: (context, state) {
               if (state is InsertShipmentLoaded) {
                 context.pop();
-                flushbar(state.message);
-                await widget.audioPlayer.play(AssetSource(successSound));
-                await shipmentCubit.fetchShipments(
-                    date: dateFormat.format(DateTime.now()),
-                    stage: widget.stage);
-              }
-              if (state is InsertShipmentError) {
-                flushbar(state.failure.message);
-
-                // Need requested
-                // switch (state.statusCode) {
-                //   case 400:
-                //     await widget.audioPlayer.play(AssetSource(skipSound));
-                //     break;
-                //   case 401:
-                //   case 23505:
-                //     await widget.audioPlayer.play(AssetSource(repeatSound));
-                //     break;
-                // }
               }
             },
             builder: (context, state) {

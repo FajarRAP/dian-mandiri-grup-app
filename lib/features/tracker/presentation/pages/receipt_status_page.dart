@@ -2,13 +2,13 @@ import 'package:barcode_scan2/barcode_scan2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../core/helpers/helpers.dart';
 import '../../data/models/shipment_detail_status_model.dart';
 import '../cubit/shipment_cubit.dart';
 import '../widgets/action_button.dart';
 import '../widgets/check_receipt_from_scanner_alert_dialog.dart';
-import '../widgets/detail_ship_info_item.dart';
 import '../widgets/expandable_fab.dart';
+import '../widgets/receipt_history_row.dart';
+import '../widgets/receipt_info_row.dart';
 
 class ReceiptStatusPage extends StatelessWidget {
   const ReceiptStatusPage({super.key});
@@ -32,93 +32,137 @@ class ReceiptStatusPage extends StatelessWidget {
             if (state is FetchReceiptStatusLoaded) {
               final stages =
                   (state.shipmentDetail as ShipmentDetailStatusModel).stages;
-              return Card(
-                margin: const EdgeInsets.all(16),
-                child: ListView(
-                  shrinkWrap: true,
-                  padding: const EdgeInsets.all(12),
-                  physics: const NeverScrollableScrollPhysics(),
-                  children: [
-                    Text(
-                      'Informasi Resi',
-                      style: textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
-                      textAlign: TextAlign.center,
+
+              return SingleChildScrollView(
+                child: Card(
+                  elevation: 2,
+                  margin: const EdgeInsets.all(16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
                     ),
-                    const SizedBox(height: 8),
-                    InfoItem(
-                      label: 'Nomor Resi',
-                      value: state.shipmentDetail.receiptNumber,
-                    ),
-                    const SizedBox(height: 8),
-                    InfoItem(
-                      label: 'Nama Karyawan',
-                      value: state.shipmentDetail.user.name,
-                    ),
-                    const SizedBox(height: 8),
-                    InfoItem(
-                      label: 'Nama Ekspedisi',
-                      value: state.shipmentDetail.courier,
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      'Riwayat Status',
-                      style: textTheme.titleMedium
-                          ?.copyWith(fontWeight: FontWeight.w700),
-                    ),
-                    const SizedBox(height: 8),
-                    ListView.separated(
-                      itemBuilder: (context, index) {
-                        final stage = stages[index];
-                        return Container(
-                          padding: const EdgeInsets.all(10),
+                    child: Column(
+                      children: [
+                        Container(
                           decoration: BoxDecoration(
-                            color: Colors.grey.shade100,
-                            borderRadius: BorderRadius.circular(8),
-                            boxShadow: [
-                              BoxShadow(
-                                blurRadius: 2,
-                                color: Colors.black.withOpacity(0.1),
-                                offset: const Offset(0, 1),
-                              ),
-                            ],
+                            borderRadius: const BorderRadius.vertical(
+                              top: Radius.circular(16),
+                            ),
+                            color: Colors.green,
                           ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                stage.stage,
-                                style: textTheme.bodyLarge
-                                    ?.copyWith(fontWeight: FontWeight.w600),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                dateTimeFormat.format(stage.date.toLocal()),
-                                style: textTheme.bodySmall
-                                    ?.copyWith(color: Colors.grey.shade600),
-                              ),
-                            ],
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          width: double.infinity,
+                          child: Text(
+                            'Informasi Resi',
+                            style: textTheme.headlineSmall?.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                            ),
+                            textAlign: TextAlign.center,
                           ),
-                        );
-                      },
-                      separatorBuilder: (context, index) =>
-                          const SizedBox(height: 8),
-                      itemCount: stages.length,
-                      physics: const NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
+                        ),
+                        ListView(
+                          padding: const EdgeInsets.all(16),
+                          physics: const NeverScrollableScrollPhysics(),
+                          shrinkWrap: true,
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                boxShadow: [
+                                  BoxShadow(
+                                    blurRadius: 8,
+                                    color: Colors.black.withOpacity(0.05),
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                                color: Colors.white,
+                              ),
+                              padding: const EdgeInsets.all(16),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.receipt_long,
+                                        color: Colors.green,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        'Detail Pengiriman',
+                                        style: textTheme.titleMedium?.copyWith(
+                                          color: Colors.green,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const Divider(height: 24),
+                                  ReceiptInfoRow(
+                                    icon: Icons.numbers,
+                                    label: 'Nomor Resi',
+                                    value: state.shipmentDetail.receiptNumber,
+                                    isSelectable: true,
+                                  ),
+                                  const SizedBox(height: 12),
+                                  ReceiptInfoRow(
+                                    icon: Icons.local_shipping,
+                                    label: 'Nama Ekspedisi',
+                                    value: state.shipmentDetail.courier,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.history,
+                                  color: Colors.green,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'Riwayat Status',
+                                  style: textTheme.titleMedium?.copyWith(
+                                    color: Colors.green,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                            ListView.separated(
+                              itemBuilder: (context, index) {
+                                final stage = stages[index];
+                                final isLast = index == stages.length - 1;
+
+                                return ReceiptHistoryRow(
+                                  isLast: isLast,
+                                  stage: stage,
+                                );
+                              },
+                              separatorBuilder: (context, index) =>
+                                  const SizedBox(height: 12),
+                              itemCount: stages.length,
+                              physics: const NeverScrollableScrollPhysics(),
+                              shrinkWrap: true,
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 12),
-                  ],
+                  ),
                 ),
               );
             }
 
-            if (state is FetchReceiptStatusError) {
-              return Text(state.message, style: textTheme.titleMedium);
-            }
-
-            return Text('Scan terlebih dahulu', style: textTheme.titleMedium);
+            return Text(
+              'Scan terlebih dahulu',
+              style: textTheme.titleMedium,
+            );
           },
         ),
       ),

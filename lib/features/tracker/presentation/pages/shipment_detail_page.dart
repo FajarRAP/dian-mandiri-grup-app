@@ -26,9 +26,7 @@ class ShipmentDetailPage extends StatelessWidget {
 
     return BlocListener<ShipmentCubit, ShipmentState>(
       listener: (context, state) {
-        if (state is FetchShipmentDetailError) {
-          print(state.message);
-        }
+        if (state is FetchShipmentDetailError) {}
       },
       child: Scaffold(
         appBar: AppBar(title: const Text('Detail Resi')),
@@ -36,14 +34,15 @@ class ShipmentDetailPage extends StatelessWidget {
           bloc: shipmentCubit..fetchShipmentById(shipmentId: shipmentId),
           buildWhen: (previous, current) => current is FetchShipmentDetail,
           builder: (context, state) {
-            print(state);
             if (state is FetchShipmentDetailLoading) {
               return const Center(child: CircularProgressIndicator());
             }
 
             if (state is FetchShipmentDetailLoaded) {
+              final shipmentDetail =
+                  state.shipmentDetail as ShipmentDetailModel;
               final isPermissionGranted =
-                  authCubit.user.id == state.shipmentDetail.user.id;
+                  authCubit.user.id == shipmentDetail.stage.user.id;
               // final isSuperAdmin =
               //     authCubit.user.permissions.contains(superAdminPermission);
               shipmentCubit.shipmentDetail =
@@ -88,7 +87,7 @@ class ShipmentDetailPage extends StatelessWidget {
                     const SizedBox(height: 12),
                     InfoItem(
                       label: 'Di Scan Oleh',
-                      value: state.shipmentDetail.user.name,
+                      value: shipmentDetail.stage.user.name,
                     ),
                     const SizedBox(height: 8),
                     InfoItem(

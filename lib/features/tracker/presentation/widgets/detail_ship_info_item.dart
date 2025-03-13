@@ -21,7 +21,7 @@ class InfoItem extends StatelessWidget {
           label,
           style: textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
         ),
-        Text(
+        SelectableText(
           value,
           style: textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w500),
         ),

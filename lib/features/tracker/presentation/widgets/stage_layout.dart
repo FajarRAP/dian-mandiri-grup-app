@@ -5,9 +5,9 @@ import 'package:barcode_scan2/platform_wrapper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ship_tracker/core/common/snackbar.dart';
 
 import '../../../../core/common/constants.dart';
+import '../../../../core/common/snackbar.dart';
 import '../../../../core/helpers/helpers.dart';
 import '../../../auth/presentation/cubit/auth_cubit.dart';
 import '../../domain/entities/shipment_entity.dart';
@@ -63,8 +63,10 @@ class _StageLayoutState extends State<StageLayout> {
         if (state is InsertShipmentLoaded) {
           flushbar(state.message);
           await audioPlayer.play(AssetSource(successSound));
-          await shipmentCubit.fetchShipmentsPaginate(
-              date: dateFormat.format(DateTime.now()), stage: widget.stage);
+          await shipmentCubit.fetchShipments(
+            date: dateFormat.format(DateTime.now()),
+            stage: widget.stage,
+          );
         }
         if (state is InsertShipmentError) {
           flushbar(state.failure.message);
@@ -305,8 +307,8 @@ class _StageLayoutState extends State<StageLayout> {
             ActionButton(
               onPressed: () => showDialog(
                 context: context,
-                builder: (context) => InsertDataFromScannerAlertDialog(
-                    audioPlayer: AudioPlayer(), stage: widget.stage),
+                builder: (context) =>
+                    InsertDataFromScannerAlertDialog(stage: widget.stage),
               ),
               icon: Icons.barcode_reader,
             ),

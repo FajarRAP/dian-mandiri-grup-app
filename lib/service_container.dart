@@ -1,10 +1,10 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:ship_tracker/core/common/constants.dart';
 
-import 'core/common/constants.dart';
+import 'core/helpers/dio_interceptor.dart';
 import 'features/auth/data/datasources/auth_remote_data_source.dart';
 import 'features/auth/data/repositories/auth_repository_impl.dart';
 import 'features/auth/domain/repositories/auth_repository.dart';
@@ -38,52 +38,10 @@ void setup() {
   getIt.registerLazySingleton<Dio>(
     () => Dio(
       BaseOptions(
-        baseUrl: dotenv.get('API_URL'),
+        baseUrl: apiUrl,
         connectTimeout: const Duration(seconds: 5),
       ),
-    )..interceptors.add(
-        InterceptorsWrapper(
-          onError: (error, handler) async {
-            final storage = getIt.get<FlutterSecureStorage>();
-            final refreshToken = await storage.read(key: refreshTokenKey);
-            final authRepository = getIt.get<AuthRepository>();
-
-            if (error.requestOptions.path == '$authEndpoint/refresh') {
-              if (error.response?.statusCode == 401) {
-                await storage.deleteAll();
-              }
-            } else {
-              if (error.response?.statusCode == 401 && refreshToken != null) {
-                await authRepository.refreshToken(
-                    refreshToken: refreshToken);
-              }
-            }
-
-            return handler.next(error);
-          },
-          onRequest: (options, handler) async {
-            final storage = getIt.get<FlutterSecureStorage>();
-            final accessToken = await storage.read(key: accessTokenKey);
-
-            if (options.path != '$authEndpoint/refresh') {
-              options.headers = {
-                'Accept': 'application/json',
-                'Authorization': 'Bearer $accessToken',
-              };
-            }
-
-            return handler.next(options);
-          },
-          onResponse: (response, handler) async {
-            final storage = getIt.get<FlutterSecureStorage>();
-            if (response.requestOptions.path == '$authEndpoint/refresh' &&
-                response.statusCode == 401) {
-              await storage.deleteAll();
-            }
-            return handler.next(response);
-          },
-        ),
-      ),
+    )..interceptors.add(DioInterceptor()),
   );
 
   // Auth
