@@ -1,6 +1,5 @@
 import '../../domain/entities/shipment_detail_entity.dart';
 import 'stage_model.dart';
-import 'user_model.dart';
 
 class ShipmentDetailStatusModel extends ShipmentDetailEntity {
   ShipmentDetailStatusModel({
@@ -8,7 +7,6 @@ class ShipmentDetailStatusModel extends ShipmentDetailEntity {
     required super.courier,
     required super.document,
     required super.receiptNumber,
-    required super.user,
     required this.stages,
   });
 
@@ -16,12 +14,12 @@ class ShipmentDetailStatusModel extends ShipmentDetailEntity {
 
   factory ShipmentDetailStatusModel.fromJson(Map<String, dynamic> json) =>
       ShipmentDetailStatusModel(
-          id: json['id'],
-          courier: json['courier'],
-          document: json['document'],
-          receiptNumber: json['receipt_number'],
-          stages: (json['stages'] as List)
-              .map((e) => StageModel.fromJson(e))
-              .toList(),
-          user: UserModel.fromJson(json['user']));
+        id: json['id'],
+        courier: json['courier'],
+        document: json['document'],
+        receiptNumber: json['receipt_number'],
+        stages: List<Map<String, dynamic>>.from(json['stages'])
+            .map(StageModel.fromJson)
+            .toList(),
+      );
 }

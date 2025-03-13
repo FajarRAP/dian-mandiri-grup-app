@@ -8,7 +8,6 @@ class ShipmentDetailModel extends ShipmentDetailEntity {
     required super.courier,
     required super.document,
     required super.receiptNumber,
-    required super.user,
     required this.stage,
   });
 
@@ -16,11 +15,14 @@ class ShipmentDetailModel extends ShipmentDetailEntity {
 
   factory ShipmentDetailModel.fromJson(Map<String, dynamic> json) =>
       ShipmentDetailModel(
-          id: json['id'],
-          courier: json['courier'],
-          document: json['document'],
-          receiptNumber: json['receipt_number'],
+        id: json['id'],
+        courier: json['courier'],
+        document: json['document'],
+        receiptNumber: json['receipt_number'],
+        stage: StageModel(
+          stage: json['stage'],
+          date: DateTime.parse(json['date']),
           user: UserModel.fromJson(json['user']),
-          stage: StageModel(
-              stage: json['stage'], date: DateTime.parse(json['date'])));
+        ),
+      );
 }
