@@ -4,11 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:meta/meta.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:ship_tracker/core/common/constants.dart';
-import 'package:ship_tracker/service_container.dart';
 
+import '../../../../core/common/constants.dart';
 import '../../../../core/exceptions/refresh_token.dart';
 import '../../../../core/failure/failure.dart';
+import '../../../../service_container.dart';
 import '../../domain/entities/shipment_detail_entity.dart';
 import '../../domain/entities/shipment_entity.dart';
 import '../../domain/entities/shipment_report_entity.dart';
