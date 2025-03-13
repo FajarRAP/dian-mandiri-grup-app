@@ -1,4 +1,6 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:intl/intl.dart';
+
 import '../common/constants.dart';
 
 final dateFormat = DateFormat('y-MM-dd', 'id_ID');
@@ -23,4 +25,9 @@ String evaluateStage(String stage) {
     default:
       return 'Tidak Diketahui';
   }
+}
+
+Future<bool> isInternetConnected() async {
+  final connectivity = await Connectivity().checkConnectivity();
+  return !connectivity.contains(ConnectivityResult.none);
 }
