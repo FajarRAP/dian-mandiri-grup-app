@@ -1,6 +1,8 @@
+import 'package:flutter/material.dart';
+
 const loginRoute = "/login";
-const getTokenResetPasswordRoute = "/get-token-reset-password";
-const resetPasswordRoute = "/reset-password";
+const profileRoute = "/profile";
+const displayPictureRoute = "/picture";
 
 const trackerRoute = "/";
 const scanReceiptRoute = "${trackerRoute}scan";
@@ -14,11 +16,21 @@ const receiptStatusRoute = "${trackerRoute}status";
 const detailReceiptRoute = "${trackerRoute}detail";
 const cameraRoute = "${trackerRoute}camera";
 
-const profileRoute = "/profile";
-const registerRoute = "$profileRoute/register";
-
-const barcodeScannerRoute = "/barcode-scanner";
-const displayPictureRoute = "/picture";
+const iconsPath = "assets/icons";
+const spreadsheetIcon = "$iconsPath/excel.png";
+const scanReceiptIcon = "$iconsPath/scan.png";
+const pickUpReceiptIcon = "$iconsPath/pick-up.png";
+const checkReceiptIcon = "$iconsPath/check.png";
+const packReceiptIcon = "$iconsPath/pack.png";
+const sendReceiptIcon = "$iconsPath/send.png";
+const returnReceiptIcon = "$iconsPath/return.png";
+const reportReceiptIcon = "$iconsPath/report.png";
+const checkReceiptStatusIcon = "$iconsPath/check.png";
+const googleIcon = "$iconsPath/google.png";
+const soundsPath = "sounds";
+const successSound = "$soundsPath/success.mp3";
+const skipSound = "$soundsPath/skip.mp3";
+const repeatSound = "$soundsPath/repeat.mp3";
 
 const scanStage = 'scan';
 const pickUpStage = 'pick_up';
@@ -26,30 +38,6 @@ const checkStage = 'check';
 const packStage = 'pack';
 const sendStage = 'send';
 const returnStage = 'return';
-
-const spreadsheetIcon = "assets/excel.png";
-const scanReceiptIcon = "assets/scan.png";
-const pickUpReceiptIcon = "assets/pick-up.png";
-const checkReceiptIcon = "assets/check.png";
-const packReceiptIcon = "assets/pack.png";
-const sendReceiptIcon = "assets/send.png";
-const returnReceiptIcon = "assets/return.png";
-const reportReceiptIcon = "assets/report.png";
-const checkReceiptStatusIcon = "assets/check-receipt.png";
-const googleIcon = "assets/google-icon.png";
-
-const successSound = "sounds/success.mp3";
-const skipSound = "sounds/skip.mp3";
-const repeatSound = "sounds/repeat.mp3";
-
-const scanRole = 2;
-const pickUpRole = 3;
-const checkRole = 4;
-const packRole = 5;
-const sendRole = 6;
-const returnRole = 7;
-const pickUpAndPackRole = 8;
-const packAndSendRole = 9;
 
 const superAdminPermission = 'super_admin';
 const scanPermission = 'shipment:$scanStage';
@@ -64,11 +52,11 @@ const processingReport = 'processing';
 const completedReport = 'completed';
 const failedReport = 'failed';
 
-enum ScanType { camera, scannner }
-
 const apiUrl = String.fromEnvironment('API_URL');
 const shipmentEndpoint = String.fromEnvironment('SHIPMENT_ENDPOINT');
 const authEndpoint = String.fromEnvironment('AUTH_ENDPOINT');
 const accessTokenKey = String.fromEnvironment('ACCESS_TOKEN_KEY');
 const refreshTokenKey = String.fromEnvironment('REFRESH_TOKEN_KEY');
 const userKey = String.fromEnvironment('USER_KEY');
+
+final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
