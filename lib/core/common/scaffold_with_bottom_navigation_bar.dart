@@ -45,9 +45,9 @@ class ScaffoldWithBottomNavigationBar extends StatelessWidget {
         bottomNavigationBar: BottomNavigationBar(
           currentIndex: child.currentIndex,
           onTap: child.goBranch,
-          items: const [
+          items: const <BottomNavigationBarItem>[
             BottomNavigationBarItem(
-              icon: Icon(Icons.home),
+              icon: Icon(Icons.home_outlined),
               label: 'Home',
             ),
             BottomNavigationBarItem(
