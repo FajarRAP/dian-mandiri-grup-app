@@ -110,8 +110,12 @@ class ShipmentCubit extends Cubit<ShipmentState> {
         }
       },
       (r) {
-        shipments.addAll(r);
-        _fetchShipmentsPage++;
+        shipments.addAll(r['shipments']);
+        if (_fetchShipmentsPage < r['totalPage']) {
+          _fetchShipmentsPage++;
+        } else {
+          isEndPage = true;
+        }
         emit(FetchShipmentsLoaded(shipments: shipments));
       },
     );
@@ -134,10 +138,10 @@ class ShipmentCubit extends Cubit<ShipmentState> {
         }
       },
       (r) {
-        if (r.isNotEmpty) {
+        if (_fetchShipmentsPage < r['totalPage']) {
           isEndPage = false;
           _fetchShipmentsPage++;
-          shipments.addAll(r);
+          shipments.addAll(r['shipments']);
         } else {
           isEndPage = true;
         }
@@ -163,7 +167,7 @@ class ShipmentCubit extends Cubit<ShipmentState> {
           emit(FetchShipmentsError(message: l.message));
         }
       },
-      (r) => emit(SearchShipmentsLoaded(shipments: r)),
+      (r) => emit(SearchShipmentsLoaded(shipments: r['shipments'])),
     );
   }
 

@@ -6,7 +6,6 @@ import 'package:flutter/foundation.dart';
 import '../../../../core/exceptions/refresh_token.dart';
 import '../../../../core/failure/failure.dart';
 import '../../domain/entities/shipment_detail_entity.dart';
-import '../../domain/entities/shipment_entity.dart';
 import '../../domain/entities/shipment_report_entity.dart';
 import '../../domain/repositories/shipment_repository.dart';
 import '../datasources/shipment_remote_data_source.dart';
@@ -140,7 +139,7 @@ class ShipmentRepositoryImpl extends ShipmentRepository {
   }
 
   @override
-  Future<Either<Failure, List<ShipmentEntity>>> fetchShipments(
+  Future<Either<Failure, Map<String, dynamic>>> fetchShipments(
       {required String date,
       required String stage,
       int page = 1,
@@ -148,8 +147,11 @@ class ShipmentRepositoryImpl extends ShipmentRepository {
     try {
       final response = await shipmentRemoteDataSource.fetchShipments(
           date: date, stage: stage, page: page, keyword: keyword);
-      final contents = response.data['data']['content'] as List;
-      return Right(contents.map((e) => ShipmentModel.fromJson(e)).toList());
+      final contents =
+          List<Map<String, dynamic>>.from(response.data['data']['content']);
+      final shipments = contents.map(ShipmentModel.fromJson).toList();
+      final totalPage = response.data['data']['metadata']['total_page'];
+      return Right({'shipments': shipments, 'totalPage': totalPage});
     } on DioException catch (de) {
       switch (de.response?.statusCode) {
         case 401:
