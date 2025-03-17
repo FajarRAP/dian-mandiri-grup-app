@@ -25,8 +25,6 @@ class ReceiptHistoryRow extends StatelessWidget {
         Column(
           children: [
             Container(
-              width: 24,
-              height: 24,
               decoration: BoxDecoration(
                 border: Border.all(
                   color: Colors.white,
@@ -35,12 +33,14 @@ class ReceiptHistoryRow extends StatelessWidget {
                 boxShadow: [
                   BoxShadow(
                     blurRadius: 5,
-                    color: Colors.green.withOpacity(0.3),
+                    color: Colors.green.withValues(alpha: 0.3),
                   )
                 ],
-                color: Colors.green.withOpacity(0.6),
+                color: Colors.green.withValues(alpha: 0.6),
                 shape: BoxShape.circle,
               ),
+              height: 24,
+              width: 24,
               child: Icon(
                 Icons.circle,
                 color: Colors.white,
@@ -49,7 +49,7 @@ class ReceiptHistoryRow extends StatelessWidget {
             ),
             if (!isLast)
               Container(
-                color: Colors.green.withOpacity(0.3),
+                color: Colors.green.withValues(alpha: 0.3),
                 height: 60,
                 width: 2,
               ),
@@ -65,7 +65,7 @@ class ReceiptHistoryRow extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: Colors.black.withValues(alpha: 0.05),
                       blurRadius: 5,
                       offset: const Offset(0, 2),
                     ),
@@ -83,7 +83,7 @@ class ReceiptHistoryRow extends StatelessWidget {
                     Text(
                       stageName,
                       style: textTheme.titleLarge?.copyWith(
-                        color: Colors.green.withOpacity(0.8),
+                        color: Colors.green.withValues(alpha: 0.8),
                         fontWeight: FontWeight.w700,
                       ),
                     ),

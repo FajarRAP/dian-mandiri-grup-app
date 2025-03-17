@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:camera/camera.dart';
-import 'package:flashy_flushbar/flashy_flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -43,7 +42,6 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (context) => getIt.get<ShipmentCubit>()),
       ],
       child: MaterialApp.router(
-        builder: FlashyFlushbarProvider.init(),
         localizationsDelegates: const [
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
@@ -52,6 +50,7 @@ class MyApp extends StatelessWidget {
         title: 'Ship Tracker',
         theme: theme,
         routerConfig: router,
+        scaffoldMessengerKey: scaffoldMessengerKey,
         supportedLocales: const [
           Locale('en'),
           Locale('id'),

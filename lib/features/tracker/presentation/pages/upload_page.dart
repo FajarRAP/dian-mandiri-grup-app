@@ -5,12 +5,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/common/constants.dart';
 import '../../../../core/common/snackbar.dart';
 import '../../data/models/shipment_detail_model.dart';
 import '../cubit/shipment_cubit.dart';
 
 class DisplayPictureScreen extends StatelessWidget {
-  const DisplayPictureScreen({super.key, required this.image});
+  const DisplayPictureScreen({
+    super.key,
+    required this.image,
+  });
 
   final XFile image;
 
@@ -21,7 +25,9 @@ class DisplayPictureScreen extends StatelessWidget {
     final file = File(image.path);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Upload Gambar Resi')),
+      appBar: AppBar(
+        title: const Text('Upload Gambar Resi'),
+      ),
       body: Column(
         children: [
           Image.file(file),
@@ -30,14 +36,17 @@ class DisplayPictureScreen extends StatelessWidget {
             buildWhen: (previous, current) => current is InsertShipmentDocument,
             listener: (context, state) {
               if (state is InsertShipmentDocumentLoaded) {
-                flushbar(state.message);
+                scaffoldMessengerKey.currentState
+                    ?.showSnackBar(successSnackbar(state.message));
                 shipmentCubit.fetchShipmentById(shipmentId: shipmentId);
-                context.pop();
-                context.pop();
+                context
+                  ..pop()
+                  ..pop();
               }
 
               if (state is InsertShipmentDocumentError) {
-                flushbar(state.message);
+                scaffoldMessengerKey.currentState
+                    ?.showSnackBar(dangerSnackbar(state.message));
               }
             },
             builder: (context, state) {

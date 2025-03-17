@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../../core/common/constants.dart';
+import '../../../../core/common/snackbar.dart';
+
 class ReceiptInfoRow extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -24,7 +27,7 @@ class ReceiptInfoRow extends StatelessWidget {
         Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8),
-            color: Colors.green.withOpacity(0.1),
+            color: Colors.green.withValues(alpha: 0.1),
           ),
           padding: const EdgeInsets.all(8),
           child: Icon(
@@ -49,14 +52,8 @@ class ReceiptInfoRow extends StatelessWidget {
                 GestureDetector(
                   onTap: () {
                     Clipboard.setData(ClipboardData(text: value));
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        behavior: SnackBarBehavior.floating,
-                        backgroundColor: Colors.green,
-                        content: Text('$label disalin ke clipboard'),
-                        duration: const Duration(seconds: 1),
-                      ),
-                    );
+                    scaffoldMessengerKey.currentState?.showSnackBar(
+                        successSnackbar('$label disalin ke clipboard'));
                   },
                   child: Row(
                     children: [

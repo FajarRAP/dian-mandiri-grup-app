@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:audioplayers/audioplayers.dart';
-import 'package:barcode_scan2/platform_wrapper.dart';
+import 'package:barcode_scan2/barcode_scan2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -61,28 +61,19 @@ class _StageLayoutState extends State<StageLayout> {
     return BlocListener<ShipmentCubit, ShipmentState>(
       listener: (context, state) async {
         if (state is InsertShipmentLoaded) {
-          flushbar(state.message);
+          scaffoldMessengerKey.currentState
+              ?.showSnackBar(successSnackbar(state.message));
           await audioPlayer.play(AssetSource(successSound));
           await shipmentCubit.fetchShipments(
             date: dateFormat.format(DateTime.now()),
             stage: widget.stage,
           );
         }
-        if (state is InsertShipmentError) {
-          flushbar(state.failure.message);
-
-          switch (state.failure.statusCode) {
-            case 422:
-              await audioPlayer.play(AssetSource(repeatSound));
-              break;
-            case 423:
-              await audioPlayer.play(AssetSource(skipSound));
-              break;
-          }
-        }
       },
       child: Scaffold(
-        appBar: AppBar(title: Text(widget.appBarTitle)),
+        appBar: AppBar(
+          title: Text(widget.appBarTitle),
+        ),
         body: Column(
           children: [
             Container(
@@ -94,12 +85,16 @@ class _StageLayoutState extends State<StageLayout> {
                   TextField(
                     onChanged: (value) {
                       if (_debounce?.isActive ?? false) _debounce?.cancel();
+
+                      void callback() => shipmentCubit.searchShipments(
+                          date: date,
+                          stage: widget.stage,
+                          keyword: value.trim());
+
                       _debounce = Timer(
-                          const Duration(milliseconds: 500),
-                          () => shipmentCubit.searchShipments(
-                              date: date,
-                              stage: widget.stage,
-                              keyword: value.trim()));
+                        const Duration(milliseconds: 500),
+                        callback,
+                      );
                     },
                     controller: _controller,
                     decoration: const InputDecoration(
@@ -113,20 +108,24 @@ class _StageLayoutState extends State<StageLayout> {
                       builder: (context, setState) => TextButton.icon(
                         onPressed: () async {
                           final datePicked = await showDatePicker(
-                              context: context,
-                              confirmText: 'Oke',
-                              firstDate: DateTime(2000),
-                              lastDate: DateTime(2100),
-                              locale: const Locale('id'));
+                            context: context,
+                            confirmText: 'Oke',
+                            firstDate: DateTime(2000),
+                            lastDate: DateTime(2100),
+                            locale: const Locale('id'),
+                          );
 
-                          if (datePicked != null) {
-                            setState(() {
-                              dMyDate = dMyFormat.format(datePicked);
-                              date = dateFormat.format(datePicked);
-                            });
-                            await shipmentCubit.fetchShipments(
-                                date: date, stage: widget.stage);
-                          }
+                          if (datePicked == null) return;
+
+                          setState(() {
+                            dMyDate = dMyFormat.format(datePicked);
+                            date = dateFormat.format(datePicked);
+                          });
+
+                          await shipmentCubit.fetchShipments(
+                            date: date,
+                            stage: widget.stage,
+                          );
                         },
                         iconAlignment: IconAlignment.end,
                         icon: const Icon(Icons.calendar_month_outlined),
@@ -150,7 +149,9 @@ class _StageLayoutState extends State<StageLayout> {
                 buildWhen: (previous, current) => current is FetchShipments,
                 builder: (context, state) {
                   if (state is FetchShipmentsLoading) {
-                    return const Center(child: CircularProgressIndicator());
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
                   }
 
                   if (state is FetchShipmentsLoaded) {
@@ -163,112 +164,35 @@ class _StageLayoutState extends State<StageLayout> {
                       );
                     }
 
-                    return ListTileTheme(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      tileColor: Colors.green,
-                      child: RefreshIndicator(
-                        displacement: 12,
-                        onRefresh: () async => shipmentCubit.fetchShipments(
-                            date: date, stage: widget.stage),
-                        child: ListView.separated(
-                          padding: const EdgeInsets.all(16),
-                          separatorBuilder: (context, index) =>
-                              const SizedBox(height: 8),
-                          itemBuilder: (context, index) {
-                            if (index == shipmentCubit.shipments.length) {
-                              if (!shipmentCubit.isEndPage) {
-                                shipmentCubit.fetchShipmentsPaginate(
-                                    date: date, stage: widget.stage);
-                                return const Center(
-                                  child: CircularProgressIndicator(),
-                                );
-                              } else {
-                                return const SizedBox();
-                              }
-                            }
+                    return _buildListItemWrapper(
+                      itemBuilder: (context, index) {
+                        if (index != shipmentCubit.shipments.length) {
+                          final shipment = state.shipments[index];
+                          return _buildListItem(shipment: shipment);
+                        }
 
-                            return ListTile(
-                              onTap: () => context.push(detailReceiptRoute,
-                                  extra: shipmentCubit.shipments[index].id),
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                              ),
-                              title: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    shipmentCubit.shipments[index].courier,
-                                    style: textTheme.titleLarge,
-                                  ),
-                                  Text(
-                                    dateTimeFormat.format(shipmentCubit
-                                        .shipments[index].date
-                                        .toLocal()),
-                                    style: textTheme.bodyMedium,
-                                  ),
-                                ],
-                              ),
-                              subtitle: Text(
-                                shipmentCubit.shipments[index].receiptNumber,
-                                style: textTheme.titleMedium,
-                              ),
-                              trailing: _buildDeleteButton(
-                                  shipmentCubit.shipments[index]),
-                            );
-                          },
-                          itemCount: shipmentCubit.shipments.length + 1,
-                        ),
-                      ),
+                        if (!shipmentCubit.isEndPage) {
+                          shipmentCubit.fetchShipmentsPaginate(
+                            date: date,
+                            stage: widget.stage,
+                          );
+
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+
+                        return const SizedBox();
+                      },
+                      itemCount: state.shipments.length + 1,
                     );
                   }
 
                   if (state is SearchShipmentsLoaded) {
-                    return ListTileTheme(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      tileColor: Colors.green,
-                      child: RefreshIndicator(
-                        displacement: 12,
-                        onRefresh: () async => shipmentCubit.fetchShipments(
-                            date: date, stage: widget.stage),
-                        child: ListView.separated(
-                          padding: const EdgeInsets.all(16),
-                          separatorBuilder: (context, index) =>
-                              const SizedBox(height: 8),
-                          itemBuilder: (context, index) => ListTile(
-                            onTap: () => context.push(detailReceiptRoute,
-                                extra: state.shipments[index].id),
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                            ),
-                            title: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  state.shipments[index].courier,
-                                  style: textTheme.titleLarge,
-                                ),
-                                Text(
-                                  dateTimeFormat
-                                      .format(state.shipments[index].date),
-                                  style: textTheme.bodyMedium,
-                                ),
-                              ],
-                            ),
-                            subtitle: Text(
-                              state.shipments[index].receiptNumber,
-                              style: textTheme.titleMedium,
-                            ),
-                            trailing:
-                                _buildDeleteButton(state.shipments[index]),
-                          ),
-                          itemCount: state.shipments.length,
-                        ),
-                      ),
+                    return _buildListItemWrapper(
+                      itemBuilder: (context, index) =>
+                          _buildListItem(shipment: state.shipments[index]),
+                      itemCount: state.shipments.length,
                     );
                   }
 
@@ -289,7 +213,7 @@ class _StageLayoutState extends State<StageLayout> {
             ),
           ],
         ),
-        floatingActionButton: ExpandableFabMine(
+        floatingActionButton: ExpandableFAB(
           distance: 90,
           children: [
             ActionButton(
@@ -306,9 +230,9 @@ class _StageLayoutState extends State<StageLayout> {
             ),
             ActionButton(
               onPressed: () => showDialog(
-                context: context,
                 builder: (context) =>
                     InsertDataFromScannerAlertDialog(stage: widget.stage),
+                context: context,
               ),
               icon: Icons.barcode_reader,
             ),
@@ -318,7 +242,58 @@ class _StageLayoutState extends State<StageLayout> {
     );
   }
 
-  Widget _buildDeleteButton(ShipmentEntity shipment) {
+  Widget _buildListItemWrapper({
+    required Widget Function(BuildContext context, int index) itemBuilder,
+    required int itemCount,
+  }) {
+    return ListTileTheme(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+      tileColor: Colors.green,
+      child: RefreshIndicator(
+        displacement: 12,
+        onRefresh: () async => context
+            .read<ShipmentCubit>()
+            .fetchShipments(date: date, stage: widget.stage),
+        child: ListView.separated(
+          padding: const EdgeInsets.all(16),
+          separatorBuilder: (context, index) => const SizedBox(height: 8),
+          itemBuilder: itemBuilder,
+          itemCount: itemCount,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildListItem({required ShipmentEntity shipment}) {
+    final textTheme = Theme.of(context).textTheme;
+
+    return ListTile(
+      onTap: () => context.push(detailReceiptRoute, extra: shipment.id),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            shipment.courier,
+            style: textTheme.titleLarge,
+          ),
+          Text(
+            dateTimeFormat.format(shipment.date),
+            style: textTheme.bodyMedium,
+          ),
+        ],
+      ),
+      subtitle: Text(
+        shipment.receiptNumber,
+        style: textTheme.titleMedium,
+      ),
+      trailing: _buildDeleteButton(shipment: shipment),
+    );
+  }
+
+  Widget _buildDeleteButton({required ShipmentEntity shipment}) {
     final authCubit = context.read<AuthCubit>();
     final isSuperAdmin =
         authCubit.user.permissions.contains(superAdminPermission);
@@ -329,6 +304,7 @@ class _StageLayoutState extends State<StageLayout> {
       onTap: () => showDialog(
         context: context,
         builder: (context) => DeleteDataAlertDialog(
+          date: date,
           shipment: shipment,
           stage: widget.stage,
         ),

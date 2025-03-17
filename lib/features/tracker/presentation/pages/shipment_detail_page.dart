@@ -3,12 +3,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/common/constants.dart';
+import '../../../../core/common/snackbar.dart';
 import '../../../../core/helpers/helpers.dart';
 import '../../../auth/presentation/cubit/auth_cubit.dart';
 import '../../data/models/shipment_detail_model.dart';
 import '../cubit/shipment_cubit.dart';
-import '../widgets/detail_ship_info_item.dart';
 import '../widgets/image_not_found.dart';
+import '../widgets/ship_detail_info_item.dart';
 
 class ShipmentDetailPage extends StatelessWidget {
   const ShipmentDetailPage({
@@ -26,22 +27,29 @@ class ShipmentDetailPage extends StatelessWidget {
 
     return BlocListener<ShipmentCubit, ShipmentState>(
       listener: (context, state) {
-        if (state is FetchShipmentDetailError) {}
+        if (state is FetchShipmentDetailError) {
+          scaffoldMessengerKey.currentState
+              ?.showSnackBar(dangerSnackbar(state.message));
+        }
       },
       child: Scaffold(
-        appBar: AppBar(title: const Text('Detail Resi')),
+        appBar: AppBar(
+          title: const Text('Detail Resi'),
+        ),
         body: BlocBuilder<ShipmentCubit, ShipmentState>(
           bloc: shipmentCubit..fetchShipmentById(shipmentId: shipmentId),
           buildWhen: (previous, current) => current is FetchShipmentDetail,
           builder: (context, state) {
             if (state is FetchShipmentDetailLoading) {
-              return const Center(child: CircularProgressIndicator());
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
             }
 
             if (state is FetchShipmentDetailLoaded) {
               final shipmentDetail =
                   state.shipmentDetail as ShipmentDetailModel;
-              final isPermissionGranted =
+              final isHavePermission =
                   authCubit.user.id == shipmentDetail.stage.user.id;
               // final isSuperAdmin =
               //     authCubit.user.permissions.contains(superAdminPermission);
@@ -66,7 +74,7 @@ class ShipmentDetailPage extends StatelessWidget {
                         ),
                       ),
                     ),
-                    if (isPermissionGranted) ...[
+                    if (isHavePermission) ...[
                       const SizedBox(height: 10),
                       Center(
                         child: ElevatedButton.icon(
@@ -85,35 +93,30 @@ class ShipmentDetailPage extends StatelessWidget {
                           ?.copyWith(fontWeight: FontWeight.w700),
                     ),
                     const SizedBox(height: 12),
-                    InfoItem(
+                    ShipDetailInfoItem(
                       label: 'Di Scan Oleh',
                       value: shipmentDetail.stage.user.name,
                     ),
                     const SizedBox(height: 8),
-                    InfoItem(
+                    ShipDetailInfoItem(
                       label: 'Nomor Resi',
-                      value: state.shipmentDetail.receiptNumber,
+                      value: shipmentDetail.receiptNumber,
                     ),
                     const SizedBox(height: 8),
-                    InfoItem(
+                    ShipDetailInfoItem(
                       label: 'Nama Ekspedisi',
-                      value: state.shipmentDetail.courier,
+                      value: shipmentDetail.courier,
                     ),
                     const SizedBox(height: 8),
-                    InfoItem(
+                    ShipDetailInfoItem(
                       label: 'Stage',
-                      value: (state.shipmentDetail as ShipmentDetailModel)
-                          .stage
-                          .stage,
+                      value: shipmentDetail.stage.stage,
                     ),
                     const SizedBox(height: 8),
-                    InfoItem(
+                    ShipDetailInfoItem(
                       label: 'Tanggal Scan',
-                      value: dateTimeFormat.format(
-                          (state.shipmentDetail as ShipmentDetailModel)
-                              .stage
-                              .date
-                              .toLocal()),
+                      value: dateTimeFormat
+                          .format(shipmentDetail.stage.date.toLocal()),
                     ),
                   ],
                 ),
