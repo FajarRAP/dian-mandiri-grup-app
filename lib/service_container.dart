@@ -59,8 +59,8 @@ void setup() {
         refreshTokenUseCase: RefreshTokenUseCase(authRepository: getIt.get()),
         signInUseCase: SignInUseCase(authRepository: getIt.get()),
         signOutUseCase: SignOutUseCase(authRepository: getIt.get()),
-        updateProfileUseCase:
-            UpdateProfileUseCase(authRepository: getIt.get())));
+        updateProfileUseCase: UpdateProfileUseCase(authRepository: getIt.get()),
+        storage: getIt.get()));
 
   // Ship
   getIt
@@ -87,5 +87,6 @@ void setup() {
         insertShipmentUseCase:
             InsertShipmentUseCase(shipmentRepository: getIt.get()),
         downloadShipmentReportUseCase:
-            DownloadShipmentReportUseCase(shipmentRepository: getIt.get())));
+            DownloadShipmentReportUseCase(shipmentRepository: getIt.get()),
+        storage: getIt.get()));
 }

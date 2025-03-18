@@ -6,9 +6,8 @@ import 'package:meta/meta.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../../../../core/common/constants.dart';
-import '../../../../core/exceptions/refresh_token.dart';
 import '../../../../core/failure/failure.dart';
-import '../../../../service_container.dart';
+import '../../../../core/helpers/helpers.dart';
 import '../../domain/entities/shipment_detail_entity.dart';
 import '../../domain/entities/shipment_entity.dart';
 import '../../domain/entities/shipment_report_entity.dart';
@@ -25,18 +24,19 @@ import '../../domain/usecases/insert_shipment_use_case.dart';
 part 'shipment_state.dart';
 
 class ShipmentCubit extends Cubit<ShipmentState> {
-  ShipmentCubit(
-      {required CreateShipmentReportUseCase createShipmentReportUseCase,
-      required DeleteShipmentUseCase deleteShipmentUseCase,
-      required FetchShipmentByIdUseCase fetchShipmentByIdUseCase,
-      required FetchShipmentByReceiptNumberUseCase
-          fetchShipmentByReceiptNumberUseCase,
-      required FetchShipmentReportsUseCase fetchShipmentReportsUseCase,
-      required FetchShipmentsUseCase fetchShipmentsUseCase,
-      required InsertShipmentDocumentUseCase insertShipmentDocumentUseCase,
-      required InsertShipmentUseCase insertShipmentUseCase,
-      required DownloadShipmentReportUseCase downloadShipmentReportUseCase})
-      : _createShipmentReportUseCase = createShipmentReportUseCase,
+  ShipmentCubit({
+    required CreateShipmentReportUseCase createShipmentReportUseCase,
+    required DeleteShipmentUseCase deleteShipmentUseCase,
+    required FetchShipmentByIdUseCase fetchShipmentByIdUseCase,
+    required FetchShipmentByReceiptNumberUseCase
+        fetchShipmentByReceiptNumberUseCase,
+    required FetchShipmentReportsUseCase fetchShipmentReportsUseCase,
+    required FetchShipmentsUseCase fetchShipmentsUseCase,
+    required InsertShipmentDocumentUseCase insertShipmentDocumentUseCase,
+    required InsertShipmentUseCase insertShipmentUseCase,
+    required DownloadShipmentReportUseCase downloadShipmentReportUseCase,
+    required FlutterSecureStorage storage,
+  })  : _createShipmentReportUseCase = createShipmentReportUseCase,
         _deleteShipmentUseCase = deleteShipmentUseCase,
         _fetchShipmentByIdUseCase = fetchShipmentByIdUseCase,
         _fetchShipmentByReceiptNumberUseCase =
@@ -46,6 +46,7 @@ class ShipmentCubit extends Cubit<ShipmentState> {
         _insertShipmentDocumentUseCase = insertShipmentDocumentUseCase,
         _insertShipmentUseCase = insertShipmentUseCase,
         _downloadShipmentReportUseCase = downloadShipmentReportUseCase,
+        _storage = storage,
         super(ShipInitial());
 
   final CreateShipmentReportUseCase _createShipmentReportUseCase;
@@ -58,6 +59,7 @@ class ShipmentCubit extends Cubit<ShipmentState> {
   final InsertShipmentDocumentUseCase _insertShipmentDocumentUseCase;
   final InsertShipmentUseCase _insertShipmentUseCase;
   final DownloadShipmentReportUseCase _downloadShipmentReportUseCase;
+  final FlutterSecureStorage _storage;
 
   late ShipmentDetailEntity shipmentDetail;
   late String externalPath;
@@ -73,42 +75,35 @@ class ShipmentCubit extends Cubit<ShipmentState> {
   Future<void> fetchShipmentByReceiptNumber(
       {required String receipNumber}) async {
     emit(FetchReceiptStatusLoading());
-    final refreshToken =
-        await getIt.get<FlutterSecureStorage>().read(key: refreshTokenKey);
+
+    final refreshToken = await _storage.read(key: refreshTokenKey);
     final result = await _fetchShipmentByReceiptNumberUseCase(receipNumber);
 
     result.fold(
-      (l) {
-        if (l is RefreshToken && refreshToken != null) {
-          fetchShipmentByReceiptNumber(receipNumber: receipNumber);
-        } else {
-          emit(FetchReceiptStatusError(message: l.message));
-        }
-      },
+      (l) => isRefreshed(l, refreshToken)
+          ? fetchShipmentByReceiptNumber(receipNumber: receipNumber)
+          : emit(FetchReceiptStatusError(message: l.message)),
       (r) => emit(FetchReceiptStatusLoaded(shipmentDetail: r)),
     );
   }
 
   Future<void> fetchShipments(
       {required String date, required String stage, String? keyword}) async {
+    emit(FetchShipmentsLoading());
+
     shipments.clear();
     isEndPage = false;
     _fetchShipmentsPage = 1;
-    emit(FetchShipmentsLoading());
+
     final params =
         FetchShipmentsParams(date: date, stage: stage, keyword: keyword);
-    final refreshToken =
-        await getIt.get<FlutterSecureStorage>().read(key: refreshTokenKey);
+    final refreshToken = await _storage.read(key: refreshTokenKey);
     final result = await _fetchShipmentsUseCase(params);
 
     result.fold(
-      (l) {
-        if (l is RefreshToken && refreshToken != null) {
-          fetchShipments(date: date, stage: stage, keyword: keyword);
-        } else {
-          emit(FetchShipmentsError(message: l.message));
-        }
-      },
+      (l) => isRefreshed(l, refreshToken)
+          ? fetchShipments(date: date, stage: stage, keyword: keyword)
+          : emit(FetchShipmentsError(message: l.message)),
       (r) {
         shipments.addAll(r['shipments']);
         if (_fetchShipmentsPage < r['totalPage']) {
@@ -125,18 +120,13 @@ class ShipmentCubit extends Cubit<ShipmentState> {
       {required String date, required String stage}) async {
     final params = FetchShipmentsParams(
         date: date, stage: stage, page: _fetchShipmentsPage);
-    final refreshToken =
-        await getIt.get<FlutterSecureStorage>().read(key: refreshTokenKey);
+    final refreshToken = await _storage.read(key: refreshTokenKey);
     final result = await _fetchShipmentsUseCase(params);
 
     result.fold(
-      (l) {
-        if (l is RefreshToken && refreshToken != null) {
-          fetchShipmentsPaginate(date: date, stage: stage);
-        } else {
-          emit(FetchShipmentsError(message: l.message));
-        }
-      },
+      (l) => isRefreshed(l, refreshToken)
+          ? fetchShipmentsPaginate(date: date, stage: stage)
+          : emit(FetchShipmentsError(message: l.message)),
       (r) {
         if (_fetchShipmentsPage < r['totalPage']) {
           isEndPage = false;
@@ -153,20 +143,16 @@ class ShipmentCubit extends Cubit<ShipmentState> {
   Future<void> searchShipments(
       {required String date, required String stage, String? keyword}) async {
     emit(FetchShipmentsLoading());
+
     final params =
         FetchShipmentsParams(date: date, stage: stage, keyword: keyword);
-    final refreshToken =
-        await getIt.get<FlutterSecureStorage>().read(key: refreshTokenKey);
+    final refreshToken = await _storage.read(key: refreshTokenKey);
     final result = await _fetchShipmentsUseCase(params);
 
     result.fold(
-      (l) {
-        if (l is RefreshToken && refreshToken != null) {
-          searchShipments(date: date, stage: stage, keyword: keyword);
-        } else {
-          emit(FetchShipmentsError(message: l.message));
-        }
-      },
+      (l) => isRefreshed(l, refreshToken)
+          ? searchShipments(date: date, stage: stage, keyword: keyword)
+          : emit(FetchShipmentsError(message: l.message)),
       (r) => emit(SearchShipmentsLoaded(shipments: r['shipments'])),
     );
   }
@@ -174,38 +160,29 @@ class ShipmentCubit extends Cubit<ShipmentState> {
   Future<void> insertShipment(
       {required String receiptNumber, required String stage}) async {
     emit(InsertShipmentLoading());
+
     final params =
         InsertShipmentParams(receiptNumber: receiptNumber, stage: stage);
-    final refreshToken =
-        await getIt.get<FlutterSecureStorage>().read(key: refreshTokenKey);
+    final refreshToken = await _storage.read(key: refreshTokenKey);
     final result = await _insertShipmentUseCase(params);
 
     result.fold(
-      (l) {
-        if (l is RefreshToken && refreshToken != null) {
-          insertShipment(receiptNumber: receiptNumber, stage: stage);
-        } else {
-          emit(InsertShipmentError(failure: l));
-        }
-      },
+      (l) => isRefreshed(l, refreshToken)
+          ? insertShipment(receiptNumber: receiptNumber, stage: stage)
+          : emit(InsertShipmentError(failure: l)),
       (r) => emit(InsertShipmentLoaded(message: r)),
     );
   }
 
   Future<void> fetchShipmentById({required String shipmentId}) async {
     emit(FetchShipmentDetailLoading());
-    final refreshToken =
-        await getIt.get<FlutterSecureStorage>().read(key: refreshTokenKey);
+    final refreshToken = await _storage.read(key: refreshTokenKey);
     final result = await _fetchShipmentByIdUseCase(shipmentId);
 
     result.fold(
-      (l) {
-        if (l is RefreshToken && refreshToken != null) {
-          fetchShipmentById(shipmentId: shipmentId);
-        } else {
-          emit(FetchShipmentDetailError(message: l.message));
-        }
-      },
+      (l) => isRefreshed(l, refreshToken)
+          ? fetchShipmentById(shipmentId: shipmentId)
+          : emit(FetchShipmentDetailError(message: l.message)),
       (r) => emit(FetchShipmentDetailLoaded(shipmentDetail: r)),
     );
   }
@@ -215,39 +192,31 @@ class ShipmentCubit extends Cubit<ShipmentState> {
       required XFile image,
       required String stage}) async {
     emit(InsertShipmentDocumentLoading());
+
     final params = InsertShipmentDocumentParams(
         shipmentId: shipmentId, document: image, stage: stage);
-    final refreshToken =
-        await getIt.get<FlutterSecureStorage>().read(key: refreshTokenKey);
+    final refreshToken = await _storage.read(key: refreshTokenKey);
     final result = await _insertShipmentDocumentUseCase(params);
 
     result.fold(
-      (l) {
-        if (l is RefreshToken && refreshToken != null) {
-          insertShipmentDocument(
-              shipmentId: shipmentId, image: image, stage: stage);
-        } else {
-          emit(InsertShipmentDocumentError(message: l.message));
-        }
-      },
+      (l) => isRefreshed(l, refreshToken)
+          ? insertShipmentDocument(
+              shipmentId: shipmentId, image: image, stage: stage)
+          : emit(InsertShipmentDocumentError(message: l.message)),
       (r) => emit(InsertShipmentDocumentLoaded(message: r)),
     );
   }
 
   Future<void> deleteShipment({required String shipmentId}) async {
     emit(DeleteShipmentLoading());
-    final refreshToken =
-        await getIt.get<FlutterSecureStorage>().read(key: refreshTokenKey);
+
+    final refreshToken = await _storage.read(key: refreshTokenKey);
     final result = await _deleteShipmentUseCase(shipmentId);
 
     result.fold(
-      (l) {
-        if (l is RefreshToken && refreshToken != null) {
-          deleteShipment(shipmentId: shipmentId);
-        } else {
-          emit(DeleteShipmentError(message: l.message));
-        }
-      },
+      (l) => isRefreshed(l, refreshToken)
+          ? deleteShipment(shipmentId: shipmentId)
+          : emit(DeleteShipmentError(message: l.message)),
       (r) => emit(DeleteShipmentLoaded(message: r)),
     );
   }
@@ -257,21 +226,17 @@ class ShipmentCubit extends Cubit<ShipmentState> {
       required String endDate,
       required String status}) async {
     emit(FetchShipmentReportsLoading());
+
     final params = FetchShipmentReportsParams(
         startDate: startDate, endDate: endDate, status: status);
-    final refreshToken =
-        await getIt.get<FlutterSecureStorage>().read(key: refreshTokenKey);
+    final refreshToken = await _storage.read(key: refreshTokenKey);
     final result = await _fetchShipmentReportsUseCase(params);
 
     result.fold(
-      (l) {
-        if (l is RefreshToken && refreshToken != null) {
-          fetchShipmentReports(
-              startDate: startDate, endDate: endDate, status: status);
-        } else {
-          emit(FetchShipmentReportsError(message: l.message));
-        }
-      },
+      (l) => isRefreshed(l, refreshToken)
+          ? fetchShipmentReports(
+              startDate: startDate, endDate: endDate, status: status)
+          : emit(FetchShipmentReportsError(message: l.message)),
       (r) => emit(FetchShipmentReportsLoaded(shipmentReports: r)),
     );
   }
@@ -279,20 +244,16 @@ class ShipmentCubit extends Cubit<ShipmentState> {
   Future<void> createShipmentReport(
       {required String startDate, required String endDate}) async {
     emit(CreateShipmentReportLoading());
+
     final params =
         CreateShipmentReportParams(startDate: startDate, endDate: endDate);
-    final refreshToken =
-        await getIt.get<FlutterSecureStorage>().read(key: refreshTokenKey);
+    final refreshToken = await _storage.read(key: refreshTokenKey);
     final result = await _createShipmentReportUseCase(params);
 
     result.fold(
-      (l) {
-        if (l is RefreshToken && refreshToken != null) {
-          createShipmentReport(startDate: startDate, endDate: endDate);
-        } else {
-          emit(CreateShipmentReportError(message: l.message));
-        }
-      },
+      (l) => isRefreshed(l, refreshToken)
+          ? createShipmentReport(startDate: startDate, endDate: endDate)
+          : emit(CreateShipmentReportError(message: l.message)),
       (r) => emit(CreateShipmentReportLoaded(message: r)),
     );
   }
@@ -300,17 +261,14 @@ class ShipmentCubit extends Cubit<ShipmentState> {
   Future<void> downloadShipmentReport(
       {required ShipmentReportEntity shipmentReportEntity}) async {
     emit(DownloadShipmentReportLoading());
-    final refreshToken =
-        await getIt.get<FlutterSecureStorage>().read(key: refreshTokenKey);
+
+    final refreshToken = await _storage.read(key: refreshTokenKey);
     final result = await _downloadShipmentReportUseCase(shipmentReportEntity);
 
     result.fold(
-      (l) {
-        if (l is RefreshToken && refreshToken != null) {
-          downloadShipmentReport(shipmentReportEntity: shipmentReportEntity);
-        }
-        emit(DownloadShipmentReportError(message: l.message));
-      },
+      (l) => isRefreshed(l, refreshToken)
+          ? downloadShipmentReport(shipmentReportEntity: shipmentReportEntity)
+          : emit(DownloadShipmentReportError(message: l.message)),
       (r) => emit(DownloadShipmentReportLoaded(message: r)),
     );
   }

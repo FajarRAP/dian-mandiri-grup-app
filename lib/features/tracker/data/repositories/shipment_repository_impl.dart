@@ -25,6 +25,7 @@ class ShipmentRepositoryImpl extends ShipmentRepository {
     try {
       final response = await shipmentRemoteDataSource.createShipmentReport(
           startDate: startDate, endDate: endDate);
+
       return Right(response.data['message']);
     } on DioException catch (de) {
       switch (de.response?.statusCode) {
@@ -48,6 +49,7 @@ class ShipmentRepositoryImpl extends ShipmentRepository {
     try {
       final response =
           await shipmentRemoteDataSource.deleteShipment(shipmentId: shipmentId);
+
       return Right(response.data['message']);
     } on DioException catch (de) {
       switch (de.response?.statusCode) {
@@ -71,6 +73,7 @@ class ShipmentRepositoryImpl extends ShipmentRepository {
     try {
       final response = await shipmentRemoteDataSource.fetchShipmentById(
           shipmentId: shipmentId);
+
       return Right(ShipmentDetailModel.fromJson(response.data['data']));
     } on DioException catch (de) {
       switch (de.response?.statusCode) {
@@ -94,6 +97,7 @@ class ShipmentRepositoryImpl extends ShipmentRepository {
     try {
       final response = await shipmentRemoteDataSource
           .fetchShipmentByReceiptNumber(receiptNumber: receiptNumber);
+
       return Right(ShipmentDetailStatusModel.fromJson(response.data['data']));
     } on DioException catch (de) {
       switch (de.response?.statusCode) {
@@ -119,9 +123,10 @@ class ShipmentRepositoryImpl extends ShipmentRepository {
     try {
       final response = await shipmentRemoteDataSource.fetchShipmentReports(
           startDate: startDate, endDate: endDate, status: status);
-      final contents = response.data['data']['content'] as List;
-      return Right(
-          contents.map((e) => ShipmentReportModel.fromJson(e)).toList());
+      final contents =
+          List<Map<String, dynamic>>.from(response.data['data']['content']);
+
+      return Right(contents.map(ShipmentReportModel.fromJson).toList());
     } on DioException catch (de) {
       switch (de.response?.statusCode) {
         case 401:
@@ -151,6 +156,7 @@ class ShipmentRepositoryImpl extends ShipmentRepository {
           List<Map<String, dynamic>>.from(response.data['data']['content']);
       final shipments = contents.map(ShipmentModel.fromJson).toList();
       final totalPage = response.data['data']['metadata']['total_page'];
+
       return Right({'shipments': shipments, 'totalPage': totalPage});
     } on DioException catch (de) {
       switch (de.response?.statusCode) {
@@ -174,6 +180,7 @@ class ShipmentRepositoryImpl extends ShipmentRepository {
     try {
       final response = await shipmentRemoteDataSource.insertShipment(
           receiptNumber: receiptNumber, stage: stage);
+
       return Right(response.data['message']);
     } on DioException catch (de) {
       final data = de.response?.data;
@@ -204,6 +211,7 @@ class ShipmentRepositoryImpl extends ShipmentRepository {
     try {
       final response = await shipmentRemoteDataSource.insertShipmentDocument(
           shipmentId: shipmentId, document: document, stage: stage);
+
       return Right(response.data['message']);
     } on DioException catch (de) {
       switch (de.response?.statusCode) {

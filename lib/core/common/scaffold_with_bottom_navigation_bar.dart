@@ -19,11 +19,10 @@ class ScaffoldWithBottomNavigationBar extends StatelessWidget {
 
   void listener<T>(BuildContext context, T state) async {
     final storage = getIt.get<FlutterSecureStorage>();
-
     final refresh = await storage.read(key: refreshTokenKey);
+
     if (refresh == null) await GoogleSignIn().signOut();
     if (!context.mounted) return;
-
     if (refresh == null) context.go(loginRoute);
   }
 
