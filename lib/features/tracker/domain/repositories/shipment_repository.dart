@@ -3,11 +3,10 @@ import 'package:dartz/dartz.dart';
 
 import '../../../../core/failure/failure.dart';
 import '../entities/shipment_detail_entity.dart';
-import '../entities/shipment_entity.dart';
 import '../entities/shipment_report_entity.dart';
 
 abstract class ShipmentRepository {
-  Future<Either<Failure, List<ShipmentEntity>>> fetchShipments(
+  Future<Either<Failure, Map<String, dynamic>>> fetchShipments(
       {required String date,
       required String stage,
       int page = 1,

@@ -2,8 +2,8 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
-class ExpandableFabMine extends StatefulWidget {
-  const ExpandableFabMine({
+class ExpandableFAB extends StatefulWidget {
+  const ExpandableFAB({
     super.key,
     this.initialOpen,
     required this.distance,
@@ -15,27 +15,27 @@ class ExpandableFabMine extends StatefulWidget {
   final List<Widget> children;
 
   @override
-  State<ExpandableFabMine> createState() => _ExpandableFabMineState();
+  State<ExpandableFAB> createState() => _ExpandableFABState();
 }
 
-class _ExpandableFabMineState extends State<ExpandableFabMine>
+class _ExpandableFABState extends State<ExpandableFAB>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _expandAnimation;
-  bool _open = false;
+  var _open = false;
 
   @override
   void initState() {
     super.initState();
     _open = widget.initialOpen ?? false;
     _controller = AnimationController(
-      value: _open ? 1.0 : 0.0,
       duration: const Duration(milliseconds: 300),
+      value: _open ? 1.0 : 0.0,
       vsync: this,
     );
     _expandAnimation = CurvedAnimation(
-      parent: _controller,
       curve: Curves.fastOutSlowIn,
+      parent: _controller,
       reverseCurve: Curves.easeOutQuad,
     );
   }
@@ -49,11 +49,7 @@ class _ExpandableFabMineState extends State<ExpandableFabMine>
   void _toggle() {
     setState(() {
       _open = !_open;
-      if (_open) {
-        _controller.forward();
-      } else {
-        _controller.reverse();
-      }
+      _open ? _controller.forward() : _controller.reverse();
     });
   }
 
@@ -77,9 +73,9 @@ class _ExpandableFabMineState extends State<ExpandableFabMine>
       height: 56,
       child: Center(
         child: Material(
-          shape: const CircleBorder(),
           clipBehavior: Clip.antiAlias,
           elevation: 4,
+          shape: const CircleBorder(),
           child: InkWell(
             onTap: _toggle,
             child: Padding(
@@ -99,6 +95,7 @@ class _ExpandableFabMineState extends State<ExpandableFabMine>
     final children = <Widget>[];
     final length = widget.children.length;
     final step = 90.0 / (length - 1);
+
     for (var i = 0, angleInDegrees = 0.0;
         i < length;
         i++, angleInDegrees += step) {
@@ -111,6 +108,7 @@ class _ExpandableFabMineState extends State<ExpandableFabMine>
         ),
       );
     }
+
     return children;
   }
 

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/common/constants.dart';
 import '../../../../core/common/snackbar.dart';
+import '../../../../core/widgets/light_icon_button.dart';
 import '../cubit/auth_cubit.dart';
 
 class SignInPage extends StatelessWidget {
@@ -14,57 +15,39 @@ class SignInPage extends StatelessWidget {
     final authCubit = context.read<AuthCubit>();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Sign In')),
+      appBar: AppBar(
+        title: const Text('Sign In'),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Center(
-          child: SizedBox(
-            width: double.infinity,
-            child: BlocConsumer<AuthCubit, AuthState>(
-              listener: (context, state) {
-                if (state is SignInLoaded) {
-                  flushbar(state.message);
-                  context.go(trackerRoute);
-                }
+          child: BlocConsumer<AuthCubit, AuthState>(
+            listener: (context, state) {
+              if (state is SignInLoaded) {
+                scaffoldMessengerKey.currentState
+                    ?.showSnackBar(successSnackbar(state.message));
+                context.go(trackerRoute);
+              }
 
-                if (state is SignInError) {
-                  flushbar(state.message);
-                }
-              },
-              builder: (context, state) {
-                if (state is SignInLoading) {
-                  return ElevatedButton.icon(
-                    onPressed: null,
-                    icon: Image.asset(googleIcon, scale: 1.5),
-                    label: const Text('Masuk dengan Akun Google'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: Colors.black,
-                      fixedSize: const Size.fromHeight(56),
-                      shadowColor: Colors.black,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                  );
-                }
-
-                return ElevatedButton.icon(
-                  onPressed: authCubit.signIn,
-                  icon: Image.asset(googleIcon, scale: 1.5),
+              if (state is SignInError) {
+                scaffoldMessengerKey.currentState
+                    ?.showSnackBar(dangerSnackbar(state.message));
+              }
+            },
+            builder: (context, state) {
+              if (state is SignInLoading) {
+                return LightIconButton(
+                  icon: Image.asset(googleIcon),
                   label: const Text('Masuk dengan Akun Google'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: Colors.black,
-                    fixedSize: const Size.fromHeight(56),
-                    shadowColor: Colors.black,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
                 );
-              },
-            ),
+              }
+
+              return LightIconButton(
+                onPressed: authCubit.signIn,
+                icon: Image.asset(googleIcon),
+                label: const Text('Masuk dengan Akun Google'),
+              );
+            },
           ),
         ),
       ),

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-class InfoItem extends StatelessWidget {
+class ShipDetailInfoItem extends StatelessWidget {
   final String label;
   final String value;
 
-  const InfoItem({
+  const ShipDetailInfoItem({
     super.key,
     required this.label,
     required this.value,

@@ -39,14 +39,16 @@ class TakePictureScreenState extends State<TakePictureScreen> {
       body: SizedBox(
         height: MediaQuery.sizeOf(context).height,
         child: FutureBuilder<void>(
-          future: _initializeControllerFuture,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.done) {
               return CameraPreview(_controller);
             }
 
-            return const Center(child: CircularProgressIndicator());
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
           },
+          future: _initializeControllerFuture,
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,

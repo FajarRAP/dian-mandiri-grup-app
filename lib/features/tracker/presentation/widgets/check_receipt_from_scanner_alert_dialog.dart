@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/common/constants.dart';
 import '../../../../core/common/snackbar.dart';
 import '../../../../core/helpers/validators.dart';
 import '../cubit/shipment_cubit.dart';
@@ -15,7 +16,8 @@ class CheckReceiptFromScannerAlertDialog extends StatefulWidget {
 }
 
 class _CheckReceiptFromScannerAlertDialogState
-    extends State<CheckReceiptFromScannerAlertDialog> {
+    extends State<CheckReceiptFromScannerAlertDialog>
+    with SingleTickerProviderStateMixin {
   final _receiptController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
@@ -32,10 +34,14 @@ class _CheckReceiptFromScannerAlertDialogState
     final textTheme = theme.textTheme;
 
     return AlertDialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
       title: Text(
         'Silakan Scan',
-        style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+        style: textTheme.titleLarge?.copyWith(
+          fontWeight: FontWeight.w700,
+        ),
       ),
       content: Form(
         key: _formKey,
@@ -43,7 +49,10 @@ class _CheckReceiptFromScannerAlertDialogState
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Nomor Resi:', style: textTheme.bodyMedium),
+            Text(
+              'Nomor Resi:',
+              style: textTheme.bodyMedium,
+            ),
             const SizedBox(height: 4),
             TextFormField(
               autofocus: true,
@@ -58,7 +67,10 @@ class _CheckReceiptFromScannerAlertDialogState
         ),
       ),
       actions: [
-        TextButton(onPressed: context.pop, child: const Text('Batal')),
+        TextButton(
+          onPressed: context.pop,
+          child: const Text('Batal'),
+        ),
         TextButton(
           onPressed: () async {
             if (!_formKey.currentState!.validate()) return;
@@ -68,17 +80,20 @@ class _CheckReceiptFromScannerAlertDialogState
           },
           child: BlocListener<ShipmentCubit, ShipmentState>(
             listener: (context, state) {
-              if (state is FetchReceiptStatusError) {
-                flushbar(state.message);
-              }
-
               if (state is FetchReceiptStatusLoading) {
                 context.pop();
+              }
+
+              if (state is FetchReceiptStatusError) {
+                scaffoldMessengerKey.currentState
+                    ?.showSnackBar(dangerSnackbar(state.message));
               }
             },
             child: const Text(
               'Cari',
-              style: TextStyle(fontWeight: FontWeight.w700),
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ),
         ),

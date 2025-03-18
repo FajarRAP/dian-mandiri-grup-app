@@ -1,7 +1,6 @@
 import 'package:dartz/dartz.dart';
 
 import '../../../../core/failure/failure.dart';
-import '../entities/shipment_entity.dart';
 import '../repositories/shipment_repository.dart';
 
 class FetchShipmentsUseCase {
@@ -9,7 +8,7 @@ class FetchShipmentsUseCase {
 
   final ShipmentRepository shipmentRepository;
 
-  Future<Either<Failure, List<ShipmentEntity>>> call(
+  Future<Either<Failure, Map<String, dynamic>>> call(
       FetchShipmentsParams params) async {
     return await shipmentRepository.fetchShipments(
         date: params.date,

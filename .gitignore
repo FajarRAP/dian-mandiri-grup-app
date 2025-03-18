@@ -45,15 +45,3 @@ app.*.map.json
 # environment
 *.env
 *.env.*
-
-# images
-*.jpg
-*.jpeg
-*.png
-*.svg
-
-# sounds
-*.mp3
-*.wav
-
-.vscode/

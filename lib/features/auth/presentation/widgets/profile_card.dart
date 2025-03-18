@@ -16,7 +16,9 @@ class ProfileCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
 
     return Container(
       decoration: BoxDecoration(
@@ -27,7 +29,7 @@ class ProfileCard extends StatelessWidget {
             blurRadius: 16,
             spreadRadius: 0,
             offset: const Offset(0, 4),
-            color: Colors.black.withOpacity(.12),
+            color: Colors.black.withValues(alpha: .12),
           )
         ],
       ),
@@ -37,7 +39,7 @@ class ProfileCard extends StatelessWidget {
         children: [
           Icon(
             icon,
-            color: Theme.of(context).colorScheme.primary,
+            color: colorScheme.primary,
           ),
           const SizedBox(width: 18),
           Column(

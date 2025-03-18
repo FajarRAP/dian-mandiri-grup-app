@@ -19,11 +19,10 @@ class ScaffoldWithBottomNavigationBar extends StatelessWidget {
 
   void listener<T>(BuildContext context, T state) async {
     final storage = getIt.get<FlutterSecureStorage>();
-
     final refresh = await storage.read(key: refreshTokenKey);
+
     if (refresh == null) await GoogleSignIn().signOut();
     if (!context.mounted) return;
-
     if (refresh == null) context.go(loginRoute);
   }
 
@@ -45,9 +44,9 @@ class ScaffoldWithBottomNavigationBar extends StatelessWidget {
         bottomNavigationBar: BottomNavigationBar(
           currentIndex: child.currentIndex,
           onTap: child.goBranch,
-          items: const [
+          items: const <BottomNavigationBarItem>[
             BottomNavigationBarItem(
-              icon: Icon(Icons.home),
+              icon: Icon(Icons.home_outlined),
               label: 'Home',
             ),
             BottomNavigationBarItem(

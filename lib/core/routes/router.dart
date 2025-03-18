@@ -38,6 +38,27 @@ final router = GoRouter(
   navigatorKey: _rootNavigatorkey,
   initialLocation: initialLocation,
   routes: [
+    GoRoute(
+      path: loginRoute,
+      pageBuilder: (context, state) => CustomTransitionPage(
+          key: state.pageKey,
+          child: const SignInPage(),
+          transitionsBuilder: transitionsBuilder),
+    ),
+    GoRoute(
+      path: cameraRoute,
+      pageBuilder: (context, state) => CustomTransitionPage(
+          key: state.pageKey,
+          child: TakePictureScreen(camera: cameras.first),
+          transitionsBuilder: transitionsBuilder),
+    ),
+    GoRoute(
+      path: displayPictureRoute,
+      pageBuilder: (context, state) => CustomTransitionPage(
+          key: state.pageKey,
+          child: DisplayPictureScreen(image: state.extra as XFile),
+          transitionsBuilder: transitionsBuilder),
+    ),
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) =>
           ScaffoldWithBottomNavigationBar(child: navigationShell),
@@ -101,26 +122,5 @@ final router = GoRouter(
         ),
       ],
     ),
-    GoRoute(
-      path: loginRoute,
-      pageBuilder: (context, state) => CustomTransitionPage(
-          key: state.pageKey,
-          child: const SignInPage(),
-          transitionsBuilder: transitionsBuilder),
-    ),
-    GoRoute(
-      path: cameraRoute,
-      pageBuilder: (context, state) => CustomTransitionPage(
-          key: state.pageKey,
-          child: TakePictureScreen(camera: cameras.first),
-          transitionsBuilder: transitionsBuilder),
-    ),
-    GoRoute(
-      path: displayPictureRoute,
-      pageBuilder: (context, state) => CustomTransitionPage(
-          key: state.pageKey,
-          child: DisplayPictureScreen(image: state.extra as XFile),
-          transitionsBuilder: transitionsBuilder),
-    )
   ],
 );

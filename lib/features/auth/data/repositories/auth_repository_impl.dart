@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -36,14 +35,10 @@ class AuthRepositoryImpl implements AuthRepository {
         case 401:
           return Left(RefreshToken());
         default:
-          return kReleaseMode || kProfileMode
-              ? const Left(Failure())
-              : Left(Failure(message: de.response?.data['message']));
+          return Left(Failure());
       }
     } catch (e) {
-      return kReleaseMode || kProfileMode
-          ? const Left(Failure())
-          : Left(Failure(message: '$e'));
+      return Left(Failure(message: '$e'));
     }
   }
 
@@ -54,9 +49,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
       return Right(UserModel.fromJson(jsonDecode('$user')));
     } catch (e) {
-      return kReleaseMode || kProfileMode
-          ? const Left(Failure())
-          : Left(Failure(message: '$e'));
+      return const Left(Failure());
     }
   }
 
@@ -67,14 +60,13 @@ class AuthRepositoryImpl implements AuthRepository {
       final response =
           await authRemoteDataSource.refreshToken(refreshToken: refreshToken);
       final data = response.data['data'];
+
       await storage.write(key: accessTokenKey, value: data['access_token']);
       await storage.write(key: refreshTokenKey, value: data['refresh_token']);
 
       return Right(response.data['message']);
     } catch (e) {
-      return kReleaseMode || kProfileMode
-          ? const Left(Failure())
-          : Left(Failure(message: '$e'));
+      return const Left(Failure());
     }
   }
 
@@ -84,24 +76,20 @@ class AuthRepositoryImpl implements AuthRepository {
       final googleSignInAccount = await googleSignIn.signIn();
       final googleSignInAuthentication =
           await googleSignInAccount?.authentication;
-
       final response = await authRemoteDataSource.signIn(
           googleAccessToken: '${googleSignInAuthentication?.accessToken}');
       final data = response.data['data'];
+
       await storage.write(key: userKey, value: jsonEncode(data['user']));
       await storage.write(key: accessTokenKey, value: data['access_token']);
       await storage.write(key: refreshTokenKey, value: data['refresh_token']);
 
       return Right(UserModel.fromJson(data['user']));
-    } on DioException catch (de) {
+    } on DioException {
       await googleSignIn.signOut();
-      return kReleaseMode || kProfileMode
-          ? const Left(Failure())
-          : Left(Failure(message: de.response?.data['message']));
+      return const Left(Failure());
     } catch (e) {
-      return kReleaseMode || kProfileMode
-          ? const Left(Failure())
-          : Left(Failure(message: '$e'));
+      return const Left(Failure());
     }
   }
 
@@ -109,13 +97,13 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<Failure, String>> signOut() async {
     try {
       final response = await authRemoteDataSource.signOut();
+
       await googleSignIn.signOut();
       await storage.deleteAll();
+
       return Right(response.data['message']);
     } catch (e) {
-      return kReleaseMode || kProfileMode
-          ? const Left(Failure())
-          : Left(Failure(message: '$e'));
+      return const Left(Failure());
     }
   }
 
@@ -130,14 +118,10 @@ class AuthRepositoryImpl implements AuthRepository {
         case 401:
           return Left(RefreshToken());
         default:
-          return kReleaseMode || kProfileMode
-              ? const Left(Failure())
-              : Left(Failure(message: de.response?.data['message']));
+          return const Left(Failure());
       }
     } catch (e) {
-      return kReleaseMode || kProfileMode
-          ? const Left(Failure())
-          : Left(Failure(message: '$e'));
+      return const Left(Failure());
     }
   }
 }
