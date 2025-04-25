@@ -61,8 +61,16 @@ class _StageLayoutState extends State<StageLayout> {
     return BlocListener<ShipmentCubit, ShipmentState>(
       listener: (context, state) async {
         if (state is InsertShipmentLoaded) {
-          scaffoldMessengerKey.currentState
-              ?.showSnackBar(successSnackbar(state.message));
+          scaffoldMessengerKey.currentState?.showSnackBar(
+            successSnackbar(
+              state.message,
+              EdgeInsets.only(
+                left: 16,
+                right: 16,
+                bottom: MediaQuery.sizeOf(context).height - 175,
+              ),
+            ),
+          );
           await audioPlayer.play(AssetSource(successSound));
           await shipmentCubit.fetchShipments(
             date: dateFormat.format(DateTime.now()),
