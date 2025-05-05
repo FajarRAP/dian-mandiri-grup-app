@@ -36,8 +36,16 @@ class DisplayPictureScreen extends StatelessWidget {
             buildWhen: (previous, current) => current is InsertShipmentDocument,
             listener: (context, state) {
               if (state is InsertShipmentDocumentLoaded) {
-                scaffoldMessengerKey.currentState
-                    ?.showSnackBar(successSnackbar(state.message));
+                scaffoldMessengerKey.currentState?.showSnackBar(
+                  successSnackbar(
+                    state.message,
+                    EdgeInsets.only(
+                      left: 16,
+                      right: 16,
+                      bottom: MediaQuery.sizeOf(context).height - 175,
+                    ),
+                  ),
+                );
                 shipmentCubit.fetchShipmentById(shipmentId: shipmentId);
                 context
                   ..pop()
@@ -45,8 +53,16 @@ class DisplayPictureScreen extends StatelessWidget {
               }
 
               if (state is InsertShipmentDocumentError) {
-                scaffoldMessengerKey.currentState
-                    ?.showSnackBar(dangerSnackbar(state.message));
+                scaffoldMessengerKey.currentState?.showSnackBar(
+                  dangerSnackbar(
+                    state.message,
+                    EdgeInsets.only(
+                      left: 16,
+                      right: 16,
+                      bottom: MediaQuery.sizeOf(context).height - 175,
+                    ),
+                  ),
+                );
               }
             },
             builder: (context, state) {

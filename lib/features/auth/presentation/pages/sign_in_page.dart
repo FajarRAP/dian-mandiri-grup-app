@@ -24,14 +24,30 @@ class SignInPage extends StatelessWidget {
           child: BlocConsumer<AuthCubit, AuthState>(
             listener: (context, state) {
               if (state is SignInLoaded) {
-                scaffoldMessengerKey.currentState
-                    ?.showSnackBar(successSnackbar(state.message));
+                scaffoldMessengerKey.currentState?.showSnackBar(
+                  successSnackbar(
+                    state.message,
+                    EdgeInsets.only(
+                      left: 16,
+                      right: 16,
+                      bottom: MediaQuery.sizeOf(context).height - 175,
+                    ),
+                  ),
+                );
                 context.go(trackerRoute);
               }
 
               if (state is SignInError) {
-                scaffoldMessengerKey.currentState
-                    ?.showSnackBar(dangerSnackbar(state.message));
+                scaffoldMessengerKey.currentState?.showSnackBar(
+                  dangerSnackbar(
+                    state.message,
+                    EdgeInsets.only(
+                      left: 16,
+                      right: 16,
+                      bottom: MediaQuery.sizeOf(context).height - 175,
+                    ),
+                  ),
+                );
               }
             },
             builder: (context, state) {

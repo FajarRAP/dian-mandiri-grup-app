@@ -128,13 +128,29 @@ class _ReportPageState extends State<ReportPage> {
                   current is DownloadShipmentReport,
               listener: (context, state) {
                 if (state is DownloadShipmentReportLoaded) {
-                  scaffoldMessengerKey.currentState
-                      ?.showSnackBar(successSnackbar(state.message));
+                  scaffoldMessengerKey.currentState?.showSnackBar(
+                    successSnackbar(
+                      state.message,
+                      EdgeInsets.only(
+                        left: 16,
+                        right: 16,
+                        bottom: MediaQuery.sizeOf(context).height - 175,
+                      ),
+                    ),
+                  );
                 }
 
                 if (state is DownloadShipmentReportError) {
-                  scaffoldMessengerKey.currentState
-                      ?.showSnackBar(dangerSnackbar(state.message));
+                  scaffoldMessengerKey.currentState?.showSnackBar(
+                    dangerSnackbar(
+                      state.message,
+                      EdgeInsets.only(
+                        left: 16,
+                        right: 16,
+                        bottom: MediaQuery.sizeOf(context).height - 175,
+                      ),
+                    ),
+                  );
                 }
               },
               builder: (context, state) {
