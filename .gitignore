@@ -45,3 +45,6 @@ app.*.map.json
 # environment
 *.env
 *.env.*
+
+# testers
+testers.txt
