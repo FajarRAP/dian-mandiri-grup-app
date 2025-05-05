@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "96521716846",
+    "project_id": "dmg-project-3c1dc",
+    "storage_bucket": "dmg-project-3c1dc.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:96521716846:android:a373fd436cac0e1369127f",
+        "android_client_info": {
+          "package_name": "com.dianmandirigrup.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAVU9HoiXw8JJEHTxTcdKu68V0pzUNQzBw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
