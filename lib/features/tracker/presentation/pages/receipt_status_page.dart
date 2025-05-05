@@ -1,6 +1,6 @@
-import 'package:barcode_scan2/barcode_scan2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 
 import '../../data/models/shipment_detail_status_model.dart';
 import '../cubit/shipment_cubit.dart';
@@ -169,12 +169,12 @@ class ReceiptStatusPage extends StatelessWidget {
         children: [
           ActionButton(
             onPressed: () async {
-              final receiptNumber = await BarcodeScanner.scan();
+              final receiptNumber = await SimpleBarcodeScanner.scanBarcode(context);
 
-              if (receiptNumber.rawContent.isEmpty) return;
+              if (receiptNumber == null) return;
 
               await shipmentCubit.fetchShipmentByReceiptNumber(
-                  receipNumber: receiptNumber.rawContent);
+                  receipNumber: receiptNumber);
             },
             icon: Icons.document_scanner_rounded,
           ),
