@@ -81,8 +81,16 @@ class _DateRangeDialogState extends State<DateRangeDialog> {
                 }
 
                 if (state is CreateShipmentReportError) {
-                  ScaffoldMessenger.of(context)
-                      .showSnackBar(dangerSnackbar(state.message));
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    dangerSnackbar(
+                      state.message,
+                      EdgeInsets.only(
+                        left: 16,
+                        right: 16,
+                        bottom: MediaQuery.sizeOf(context).height - 175,
+                      ),
+                    ),
+                  );
                 }
               },
               builder: (context, state) {

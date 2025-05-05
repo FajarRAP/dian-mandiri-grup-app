@@ -1,10 +1,10 @@
 import 'dart:async';
 
 import 'package:audioplayers/audioplayers.dart';
-import 'package:barcode_scan2/barcode_scan2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 
 import '../../../../core/common/constants.dart';
 import '../../../../core/common/snackbar.dart';
@@ -59,6 +59,7 @@ class _StageLayoutState extends State<StageLayout> {
     final textTheme = theme.textTheme;
 
     return BlocListener<ShipmentCubit, ShipmentState>(
+      listenWhen: (previous, current) => current is InsertShipment,
       listener: (context, state) async {
         if (state is InsertShipmentLoaded) {
           scaffoldMessengerKey.currentState?.showSnackBar(
@@ -76,6 +77,32 @@ class _StageLayoutState extends State<StageLayout> {
             date: dateFormat.format(DateTime.now()),
             stage: widget.stage,
           );
+        }
+
+        if (state is InsertShipmentError) {
+          if (!context.mounted) return;
+
+          final audioPlayer = AudioPlayer();
+
+          scaffoldMessengerKey.currentState?.showSnackBar(
+            dangerSnackbar(
+              state.failure.message,
+              EdgeInsets.only(
+                left: 16,
+                right: 16,
+                bottom: MediaQuery.sizeOf(context).height - 175,
+              ),
+            ),
+          );
+
+          switch (state.failure.statusCode) {
+            case 422:
+              await audioPlayer.play(AssetSource(repeatSound));
+              break;
+            case 423:
+              await audioPlayer.play(AssetSource(skipSound));
+              break;
+          }
         }
       },
       child: Scaffold(
@@ -226,13 +253,17 @@ class _StageLayoutState extends State<StageLayout> {
           children: [
             ActionButton(
               onPressed: () async {
-                final receiptCamera = await BarcodeScanner.scan();
+                final receiptCamera = await SimpleBarcodeScanner.scanBarcode(
+                  context,
+                  cameraFace: CameraFace.back,
+                );
 
-                if (receiptCamera.rawContent.isEmpty) return;
+                if (receiptCamera == null) return;
 
                 await shipmentCubit.insertShipment(
-                    receiptNumber: receiptCamera.rawContent,
-                    stage: widget.stage);
+                  receiptNumber: receiptCamera,
+                  stage: widget.stage,
+                );
               },
               icon: Icons.document_scanner_rounded,
             ),
@@ -241,6 +272,7 @@ class _StageLayoutState extends State<StageLayout> {
                 builder: (context) =>
                     InsertDataFromScannerAlertDialog(stage: widget.stage),
                 context: context,
+                useRootNavigator: false,
               ),
               icon: Icons.barcode_reader,
             ),

@@ -1,10 +1,7 @@
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/common/constants.dart';
-import '../../../../core/common/snackbar.dart';
 import '../../../../core/helpers/validators.dart';
 import '../../../../core/widgets/alert_dialog_snackbar_wrapper.dart';
 import '../../../auth/presentation/cubit/auth_cubit.dart';
@@ -103,23 +100,6 @@ class _InsertDataFromScannerAlertDialogState
               listener: (context, state) async {
                 if (state is InsertShipmentLoaded) {
                   context.pop();
-                }
-
-                if (state is InsertShipmentError) {
-                  final audioPlayer = AudioPlayer();
-
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    dangerSnackbar(state.failure.message),
-                  );
-
-                  switch (state.failure.statusCode) {
-                    case 422:
-                      await audioPlayer.play(AssetSource(repeatSound));
-                      break;
-                    case 423:
-                      await audioPlayer.play(AssetSource(skipSound));
-                      break;
-                  }
                 }
               },
               builder: (context, state) {
