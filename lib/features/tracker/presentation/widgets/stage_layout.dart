@@ -57,7 +57,6 @@ class _StageLayoutState extends State<StageLayout> {
     final shipmentCubit = context.read<ShipmentCubit>();
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
-    final routeName = GoRouterState.of(context).fullPath;
 
     return BlocListener<ShipmentCubit, ShipmentState>(
       listenWhen: (previous, current) => current is InsertShipment,
@@ -247,7 +246,7 @@ class _StageLayoutState extends State<StageLayout> {
             ),
           ],
         ),
-        floatingActionButton: routeName == cancelReceiptRoute
+        floatingActionButton: widget.stage == cancelStage
             ? null
             : ExpandableFAB(
                 distance: 90,
