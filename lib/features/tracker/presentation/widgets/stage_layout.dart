@@ -57,6 +57,7 @@ class _StageLayoutState extends State<StageLayout> {
     final shipmentCubit = context.read<ShipmentCubit>();
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
+    final routeName = GoRouterState.of(context).fullPath;
 
     return BlocListener<ShipmentCubit, ShipmentState>(
       listenWhen: (previous, current) => current is InsertShipment,
@@ -81,8 +82,6 @@ class _StageLayoutState extends State<StageLayout> {
 
         if (state is InsertShipmentError) {
           if (!context.mounted) return;
-
-          final audioPlayer = AudioPlayer();
 
           scaffoldMessengerKey.currentState?.showSnackBar(
             dangerSnackbar(
@@ -248,36 +247,39 @@ class _StageLayoutState extends State<StageLayout> {
             ),
           ],
         ),
-        floatingActionButton: ExpandableFAB(
-          distance: 90,
-          children: [
-            ActionButton(
-              onPressed: () async {
-                final receiptCamera = await SimpleBarcodeScanner.scanBarcode(
-                  context,
-                  cameraFace: CameraFace.back,
-                );
+        floatingActionButton: routeName == cancelReceiptRoute
+            ? null
+            : ExpandableFAB(
+                distance: 90,
+                children: [
+                  ActionButton(
+                    onPressed: () async {
+                      final receiptCamera =
+                          await SimpleBarcodeScanner.scanBarcode(
+                        context,
+                        cameraFace: CameraFace.back,
+                      );
 
-                if (receiptCamera == null) return;
+                      if (receiptCamera == null) return;
 
-                await shipmentCubit.insertShipment(
-                  receiptNumber: receiptCamera,
-                  stage: widget.stage,
-                );
-              },
-              icon: Icons.document_scanner_rounded,
-            ),
-            ActionButton(
-              onPressed: () => showDialog(
-                builder: (context) =>
-                    InsertDataFromScannerAlertDialog(stage: widget.stage),
-                context: context,
-                useRootNavigator: false,
+                      await shipmentCubit.insertShipment(
+                        receiptNumber: receiptCamera,
+                        stage: widget.stage,
+                      );
+                    },
+                    icon: Icons.document_scanner_rounded,
+                  ),
+                  ActionButton(
+                    onPressed: () => showDialog(
+                      builder: (context) =>
+                          InsertDataFromScannerAlertDialog(stage: widget.stage),
+                      context: context,
+                      useRootNavigator: false,
+                    ),
+                    icon: Icons.barcode_reader,
+                  ),
+                ],
               ),
-              icon: Icons.barcode_reader,
-            ),
-          ],
-        ),
       ),
     );
   }
@@ -308,6 +310,10 @@ class _StageLayoutState extends State<StageLayout> {
 
   Widget _buildListItem({required ShipmentEntity shipment}) {
     final textTheme = Theme.of(context).textTheme;
+    final shipmentCubit = context.read<ShipmentCubit>();
+    final authCubit = context.read<AuthCubit>();
+    final isSuperAdmin =
+        authCubit.user.permissions.contains(superAdminPermission);
 
     return ListTile(
       onTap: () => context.push(detailReceiptRoute, extra: shipment.id),
@@ -320,7 +326,7 @@ class _StageLayoutState extends State<StageLayout> {
             style: textTheme.titleLarge,
           ),
           Text(
-            dateTimeFormat.format(shipment.date),
+            timeFormat.format(shipment.date),
             style: textTheme.bodyMedium,
           ),
         ],
@@ -329,27 +335,31 @@ class _StageLayoutState extends State<StageLayout> {
         shipment.receiptNumber,
         style: textTheme.titleMedium,
       ),
-      trailing: _buildDeleteButton(shipment: shipment),
-    );
-  }
-
-  Widget _buildDeleteButton({required ShipmentEntity shipment}) {
-    final authCubit = context.read<AuthCubit>();
-    final isSuperAdmin =
-        authCubit.user.permissions.contains(superAdminPermission);
-
-    if (!isSuperAdmin) return const SizedBox();
-
-    return GestureDetector(
-      onTap: () => showDialog(
-        context: context,
-        builder: (context) => DeleteDataAlertDialog(
-          date: date,
-          shipment: shipment,
-          stage: widget.stage,
-        ),
-      ),
-      child: const Icon(Icons.delete),
+      trailing: isSuperAdmin
+          ? PopupMenuButton(
+              padding: const EdgeInsets.all(0),
+              itemBuilder: (context) => <PopupMenuItem>[
+                PopupMenuItem(
+                  onTap: () async => await shipmentCubit.insertShipment(
+                    receiptNumber: shipment.receiptNumber,
+                    stage: cancelStage,
+                  ),
+                  child: const Text('Cancel'),
+                ),
+                PopupMenuItem(
+                  onTap: () => showDialog(
+                    context: context,
+                    builder: (context) => DeleteDataAlertDialog(
+                      date: date,
+                      shipment: shipment,
+                      stage: widget.stage,
+                    ),
+                  ),
+                  child: const Text('Hapus'),
+                ),
+              ],
+            )
+          : null,
     );
   }
 }
