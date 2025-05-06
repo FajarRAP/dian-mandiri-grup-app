@@ -85,8 +85,16 @@ class _CheckReceiptFromScannerAlertDialogState
               }
 
               if (state is FetchReceiptStatusError) {
-                scaffoldMessengerKey.currentState
-                    ?.showSnackBar(dangerSnackbar(state.message));
+                scaffoldMessengerKey.currentState?.showSnackBar(
+                  dangerSnackbar(
+                    state.message,
+                    EdgeInsets.only(
+                      left: 16,
+                      right: 16,
+                      bottom: MediaQuery.sizeOf(context).height - 175,
+                    ),
+                  ),
+                );
               }
             },
             child: const Text(

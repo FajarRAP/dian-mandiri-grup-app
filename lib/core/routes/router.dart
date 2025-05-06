@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../features/auth/presentation/pages/profile_page.dart';
 import '../../features/auth/presentation/pages/sign_in_page.dart';
+import '../../features/tracker/presentation/pages/cancel_page.dart';
 import '../../features/tracker/presentation/pages/check_page.dart';
 import '../../features/tracker/presentation/pages/pack_page.dart';
 import '../../features/tracker/presentation/pages/pick_up_page.dart';
@@ -93,6 +94,10 @@ final router = GoRouter(
                 GoRoute(
                   path: 'return',
                   builder: (context, state) => const ReturnPage(),
+                ),
+                GoRoute(
+                  path: 'cancel',
+                  builder: (context, state) => const CancelPage(),
                 ),
                 GoRoute(
                   path: 'report',

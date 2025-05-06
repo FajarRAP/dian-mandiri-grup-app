@@ -63,8 +63,16 @@ class _DateRangeDialogState extends State<DateRangeDialog> {
                   current is CreateShipmentReport,
               listener: (context, state) {
                 if (state is CreateShipmentReportLoaded) {
-                  scaffoldMessengerKey.currentState
-                      ?.showSnackBar(successSnackbar(state.message));
+                  scaffoldMessengerKey.currentState?.showSnackBar(
+                    successSnackbar(
+                      state.message,
+                      EdgeInsets.only(
+                        left: 16,
+                        right: 16,
+                        bottom: MediaQuery.sizeOf(context).height - 175,
+                      ),
+                    ),
+                  );
                   context.pop();
                   shipmentCubit.fetchShipmentReports(
                       endDate: dateFormat.format(_dateTimeRange.end),
@@ -73,8 +81,16 @@ class _DateRangeDialogState extends State<DateRangeDialog> {
                 }
 
                 if (state is CreateShipmentReportError) {
-                  ScaffoldMessenger.of(context)
-                      .showSnackBar(dangerSnackbar(state.message));
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    dangerSnackbar(
+                      state.message,
+                      EdgeInsets.only(
+                        left: 16,
+                        right: 16,
+                        bottom: MediaQuery.sizeOf(context).height - 175,
+                      ),
+                    ),
+                  );
                 }
               },
               builder: (context, state) {

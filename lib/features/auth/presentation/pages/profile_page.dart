@@ -88,14 +88,30 @@ class ProfilePage extends StatelessWidget {
                       listenWhen: (previous, current) => current is SignOut,
                       listener: (context, state) {
                         if (state is SignOutLoaded) {
-                          scaffoldMessengerKey.currentState
-                              ?.showSnackBar(successSnackbar(state.message));
+                          scaffoldMessengerKey.currentState?.showSnackBar(
+                            successSnackbar(
+                              state.message,
+                              EdgeInsets.only(
+                                left: 16,
+                                right: 16,
+                                bottom: MediaQuery.sizeOf(context).height - 175,
+                              ),
+                            ),
+                          );
                           context.go(loginRoute);
                         }
 
                         if (state is SignOutError) {
-                          scaffoldMessengerKey.currentState
-                              ?.showSnackBar(dangerSnackbar(state.message));
+                          scaffoldMessengerKey.currentState?.showSnackBar(
+                            dangerSnackbar(
+                              state.message,
+                              EdgeInsets.only(
+                                left: 16,
+                                right: 16,
+                                bottom: MediaQuery.sizeOf(context).height - 175,
+                              ),
+                            ),
+                          );
                         }
                       },
                       builder: (context, state) {
@@ -125,4 +141,3 @@ class ProfilePage extends StatelessWidget {
     );
   }
 }
-

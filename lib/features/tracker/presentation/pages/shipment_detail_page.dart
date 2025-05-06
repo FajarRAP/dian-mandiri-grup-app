@@ -28,8 +28,16 @@ class ShipmentDetailPage extends StatelessWidget {
     return BlocListener<ShipmentCubit, ShipmentState>(
       listener: (context, state) {
         if (state is FetchShipmentDetailError) {
-          scaffoldMessengerKey.currentState
-              ?.showSnackBar(dangerSnackbar(state.message));
+          scaffoldMessengerKey.currentState?.showSnackBar(
+            dangerSnackbar(
+              state.message,
+              EdgeInsets.only(
+                left: 16,
+                right: 16,
+                bottom: MediaQuery.sizeOf(context).height - 175,
+              ),
+            ),
+          );
         }
       },
       child: Scaffold(

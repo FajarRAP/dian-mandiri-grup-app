@@ -53,7 +53,15 @@ class ReceiptInfoRow extends StatelessWidget {
                   onTap: () {
                     Clipboard.setData(ClipboardData(text: value));
                     scaffoldMessengerKey.currentState?.showSnackBar(
-                        successSnackbar('$label disalin ke clipboard'));
+                      successSnackbar(
+                        '$label disalin ke clipboard',
+                        EdgeInsets.only(
+                          left: 16,
+                          right: 16,
+                          bottom: MediaQuery.sizeOf(context).height - 175,
+                        ),
+                      ),
+                    );
                   },
                   child: Row(
                     children: [

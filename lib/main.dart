@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:camera/camera.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -12,6 +13,7 @@ import 'core/routes/router.dart';
 import 'core/themes/theme.dart';
 import 'features/auth/presentation/cubit/auth_cubit.dart';
 import 'features/tracker/presentation/cubit/shipment_cubit.dart';
+import 'firebase_options.dart';
 import 'service_container.dart';
 
 late List<CameraDescription> cameras;
@@ -19,6 +21,9 @@ late String initialLocation;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   cameras = await availableCameras();
   await initializeDateFormatting('id_ID', null);
 

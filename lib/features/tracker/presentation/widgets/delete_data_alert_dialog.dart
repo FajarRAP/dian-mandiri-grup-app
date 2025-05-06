@@ -39,8 +39,16 @@ class DeleteDataAlertDialog extends StatelessWidget {
               listener: (context, state) {
                 if (state is DeleteShipmentLoaded) {
                   context.pop();
-                  scaffoldMessengerKey.currentState
-                      ?.showSnackBar(successSnackbar(state.message));
+                  scaffoldMessengerKey.currentState?.showSnackBar(
+                    successSnackbar(
+                      state.message,
+                      EdgeInsets.only(
+                        left: 16,
+                        right: 16,
+                        bottom: MediaQuery.sizeOf(context).height - 175,
+                      ),
+                    ),
+                  );
                   shipmentCubit.fetchShipments(
                     date: date,
                     stage: stage,
@@ -48,8 +56,16 @@ class DeleteDataAlertDialog extends StatelessWidget {
                 }
 
                 if (state is DeleteShipmentError) {
-                  ScaffoldMessenger.of(context)
-                      .showSnackBar(dangerSnackbar(state.message));
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    dangerSnackbar(
+                      state.message,
+                      EdgeInsets.only(
+                        left: 16,
+                        right: 16,
+                        bottom: MediaQuery.sizeOf(context).height - 175,
+                      ),
+                    ),
+                  );
                 }
               },
               builder: (context, state) {

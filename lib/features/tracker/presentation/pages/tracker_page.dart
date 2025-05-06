@@ -105,6 +105,12 @@ class TrackerPage extends StatelessWidget {
         assetName: returnReceiptIcon,
       ),
       HomeMenuCard(
+        title: 'Barang Cancel',
+        route: cancelReceiptRoute,
+        color: Colors.deepOrange,
+        assetName: cancelReceiptIcon,
+      ),
+      HomeMenuCard(
         title: 'Laporan',
         route: reportRoute,
         color: Colors.teal,
@@ -179,4 +185,11 @@ const menus = <_Menu>[
     assetName: returnReceiptIcon,
     permission: returnPermission,
   ),
+  _Menu(
+    title: 'Barang Cancel',
+    route: cancelReceiptRoute,
+    color: Colors.indigo,
+    assetName: cancelReceiptIcon,
+    permission: superAdminPermission,
+  )
 ];
