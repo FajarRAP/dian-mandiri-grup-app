@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 
+import '../../../../core/common/constants.dart';
+import '../../../../core/common/snackbar.dart';
+import '../../../../core/widgets/danger_button.dart';
+import '../../../auth/presentation/cubit/auth_cubit.dart';
 import '../../data/models/shipment_detail_status_model.dart';
 import '../cubit/shipment_cubit.dart';
 import '../widgets/action_button.dart';
@@ -16,8 +21,11 @@ class ReceiptStatusPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final shipmentCubit = context.read<ShipmentCubit>();
+    final authCubit = context.read<AuthCubit>();
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
+    final isSuperAdmin =
+        authCubit.user.permissions.contains(superAdminPermission);
 
     return Scaffold(
       appBar: AppBar(
@@ -35,6 +43,8 @@ class ReceiptStatusPage extends StatelessWidget {
               final shipmentDetail =
                   state.shipmentDetail as ShipmentDetailStatusModel;
               final stages = shipmentDetail.stages;
+              final isCanceled = shipmentDetail.stages
+                  .any((stage) => stage.stage == cancelStage);
 
               return SingleChildScrollView(
                 child: Card(
@@ -115,6 +125,66 @@ class ReceiptStatusPage extends StatelessWidget {
                               ],
                             ),
                           ),
+                          if (isSuperAdmin && !isCanceled) ...[
+                            const SizedBox(height: 24),
+                            DangerButton(
+                              onPressed: () => showDialog(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  title: const Text('Konfirmasi'),
+                                  content: const Text(
+                                    'Apakah Anda yakin ingin membatalkan resi ini?',
+                                  ),
+                                  actions: <Widget>[
+                                    TextButton(
+                                      onPressed: context.pop,
+                                      child: const Text('Tidak'),
+                                    ),
+                                    BlocConsumer<ShipmentCubit, ShipmentState>(
+                                      listener: (context, cancelState) {
+                                        if (cancelState
+                                            is InsertShipmentLoaded) {
+                                          context.pop();
+                                          shipmentCubit
+                                              .fetchShipmentByReceiptNumber(
+                                            receipNumber: state
+                                                .shipmentDetail.receiptNumber,
+                                          );
+                                        }
+                                        if (cancelState
+                                            is InsertShipmentError) {
+                                          context.pop();
+                                          scaffoldMessengerKey.currentState
+                                              ?.showSnackBar(
+                                            dangerSnackbar(
+                                                cancelState.failure.message),
+                                          );
+                                        }
+                                      },
+                                      builder: (context, cancelState) {
+                                        if (cancelState
+                                            is InsertShipmentLoading) {
+                                          return const CircularProgressIndicator
+                                              .adaptive();
+                                        }
+
+                                        return TextButton(
+                                          onPressed: () =>
+                                              shipmentCubit.insertShipment(
+                                            receiptNumber: state
+                                                .shipmentDetail.receiptNumber,
+                                            stage: cancelStage,
+                                          ),
+                                          child: const Text('Ya'),
+                                        );
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              child: const Text('Cancel Resi'),
+                            ),
+                          ],
                           const SizedBox(height: 24),
                           Row(
                             children: [
@@ -169,7 +239,8 @@ class ReceiptStatusPage extends StatelessWidget {
         children: [
           ActionButton(
             onPressed: () async {
-              final receiptNumber = await SimpleBarcodeScanner.scanBarcode(context);
+              final receiptNumber =
+                  await SimpleBarcodeScanner.scanBarcode(context);
 
               if (receiptNumber == null) return;
 
