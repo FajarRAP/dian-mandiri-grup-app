@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../common/colors.dart';
+import '../themes/colors.dart';
 
 class DangerButton extends StatelessWidget {
   const DangerButton({
