@@ -23,6 +23,8 @@ String evaluateStage(String stage) {
       return 'Kirim';
     case returnStage:
       return 'Retur';
+    case cancelStage:
+      return 'Cancel';
     default:
       return 'Tidak Diketahui';
   }
