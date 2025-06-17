@@ -156,7 +156,7 @@ class ReceiptStatusPage extends StatelessWidget {
                                           context.pop();
                                           scaffoldMessengerKey.currentState
                                               ?.showSnackBar(
-                                            successSnackbar(
+                                            dangerSnackbar(
                                                 cancelState.failure.message),
                                           );
                                         }
