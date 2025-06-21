@@ -1,25 +1,48 @@
 import 'package:flutter/material.dart';
 
+import 'colors.dart';
+
 const fontFamily = 'Inter18pt';
 
 final theme = ThemeData(
   appBarTheme: const AppBarTheme(
+    centerTitle: true,
+    iconTheme: IconThemeData(color: CustomColors.primaryNormal),
+    scrolledUnderElevation: 0,
     titleTextStyle: TextStyle(
-      color: Colors.black,
+      color: CustomColors.primaryNormal,
       fontFamily: fontFamily,
-      fontSize: 24,
-      fontWeight: FontWeight.w600,
+      fontSize: 16,
+      fontWeight: FontWeight.w400,
     ),
   ),
-  colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
+  colorScheme: ColorScheme.fromSeed(seedColor: CustomColors.primaryNormal),
   fontFamily: fontFamily,
+  floatingActionButtonTheme: const FloatingActionButtonThemeData(
+    backgroundColor: CustomColors.primaryNormal,
+    foregroundColor: MaterialColors.onPrimary,
+  ),
   inputDecorationTheme: InputDecorationTheme(
     border: OutlineInputBorder(
       borderRadius: BorderRadius.circular(10),
     ),
-    hintStyle: TextStyle(
-      color: Colors.grey[400],
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(10),
+      borderSide: const BorderSide(color: MaterialColors.outlineVariant),
     ),
+    errorBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(10),
+      borderSide: const BorderSide(color: MaterialColors.error),
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(10),
+      borderSide: const BorderSide(color: MaterialColors.outlineVariant),
+    ),
+    hintStyle: TextStyle(
+      color: MaterialColors.onSurfaceVariant,
+      fontSize: 16,
+    ),
+    prefixIconColor: MaterialColors.outlineVariant,
   ),
   textTheme: const TextTheme(
     displayLarge: TextStyle(
