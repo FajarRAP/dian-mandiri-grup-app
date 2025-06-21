@@ -18,7 +18,22 @@ class MaterialColors {
   static const errorContainer = Color(0xFFFFDAD6);
   static const onErrorContainer = Color(0xFF93000A);
   static const surface = Color(0xFFFBF8FF);
+  static const surfaceDim = Color(0xFFDBD9E0);
+  static const surfaceBright = Color(0xFFFBF8FF);
+  static const surfaceContainerLowest = Color(0xFFFFFFFF);
+  static const surfaceContainerLow = Color(0xFFF5F2FA);
+  static const surfaceContainer = Color(0xFFEFEDF4);
+  static const surfaceContainerHigh = Color(0xFFE9E7EF);
+  static const surfaceContainerHighest = Color(0xFFE3E1E9);
   static const onSurface = Color(0xFF1B1B21);
+  static const onSurfaceVariant = Color(0xFF45464F);
+  static const outline = Color(0xFF767680);
+  static const outlineVariant = Color(0xFFC6C5D0);
+  static const inversePrimary = Color(0xFFB8C3FF);
+  static const inverseSurface = Color(0xFF303036);
+  static const onInverseSurface = Color(0xFFF2F0F7);
+  static const scrim = Color(0xFF000000);
+  static const shadow = Color(0xFF000000);
 }
 
 class CustomColors {
