@@ -14,6 +14,30 @@ class SupplierPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        actions: <Widget>[
+          PopupMenuButton(
+            icon: const Icon(Icons.sort),
+            tooltip: 'Urutkan',
+            itemBuilder: (context) => <PopupMenuEntry>[
+              PopupMenuItem(
+                value: 'name,asc',
+                child: const Text('Nama Naik'),
+              ),
+              PopupMenuItem(
+                value: 'name,desc',
+                child: const Text('Nama Turun'),
+              ),
+              PopupMenuItem(
+                value: 'created_at,asc',
+                child: const Text('Tanggal Ditambahkan Naik'),
+              ),
+              PopupMenuItem(
+                value: 'created_at,desc',
+                child: const Text('Tanggal Ditambahkan Turun'),
+              ),
+            ],
+          ),
+        ],
         backgroundColor: MaterialColors.onPrimary,
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(76),
