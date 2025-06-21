@@ -20,6 +20,10 @@ abstract class SupplierRemoteDataSources<T> {
 
 class SupplierRemoteDataSourcesImpl
     implements SupplierRemoteDataSources<Response> {
+  SupplierRemoteDataSourcesImpl({required this.dio});
+
+  final Dio dio;
+
   @override
   Future<Response> fetchSupplier({required String supplierId}) {
     // TODO: implement fetchSupplier

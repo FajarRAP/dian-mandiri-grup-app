@@ -5,8 +5,13 @@ import '../../../../core/failure/failure.dart';
 import '../../domain/entities/supplier_detail_entity.dart';
 import '../../domain/entities/supplier_entity.dart';
 import '../../domain/repositories/supplier_repositories.dart';
+import '../datasources/supplier_remote_data_sources.dart';
 
 class SupplierRepositoriesImpl extends SupplierRepositories {
+  SupplierRepositoriesImpl({required this.supplierRemoteDataSources});
+
+  final SupplierRemoteDataSources supplierRemoteDataSources;
+
   @override
   Future<Either<Failure, SupplierDetailEntity>> fetchSupplier(
       {required String supplierId}) {
