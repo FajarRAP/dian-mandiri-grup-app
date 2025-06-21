@@ -4,6 +4,10 @@ import 'package:go_router/go_router.dart';
 
 import '../../features/auth/presentation/pages/profile_page.dart';
 import '../../features/auth/presentation/pages/sign_in_page.dart';
+import '../../features/home_page.dart';
+import '../../features/staff_management_page.dart';
+import '../../features/supplier/presentation/pages/add_supplier_page.dart';
+import '../../features/supplier/presentation/pages/supplier_page.dart';
 import '../../features/tracker/presentation/pages/cancel_page.dart';
 import '../../features/tracker/presentation/pages/check_page.dart';
 import '../../features/tracker/presentation/pages/pack_page.dart';
@@ -33,6 +37,7 @@ Widget transitionsBuilder(BuildContext context, Animation<double> animation,
 
 final _rootNavigatorkey = GlobalKey<NavigatorState>();
 final _homeNavigatorKey = GlobalKey<NavigatorState>();
+final _staffManagementNavigatorKey = GlobalKey<NavigatorState>();
 final _profileNavigatorKey = GlobalKey<NavigatorState>();
 
 final router = GoRouter(
@@ -68,51 +73,76 @@ final router = GoRouter(
           navigatorKey: _homeNavigatorKey,
           routes: <RouteBase>[
             GoRoute(
-              path: trackerRoute,
-              builder: (context, state) => const TrackerPage(),
+              path: homeRoute,
+              builder: (context, state) => const HomePage(),
               routes: <RouteBase>[
                 GoRoute(
-                  path: 'scan',
-                  builder: (context, state) => const ScanPage(),
+                  path: 'tracker',
+                  builder: (context, state) => const TrackerPage(),
+                  routes: <RouteBase>[
+                    GoRoute(
+                      path: 'scan',
+                      builder: (context, state) => const ScanPage(),
+                    ),
+                    GoRoute(
+                      path: 'pick-up',
+                      builder: (context, state) => const PickUpPage(),
+                    ),
+                    GoRoute(
+                      path: 'check',
+                      builder: (context, state) => const CheckPage(),
+                    ),
+                    GoRoute(
+                      path: 'pack',
+                      builder: (context, state) => const PackPage(),
+                    ),
+                    GoRoute(
+                      path: 'send',
+                      builder: (context, state) => const SendPage(),
+                    ),
+                    GoRoute(
+                      path: 'return',
+                      builder: (context, state) => const ReturnPage(),
+                    ),
+                    GoRoute(
+                      path: 'cancel',
+                      builder: (context, state) => const CancelPage(),
+                    ),
+                    GoRoute(
+                      path: 'report',
+                      builder: (context, state) => const ReportPage(),
+                    ),
+                    GoRoute(
+                      path: 'status',
+                      builder: (context, state) => const ReceiptStatusPage(),
+                    ),
+                    GoRoute(
+                      path: 'detail',
+                      builder: (context, state) =>
+                          ShipmentDetailPage(shipmentId: state.extra as String),
+                    ),
+                  ],
                 ),
                 GoRoute(
-                  path: 'pick-up',
-                  builder: (context, state) => const PickUpPage(),
-                ),
-                GoRoute(
-                  path: 'check',
-                  builder: (context, state) => const CheckPage(),
-                ),
-                GoRoute(
-                  path: 'pack',
-                  builder: (context, state) => const PackPage(),
-                ),
-                GoRoute(
-                  path: 'send',
-                  builder: (context, state) => const SendPage(),
-                ),
-                GoRoute(
-                  path: 'return',
-                  builder: (context, state) => const ReturnPage(),
-                ),
-                GoRoute(
-                  path: 'cancel',
-                  builder: (context, state) => const CancelPage(),
-                ),
-                GoRoute(
-                  path: 'report',
-                  builder: (context, state) => const ReportPage(),
-                ),
-                GoRoute(
-                  path: 'status',
-                  builder: (context, state) => const ReceiptStatusPage(),
-                ),
-                GoRoute(
-                  path: 'detail',
-                  builder: (context, state) =>
-                      ShipmentDetailPage(shipmentId: state.extra as String),
+                  path: 'supplier',
+                  builder: (context, state) => const SupplierPage(),
+                  routes: <RouteBase>[
+                    GoRoute(
+                      path: 'add',
+                      builder: (context, state) => const AddSupplierPage(),
+                    ),
+                  ],
                 ),
               ],
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          navigatorKey: _staffManagementNavigatorKey,
+          routes: <RouteBase>[
+            GoRoute(
+              path: staffManagementRoute,
+              builder: (context, state) => const StaffManagementPage(),
             ),
           ],
         ),
