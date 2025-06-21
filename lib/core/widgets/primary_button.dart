@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 
+import '../themes/colors.dart';
+
 class PrimaryButton extends StatelessWidget {
   const PrimaryButton({
     super.key,
     required this.child,
-    required this.icon,
     this.height,
     this.width,
     this.onPressed,
   });
 
   final Widget child;
-  final IconData icon;
   final double? height;
   final double? width;
   final void Function()? onPressed;
@@ -19,19 +19,23 @@ class PrimaryButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
 
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        backgroundColor: theme.colorScheme.primary,
-        foregroundColor: theme.colorScheme.onPrimary,
+        backgroundColor: CustomColors.primaryNormal,
+        foregroundColor: MaterialColors.onPrimary,
         fixedSize: Size(
           width ?? MediaQuery.sizeOf(context).width,
           height ?? 48,
         ),
-        padding: const EdgeInsets.symmetric(vertical: 14),
+        padding: const EdgeInsets.symmetric(vertical: 8),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        textStyle: textTheme.titleMedium?.copyWith(
+          fontWeight: FontWeight.w500,
         ),
       ),
       child: child,
