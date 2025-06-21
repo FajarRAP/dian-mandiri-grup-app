@@ -61,7 +61,7 @@ class _AddSupplierPageState extends State<AddSupplierPage> {
                     alignment: Alignment.bottomRight,
                     child: Container(
                       decoration: BoxDecoration(
-                        color: MaterialColors.primary,
+                        color: CustomColors.primaryNormal,
                         shape: BoxShape.circle,
                       ),
                       padding: const EdgeInsets.all(4),
