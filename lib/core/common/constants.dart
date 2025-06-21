@@ -5,8 +5,8 @@ const homeRoute = "/";
 const loginRoute = "/login";
 const displayPictureRoute = "/picture";
 
-const profileRoute = "${homeRoute}profile";
-
+const supplierRoute = "${homeRoute}supplier";
+const addSupplierRoute = "$supplierRoute/add";
 const trackerRoute = "${homeRoute}tracker";
 const scanReceiptRoute = "$trackerRoute/scan";
 const pickUpReceiptRoute = "$trackerRoute/pick-up";
@@ -19,6 +19,10 @@ const reportRoute = "$trackerRoute/report";
 const receiptStatusRoute = "$trackerRoute/status";
 const detailReceiptRoute = "$trackerRoute/detail";
 const cameraRoute = "$trackerRoute/camera";
+
+const staffManagementRoute = "${homeRoute}staff-management";
+
+const profileRoute = "${homeRoute}profile";
 
 const iconsPath = "assets/icons";
 const spreadsheetIcon = "$iconsPath/excel.png";
@@ -46,7 +50,7 @@ const categorySquareSvg = '$svgPath/category-square.svg';
 const categorySvg = '$svgPath/category.svg';
 const dollarSvg = '$svgPath/dollar.svg';
 const personMenuSvg = '$svgPath/person-menu.svg';
-const personOutlineSvg = '$svgPath/person-outline.svg';
+const personSquareSvg = '$svgPath/person-square.svg';
 const personSvg = '$svgPath/person.svg';
 const reportV1Svg = '$svgPath/report-v1.svg';
 const reportV2Svg = '$svgPath/report-v2.svg';
