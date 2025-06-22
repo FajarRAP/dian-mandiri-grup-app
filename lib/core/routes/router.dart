@@ -7,6 +7,8 @@ import '../../features/auth/presentation/pages/sign_in_page.dart';
 import '../../features/home_page.dart';
 import '../../features/staff_management_page.dart';
 import '../../features/supplier/presentation/pages/add_supplier_page.dart';
+import '../../features/supplier/presentation/pages/edit_supplier_page.dart';
+import '../../features/supplier/presentation/pages/supplier_detail_page.dart';
 import '../../features/supplier/presentation/pages/supplier_page.dart';
 import '../../features/tracker/presentation/pages/cancel_page.dart';
 import '../../features/tracker/presentation/pages/check_page.dart';
@@ -21,6 +23,8 @@ import '../../features/tracker/presentation/pages/shipment_detail_page.dart';
 import '../../features/tracker/presentation/pages/tracker_page.dart';
 import '../../features/tracker/presentation/pages/upload_page.dart';
 import '../../features/tracker/presentation/widgets/open_camera.dart';
+import '../../features/warehouse/presentation/pages/add_shipping_fee_page.dart';
+import '../../features/warehouse/presentation/pages/warehouse_page.dart';
 import '../../main.dart';
 import '../common/constants.dart';
 import '../common/scaffold_with_bottom_navigation_bar.dart';
@@ -130,6 +134,28 @@ final router = GoRouter(
                     GoRoute(
                       path: 'add',
                       builder: (context, state) => const AddSupplierPage(),
+                    ),
+                    GoRoute(
+                      path: 'detail',
+                      builder: (context, state) => SupplierDetailPage(
+                        supplierId: state.extra as String,
+                      ),
+                    ),
+                    GoRoute(
+                      path: 'edit',
+                      builder: (context, state) => EditSupplierPage(
+                        supplierId: state.extra as String,
+                      ),
+                    ),
+                  ],
+                ),
+                GoRoute(
+                  path: 'warehouse',
+                  builder: (context, state) => const WarehousePage(),
+                  routes: <RouteBase>[
+                    GoRoute(
+                      path: 'add-shipping-fee',
+                      builder: (context, state) => const AddShippingFeePage(),
                     ),
                   ],
                 ),

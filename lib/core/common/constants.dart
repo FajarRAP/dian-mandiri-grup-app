@@ -7,6 +7,12 @@ const displayPictureRoute = "/picture";
 
 const supplierRoute = "${homeRoute}supplier";
 const addSupplierRoute = "$supplierRoute/add";
+const editSupplierRoute = "$supplierRoute/edit";
+const supplierDetailRoute = "$supplierRoute/detail";
+
+const warehouseRoute = "${homeRoute}warehouse";
+const addShippingFeeRoute = "$warehouseRoute/add-shipping-fee";
+
 const trackerRoute = "${homeRoute}tracker";
 const scanReceiptRoute = "$trackerRoute/scan";
 const pickUpReceiptRoute = "$trackerRoute/pick-up";
