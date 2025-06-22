@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/common/constants.dart';
 import '../../../../core/themes/colors.dart';
+import '../../domain/entities/supplier_entity.dart';
 import '../widgets/supplier_item.dart';
 
 class SupplierPage extends StatelessWidget {
@@ -54,7 +55,20 @@ class SupplierPage extends StatelessWidget {
         title: const Text('Supplier'),
       ),
       body: ListView.separated(
-        itemBuilder: (context, index) => SupplierItem(),
+        itemBuilder: (context, index) => GestureDetector(
+          onTap: () => context.push(
+            supplierDetailRoute,
+            extra: 'supplierId',
+          ),
+          child: SupplierItem(
+            supplier: SupplierEntity(
+              id: '$index',
+              avatarUrl: 'avatarUrl $index',
+              name: 'Supplier $index',
+              phoneNumber: 'Phone $index',
+            ),
+          ),
+        ),
         separatorBuilder: (context, index) => const SizedBox(height: 6),
         itemCount: 10,
         padding: const EdgeInsets.all(16),
