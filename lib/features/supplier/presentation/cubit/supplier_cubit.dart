@@ -1,7 +1,9 @@
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
 
+import '../../../../core/common/dropdown_entity.dart';
 import '../../domain/entities/supplier_detail_entity.dart';
+import '../../domain/entities/supplier_entity.dart';
 import '../../domain/usecases/fetch_supplier_use_case.dart';
 import '../../domain/usecases/fetch_suppliers_dropdown_use_case.dart';
 import '../../domain/usecases/fetch_suppliers_use_case.dart';
@@ -31,7 +33,14 @@ class SupplierCubit extends Cubit<SupplierState> {
   final UpdateSupplierUseCase _updateSupplierUseCase;
 
   Future<void> fetchSupplierUseCase({required String supplierId}) async {
+    emit(FetchSupplierLoading());
+
     final result = await _fetchSupplierUseCase(supplierId);
+
+    result.fold(
+      (l) => emit(FetchSupplierError(message: l.message)),
+      (r) => emit(FetchSupplierLoaded(supplierDetail: r)),
+    );
   }
 
   Future<void> fetchSuppliersUseCase({
@@ -39,28 +48,55 @@ class SupplierCubit extends Cubit<SupplierState> {
     String column = 'name',
     String sort = 'asc',
   }) async {
+    emit(FetchSuppliersLoading());
+
     final result = await _fetchSuppliersUseCase({
       'search': search,
       'column': column,
       'sort': sort,
     });
+
+    result.fold(
+      (l) => emit(FetchSuppliersError(message: l.message)),
+      (r) => emit(FetchSuppliersLoaded(suppliers: r)),
+    );
   }
 
   Future<void> fetchSuppliersDropdownUseCase({
     String? search,
   }) async {
+    emit(FetchSuppliersDropdownLoading());
     final result = await _fetchSuppliersDropdownUseCase({
       'search': search,
     });
+
+    result.fold(
+      (l) => emit(FetchSuppliersDropdownError(message: l.message)),
+      (r) => emit(FetchSuppliersDropdownLoaded(suppliers: r)),
+    );
   }
 
   Future<void> insertSupplierUseCase(
       {required SupplierDetailEntity supplierDetailEntity}) async {
+    emit(InsertSupplierLoading());
+
     final result = await _insertSupplierUseCase(supplierDetailEntity);
+
+    result.fold(
+      (l) => emit(InsertSupplierError(message: l.message)),
+      (r) => emit(InsertSupplierLoaded(supplierDetail: r)),
+    );
   }
 
   Future<void> updateSupplierUseCase(
       {required SupplierDetailEntity supplierDetailEntity}) async {
+    emit(UpdateSupplierLoading());
+
     final result = await _updateSupplierUseCase(supplierDetailEntity);
+
+    result.fold(
+      (l) => emit(UpdateSupplierError(message: l.message)),
+      (r) => emit(UpdateSupplierLoaded(supplierDetail: r)),
+    );
   }
 }
