@@ -27,10 +27,6 @@ class LightIconButton extends StatelessWidget {
           width ?? MediaQuery.sizeOf(context).width,
           height ?? 48,
         ),
-        padding: const EdgeInsets.symmetric(vertical: 14),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
       ),
       icon: icon,
       label: label,

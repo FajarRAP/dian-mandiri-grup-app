@@ -18,9 +18,6 @@ class PrimaryOutlineButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final textTheme = theme.textTheme;
-
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
@@ -31,16 +28,9 @@ class PrimaryOutlineButton extends StatelessWidget {
           width ?? MediaQuery.sizeOf(context).width,
           height ?? 48,
         ),
-        padding: const EdgeInsets.symmetric(vertical: 8),
         side: BorderSide(
           color: CustomColors.primaryNormal,
           width: 1.5,
-        ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-        textStyle: textTheme.titleMedium?.copyWith(
-          fontWeight: FontWeight.w500,
         ),
       ),
       child: child,

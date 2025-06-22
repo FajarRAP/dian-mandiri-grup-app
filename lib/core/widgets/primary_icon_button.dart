@@ -1,37 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:ship_tracker/core/themes/colors.dart';
 
 class PrimaryIconButton extends StatelessWidget {
   const PrimaryIconButton({
     super.key,
-    required this.icon,
-    required this.label,
     this.height,
     this.width,
     this.onPressed,
+    required this.icon,
+    required this.label,
   });
 
-  final Widget icon;
-  final Widget label;
+  final void Function()? onPressed;
   final double? height;
   final double? width;
-  final void Function()? onPressed;
+  final Widget icon;
+  final Widget label;
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     return ElevatedButton.icon(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        backgroundColor: colorScheme.primary,
-        foregroundColor: colorScheme.onPrimary,
+        backgroundColor: CustomColors.primaryNormal,
+        foregroundColor: MaterialColors.onPrimary,
         fixedSize: Size(
           width ?? MediaQuery.sizeOf(context).width,
           height ?? 48,
-        ),
-        padding: const EdgeInsets.symmetric(vertical: 14),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
         ),
       ),
       icon: icon,
