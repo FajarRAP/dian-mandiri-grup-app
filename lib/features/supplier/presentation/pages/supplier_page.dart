@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/common/constants.dart';
 import '../../../../core/themes/colors.dart';
-import '../../domain/entities/supplier_entity.dart';
+import '../cubit/supplier_cubit.dart';
 import '../widgets/supplier_item.dart';
 
 class SupplierPage extends StatelessWidget {
@@ -54,24 +55,37 @@ class SupplierPage extends StatelessWidget {
         ),
         title: const Text('Supplier'),
       ),
-      body: ListView.separated(
-        itemBuilder: (context, index) => GestureDetector(
-          onTap: () => context.push(
-            supplierDetailRoute,
-            extra: 'supplierId',
-          ),
-          child: SupplierItem(
-            supplier: SupplierEntity(
-              id: '$index',
-              avatarUrl: 'avatarUrl $index',
-              name: 'Supplier $index',
-              phoneNumber: 'Phone $index',
-            ),
-          ),
+      body: RefreshIndicator(
+        onRefresh: context.read<SupplierCubit>().fetchSuppliers,
+        displacement: 10,
+        child: BlocBuilder<SupplierCubit, SupplierState>(
+          bloc: context.read<SupplierCubit>()..fetchSuppliers(),
+          buildWhen: (previous, current) => current is FetchSuppliers,
+          builder: (context, state) {
+            if (state is FetchSuppliersLoading) {
+              return const Center(
+                child: CircularProgressIndicator.adaptive(),
+              );
+            }
+
+            if (state is FetchSuppliersLoaded) {
+              return ListView.separated(
+                itemBuilder: (context, index) => GestureDetector(
+                  onTap: () => context.push(
+                    supplierDetailRoute,
+                    extra: 'supplierId',
+                  ),
+                  child: SupplierItem(supplier: state.suppliers[index]),
+                ),
+                separatorBuilder: (context, index) => const SizedBox(height: 6),
+                itemCount: state.suppliers.length,
+                padding: const EdgeInsets.all(16),
+              );
+            }
+
+            return const SizedBox();
+          },
         ),
-        separatorBuilder: (context, index) => const SizedBox(height: 6),
-        itemCount: 10,
-        padding: const EdgeInsets.all(16),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => context.push(addSupplierRoute),
