@@ -12,6 +12,7 @@ import 'core/common/constants.dart';
 import 'core/routes/router.dart';
 import 'core/themes/theme.dart';
 import 'features/auth/presentation/cubit/auth_cubit.dart';
+import 'features/supplier/presentation/cubit/supplier_cubit.dart';
 import 'features/tracker/presentation/cubit/shipment_cubit.dart';
 import 'firebase_options.dart';
 import 'service_container.dart';
@@ -31,7 +32,7 @@ Future<void> main() async {
 
   final storage = getIt.get<FlutterSecureStorage>();
   final refreshToken = await storage.read(key: refreshTokenKey);
-  initialLocation = refreshToken != null ? trackerRoute : loginRoute;
+  initialLocation = refreshToken != null ? homeRoute : loginRoute;
 
   runApp(const MyApp());
 }
@@ -45,6 +46,7 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider(create: (context) => getIt.get<AuthCubit>()),
         BlocProvider(create: (context) => getIt.get<ShipmentCubit>()),
+        BlocProvider(create: (context) => getIt.get<SupplierCubit>()),
       ],
       child: MaterialApp.router(
         localizationsDelegates: const [
