@@ -32,7 +32,7 @@ class SupplierCubit extends Cubit<SupplierState> {
   final InsertSupplierUseCase _insertSupplierUseCase;
   final UpdateSupplierUseCase _updateSupplierUseCase;
 
-  Future<void> fetchSupplierUseCase({required String supplierId}) async {
+  Future<void> fetchSupplier({required String supplierId}) async {
     emit(FetchSupplierLoading());
 
     final result = await _fetchSupplierUseCase(supplierId);
@@ -43,7 +43,7 @@ class SupplierCubit extends Cubit<SupplierState> {
     );
   }
 
-  Future<void> fetchSuppliersUseCase({
+  Future<void> fetchSuppliers({
     String? search,
     String column = 'name',
     String sort = 'asc',
@@ -62,7 +62,7 @@ class SupplierCubit extends Cubit<SupplierState> {
     );
   }
 
-  Future<void> fetchSuppliersDropdownUseCase({
+  Future<void> fetchSuppliersDropdown({
     String? search,
   }) async {
     emit(FetchSuppliersDropdownLoading());
@@ -76,7 +76,7 @@ class SupplierCubit extends Cubit<SupplierState> {
     );
   }
 
-  Future<void> insertSupplierUseCase(
+  Future<void> insertSupplier(
       {required SupplierDetailEntity supplierDetailEntity}) async {
     emit(InsertSupplierLoading());
 
@@ -88,7 +88,7 @@ class SupplierCubit extends Cubit<SupplierState> {
     );
   }
 
-  Future<void> updateSupplierUseCase(
+  Future<void> updateSupplier(
       {required SupplierDetailEntity supplierDetailEntity}) async {
     emit(UpdateSupplierLoading());
 
