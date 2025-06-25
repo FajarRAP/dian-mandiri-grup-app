@@ -38,12 +38,15 @@ dependencies:
   cupertino_icons: ^1.0.8
   dartz: ^0.10.1
   dio: ^5.7.0
+  file_selector: ^1.0.3
   flutter_bloc: ^9.1.0
   flutter_secure_storage: ^9.2.2
+  flutter_svg: ^2.2.0
   get_it: ^8.0.0
   go_router: ^14.2.7
   google_sign_in: ^6.2.2
   intl: ^0.19.0
+  image_picker: ^1.1.2
   meta: ^1.15.0
   open_filex: ^4.5.0
   path_provider: ^2.1.4
@@ -66,6 +69,8 @@ flutter:
   assets:
     - assets/icons/
     - assets/sounds/
+    - assets/svgs/
+    - dummy_json/
 
   fonts:
     - family: Inter18pt
@@ -90,6 +95,11 @@ flutter:
         - asset: fonts/Inter_18pt-MediumItalic.ttf
           weight: 500
           style: italic
+        - asset: fonts/Inter_18pt-Regular.ttf
+          weight: 400
+        - asset: fonts/Inter_18pt-Italic.ttf
+          weight: 400
+          style: italic
         - asset: fonts/Inter_18pt-Light.ttf
           weight: 300
         - asset: fonts/Inter_18pt-LightItalic.ttf
@@ -103,10 +113,6 @@ flutter:
         - asset: fonts/Inter_18pt-Thin.ttf
           weight: 100
         - asset: fonts/Inter_18pt-ThinItalic.ttf
-          weight: 100
-          style: italic
-        - asset: fonts/Inter_18pt-Regular.ttf
-        - asset: fonts/Inter_18pt-Italic.ttf
           style: italic
     # - family: Inter24pt
     #   fonts:
