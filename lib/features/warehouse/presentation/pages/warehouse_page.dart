@@ -63,11 +63,11 @@ class WarehousePage extends StatelessWidget {
         distance: 100,
         children: <Widget>[
           ActionButton(
-            onPressed: () {},
+            onPressed: () => context.push(addPurchaseNoteManualRoute),
             icon: Icons.add,
           ),
           ActionButton(
-            onPressed: () {},
+            onPressed: () => context.push(addPurchaseNoteFileRoute),
             icon: Icons.folder,
           ),
           ActionButton(
