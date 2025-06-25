@@ -23,6 +23,8 @@ import '../../features/tracker/presentation/pages/shipment_detail_page.dart';
 import '../../features/tracker/presentation/pages/tracker_page.dart';
 import '../../features/tracker/presentation/pages/upload_page.dart';
 import '../../features/tracker/presentation/widgets/open_camera.dart';
+import '../../features/warehouse/presentation/pages/add_purchase_note_file_page.dart';
+import '../../features/warehouse/presentation/pages/add_purchase_note_manual_page.dart';
 import '../../features/warehouse/presentation/pages/add_shipping_fee_page.dart';
 import '../../features/warehouse/presentation/pages/warehouse_page.dart';
 import '../../main.dart';
@@ -156,6 +158,16 @@ final router = GoRouter(
                     GoRoute(
                       path: 'add-shipping-fee',
                       builder: (context, state) => const AddShippingFeePage(),
+                    ),
+                    GoRoute(
+                      path: 'add-purchase-note-manual',
+                      builder: (context, state) =>
+                          const AddPurchaseNoteManualPage(),
+                    ),
+                    GoRoute(
+                      path: 'add-purchase-note-file',
+                      builder: (context, state) =>
+                          const AddPurchaseNoteFilePage(),
                     ),
                   ],
                 ),
