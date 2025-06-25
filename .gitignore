@@ -48,3 +48,6 @@ app.*.map.json
 
 # testers
 testers.txt
+
+# dummy files
+dummy_json/
