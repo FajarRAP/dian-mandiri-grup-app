@@ -49,7 +49,7 @@ final theme = ThemeData(
     ),
     focusedBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(10),
-      borderSide: const BorderSide(color: MaterialColors.outlineVariant),
+      borderSide: const BorderSide(color: CustomColors.primaryNormalActive),
     ),
     hintStyle: TextStyle(
       color: MaterialColors.onSurfaceVariant,
