@@ -15,7 +15,7 @@ String? inputValidator(String? value) {
   if (value == null || value.isEmpty) {
     return 'Harap Isi';
   }
-  
+
   return null;
 }
 
@@ -53,6 +53,14 @@ String? passwordValidator(String? value) {
       r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$');
   if (!passwordRegex.hasMatch(value)) {
     return 'Password harus terdiri dari huruf besar, huruf kecil, angka, dan karakter spesial';
+  }
+
+  return null;
+}
+
+String? nullValidator(String? value) {
+  if (value == null || value.isEmpty) {
+    return 'Harap Isi';
   }
 
   return null;
