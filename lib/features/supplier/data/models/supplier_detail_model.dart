@@ -10,6 +10,16 @@ class SupplierDetailModel extends SupplierDetailEntity {
     required super.email,
   });
 
+  factory SupplierDetailModel.fromEntity(SupplierDetailEntity entity) =>
+      SupplierDetailModel(
+        id: entity.id,
+        avatarUrl: entity.avatarUrl,
+        name: entity.name,
+        phoneNumber: entity.phoneNumber,
+        address: entity.address,
+        email: entity.email,
+      );
+
   factory SupplierDetailModel.fromJson(Map<String, dynamic> json) =>
       SupplierDetailModel(
         id: json['id'],

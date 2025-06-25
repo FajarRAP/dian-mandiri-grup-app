@@ -2,7 +2,7 @@ import 'supplier_entity.dart';
 
 class SupplierDetailEntity extends SupplierEntity {
   const SupplierDetailEntity({
-    required super.id,
+    super.id,
     required super.avatarUrl,
     required super.name,
     required super.phoneNumber,
