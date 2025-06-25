@@ -71,6 +71,7 @@ class ScaffoldWithBottomNavigationBar extends StatelessWidget {
             ),
           ],
         ),
+        resizeToAvoidBottomInset: false,
       ),
     );
   }
