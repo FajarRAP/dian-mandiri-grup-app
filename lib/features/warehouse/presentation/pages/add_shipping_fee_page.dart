@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ship_tracker/core/common/dropdown_entity.dart';
-import 'package:ship_tracker/core/themes/colors.dart';
-import 'package:ship_tracker/core/widgets/dropdown_modal_item.dart';
-import 'package:ship_tracker/core/widgets/dropdown_search_modal.dart';
-import 'package:ship_tracker/core/widgets/primary_button.dart';
+
+import '../../../../core/common/dropdown_entity.dart';
+import '../../../../core/themes/colors.dart';
+import '../../../../core/widgets/dropdown_modal_item.dart';
+import '../../../../core/widgets/dropdown_search_modal.dart';
+import '../../../../core/widgets/fab_container.dart';
+import '../../../../core/widgets/primary_button.dart';
 
 class AddShippingFeePage extends StatefulWidget {
   const AddShippingFeePage({
@@ -37,8 +39,9 @@ class _AddShippingFeePageState extends State<AddShippingFeePage> {
           const SizedBox(height: 8),
           TextFormField(
             decoration: InputDecoration(
-              hintText: 'Harga ongkos kirim',
+              hintText: 'Harga Ongkos Kirim',
             ),
+            keyboardType: TextInputType.number,
           ),
           const SizedBox(height: 24),
           Text(
@@ -117,17 +120,7 @@ class _AddShippingFeePageState extends State<AddShippingFeePage> {
           ),
         ],
       ),
-      floatingActionButton: Container(
-        decoration: BoxDecoration(
-          border: Border(
-            top: BorderSide(
-              color: MaterialColors.outlineVariant,
-              width: 1,
-            ),
-          ),
-          color: MaterialColors.surfaceContainerLowest,
-        ),
-        padding: const EdgeInsets.all(16),
+      floatingActionButton: FABContainer(
         child: PrimaryButton(
           onPressed: () {},
           child: const Text('Simpan'),
