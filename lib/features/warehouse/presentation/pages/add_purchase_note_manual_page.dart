@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
@@ -11,6 +12,7 @@ import '../../../../core/widgets/fab_container.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/widgets/primary_outline_button.dart';
 import '../../../../core/widgets/primary_outline_icon_button.dart';
+import '../../../supplier/presentation/cubit/supplier_cubit.dart';
 import '../widgets/add_purchase_note_item_dialog.dart';
 import '../widgets/edit_purchase_note_item_dialog.dart';
 import '../widgets/purchase_note_item_card.dart';
@@ -26,6 +28,8 @@ class AddPurchaseNoteManualPage extends StatefulWidget {
 }
 
 class _AddPurchaseNoteManualPageState extends State<AddPurchaseNoteManualPage> {
+  late final SupplierCubit _supplierCubit;
+
   final _items = <Map<String, dynamic>>[
     {
       'name': 'Barang 1',
@@ -34,6 +38,12 @@ class _AddPurchaseNoteManualPageState extends State<AddPurchaseNoteManualPage> {
       'reject': 2,
     },
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _supplierCubit = context.read<SupplierCubit>();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,12 +67,34 @@ class _AddPurchaseNoteManualPageState extends State<AddPurchaseNoteManualPage> {
                 search: (keyword) {},
                 title: 'supplier',
                 child: Expanded(
-                  child: ListView.separated(
-                    itemBuilder: (context, index) =>
-                        DropdownModalItem(child: const Text('BOKEP')),
-                    separatorBuilder: (context, index) =>
-                        const SizedBox(height: 12),
-                    itemCount: 10,
+                  child: BlocBuilder<SupplierCubit, SupplierState>(
+                    bloc: _supplierCubit..fetchSuppliersDropdown(),
+                    buildWhen: (previous, current) =>
+                        current is FetchSuppliersDropdown,
+                    builder: (context, state) {
+                      if (state is FetchSuppliersDropdownLoading) {
+                        return const Center(
+                          child: CircularProgressIndicator.adaptive(),
+                        );
+                      }
+
+                      if (state is FetchSuppliersDropdownLoaded) {
+                        return ListView.separated(
+                          itemBuilder: (context, index) => GestureDetector(
+                            onTap: () {
+                              context.pop();
+                            },
+                            child: DropdownModalItem(
+                                child: Text(state.suppliers[index].value)),
+                          ),
+                          separatorBuilder: (context, index) =>
+                              const SizedBox(height: 12),
+                          itemCount: state.suppliers.length,
+                        );
+                      }
+
+                      return const SizedBox();
+                    },
                   ),
                 ),
               ),

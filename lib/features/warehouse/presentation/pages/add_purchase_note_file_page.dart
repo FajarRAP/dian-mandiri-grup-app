@@ -1,5 +1,7 @@
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/common/constants.dart';
 import '../../../../core/helpers/helpers.dart';
@@ -10,6 +12,7 @@ import '../../../../core/widgets/fab_container.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/widgets/primary_outline_button.dart';
 import '../../../../core/widgets/primary_outline_icon_button.dart';
+import '../../../supplier/presentation/cubit/supplier_cubit.dart';
 
 class AddPurchaseNoteFilePage extends StatelessWidget {
   const AddPurchaseNoteFilePage({
@@ -18,6 +21,7 @@ class AddPurchaseNoteFilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final supplierCubit = context.read<SupplierCubit>();
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
 
@@ -38,12 +42,34 @@ class AddPurchaseNoteFilePage extends StatelessWidget {
                 search: (keyword) {},
                 title: 'supplier',
                 child: Expanded(
-                  child: ListView.separated(
-                    itemBuilder: (context, index) =>
-                        DropdownModalItem(child: const Text('BOKEP')),
-                    separatorBuilder: (context, index) =>
-                        const SizedBox(height: 12),
-                    itemCount: 10,
+                  child: BlocBuilder<SupplierCubit, SupplierState>(
+                    bloc: supplierCubit..fetchSuppliersDropdown(),
+                    buildWhen: (previous, current) =>
+                        current is FetchSuppliersDropdown,
+                    builder: (context, state) {
+                      if (state is FetchSuppliersDropdownLoading) {
+                        return const Center(
+                          child: CircularProgressIndicator.adaptive(),
+                        );
+                      }
+
+                      if (state is FetchSuppliersDropdownLoaded) {
+                        return ListView.separated(
+                          itemBuilder: (context, index) => GestureDetector(
+                            onTap: () {
+                              context.pop();
+                            },
+                            child: DropdownModalItem(
+                                child: Text(state.suppliers[index].value)),
+                          ),
+                          separatorBuilder: (context, index) =>
+                              const SizedBox(height: 12),
+                          itemCount: state.suppliers.length,
+                        );
+                      }
+
+                      return const SizedBox();
+                    },
                   ),
                 ),
               ),
