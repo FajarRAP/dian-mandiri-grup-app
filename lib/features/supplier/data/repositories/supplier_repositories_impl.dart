@@ -64,7 +64,7 @@ class SupplierRepositoriesImpl extends SupplierRepositories {
   }
 
   @override
-  Future<Either<Failure, SupplierDetailEntity>> insertSupplier(
+  Future<Either<Failure, String>> insertSupplier(
       {required SupplierDetailEntity supplierDetailEntity}) async {
     try {
       await Future.delayed(const Duration(milliseconds: 1800));
@@ -75,14 +75,14 @@ class SupplierRepositoriesImpl extends SupplierRepositories {
           await supplierRemoteDataSources.insertSupplier(data: payload);
       final data = Map<String, dynamic>.from(jsonDecode(response));
 
-      return Right(SupplierDetailModel.fromJson(data));
+      return Right(data['message']);
     } catch (e) {
       return const Left(Failure());
     }
   }
 
   @override
-  Future<Either<Failure, SupplierDetailEntity>> updateSupplier(
+  Future<Either<Failure, String>> updateSupplier(
       {required SupplierDetailEntity supplierDetailEntity}) async {
     try {
       await Future.delayed(const Duration(milliseconds: 1800));
@@ -95,7 +95,7 @@ class SupplierRepositoriesImpl extends SupplierRepositories {
           await supplierRemoteDataSources.updateSupplier(data: payload);
       final data = Map<String, dynamic>.from(jsonDecode(response));
 
-      return Right(SupplierDetailModel.fromJson(data));
+      return Right(data['message']);
     } catch (e) {
       return const Left(Failure());
     }

@@ -58,9 +58,9 @@ class InsertSupplier extends SupplierState {}
 class InsertSupplierLoading extends InsertSupplier {}
 
 class InsertSupplierLoaded extends InsertSupplier {
-  final SupplierDetailEntity supplierDetail;
+  final String message;
 
-  InsertSupplierLoaded({required this.supplierDetail});
+  InsertSupplierLoaded({required this.message});
 }
 
 class InsertSupplierError extends InsertSupplier {
@@ -74,9 +74,9 @@ class UpdateSupplier extends SupplierState {}
 class UpdateSupplierLoading extends UpdateSupplier {}
 
 class UpdateSupplierLoaded extends UpdateSupplier {
-  final SupplierDetailEntity supplierDetail;
+  final String message;
 
-  UpdateSupplierLoaded({required this.supplierDetail});
+  UpdateSupplierLoaded({required this.message});
 }
 
 class UpdateSupplierError extends UpdateSupplier {

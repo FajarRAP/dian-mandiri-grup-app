@@ -6,13 +6,13 @@ import '../entities/supplier_detail_entity.dart';
 import '../repositories/supplier_repositories.dart';
 
 class UpdateSupplierUseCase
-    implements AsyncUseCaseParams<SupplierDetailEntity, SupplierDetailEntity> {
+    implements AsyncUseCaseParams<String, SupplierDetailEntity> {
   const UpdateSupplierUseCase({required this.supplierRepositories});
 
   final SupplierRepositories supplierRepositories;
 
   @override
-  Future<Either<Failure, SupplierDetailEntity>> call(
+  Future<Either<Failure, String>> call(
       SupplierDetailEntity params) async {
     return supplierRepositories.updateSupplier(supplierDetailEntity: params);
   }

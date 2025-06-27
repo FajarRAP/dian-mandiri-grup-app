@@ -84,7 +84,7 @@ class SupplierCubit extends Cubit<SupplierState> {
 
     result.fold(
       (l) => emit(InsertSupplierError(message: l.message)),
-      (r) => emit(InsertSupplierLoaded(supplierDetail: r)),
+      (r) => emit(InsertSupplierLoaded(message: r)),
     );
   }
 
@@ -96,7 +96,7 @@ class SupplierCubit extends Cubit<SupplierState> {
 
     result.fold(
       (l) => emit(UpdateSupplierError(message: l.message)),
-      (r) => emit(UpdateSupplierLoaded(supplierDetail: r)),
+      (r) => emit(UpdateSupplierLoaded(message: r)),
     );
   }
 }

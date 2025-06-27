@@ -20,8 +20,8 @@ abstract class SupplierRepositories {
     int limit = 10,
     int page = 1,
   });
-  Future<Either<Failure, SupplierDetailEntity>> insertSupplier(
+  Future<Either<Failure, String>> insertSupplier(
       {required SupplierDetailEntity supplierDetailEntity});
-  Future<Either<Failure, SupplierDetailEntity>> updateSupplier(
+  Future<Either<Failure, String>> updateSupplier(
       {required SupplierDetailEntity supplierDetailEntity});
 }
