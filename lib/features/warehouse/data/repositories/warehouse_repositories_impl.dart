@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:dartz/dartz.dart';
 
+import '../../../../core/common/dropdown_entity.dart';
 import '../../../../core/failure/failure.dart';
 import '../../domain/entities/insert_purchase_note_file_entity.dart';
 import '../../domain/entities/insert_purchase_note_manual_entity.dart';
@@ -71,6 +72,25 @@ class WarehouseRepositoriesImpl extends WarehouseRepositories {
   }
 
   @override
+  Future<Either<Failure, List<DropdownEntity>>> fetchPurchaseNotesDropdown(
+      {String? search, int limit = 10, int page = 1}) async {
+    try {
+      await Future.delayed(const Duration(milliseconds: 1800));
+      final response =
+          await warehouseRemoteDataSources.fetchPurchaseNotesDropdown(
+        search: search,
+        limit: limit,
+        page: page,
+      );
+      final datas = List<Map<String, dynamic>>.from(jsonDecode(response));
+
+      return Right(datas.map(DropdownEntity.fromJson).toList());
+    } catch (e) {
+      return Left(Failure());
+    }
+  }
+
+  @override
   Future<Either<Failure, String>> insertPurchaseNoteFile(
       {required InsertPurchaseNoteFileEntity purchaseNote}) async {
     try {
@@ -92,6 +112,21 @@ class WarehouseRepositoriesImpl extends WarehouseRepositories {
       await Future.delayed(const Duration(milliseconds: 1800));
       final response =
           await warehouseRemoteDataSources.insertPurchaseNoteManual(data: {});
+      final data = jsonDecode(response);
+
+      return Right(data['message']);
+    } catch (e) {
+      return Left(Failure());
+    }
+  }
+
+  @override
+  Future<Either<Failure, String>> insertShippingFee(
+      {required int price, required List<String> purchaseNoteIds}) async {
+    try {
+      await Future.delayed(const Duration(milliseconds: 1800));
+      final response =
+          await warehouseRemoteDataSources.insertShippingFee(data: {});
       final data = jsonDecode(response);
 
       return Right(data['message']);

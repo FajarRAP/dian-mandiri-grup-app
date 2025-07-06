@@ -53,6 +53,22 @@ class FetchPurchaseNotesError extends FetchPurchaseNotes {
   FetchPurchaseNotesError({required this.message});
 }
 
+class FetchPurchaseNotesDropdown extends WarehouseState {}
+
+class FetchPurchaseNotesDropdownLoading extends FetchPurchaseNotesDropdown {}
+
+class FetchPurchaseNotesDropdownLoaded extends FetchPurchaseNotesDropdown {
+  final List<DropdownEntity> purchaseNotes;
+
+  FetchPurchaseNotesDropdownLoaded({required this.purchaseNotes});
+}
+
+class FetchPurchaseNotesDropdownError extends FetchPurchaseNotesDropdown {
+  final String message;
+
+  FetchPurchaseNotesDropdownError({required this.message});
+}
+
 class InsertPurchaseNoteManual extends WarehouseState {}
 
 class InsertPurchaseNoteManualLoading extends InsertPurchaseNoteManual {}
@@ -83,6 +99,22 @@ class InsertPurchaseNoteFileError extends InsertPurchaseNoteFile {
   final String message;
 
   InsertPurchaseNoteFileError({required this.message});
+}
+
+class InsertShippingFee extends WarehouseState {}
+
+class InsertShippingFeeLoading extends InsertShippingFee {}
+
+class InsertShippingFeeLoaded extends InsertShippingFee {
+  final String message;
+
+  InsertShippingFeeLoaded({required this.message});
+}
+
+class InsertShippingFeeError extends InsertShippingFee {
+  final String message;
+
+  InsertShippingFeeError({required this.message});
 }
 
 class UpdatePurchaseNote extends WarehouseState {}

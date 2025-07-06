@@ -11,8 +11,14 @@ abstract class WarehouseRemoteDataSources<T> {
     int limit = 10,
     int page = 1,
   });
+  Future<T> fetchPurchaseNotesDropdown({
+    String? search,
+    int limit = 10,
+    int page = 1,
+  });
   Future<T> insertPurchaseNoteManual({required Map<String, dynamic> data});
   Future<T> insertPurchaseNoteFile({required Map<String, dynamic> data});
+  Future<T> insertShippingFee({required Map<String, dynamic> data});
   Future<T> updatePurchaseNote({required Map<String, dynamic> data});
 }
 
@@ -45,6 +51,13 @@ class WarehouseRemoteDataSourcesImpl
   }
 
   @override
+  Future<Response> fetchPurchaseNotesDropdown(
+      {String? search, int limit = 10, int page = 1}) {
+    // TODO: implement fetchPurchaseNotesDropdown
+    throw UnimplementedError();
+  }
+
+  @override
   Future<Response> insertPurchaseNoteFile(
       {required Map<String, dynamic> data}) {
     // TODO: implement insertPurchaseNoteFile
@@ -59,6 +72,12 @@ class WarehouseRemoteDataSourcesImpl
   }
 
   @override
+  Future<Response> insertShippingFee({required Map<String, dynamic> data}) {
+    // TODO: implement insertShippingFee
+    throw UnimplementedError();
+  }
+
+  @override
   Future<Response> updatePurchaseNote({required Map<String, dynamic> data}) {
     // TODO: implement updatePurchaseNote
     throw UnimplementedError();
@@ -69,7 +88,7 @@ class WarehouseRemoteDataSourcesMock
     extends WarehouseRemoteDataSources<String> {
   @override
   Future<String> deletePurchaseNote({required String purchaseNoteId}) async {
-    return '''{data: null, message: "Purchase note deleted successfully"}''';
+    return '''{"data": null, "message": "Purchase note deleted successfully"}''';
   }
 
   @override
@@ -88,20 +107,32 @@ class WarehouseRemoteDataSourcesMock
   }
 
   @override
+  Future<String> fetchPurchaseNotesDropdown(
+      {String? search, int limit = 10, int page = 1}) async {
+    return await rootBundle
+        .loadString('dummy_json/purchase_notes_dropdown.json');
+  }
+
+  @override
   Future<String> insertPurchaseNoteFile(
       {required Map<String, dynamic> data}) async {
-    return '''{data: null, message: "Purchase note file inserted successfully"}''';
+    return '''{"data": null, "message": "Purchase note file inserted successfully"}''';
   }
 
   @override
   Future<String> insertPurchaseNoteManual(
       {required Map<String, dynamic> data}) async {
-    return '''{data: null, message: "Purchase note manual inserted successfully"}''';
+    return '''{"data": null, "message": "Purchase note manual inserted successfully"}''';
+  }
+
+  @override
+  Future<String> insertShippingFee({required Map<String, dynamic> data}) async {
+    return '''{"data": null, "message": "Shipping fee inserted successfully"}''';
   }
 
   @override
   Future<String> updatePurchaseNote(
       {required Map<String, dynamic> data}) async {
-    return '''{data: null, message: "Purchase note updated successfully"}''';
+    return '''{"data": null, "message": "Purchase note updated successfully"}''';
   }
 }
