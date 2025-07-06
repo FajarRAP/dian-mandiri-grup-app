@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/common/constants.dart';
 import '../../../../core/themes/colors.dart';
 import '../../../tracker/presentation/widgets/action_button.dart';
 import '../../../tracker/presentation/widgets/expandable_fab.dart';
+import '../cubit/warehouse_cubit.dart';
 import '../widgets/purchase_note_item.dart';
 
 class WarehousePage extends StatelessWidget {
@@ -12,6 +14,8 @@ class WarehousePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final warehouseCubit = context.read<WarehouseCubit>();
+
     return Scaffold(
       appBar: AppBar(
         actions: <Widget>[
@@ -53,11 +57,28 @@ class WarehousePage extends StatelessWidget {
         ),
         title: const Text('Barang Masuk'),
       ),
-      body: ListView.separated(
-        itemBuilder: (context, index) => PurchaseNoteItem(),
-        separatorBuilder: (context, index) => const SizedBox(height: 6),
-        itemCount: 10,
-        padding: const EdgeInsets.all(16),
+      body: BlocBuilder<WarehouseCubit, WarehouseState>(
+        bloc: warehouseCubit..fetchPurchaseNotes(),
+        builder: (context, state) {
+          if (state is FetchPurchaseNotesLoading) {
+            return const Center(
+              child: CircularProgressIndicator.adaptive(),
+            );
+          }
+
+          if (state is FetchPurchaseNotesLoaded) {
+            return ListView.separated(
+              itemBuilder: (context, index) => PurchaseNoteItem(
+                purchaseNoteSummary: state.purchaseNotes[index],
+              ),
+              separatorBuilder: (context, index) => const SizedBox(height: 12),
+              itemCount: state.purchaseNotes.length,
+              padding: const EdgeInsets.all(16),
+            );
+          }
+
+          return const SizedBox();
+        },
       ),
       floatingActionButton: ExpandableFAB(
         distance: 100,
