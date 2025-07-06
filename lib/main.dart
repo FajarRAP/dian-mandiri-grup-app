@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:ship_tracker/features/warehouse/presentation/cubit/warehouse_cubit.dart';
 
 import 'core/common/constants.dart';
 import 'core/routes/router.dart';
@@ -47,6 +48,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (context) => getIt.get<AuthCubit>()),
         BlocProvider(create: (context) => getIt.get<ShipmentCubit>()),
         BlocProvider(create: (context) => getIt.get<SupplierCubit>()),
+        BlocProvider(create: (context) => getIt.get<WarehouseCubit>())
       ],
       child: MaterialApp.router(
         localizationsDelegates: const [
