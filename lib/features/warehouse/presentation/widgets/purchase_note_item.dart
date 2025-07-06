@@ -1,47 +1,63 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/common/shadows.dart';
+import '../../../../core/helpers/helpers.dart';
 import '../../../../core/themes/colors.dart';
+import '../../domain/entities/purchase_note_summary_entity.dart';
 
 class PurchaseNoteItem extends StatelessWidget {
   const PurchaseNoteItem({
     super.key,
+    required this.purchaseNoteSummary,
   });
+
+  final PurchaseNoteSummaryEntity purchaseNoteSummary;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
 
-    return Material(
-      shape: RoundedRectangleBorder(
+    return Container(
+      decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
+        color: MaterialColors.onPrimary,
+        boxShadow: cardBoxShadow,
       ),
-      elevation: 1,
-      child: ListTile(
-        leading: Text(
-          '10',
-          style: textTheme.displayMedium?.copyWith(
-            fontWeight: FontWeight.w700,
+      padding: const EdgeInsets.all(12),
+      child: Row(
+        children: <Widget>[
+          Expanded(
+            child: Text(
+              '${purchaseNoteSummary.totalItems}',
+              style: textTheme.displayMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
+            ),
           ),
-        ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-        subtitle: Text(
-          'Tanggal Ditambahkan',
-          style: textTheme.bodySmall?.copyWith(
-            color: MaterialColors.onSurfaceVariant,
+          Expanded(
+            flex: 2,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  purchaseNoteSummary.supplier.name,
+                  style: textTheme.titleLarge,
+                ),
+                Text(
+                  dateTimeFormat.format(purchaseNoteSummary.date.toLocal()),
+                  style: textTheme.bodySmall?.copyWith(
+                    color: MaterialColors.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
-        tileColor: MaterialColors.onPrimary,
-        title: Text(
-          'Nama Nota',
-          style: textTheme.titleLarge,
-        ),
-        trailing: IconButton(
-          onPressed: () {},
-          icon: const Icon(Icons.delete),
-        ),
+          IconButton(
+            onPressed: () {},
+            icon: const Icon(Icons.delete),
+          )
+        ],
       ),
     );
   }
