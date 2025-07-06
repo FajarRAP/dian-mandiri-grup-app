@@ -2,18 +2,19 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/helpers/helpers.dart';
 import '../../../../core/themes/colors.dart';
+import '../../domain/entities/warehouse_item_entity.dart';
 
 class PurchaseNoteItemCard extends StatelessWidget {
   const PurchaseNoteItemCard({
     super.key,
     required this.onDelete,
     required this.onEdit,
-    required this.purchaseNoteItem,
+    required this.warehouseItem,
   });
 
   final void Function() onDelete;
   final void Function() onEdit;
-  final Map<String, dynamic> purchaseNoteItem;
+  final WarehouseItemEntity warehouseItem;
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +31,7 @@ class PurchaseNoteItemCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 Text(
-                  purchaseNoteItem['name'],
+                  warehouseItem.name,
                   style: textTheme.bodyMedium,
                 ),
                 const Spacer(),
@@ -64,7 +65,7 @@ class PurchaseNoteItemCard extends StatelessWidget {
                   style: textTheme.bodySmall,
                 ),
                 Text(
-                  purchaseNoteItem['quantity'].toString(),
+                  '${warehouseItem.quantity}',
                   style: textTheme.bodySmall,
                 ),
               ],
@@ -78,7 +79,7 @@ class PurchaseNoteItemCard extends StatelessWidget {
                   style: textTheme.bodySmall,
                 ),
                 Text(
-                  purchaseNoteItem['reject'].toString(),
+                  '${warehouseItem.rejectQuantity}',
                   style: textTheme.bodySmall,
                 ),
               ],
@@ -92,7 +93,7 @@ class PurchaseNoteItemCard extends StatelessWidget {
                   style: textTheme.bodySmall,
                 ),
                 Text(
-                  idrCurrencyFormat.format(purchaseNoteItem['price']),
+                  idrCurrencyFormat.format(warehouseItem.price),
                   style: textTheme.bodySmall?.copyWith(
                     color: CustomColors.primaryNormal,
                   ),
@@ -108,8 +109,8 @@ class PurchaseNoteItemCard extends StatelessWidget {
                   style: textTheme.bodySmall,
                 ),
                 Text(
-                  idrCurrencyFormat.format(
-                      purchaseNoteItem['price'] * purchaseNoteItem['quantity']),
+                  idrCurrencyFormat
+                      .format(warehouseItem.price * warehouseItem.quantity),
                   style: textTheme.bodySmall?.copyWith(
                     color: CustomColors.primaryNormal,
                   ),

@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/widgets/primary_button.dart';
+import '../../domain/entities/warehouse_item_entity.dart';
 
 class EditPurchaseNoteItemDialog extends StatefulWidget {
   const EditPurchaseNoteItemDialog({
     super.key,
     required this.onTap,
-    required this.purchaseNoteItem,
+    required this.warehouseItemEntity,
   });
 
-  final void Function(Map<String, dynamic> edited) onTap;
-  final Map<String, dynamic> purchaseNoteItem;
+  final void Function(WarehouseItemEntity edited) onTap;
+  final WarehouseItemEntity warehouseItemEntity;
 
   @override
   State<EditPurchaseNoteItemDialog> createState() =>
@@ -28,22 +29,22 @@ class _EditPurchaseNoteItemDialogState
   void initState() {
     super.initState();
     _nameController =
-        TextEditingController(text: widget.purchaseNoteItem['name']);
-    _priceController = TextEditingController(
-        text: widget.purchaseNoteItem['price'].toString());
-    _quantityController = TextEditingController(
-        text: widget.purchaseNoteItem['quantity'].toString());
+        TextEditingController(text: widget.warehouseItemEntity.name);
+    _priceController =
+        TextEditingController(text: '${widget.warehouseItemEntity.price}');
+    _quantityController =
+        TextEditingController(text: '${widget.warehouseItemEntity.quantity}');
     _rejectController = TextEditingController(
-        text: widget.purchaseNoteItem['reject'].toString());
+        text: '${widget.warehouseItemEntity.rejectQuantity}');
   }
 
   @override
   void dispose() {
-    super.dispose();
     _nameController.dispose();
     _priceController.dispose();
     _quantityController.dispose();
     _rejectController.dispose();
+    super.dispose();
   }
 
   @override
@@ -107,12 +108,12 @@ class _EditPurchaseNoteItemDialogState
           const SizedBox(height: 24),
           PrimaryButton(
             onPressed: () {
-              final edited = {
-                'name': _nameController.text,
-                'price': int.tryParse(_priceController.text) ?? 0,
-                'quantity': int.tryParse(_quantityController.text) ?? 0,
-                'reject': int.tryParse(_rejectController.text) ?? 0,
-              };
+              final edited = WarehouseItemEntity(
+                name: _nameController.text,
+                quantity: int.tryParse(_quantityController.text) ?? 0,
+                rejectQuantity: int.tryParse(_rejectController.text) ?? 0,
+                price: int.tryParse(_priceController.text) ?? 0,
+              );
               widget.onTap(edited);
             },
             child: const Text('Simpan'),
