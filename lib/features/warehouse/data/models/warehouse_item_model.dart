@@ -19,4 +19,21 @@ class WarehouseItemModel extends WarehouseItemEntity {
         rejectQuantity: json['total_reject'],
         price: json['price'],
       );
+
+  factory WarehouseItemModel.fromEntity(WarehouseItemEntity entity) =>
+      WarehouseItemModel(
+        id: entity.id,
+        shipmentFee: entity.shipmentFee,
+        name: entity.name,
+        quantity: entity.quantity,
+        rejectQuantity: entity.rejectQuantity,
+        price: entity.price,
+      );
+
+  Map<String, dynamic> toJson() => {
+        'name': name,
+        'total': quantity,
+        'total_reject': rejectQuantity,
+        'price': price,
+      };
 }
