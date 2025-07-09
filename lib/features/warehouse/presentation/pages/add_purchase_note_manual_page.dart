@@ -12,13 +12,11 @@ import '../../../../core/common/snackbar.dart';
 import '../../../../core/helpers/helpers.dart';
 import '../../../../core/helpers/validators.dart';
 import '../../../../core/themes/colors.dart';
-import '../../../../core/widgets/dropdown_modal_item.dart';
-import '../../../../core/widgets/dropdown_search_modal.dart';
+import '../../../../core/widgets/dropdowns/supplier_dropdown.dart';
 import '../../../../core/widgets/fab_container.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/widgets/primary_outline_button.dart';
 import '../../../../core/widgets/primary_outline_icon_button.dart';
-import '../../../supplier/presentation/cubit/supplier_cubit.dart';
 import '../../domain/entities/insert_purchase_note_manual_entity.dart';
 import '../../domain/entities/warehouse_item_entity.dart';
 import '../cubit/warehouse_cubit.dart';
@@ -37,7 +35,6 @@ class AddPurchaseNoteManualPage extends StatefulWidget {
 }
 
 class _AddPurchaseNoteManualPageState extends State<AddPurchaseNoteManualPage> {
-  late final SupplierCubit _supplierCubit;
   late final WarehouseCubit _warehouseCubit;
   late final ImagePicker _imagePicker;
   late final GlobalKey<FormState> _formKey;
@@ -52,7 +49,6 @@ class _AddPurchaseNoteManualPageState extends State<AddPurchaseNoteManualPage> {
   @override
   void initState() {
     super.initState();
-    _supplierCubit = context.read<SupplierCubit>();
     _warehouseCubit = context.read<WarehouseCubit>();
     _imagePicker = ImagePicker();
     _formKey = GlobalKey<FormState>();
@@ -89,44 +85,12 @@ class _AddPurchaseNoteManualPageState extends State<AddPurchaseNoteManualPage> {
             TextFormField(
               onTap: () => showModalBottomSheet(
                 context: context,
-                builder: (context) => DropdownSearchModal(
-                  search: (keyword) =>
-                      _supplierCubit.fetchSuppliersDropdown(search: keyword),
-                  title: 'supplier',
-                  child: Expanded(
-                    child: BlocBuilder<SupplierCubit, SupplierState>(
-                      bloc: _supplierCubit..fetchSuppliersDropdown(),
-                      buildWhen: (previous, current) =>
-                          current is FetchSuppliersDropdown,
-                      builder: (context, state) {
-                        if (state is FetchSuppliersDropdownLoading) {
-                          return const Center(
-                            child: CircularProgressIndicator.adaptive(),
-                          );
-                        }
-
-                        if (state is FetchSuppliersDropdownLoaded) {
-                          return ListView.separated(
-                            itemBuilder: (context, index) => GestureDetector(
-                              onTap: () {
-                                _supplierController.text =
-                                    state.suppliers[index].value;
-                                _selectedSupplier = state.suppliers[index];
-                                context.pop();
-                              },
-                              child: DropdownModalItem(
-                                  child: Text(state.suppliers[index].value)),
-                            ),
-                            separatorBuilder: (context, index) =>
-                                const SizedBox(height: 12),
-                            itemCount: state.suppliers.length,
-                          );
-                        }
-
-                        return const SizedBox();
-                      },
-                    ),
-                  ),
+                builder: (context) => SupplierDropdown(
+                  onTap: (supplier) {
+                    _supplierController.text = supplier.value;
+                    _selectedSupplier = supplier;
+                    context.pop();
+                  },
                 ),
               ),
               autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -216,14 +180,19 @@ class _AddPurchaseNoteManualPageState extends State<AddPurchaseNoteManualPage> {
             const SizedBox(height: 12),
             RichText(
               text: TextSpan(
-                text: 'Jumlah Barang',
-                style: textTheme.bodyLarge,
-                children: <TextSpan>[
+                children: <InlineSpan>[
                   TextSpan(
-                    text: ' ${_items.length}',
-                    style: textTheme.bodyLarge?.copyWith(
-                      color: MaterialColors.tertiary,
-                      fontWeight: FontWeight.w600,
+                    text: 'Jumlah Barang',
+                    style: textTheme.bodyLarge,
+                  ),
+                  WidgetSpan(
+                    alignment: PlaceholderAlignment.middle,
+                    child: Text(
+                      ' ${_items.length}',
+                      style: textTheme.titleLarge?.copyWith(
+                        color: CustomColors.primaryNormal,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ],
@@ -248,13 +217,7 @@ class _AddPurchaseNoteManualPageState extends State<AddPurchaseNoteManualPage> {
             PrimaryOutlineIconButton(
               onPressed: () => showDialog(
                 builder: (context) => AddPurchaseNoteItemDialog(
-                  onTap: () {
-                    final item = WarehouseItemEntity(
-                      name: 'Barang ${_items.length + 1}',
-                      price: 10000 + (_items.length * 1000),
-                      quantity: 10 + _items.length,
-                      rejectQuantity: 2 + _items.length,
-                    );
+                  onTap: (item) {
                     setState(() => _items.add(item));
                     context.pop();
                   },
