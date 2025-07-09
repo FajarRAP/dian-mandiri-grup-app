@@ -59,6 +59,7 @@ class WarehousePage extends StatelessWidget {
       ),
       body: BlocBuilder<WarehouseCubit, WarehouseState>(
         bloc: warehouseCubit..fetchPurchaseNotes(),
+        buildWhen: (previous, current) => current is FetchPurchaseNotes,
         builder: (context, state) {
           if (state is FetchPurchaseNotesLoading) {
             return const Center(
