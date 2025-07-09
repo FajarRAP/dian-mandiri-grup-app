@@ -96,9 +96,9 @@ class InsertPurchaseNoteFileLoaded extends InsertPurchaseNoteFile {
 }
 
 class InsertPurchaseNoteFileError extends InsertPurchaseNoteFile {
-  final String message;
+  final Failure failure;
 
-  InsertPurchaseNoteFileError({required this.message});
+  InsertPurchaseNoteFileError({required this.failure});
 }
 
 class InsertShippingFee extends WarehouseState {}

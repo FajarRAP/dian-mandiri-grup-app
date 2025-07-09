@@ -2,6 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
 
 import '../../../../core/common/dropdown_entity.dart';
+import '../../../../core/failure/failure.dart';
 import '../../domain/entities/insert_purchase_note_file_entity.dart';
 import '../../domain/entities/insert_purchase_note_manual_entity.dart';
 import '../../domain/entities/purchase_note_detail_entity.dart';
@@ -118,7 +119,7 @@ class WarehouseCubit extends Cubit<WarehouseState> {
     final result = await _insertPurchaseNoteFileUseCase(purchaseNote);
 
     result.fold(
-      (l) => emit(InsertPurchaseNoteFileError(message: l.message)),
+      (l) => emit(InsertPurchaseNoteFileError(failure: l)),
       (r) => emit(InsertPurchaseNoteFileLoaded(message: r)),
     );
   }

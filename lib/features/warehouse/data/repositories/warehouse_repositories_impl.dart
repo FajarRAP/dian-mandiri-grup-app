@@ -10,6 +10,7 @@ import '../../domain/entities/purchase_note_detail_entity.dart';
 import '../../domain/entities/purchase_note_summary_entity.dart';
 import '../../domain/repositories/warehouse_repositories.dart';
 import '../datasources/warehouse_remote_data_sources.dart';
+import '../models/insert_purchase_note_file_model.dart';
 import '../models/insert_purchase_note_manual_model.dart';
 import '../models/purchase_note_detail_model.dart';
 import '../models/purchase_note_summary_model.dart';
@@ -95,9 +96,15 @@ class WarehouseRepositoriesImpl extends WarehouseRepositories {
   Future<Either<Failure, String>> insertPurchaseNoteFile(
       {required InsertPurchaseNoteFileEntity purchaseNote}) async {
     try {
+      final payload =
+          InsertPurchaseNoteFileModel.fromEntity(purchaseNote).toJson();
+      payload['receipt'] = purchaseNote.receipt;
+      payload['file'] = purchaseNote.file;
+
       await Future.delayed(const Duration(milliseconds: 1800));
-      final response =
-          await warehouseRemoteDataSources.insertPurchaseNoteFile(data: {});
+
+      final response = await warehouseRemoteDataSources.insertPurchaseNoteFile(
+          data: payload);
       final data = jsonDecode(response);
 
       return Right(data['message']);
