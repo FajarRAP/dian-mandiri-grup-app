@@ -37,6 +37,18 @@ import 'features/tracker/domain/usecases/fetch_shipments_use_case.dart';
 import 'features/tracker/domain/usecases/insert_shipment_document_use_case.dart';
 import 'features/tracker/domain/usecases/insert_shipment_use_case.dart';
 import 'features/tracker/presentation/cubit/shipment_cubit.dart';
+import 'features/warehouse/data/datasources/warehouse_remote_data_sources.dart';
+import 'features/warehouse/data/repositories/warehouse_repositories_impl.dart';
+import 'features/warehouse/domain/repositories/warehouse_repositories.dart';
+import 'features/warehouse/domain/usecases/delete_purchase_note_use_case.dart';
+import 'features/warehouse/domain/usecases/fetch_purchase_note_use_case.dart';
+import 'features/warehouse/domain/usecases/fetch_purchase_notes_dropdown_use_case.dart';
+import 'features/warehouse/domain/usecases/fetch_purchase_notes_use_case.dart';
+import 'features/warehouse/domain/usecases/insert_purchase_note_file_use_case.dart';
+import 'features/warehouse/domain/usecases/insert_purchase_note_manual_use_case.dart';
+import 'features/warehouse/domain/usecases/insert_shipping_fee_use_case.dart';
+import 'features/warehouse/domain/usecases/update_purchase_note_use_case.dart';
+import 'features/warehouse/presentation/cubit/warehouse_cubit.dart';
 
 final getIt = GetIt.instance;
 
@@ -102,7 +114,8 @@ void setup() {
   // Supplier
   getIt
     ..registerLazySingleton<SupplierRemoteDataSources>(
-        () => SupplierRemoteDataSourcesImpl(dio: getIt.get()))
+        // () => SupplierRemoteDataSourcesImpl(dio: getIt.get()))
+        () => SupplierRemoteDataSourcesMock())
     ..registerLazySingleton<SupplierRepositories>(
         () => SupplierRepositoriesImpl(supplierRemoteDataSources: getIt.get()))
     ..registerLazySingleton<SupplierCubit>(() => SupplierCubit(
@@ -116,4 +129,29 @@ void setup() {
             InsertSupplierUseCase(supplierRepositories: getIt.get()),
         updateSupplierUseCase:
             UpdateSupplierUseCase(supplierRepositories: getIt.get())));
+
+  // Warehouse
+  getIt
+    ..registerLazySingleton<WarehouseRemoteDataSources>(
+        // () => WarehouseRemoteDataSourcesImpl(dio: getIt.get()))
+        () => WarehouseRemoteDataSourcesMock())
+    ..registerLazySingleton<WarehouseRepositories>(() =>
+        WarehouseRepositoriesImpl(warehouseRemoteDataSources: getIt.get()))
+    ..registerLazySingleton<WarehouseCubit>(() => WarehouseCubit(
+        deletePurchaseNoteUseCase:
+            DeletePurchaseNoteUseCase(warehouseRepositories: getIt.get()),
+        fetchPurchaseNoteUseCase:
+            FetchPurchaseNoteUseCase(warehouseRepositories: getIt.get()),
+        fetchPurchaseNotesUseCase:
+            FetchPurchaseNotesUseCase(warehouseRepositories: getIt.get()),
+        fetchPurchaseNotesDropdownUseCase: FetchPurchaseNotesDropdownUseCase(
+            warehouseRepositories: getIt.get()),
+        insertPurchaseNoteManualUseCase:
+            InsertPurchaseNoteManualUseCase(warehouseRepositories: getIt.get()),
+        insertPurchaseNoteFileUseCase:
+            InsertPurchaseNoteFileUseCase(warehouseRepositories: getIt.get()),
+        insertShippingFeeUseCase:
+            InsertShippingFeeUseCase(warehouseRepositories: getIt.get()),
+        updatePurchaseNoteUseCase:
+            UpdatePurchaseNoteUseCase(warehouseRepositories: getIt.get())));
 }
