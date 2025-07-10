@@ -7,13 +7,13 @@ import '../../domain/entities/warehouse_item_entity.dart';
 class PurchaseNoteItemCard extends StatelessWidget {
   const PurchaseNoteItemCard({
     super.key,
-    required this.onDelete,
-    required this.onEdit,
+    this.onDelete,
+    this.onEdit,
     required this.warehouseItem,
   });
 
-  final void Function() onDelete;
-  final void Function() onEdit;
+  final void Function()? onDelete;
+  final void Function()? onEdit;
   final WarehouseItemEntity warehouseItem;
 
   @override
@@ -35,25 +35,27 @@ class PurchaseNoteItemCard extends StatelessWidget {
                   style: textTheme.bodyMedium,
                 ),
                 const Spacer(),
-                InkWell(
-                  onTap: onDelete,
-                  child: Text(
-                    'Hapus',
-                    style: textTheme.bodySmall?.copyWith(
-                      color: MaterialColors.error,
+                if (onDelete != null)
+                  InkWell(
+                    onTap: onDelete,
+                    child: Text(
+                      'Hapus',
+                      style: textTheme.bodySmall?.copyWith(
+                        color: MaterialColors.error,
+                      ),
                     ),
                   ),
-                ),
                 const SizedBox(width: 10),
-                InkWell(
-                  onTap: onEdit,
-                  child: Text(
-                    'Edit',
-                    style: textTheme.bodySmall?.copyWith(
-                      color: CustomColors.primaryNormal,
+                if (onEdit != null)
+                  InkWell(
+                    onTap: onEdit,
+                    child: Text(
+                      'Edit',
+                      style: textTheme.bodySmall?.copyWith(
+                        color: CustomColors.primaryNormal,
+                      ),
                     ),
                   ),
-                ),
               ],
             ),
             const Divider(),
@@ -117,6 +119,24 @@ class PurchaseNoteItemCard extends StatelessWidget {
                 ),
               ],
             ),
+            if (warehouseItem.shipmentFee != null) ...[
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Text(
+                    'Biaya Ongkos Kirim',
+                    style: textTheme.bodySmall,
+                  ),
+                  Text(
+                    idrCurrencyFormat.format(warehouseItem.shipmentFee),
+                    style: textTheme.bodySmall?.copyWith(
+                      color: MaterialColors.tertiary,
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ],
         ),
       ),
