@@ -69,8 +69,14 @@ class WarehousePage extends StatelessWidget {
 
           if (state is FetchPurchaseNotesLoaded) {
             return ListView.separated(
-              itemBuilder: (context, index) => PurchaseNoteItem(
-                purchaseNoteSummary: state.purchaseNotes[index],
+              itemBuilder: (context, index) => GestureDetector(
+                onTap: () => context.push(
+                  purchaseNoteDetailRoute,
+                  extra: state.purchaseNotes[index].id,
+                ),
+                child: PurchaseNoteItem(
+                  purchaseNoteSummary: state.purchaseNotes[index],
+                ),
               ),
               separatorBuilder: (context, index) => const SizedBox(height: 12),
               itemCount: state.purchaseNotes.length,
