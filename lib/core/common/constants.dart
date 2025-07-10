@@ -14,6 +14,7 @@ const warehouseRoute = "${homeRoute}warehouse";
 const addShippingFeeRoute = "$warehouseRoute/add-shipping-fee";
 const addPurchaseNoteManualRoute = "$warehouseRoute/add-purchase-note-manual";
 const addPurchaseNoteFileRoute = "$warehouseRoute/add-purchase-note-file";
+const purchaseNoteDetailRoute = "$warehouseRoute/detail";
 
 const trackerRoute = "${homeRoute}tracker";
 const scanReceiptRoute = "$trackerRoute/scan";

@@ -26,6 +26,7 @@ import '../../features/tracker/presentation/widgets/open_camera.dart';
 import '../../features/warehouse/presentation/pages/add_purchase_note_file_page.dart';
 import '../../features/warehouse/presentation/pages/add_purchase_note_manual_page.dart';
 import '../../features/warehouse/presentation/pages/add_shipping_fee_page.dart';
+import '../../features/warehouse/presentation/pages/purchase_note_detail_page.dart';
 import '../../features/warehouse/presentation/pages/warehouse_page.dart';
 import '../../main.dart';
 import '../common/constants.dart';
@@ -168,6 +169,12 @@ final router = GoRouter(
                       path: 'add-purchase-note-file',
                       builder: (context, state) =>
                           const AddPurchaseNoteFilePage(),
+                    ),
+                    GoRoute(
+                      path: 'detail',
+                      builder: (context, state) => PurchaseNoteDetailPage(
+                        purchaseNoteId: state.extra as String,
+                      ),
                     ),
                   ],
                 ),
