@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../../core/common/constants.dart';
@@ -54,9 +55,7 @@ class _AddSupplierPageState extends State<AddSupplierPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Tambah Supplier'),
-      ),
+      appBar: AppBar(title: const Text('Tambah Supplier')),
       body: Center(
         child: Container(
           decoration: BoxDecoration(
@@ -145,9 +144,10 @@ class _AddSupplierPageState extends State<AddSupplierPage> {
                 BlocConsumer<SupplierCubit, SupplierState>(
                   listener: (context, state) {
                     if (state is InsertSupplierLoaded) {
-                      scaffoldMessengerKey.currentState?.showSnackBar(
-                        successSnackbar('Berhasil menambahkan supplier'),
-                      );
+                      scaffoldMessengerKey.currentState
+                          ?.showSnackBar(successSnackbar(state.message));
+                      _supplierCubit.fetchSuppliers();
+                      context.pop();
                     }
                   },
                   buildWhen: (previous, current) => current is InsertSupplier,
@@ -158,19 +158,19 @@ class _AddSupplierPageState extends State<AddSupplierPage> {
 
                     return PrimaryButton(
                       onPressed: () {
+                        if (!_formKey.currentState!.validate()) return;
+
                         if (_pickedImage == null) {
-                          scaffoldMessengerKey.currentState?.showSnackBar(
-                            dangerSnackbar(
-                              'Silakan pilih gambar terlebih dahulu',
-                            ),
-                          );
+                          const message =
+                              'Silakan pilih gambar terlebih dahulu';
+                          scaffoldMessengerKey.currentState
+                              ?.showSnackBar(dangerSnackbar(message));
                           return;
                         }
-                        if (!_formKey.currentState!.validate()) return;
 
                         final supplierDetail = SupplierDetailEntity(
                           address: _addressController.text,
-                          avatarUrl: '${_pickedImage?.path}',
+                          avatarUrl: _pickedImage!.path,
                           email: _emailController.text,
                           name: _nameController.text,
                           phoneNumber: _phoneController.text,

@@ -45,15 +45,15 @@ class SupplierCubit extends Cubit<SupplierState> {
 
   Future<void> fetchSuppliers({
     String? search,
-    String column = 'name',
-    String sort = 'asc',
+    String? column,
+    String? order,
   }) async {
     emit(FetchSuppliersLoading());
 
     final result = await _fetchSuppliersUseCase({
       'search': search,
-      'column': column,
-      'sort': sort,
+      'column': column ?? 'name',
+      'order': order ?? 'asc',
     });
 
     result.fold(

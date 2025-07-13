@@ -87,16 +87,16 @@ class SupplierRemoteDataSourcesMock
 
   @override
   Future<String> insertSupplier({required Map<String, dynamic> data}) async {
-    return await rootBundle.loadString('dummy_json/supplier.json');
+    return '''{"data":null, "message":"Berhasil menambahkan supplier"}''';
   }
 
   @override
   Future<String> updateSupplier({required Map<String, dynamic> data}) async {
     if (data['avatar'] != null) {
       // Multipart
-      return await rootBundle.loadString('dummy_json/supplier.json');
+      return '''{"data":null, "message":"Berhasil mengupdate supplier multipart"}''';
     } else {
-      return await rootBundle.loadString('dummy_json/supplier.json');
+      return '''{"data":null, "message":"Berhasil mengupdate supplier form-data"}''';
     }
   }
 }

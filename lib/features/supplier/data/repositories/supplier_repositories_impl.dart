@@ -40,7 +40,8 @@ class SupplierRepositoriesImpl extends SupplierRepositories {
       int page = 1}) async {
     try {
       await Future.delayed(const Duration(milliseconds: 1800));
-      final response = await supplierRemoteDataSources.fetchSuppliers();
+      final response = await supplierRemoteDataSources.fetchSuppliers(
+          column: column, order: order, search: search);
       final datas = List<Map<String, dynamic>>.from(jsonDecode(response));
 
       return Right(datas.map(SupplierModel.fromJson).toList());
@@ -54,7 +55,8 @@ class SupplierRepositoriesImpl extends SupplierRepositories {
       {String? search, int limit = 10, int page = 1}) async {
     try {
       await Future.delayed(const Duration(milliseconds: 1800));
-      final response = await supplierRemoteDataSources.fetchSuppliersDropdown();
+      final response = await supplierRemoteDataSources.fetchSuppliersDropdown(
+          search: search);
       final datas = List<Map<String, dynamic>>.from(jsonDecode(response));
 
       return Right(datas.map(DropdownEntity.fromJson).toList());

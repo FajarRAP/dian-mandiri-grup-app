@@ -166,9 +166,8 @@ class _EditSupplierPageState extends State<EditSupplierPage> {
                       BlocConsumer<SupplierCubit, SupplierState>(
                         listener: (context, state) {
                           if (state is UpdateSupplierLoaded) {
-                            scaffoldMessengerKey.currentState?.showSnackBar(
-                              successSnackbar('Berhasil menambahkan supplier'),
-                            );
+                            scaffoldMessengerKey.currentState
+                                ?.showSnackBar(successSnackbar(state.message));
                           }
                         },
                         buildWhen: (previous, current) =>
