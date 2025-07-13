@@ -17,8 +17,8 @@ class SupplierDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final debouncer = Debouncer(delay: const Duration(milliseconds: 500));
     final supplierCubit = context.read<SupplierCubit>();
-    final debouncer = Debouncer(delay: Duration(milliseconds: 500));
 
     return DropdownSearchModal(
       search: (keyword) => debouncer
