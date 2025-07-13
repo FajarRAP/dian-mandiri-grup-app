@@ -7,8 +7,7 @@ import '../../../../core/common/dropdown_entity.dart';
 import '../../../../core/common/snackbar.dart';
 import '../../../../core/helpers/validators.dart';
 import '../../../../core/themes/colors.dart';
-import '../../../../core/widgets/dropdown_modal_item.dart';
-import '../../../../core/widgets/dropdown_search_modal.dart';
+import '../../../../core/widgets/dropdowns/purchase_note_dropdown.dart';
 import '../../../../core/widgets/fab_container.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../cubit/warehouse_cubit.dart';
@@ -49,9 +48,7 @@ class _AddShippingFeePageState extends State<AddShippingFeePage> {
     final textTheme = theme.textTheme;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Tambah Ongkos Kirim'),
-      ),
+      appBar: AppBar(title: const Text('Tambah Ongkos Kirim')),
       body: Form(
         key: _formKey,
         child: ListView(
@@ -80,51 +77,11 @@ class _AddShippingFeePageState extends State<AddShippingFeePage> {
             TextField(
               onTap: () => showModalBottomSheet(
                 context: context,
-                builder: (context) => DropdownSearchModal(
-                  search: (keyword) => _warehouseCubit
-                      .fetchPurchaseNotesDropdown(search: keyword),
-                  title: 'nota',
-                  child: Expanded(
-                    child: BlocBuilder<WarehouseCubit, WarehouseState>(
-                      bloc: _warehouseCubit..fetchPurchaseNotesDropdown(),
-                      buildWhen: (previous, current) =>
-                          current is FetchPurchaseNotesDropdown,
-                      builder: (context, state) {
-                        if (state is FetchPurchaseNotesDropdownLoading) {
-                          return const Center(
-                            child: CircularProgressIndicator.adaptive(),
-                          );
-                        }
-
-                        if (state is FetchPurchaseNotesDropdownLoaded) {
-                          return ListView.separated(
-                            itemBuilder: (context, index) => GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  _selectedPurchaseNoteIds
-                                      .add(state.purchaseNotes[index]);
-                                });
-                                context.pop();
-                              },
-                              child: DropdownModalItem(
-                                child: Text(
-                                  state.purchaseNotes[index].value,
-                                  style: textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            separatorBuilder: (context, index) =>
-                                const SizedBox(height: 12),
-                            itemCount: state.purchaseNotes.length,
-                          );
-                        }
-
-                        return const SizedBox();
-                      },
-                    ),
-                  ),
+                builder: (context) => PurchaseNoteDropdown(
+                  onTap: (purchaseNote) {
+                    setState(() => _selectedPurchaseNoteIds.add(purchaseNote));
+                    context.pop();
+                  },
                 ),
               ),
               decoration: InputDecoration(

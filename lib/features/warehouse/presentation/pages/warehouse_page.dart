@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/common/constants.dart';
+import '../../../../core/helpers/debouncer.dart';
 import '../../../../core/themes/colors.dart';
 import '../../../tracker/presentation/widgets/action_button.dart';
 import '../../../tracker/presentation/widgets/expandable_fab.dart';
@@ -15,14 +16,28 @@ class WarehousePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final warehouseCubit = context.read<WarehouseCubit>();
+    final debouncer = Debouncer(delay: Duration(milliseconds: 500));
+    var column = 'name';
+    var order = 'asc';
+    String? search;
 
     return Scaffold(
       appBar: AppBar(
         actions: <Widget>[
           PopupMenuButton(
+            onSelected: (value) {
+              final params = value.split(',');
+              column = params.first;
+              order = params.last;
+              warehouseCubit.fetchPurchaseNotes(
+                column: column,
+                order: order,
+                search: search,
+              );
+            },
             icon: const Icon(Icons.sort),
             tooltip: 'Urutkan',
-            itemBuilder: (context) => <PopupMenuEntry>[
+            itemBuilder: (context) => <PopupMenuEntry<String>>[
               PopupMenuItem(
                 value: 'name,asc',
                 child: const Text('Nama Naik'),
@@ -32,11 +47,11 @@ class WarehousePage extends StatelessWidget {
                 child: const Text('Nama Turun'),
               ),
               PopupMenuItem(
-                value: 'created_at,asc',
+                value: 'total_item,asc',
                 child: const Text('Total Barang Naik'),
               ),
               PopupMenuItem(
-                value: 'created_at,desc',
+                value: 'total_item,desc',
                 child: const Text('Total Barang Turun'),
               ),
             ],
@@ -44,10 +59,15 @@ class WarehousePage extends StatelessWidget {
         ],
         backgroundColor: MaterialColors.onPrimary,
         bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(76),
+          preferredSize: const Size.fromHeight(80),
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: TextFormField(
+              onChanged: (value) {
+                search = value;
+                debouncer.run(
+                    () => warehouseCubit.fetchPurchaseNotes(search: search));
+              },
               decoration: InputDecoration(
                 hintText: 'Cari Nota',
                 prefixIcon: const Icon(Icons.search),
@@ -104,6 +124,7 @@ class WarehousePage extends StatelessWidget {
           ),
         ],
       ),
+      resizeToAvoidBottomInset: false,
     );
   }
 }

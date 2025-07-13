@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -12,8 +10,10 @@ import '../../../../core/common/snackbar.dart';
 import '../../../../core/failure/failure.dart';
 import '../../../../core/helpers/helpers.dart';
 import '../../../../core/helpers/validators.dart';
+import '../../../../core/themes/colors.dart';
 import '../../../../core/widgets/dropdowns/supplier_dropdown.dart';
 import '../../../../core/widgets/fab_container.dart';
+import '../../../../core/widgets/preview_picked_image_dialog.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/widgets/primary_outline_button.dart';
 import '../../../../core/widgets/primary_outline_icon_button.dart';
@@ -21,9 +21,7 @@ import '../../domain/entities/insert_purchase_note_file_entity.dart';
 import '../cubit/warehouse_cubit.dart';
 
 class AddPurchaseNoteFilePage extends StatefulWidget {
-  const AddPurchaseNoteFilePage({
-    super.key,
-  });
+  const AddPurchaseNoteFilePage({super.key});
 
   @override
   State<AddPurchaseNoteFilePage> createState() =>
@@ -110,7 +108,7 @@ class _AddPurchaseNoteFilePageState extends State<AddPurchaseNoteFilePage> {
                   context: context,
                   firstDate: DateTime(2000),
                   initialDate: DateTime.now(),
-                  lastDate: DateTime(2100),
+                  lastDate: DateTime.now(),
                   locale: const Locale('id', 'ID'),
                 );
 
@@ -152,20 +150,8 @@ class _AddPurchaseNoteFilePageState extends State<AddPurchaseNoteFilePage> {
                 PrimaryOutlineButton(
                   onPressed: () => showDialog(
                     context: context,
-                    builder: (context) => AlertDialog(
-                      alignment: Alignment.center,
-                      content: _pickedImage == null
-                          ? Text(
-                              'Belum memilih gambar',
-                              style: textTheme.bodyLarge?.copyWith(
-                                fontWeight: FontWeight.w600,
-                              ),
-                              textAlign: TextAlign.center,
-                            )
-                          : Image.file(
-                              File(_pickedImage!.path),
-                              fit: BoxFit.cover,
-                            ),
+                    builder: (context) => PreviewPickedImageDialog(
+                      pickedImagePath: _pickedImage?.path,
                     ),
                   ),
                   width: 150,
@@ -225,9 +211,22 @@ class _AddPurchaseNoteFilePageState extends State<AddPurchaseNoteFilePage> {
 
                   return SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
-                    child: DataTable(
-                      columns: headers,
-                      rows: rows,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        DataTable(
+                          columns: headers,
+                          rows: rows,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Dan ${spreadsheetFailure.hiddenColumnCount} kolom tersembunyi lainnya',
+                          style: textTheme.bodyMedium?.copyWith(
+                            color: MaterialColors.error,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
                     ),
                   );
                 }

@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -14,6 +12,7 @@ import '../../../../core/helpers/validators.dart';
 import '../../../../core/themes/colors.dart';
 import '../../../../core/widgets/dropdowns/supplier_dropdown.dart';
 import '../../../../core/widgets/fab_container.dart';
+import '../../../../core/widgets/preview_picked_image_dialog.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/widgets/primary_outline_button.dart';
 import '../../../../core/widgets/primary_outline_icon_button.dart';
@@ -25,9 +24,7 @@ import '../widgets/edit_purchase_note_item_dialog.dart';
 import '../widgets/purchase_note_item_card.dart';
 
 class AddPurchaseNoteManualPage extends StatefulWidget {
-  const AddPurchaseNoteManualPage({
-    super.key,
-  });
+  const AddPurchaseNoteManualPage({super.key});
 
   @override
   State<AddPurchaseNoteManualPage> createState() =>
@@ -114,7 +111,7 @@ class _AddPurchaseNoteManualPageState extends State<AddPurchaseNoteManualPage> {
                   context: context,
                   firstDate: DateTime(2000),
                   initialDate: DateTime.now(),
-                  lastDate: DateTime(2100),
+                  lastDate: DateTime.now(),
                   locale: const Locale('id', 'ID'),
                 );
 
@@ -156,20 +153,8 @@ class _AddPurchaseNoteManualPageState extends State<AddPurchaseNoteManualPage> {
                 PrimaryOutlineButton(
                   onPressed: () => showDialog(
                     context: context,
-                    builder: (context) => AlertDialog(
-                      alignment: Alignment.center,
-                      content: _pickedImage == null
-                          ? Text(
-                              'Belum memilih gambar',
-                              style: textTheme.bodyLarge?.copyWith(
-                                fontWeight: FontWeight.w600,
-                              ),
-                              textAlign: TextAlign.center,
-                            )
-                          : Image.file(
-                              File(_pickedImage!.path),
-                              fit: BoxFit.cover,
-                            ),
+                    builder: (context) => PreviewPickedImageDialog(
+                      pickedImagePath: _pickedImage?.path,
                     ),
                   ),
                   width: 150,
@@ -307,6 +292,15 @@ class _AddPurchaseNoteManualPageState extends State<AddPurchaseNoteManualPage> {
                     if (_pickedImage == null) {
                       const message =
                           'Silakan pilih gambar nota terlebih dahulu';
+                      scaffoldMessengerKey.currentState?.showSnackBar(
+                        dangerSnackbar(message),
+                      );
+                      return;
+                    }
+
+                    if (_items.isEmpty) {
+                      const message =
+                          'Silakan tambahkan barang terlebih dahulu';
                       scaffoldMessengerKey.currentState?.showSnackBar(
                         dangerSnackbar(message),
                       );

@@ -73,14 +73,16 @@ class WarehouseCubit extends Cubit<WarehouseState> {
   Future<void> fetchPurchaseNotes({
     String? search,
     String column = 'name',
-    String sort = 'asc',
+    String order = 'asc',
   }) async {
     emit(FetchPurchaseNotesLoading());
+
     final result = await _fetchPurchaseNotesUseCase({
       'search': search,
       'column': column,
-      'sort': sort,
+      'order': order,
     });
+
     result.fold(
       (l) => emit(FetchPurchaseNotesError(message: l.message)),
       (r) => emit(FetchPurchaseNotesLoaded(purchaseNotes: r)),
@@ -91,9 +93,11 @@ class WarehouseCubit extends Cubit<WarehouseState> {
     String? search,
   }) async {
     emit(FetchPurchaseNotesDropdownLoading());
+
     final result = await _fetchPurchaseNotesDropdownUseCase({
       'search': search,
     });
+
     result.fold(
       (l) => emit(FetchPurchaseNotesDropdownError(message: l.message)),
       (r) => emit(FetchPurchaseNotesDropdownLoaded(purchaseNotes: r)),
@@ -105,6 +109,7 @@ class WarehouseCubit extends Cubit<WarehouseState> {
     emit(InsertPurchaseNoteManualLoading());
 
     final result = await _insertPurchaseNoteManualUseCase(purchaseNote);
+    
     result.fold(
       (l) => emit(InsertPurchaseNoteManualError(message: l.message)),
       (r) => emit(InsertPurchaseNoteManualLoaded(message: r)),
