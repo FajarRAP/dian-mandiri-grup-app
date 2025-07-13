@@ -24,7 +24,7 @@ class InsertPurchaseNoteManualModel extends InsertPurchaseNoteManualEntity {
   Map<String, dynamic> toJson() {
     return {
       'supplier_id': supplierId,
-      'date': date,
+      'date': date.toIso8601String(),
       'note': note,
       'items': items
           .map((item) => WarehouseItemModel.fromEntity(item).toJson())

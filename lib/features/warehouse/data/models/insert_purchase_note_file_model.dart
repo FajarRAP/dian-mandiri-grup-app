@@ -20,9 +20,8 @@ class InsertPurchaseNoteFileModel extends InsertPurchaseNoteFileEntity {
       );
 
   Map<String, dynamic> toJson() => {
-        'date': date,
-        'receipt': receipt,
-        'note': note,
         'supplier_id': supplierId,
+        'date': date.toIso8601String(),
+        'note': note,
       };
 }
