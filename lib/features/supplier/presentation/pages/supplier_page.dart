@@ -8,50 +8,30 @@ import '../../../../core/themes/colors.dart';
 import '../cubit/supplier_cubit.dart';
 import '../widgets/supplier_item.dart';
 
-class SupplierPage extends StatefulWidget {
-  const SupplierPage({
-    super.key,
-  });
-
-  @override
-  State<SupplierPage> createState() => _SupplierPageState();
-}
-
-class _SupplierPageState extends State<SupplierPage> {
-  late final SupplierCubit _supplierCubit;
-  late final TextEditingController _searchController;
-  late final Debouncer _debouncer;
-  String? _column;
-  String? _order;
-  String? _search;
-
-  @override
-  void initState() {
-    super.initState();
-    _debouncer = Debouncer(delay: const Duration(milliseconds: 500));
-    _supplierCubit = context.read<SupplierCubit>();
-    _searchController = TextEditingController();
-  }
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
+class SupplierPage extends StatelessWidget {
+  const SupplierPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final debouncer = Debouncer(delay: const Duration(milliseconds: 500));
+    final supplierCubit = context.read<SupplierCubit>();
+    var column = 'name';
+    var order = 'asc';
+    String? search;
+
     return Scaffold(
       appBar: AppBar(
         actions: <Widget>[
           PopupMenuButton(
             onSelected: (value) {
               final params = value.split(',');
-
-              setState(() {
-                _column = params.first;
-                _order = params.last;
-              });
+              column = params.first;
+              order = params.last;
+              supplierCubit.fetchSuppliers(
+                column: column,
+                order: order,
+                search: search,
+              );
             },
             icon: const Icon(Icons.sort),
             tooltip: 'Urutkan',
@@ -81,14 +61,16 @@ class _SupplierPageState extends State<SupplierPage> {
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: TextFormField(
-              onChanged: (value) => _debouncer.run(
-                () => _supplierCubit.fetchSuppliers(
-                  search: value,
-                  column: _column ?? 'name',
-                  order: _order ?? 'asc',
-                ),
-              ),
-              controller: _searchController,
+              onChanged: (value) {
+                search = value;
+                debouncer.run(
+                  () => supplierCubit.fetchSuppliers(
+                    search: search,
+                    column: column,
+                    order: order,
+                  ),
+                );
+              },
               decoration: InputDecoration(
                 hintText: 'Cari Supplier',
                 prefixIcon: const Icon(Icons.search),
@@ -104,9 +86,9 @@ class _SupplierPageState extends State<SupplierPage> {
         child: BlocBuilder<SupplierCubit, SupplierState>(
           bloc: context.read<SupplierCubit>()
             ..fetchSuppliers(
-              column: _column ?? 'name',
-              order: _order ?? 'asc',
-              search: _search,
+              column: column,
+              order: order,
+              search: search,
             ),
           buildWhen: (previous, current) => current is FetchSuppliers,
           builder: (context, state) {
