@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../features/supplier/presentation/cubit/supplier_cubit.dart';
 import '../../common/dropdown_entity.dart';
+import '../../helpers/debouncer.dart';
 import '../dropdown_modal_item.dart';
 import '../dropdown_search_modal.dart';
 
@@ -17,10 +18,11 @@ class SupplierDropdown extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final supplierCubit = context.read<SupplierCubit>();
+    final debouncer = Debouncer(delay: Duration(milliseconds: 500));
 
     return DropdownSearchModal(
-      search: (keyword) =>
-          supplierCubit.fetchSuppliersDropdown(search: keyword),
+      search: (keyword) => debouncer
+          .run(() => supplierCubit.fetchSuppliersDropdown(search: keyword)),
       title: 'supplier',
       child: Expanded(
         child: BlocBuilder<SupplierCubit, SupplierState>(
