@@ -6,17 +6,22 @@ import '../../service_container.dart';
 import '../common/constants.dart';
 
 class DioInterceptor implements Interceptor {
+  final _storage = getIt.get<FlutterSecureStorage>();
+
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
-    final storage = getIt.get<FlutterSecureStorage>();
-    final refreshToken = await storage.read(key: refreshTokenKey);
-    final authRepository = getIt.get<AuthRepository>();
+    final refreshToken = await _storage.read(key: refreshTokenKey);
 
     if (err.response?.statusCode == 401) {
       if (err.requestOptions.path == '$authEndpoint/refresh') {
-        await storage.deleteAll();
+        await _storage.deleteAll();
       } else if (refreshToken != null) {
-        await authRepository.refreshToken(refreshToken: refreshToken);
+        await getIt
+            .get<AuthRepository>()
+            .refreshToken(refreshToken: refreshToken);
+        final accessToken = await _storage.read(key: accessTokenKey);
+        return handler.resolve(await Dio().fetch(err.requestOptions
+          ..headers['Authorization'] = 'Bearer $accessToken'));
       }
     }
 
@@ -26,8 +31,7 @@ class DioInterceptor implements Interceptor {
   @override
   void onRequest(
       RequestOptions options, RequestInterceptorHandler handler) async {
-    final storage = getIt.get<FlutterSecureStorage>();
-    final accessToken = await storage.read(key: accessTokenKey);
+    final accessToken = await _storage.read(key: accessTokenKey);
 
     if (options.path != '$authEndpoint/refresh') {
       options.headers = {
@@ -41,10 +45,9 @@ class DioInterceptor implements Interceptor {
 
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) async {
-    final storage = getIt.get<FlutterSecureStorage>();
     if (response.requestOptions.path == '$authEndpoint/refresh' &&
         response.statusCode == 401) {
-      await storage.deleteAll();
+      await _storage.deleteAll();
     }
 
     return handler.next(response);
