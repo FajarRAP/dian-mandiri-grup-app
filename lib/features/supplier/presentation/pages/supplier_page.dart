@@ -81,10 +81,10 @@ class SupplierPage extends StatelessWidget {
         title: const Text('Supplier'),
       ),
       body: RefreshIndicator(
-        onRefresh: context.read<SupplierCubit>().fetchSuppliers,
+        onRefresh: supplierCubit.fetchSuppliers,
         displacement: 10,
         child: BlocBuilder<SupplierCubit, SupplierState>(
-          bloc: context.read<SupplierCubit>()
+          bloc: supplierCubit
             ..fetchSuppliers(
               column: column,
               order: order,
@@ -99,11 +99,17 @@ class SupplierPage extends StatelessWidget {
             }
 
             if (state is FetchSuppliersLoaded) {
+              if (state.suppliers.isEmpty) {
+                return const Center(
+                  child: Text('Belum ada supplier'),
+                );
+              }
+
               return ListView.separated(
                 itemBuilder: (context, index) => GestureDetector(
                   onTap: () => context.push(
                     supplierDetailRoute,
-                    extra: 'supplierId',
+                    extra: state.suppliers[index].id,
                   ),
                   child: SupplierItem(supplier: state.suppliers[index]),
                 ),
