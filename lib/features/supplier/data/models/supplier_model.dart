@@ -12,6 +12,6 @@ class SupplierModel extends SupplierEntity {
         id: json['id'],
         avatarUrl: json['avatar'],
         name: json['name'],
-        phoneNumber: json['phone_number'],
+        phoneNumber: json['phone'],
       );
 }
