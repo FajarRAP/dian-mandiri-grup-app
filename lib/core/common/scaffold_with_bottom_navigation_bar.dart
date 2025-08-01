@@ -6,7 +6,9 @@ import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import '../../features/auth/presentation/cubit/auth_cubit.dart';
+import '../../features/supplier/presentation/cubit/supplier_cubit.dart';
 import '../../features/tracker/presentation/cubit/shipment_cubit.dart';
+import '../../features/warehouse/presentation/cubit/warehouse_cubit.dart';
 import '../../service_container.dart';
 import '../themes/colors.dart';
 import 'constants.dart';
@@ -40,6 +42,14 @@ class ScaffoldWithBottomNavigationBar extends StatelessWidget {
           bloc: context.read<ShipmentCubit>(),
           listener: listener<ShipmentState>,
         ),
+        BlocListener<SupplierCubit, SupplierState>(
+          bloc: context.read<SupplierCubit>(),
+          listener: listener<SupplierState>,
+        ),
+        BlocListener<WarehouseCubit, WarehouseState>(
+          bloc: context.read<WarehouseCubit>(),
+          listener: listener<WarehouseState>,
+        ),
       ],
       child: Scaffold(
         body: child,
@@ -71,7 +81,6 @@ class ScaffoldWithBottomNavigationBar extends StatelessWidget {
             ),
           ],
         ),
-        resizeToAvoidBottomInset: false,
       ),
     );
   }
