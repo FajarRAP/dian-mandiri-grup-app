@@ -26,9 +26,8 @@ class SupplierRemoteDataSourcesImpl
   final Dio dio;
 
   @override
-  Future<Response> fetchSupplier({required String supplierId}) {
-    // TODO: implement fetchSupplier
-    throw UnimplementedError();
+  Future<Response> fetchSupplier({required String supplierId}) async {
+    return await dio.get('v1/supplier/$supplierId');
   }
 
   @override
@@ -37,28 +36,46 @@ class SupplierRemoteDataSourcesImpl
       String order = 'asc',
       String? search,
       int limit = 10,
-      int page = 1}) {
-    // TODO: implement fetchSuppliers
-    throw UnimplementedError();
+      int page = 1}) async {
+    return await dio.get(
+      'v1/supplier',
+      queryParameters: {
+        'column': column,
+        'order': order,
+        'search': search,
+        'limit': limit,
+        'page': page,
+      },
+    );
   }
 
   @override
   Future<Response> fetchSuppliersDropdown(
-      {String? search, int limit = 10, int page = 1}) {
-    // TODO: implement fetchSuppliersDropdown
-    throw UnimplementedError();
+      {String? search, int limit = 10, int page = 1}) async {
+    return await dio.get(
+      'v1/supplier/dropdown',
+      queryParameters: {
+        'search': search,
+        'limit': limit,
+        'page': page,
+      },
+    );
   }
 
   @override
-  Future<Response> insertSupplier({required Map<String, dynamic> data}) {
-    // TODO: implement insertSupplier
-    throw UnimplementedError();
+  Future<Response> insertSupplier({required Map<String, dynamic> data}) async {
+    return await dio.post(
+      'v1/supplier',
+      data: FormData.fromMap(data),
+    );
   }
 
   @override
-  Future<Response> updateSupplier({required Map<String, dynamic> data}) {
-    // TODO: implement updateSupplier
-    throw UnimplementedError();
+  Future<Response> updateSupplier({required Map<String, dynamic> data}) async {
+    return await dio.put(
+      'v1/supplier/${data['id']}',
+      data: FormData.fromMap(data),
+    );
   }
 }
 
