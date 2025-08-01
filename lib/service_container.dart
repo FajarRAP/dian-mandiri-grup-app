@@ -113,9 +113,8 @@ void setup() {
 
   // Supplier
   getIt
-    ..registerLazySingleton<SupplierRemoteDataSources>(
-        // () => SupplierRemoteDataSourcesImpl(dio: getIt.get()))
-        () => SupplierRemoteDataSourcesMock())
+    ..registerLazySingleton<SupplierRemoteDataSources<Response>>(
+        () => SupplierRemoteDataSourcesImpl(dio: getIt.get()))
     ..registerLazySingleton<SupplierRepositories>(
         () => SupplierRepositoriesImpl(supplierRemoteDataSources: getIt.get()))
     ..registerLazySingleton<SupplierCubit>(() => SupplierCubit(
