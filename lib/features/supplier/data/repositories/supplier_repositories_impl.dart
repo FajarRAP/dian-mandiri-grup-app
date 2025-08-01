@@ -1,6 +1,5 @@
-import 'dart:convert';
-
 import 'package:dartz/dartz.dart';
+import 'package:dio/dio.dart';
 
 import '../../../../core/common/dropdown_entity.dart';
 import '../../../../core/failure/failure.dart';
@@ -14,16 +13,15 @@ import '../models/supplier_model.dart';
 class SupplierRepositoriesImpl extends SupplierRepositories {
   SupplierRepositoriesImpl({required this.supplierRemoteDataSources});
 
-  final SupplierRemoteDataSources supplierRemoteDataSources;
+  final SupplierRemoteDataSources<Response> supplierRemoteDataSources;
 
   @override
   Future<Either<Failure, SupplierDetailEntity>> fetchSupplier(
       {required String supplierId}) async {
     try {
-      await Future.delayed(const Duration(milliseconds: 1800));
       final response =
           await supplierRemoteDataSources.fetchSupplier(supplierId: supplierId);
-      final data = Map<String, dynamic>.from(jsonDecode(response));
+      final data = Map<String, dynamic>.from(response.data['data']);
 
       return Right(SupplierDetailModel.fromJson(data));
     } catch (e) {
@@ -39,10 +37,10 @@ class SupplierRepositoriesImpl extends SupplierRepositories {
       int limit = 10,
       int page = 1}) async {
     try {
-      await Future.delayed(const Duration(milliseconds: 1800));
       final response = await supplierRemoteDataSources.fetchSuppliers(
           column: column, order: order, search: search);
-      final datas = List<Map<String, dynamic>>.from(jsonDecode(response));
+      final datas =
+          List<Map<String, dynamic>>.from(response.data['data']['content']);
 
       return Right(datas.map(SupplierModel.fromJson).toList());
     } catch (e) {
@@ -54,10 +52,10 @@ class SupplierRepositoriesImpl extends SupplierRepositories {
   Future<Either<Failure, List<DropdownEntity>>> fetchSuppliersDropdown(
       {String? search, int limit = 10, int page = 1}) async {
     try {
-      await Future.delayed(const Duration(milliseconds: 1800));
       final response = await supplierRemoteDataSources.fetchSuppliersDropdown(
           search: search);
-      final datas = List<Map<String, dynamic>>.from(jsonDecode(response));
+      final datas =
+          List<Map<String, dynamic>>.from(response.data['data']['content']);
 
       return Right(datas.map(DropdownEntity.fromJson).toList());
     } catch (e) {
@@ -69,15 +67,22 @@ class SupplierRepositoriesImpl extends SupplierRepositories {
   Future<Either<Failure, String>> insertSupplier(
       {required SupplierDetailEntity supplierDetailEntity}) async {
     try {
-      await Future.delayed(const Duration(milliseconds: 1800));
       final supplierDetail =
           SupplierDetailModel.fromEntity(supplierDetailEntity);
       final payload = supplierDetail.toJsonWithAvatar();
+      payload['avatar'] = await MultipartFile.fromFile(payload['avatar']);
+
       final response =
           await supplierRemoteDataSources.insertSupplier(data: payload);
-      final data = Map<String, dynamic>.from(jsonDecode(response));
 
-      return Right(data['message']);
+      return Right(response.data['message']);
+    } on DioException catch (de) {
+      switch (de.response?.statusCode) {
+        case 400:
+          return Left(Failure(message: de.response?.data['message']));
+        default:
+          return const Left(Failure());
+      }
     } catch (e) {
       return const Left(Failure());
     }
@@ -87,17 +92,26 @@ class SupplierRepositoriesImpl extends SupplierRepositories {
   Future<Either<Failure, String>> updateSupplier(
       {required SupplierDetailEntity supplierDetailEntity}) async {
     try {
-      await Future.delayed(const Duration(milliseconds: 1800));
       final supplierDetail =
           SupplierDetailModel.fromEntity(supplierDetailEntity);
       final payload = supplierDetail.avatarUrl.startsWith('https://')
           ? supplierDetail.toJsonWithoutAvatar()
           : supplierDetail.toJsonWithAvatar();
+      if (payload.containsKey('avatar')) {
+        payload['avatar'] = await MultipartFile.fromFile(payload['avatar']);
+      }
+
       final response =
           await supplierRemoteDataSources.updateSupplier(data: payload);
-      final data = Map<String, dynamic>.from(jsonDecode(response));
 
-      return Right(data['message']);
+      return Right(response.data['message']);
+    } on DioException catch (de) {
+      switch (de.response?.statusCode) {
+        case 400:
+          return Left(Failure(message: de.response?.data['message']));
+        default:
+          return const Left(Failure());
+      }
     } catch (e) {
       return const Left(Failure());
     }
