@@ -67,128 +67,134 @@ class _AddSupplierPageState extends State<AddSupplierPage> {
           padding: const EdgeInsets.all(24),
           child: Form(
             key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                GestureDetector(
-                  onTap: () async {
-                    final pickedImage = await _imagePicker.pickImage(
-                      source: ImageSource.gallery,
-                    );
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  GestureDetector(
+                    onTap: () async {
+                      final pickedImage = await _imagePicker.pickImage(
+                        source: ImageSource.gallery,
+                      );
 
-                    setState(() => _pickedImage = pickedImage);
-                  },
-                  child: CircleAvatar(
-                    backgroundColor: Colors.grey[300],
-                    backgroundImage: _pickedImage == null
-                        ? null
-                        : FileImage(File(_pickedImage!.path)),
-                    radius: 50,
-                    child: Align(
-                      alignment: Alignment.bottomRight,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: CustomColors.primaryNormal,
-                          shape: BoxShape.circle,
-                        ),
-                        padding: const EdgeInsets.all(4),
-                        child: const Icon(
-                          Icons.edit,
-                          color: MaterialColors.onPrimary,
+                      setState(() => _pickedImage = pickedImage);
+                    },
+                    child: CircleAvatar(
+                      backgroundColor: Colors.grey[300],
+                      backgroundImage: _pickedImage == null
+                          ? null
+                          : FileImage(File(_pickedImage!.path)),
+                      radius: 50,
+                      child: Align(
+                        alignment: Alignment.bottomRight,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: CustomColors.primaryNormal,
+                            shape: BoxShape.circle,
+                          ),
+                          padding: const EdgeInsets.all(4),
+                          child: const Icon(
+                            Icons.edit,
+                            color: MaterialColors.onPrimary,
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 24),
-                TextFormField(
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  controller: _nameController,
-                  decoration: InputDecoration(
-                    hintText: 'Nama',
+                  const SizedBox(height: 24),
+                  TextFormField(
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    controller: _nameController,
+                    decoration: InputDecoration(
+                      hintText: 'Nama',
+                    ),
+                    validator: nullValidator,
                   ),
-                  validator: nullValidator,
-                ),
-                const SizedBox(height: 12),
-                TextFormField(
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  controller: _emailController,
-                  decoration: InputDecoration(
-                    hintText: 'Email',
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    controller: _emailController,
+                    decoration: InputDecoration(
+                      hintText: 'Email',
+                    ),
+                    keyboardType: TextInputType.emailAddress,
+                    validator: emailValidator,
                   ),
-                  keyboardType: TextInputType.emailAddress,
-                  validator: emailValidator,
-                ),
-                const SizedBox(height: 12),
-                TextFormField(
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  controller: _phoneController,
-                  decoration: InputDecoration(
-                    hintText: 'Telepon',
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    controller: _phoneController,
+                    decoration: InputDecoration(
+                      hintText: 'Telepon',
+                    ),
+                    keyboardType: TextInputType.phone,
+                    validator: nullValidator,
                   ),
-                  keyboardType: TextInputType.phone,
-                  validator: nullValidator,
-                ),
-                const SizedBox(height: 12),
-                TextFormField(
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  controller: _addressController,
-                  decoration: InputDecoration(
-                    hintText: 'Alamat',
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    controller: _addressController,
+                    decoration: InputDecoration(
+                      hintText: 'Alamat',
+                    ),
+                    keyboardType: TextInputType.multiline,
+                    maxLines: 2,
+                    validator: nullValidator,
                   ),
-                  keyboardType: TextInputType.multiline,
-                  maxLines: 2,
-                  validator: nullValidator,
-                ),
-                const SizedBox(height: 24),
-                BlocConsumer<SupplierCubit, SupplierState>(
-                  listener: (context, state) {
-                    if (state is InsertSupplierLoaded) {
-                      scaffoldMessengerKey.currentState
-                          ?.showSnackBar(successSnackbar(state.message));
-                      _supplierCubit.fetchSuppliers();
-                      context.pop();
-                    }
-                  },
-                  buildWhen: (previous, current) => current is InsertSupplier,
-                  builder: (context, state) {
-                    if (state is InsertSupplierLoading) {
-                      return const PrimaryButton(child: Text('Simpan'));
-                    }
+                  const SizedBox(height: 24),
+                  BlocConsumer<SupplierCubit, SupplierState>(
+                    listener: (context, state) {
+                      if (state is InsertSupplierError) {
+                        scaffoldMessengerKey.currentState
+                            ?.showSnackBar(dangerSnackbar(state.message));
+                      }
 
-                    return PrimaryButton(
-                      onPressed: () {
-                        if (!_formKey.currentState!.validate()) return;
+                      if (state is InsertSupplierLoaded) {
+                        scaffoldMessengerKey.currentState
+                            ?.showSnackBar(successSnackbar(state.message));
+                        _supplierCubit.fetchSuppliers();
+                        context.pop();
+                      }
+                    },
+                    buildWhen: (previous, current) => current is InsertSupplier,
+                    builder: (context, state) {
+                      if (state is InsertSupplierLoading) {
+                        return const PrimaryButton(child: Text('Simpan'));
+                      }
 
-                        if (_pickedImage == null) {
-                          const message =
-                              'Silakan pilih gambar terlebih dahulu';
-                          scaffoldMessengerKey.currentState
-                              ?.showSnackBar(dangerSnackbar(message));
-                          return;
-                        }
+                      return PrimaryButton(
+                        onPressed: () {
+                          if (!_formKey.currentState!.validate()) return;
 
-                        final supplierDetail = SupplierDetailEntity(
-                          address: _addressController.text,
-                          avatarUrl: _pickedImage!.path,
-                          email: _emailController.text,
-                          name: _nameController.text,
-                          phoneNumber: _phoneController.text,
-                        );
+                          if (_pickedImage == null) {
+                            const message =
+                                'Silakan pilih gambar terlebih dahulu';
+                            scaffoldMessengerKey.currentState
+                                ?.showSnackBar(dangerSnackbar(message));
+                            return;
+                          }
 
-                        _supplierCubit.insertSupplier(
-                            supplierDetailEntity: supplierDetail);
-                      },
-                      child: const Text('Simpan'),
-                    );
-                  },
-                ),
-              ],
+                          final supplierDetail = SupplierDetailEntity(
+                            address: _addressController.text,
+                            avatarUrl: _pickedImage!.path,
+                            email: _emailController.text,
+                            name: _nameController.text,
+                            phoneNumber: _phoneController.text,
+                          );
+
+                          _supplierCubit.insertSupplier(
+                              supplierDetailEntity: supplierDetail);
+                        },
+                        child: const Text('Simpan'),
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         ),
       ),
-      resizeToAvoidBottomInset: false,
     );
   }
 }
