@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/common/constants.dart';
+import '../../../../core/common/snackbar.dart';
 import '../../../../core/helpers/helpers.dart';
 import '../../../../core/themes/colors.dart';
 import '../../../../core/widgets/fab_container.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/widgets/primary_outline_button.dart';
+import '../../domain/entities/purchase_note_detail_entity.dart';
 import '../cubit/warehouse_cubit.dart';
 import '../widgets/purchase_note_item_card.dart';
 import '../widgets/refund_purchase_note_dialog.dart';
@@ -21,10 +24,9 @@ class PurchaseNoteDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    late final PurchaseNoteDetailEntity purchaseNoteDetail;
     final warehouseCubit = context.read<WarehouseCubit>();
     final textTheme = Theme.of(context).textTheme;
-    var refundAmount = 0;
-    var totalPrice = 0;
 
     return Scaffold(
       appBar: AppBar(
@@ -41,8 +43,7 @@ class PurchaseNoteDetailPage extends StatelessWidget {
           }
 
           if (state is FetchPurchaseNoteLoaded) {
-            totalPrice = state.purchaseNote.items
-                .fold(0, (prev, e) => prev + e.price * e.quantity);
+            purchaseNoteDetail = state.purchaseNote;
 
             return ListView(
               padding: const EdgeInsets.all(16),
@@ -53,7 +54,8 @@ class PurchaseNoteDetailPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 TextFormField(
-                  initialValue: state.purchaseNote.supplier.name,
+                  onTapOutside: (event) => FocusScope.of(context).unfocus(),
+                  initialValue: purchaseNoteDetail.supplier.name,
                   readOnly: true,
                 ),
                 const SizedBox(height: 12),
@@ -63,7 +65,8 @@ class PurchaseNoteDetailPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 TextFormField(
-                  initialValue: dMyFormat.format(state.purchaseNote.date),
+                  onTapOutside: (event) => FocusScope.of(context).unfocus(),
+                  initialValue: dMyFormat.format(purchaseNoteDetail.date),
                   readOnly: true,
                 ),
                 const SizedBox(height: 12),
@@ -73,7 +76,7 @@ class PurchaseNoteDetailPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Image.network(
-                  state.purchaseNote.receipt,
+                  purchaseNoteDetail.receipt,
                   height: 400,
                   width: double.infinity,
                   fit: BoxFit.cover,
@@ -89,7 +92,7 @@ class PurchaseNoteDetailPage extends StatelessWidget {
                       WidgetSpan(
                         alignment: PlaceholderAlignment.middle,
                         child: Text(
-                          ' ${state.purchaseNote.items.length}',
+                          ' ${purchaseNoteDetail.items.length}',
                           style: textTheme.titleLarge?.copyWith(
                             color: CustomColors.primaryNormal,
                             fontWeight: FontWeight.w600,
@@ -106,7 +109,8 @@ class PurchaseNoteDetailPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 TextFormField(
-                  initialValue: state.purchaseNote.note,
+                  onTapOutside: (event) => FocusScope.of(context).unfocus(),
+                  initialValue: purchaseNoteDetail.note,
                   maxLines: 3,
                   readOnly: true,
                 ),
@@ -115,11 +119,11 @@ class PurchaseNoteDetailPage extends StatelessWidget {
                 const SizedBox(height: 24),
                 ListView.separated(
                   itemBuilder: (context, index) => PurchaseNoteItemCard(
-                    warehouseItem: state.purchaseNote.items[index],
+                    warehouseItem: purchaseNoteDetail.items[index],
                   ),
                   separatorBuilder: (context, index) =>
                       const SizedBox(height: 12),
-                  itemCount: state.purchaseNote.items.length,
+                  itemCount: purchaseNoteDetail.items.length,
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                 ),
@@ -148,7 +152,8 @@ class PurchaseNoteDetailPage extends StatelessWidget {
                           style: textTheme.bodyMedium,
                         ),
                         Text(
-                          idrCurrencyFormat.format(refundAmount),
+                          idrCurrencyFormat
+                              .format(purchaseNoteDetail.returnCost),
                           style: textTheme.bodyLarge?.copyWith(
                             color: MaterialColors.error,
                           ),
@@ -163,7 +168,9 @@ class PurchaseNoteDetailPage extends StatelessWidget {
                           style: textTheme.bodyMedium,
                         ),
                         Text(
-                          idrCurrencyFormat.format(totalPrice - refundAmount),
+                          idrCurrencyFormat.format(
+                              purchaseNoteDetail.totalPrice -
+                                  purchaseNoteDetail.returnCost),
                           style: textTheme.bodyLarge?.copyWith(
                             color: CustomColors.primaryNormal,
                           ),
@@ -171,36 +178,60 @@ class PurchaseNoteDetailPage extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 16),
-                    BlocConsumer<WarehouseCubit, WarehouseState>(
-                      listener: (context, state) {},
-                      builder: (context, state) {
-                        return Row(
-                          children: <Widget>[
-                            Expanded(
-                              child: PrimaryOutlineButton(
-                                onPressed: () => showDialog(
-                                  context: context,
-                                  builder: (context) =>
-                                      RefundPurchaseNoteDialog(
-                                    onRefund: (amount) {
-                                      setState(() => refundAmount = amount);
-                                      context.pop();
-                                    },
-                                  ),
-                                ),
-                                child: const Text('Refund'),
+                    Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: PrimaryOutlineButton(
+                            onPressed: () => showDialog(
+                              context: context,
+                              builder: (context) => RefundPurchaseNoteDialog(
+                                onRefund: (amount) {
+                                  setState(() =>
+                                      purchaseNoteDetail.returnCost = amount);
+                                  context.pop();
+                                },
                               ),
                             ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: PrimaryButton(
-                                onPressed: () async {},
+                            child: const Text('Refund'),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: BlocConsumer<WarehouseCubit, WarehouseState>(
+                            listener: (context, state) {
+                              if (state is InsertReturnCostLoaded) {
+                                scaffoldMessengerKey.currentState?.showSnackBar(
+                                  successSnackbar(state.message),
+                                );
+                              }
+
+                              if (state is InsertReturnCostError) {
+                                scaffoldMessengerKey.currentState?.showSnackBar(
+                                  dangerSnackbar(state.message),
+                                );
+                              }
+                            },
+                            buildWhen: (previous, current) =>
+                                current is InsertReturnCost,
+                            builder: (context, state) {
+                              if (state is InsertReturnCostLoading) {
+                                return const PrimaryButton(
+                                  child: Text('Simpan'),
+                                );
+                              }
+
+                              return PrimaryButton(
+                                onPressed: () async {
+                                  await warehouseCubit.insertReturnCost(
+                                      purchaseNoteId: purchaseNoteId,
+                                      amount: purchaseNoteDetail.returnCost);
+                                },
                                 child: const Text('Simpan'),
-                              ),
-                            ),
-                          ],
-                        );
-                      },
+                              );
+                            },
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
