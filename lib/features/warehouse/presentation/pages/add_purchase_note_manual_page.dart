@@ -82,13 +82,19 @@ class _AddPurchaseNoteManualPageState extends State<AddPurchaseNoteManualPage> {
             TextFormField(
               onTap: () => showModalBottomSheet(
                 context: context,
-                builder: (context) => SupplierDropdown(
-                  onTap: (supplier) {
-                    _supplierController.text = supplier.value;
-                    _selectedSupplier = supplier;
-                    context.pop();
-                  },
+                builder: (context) => Padding(
+                  padding: EdgeInsets.only(
+                    bottom: MediaQuery.viewInsetsOf(context).bottom,
+                  ),
+                  child: SupplierDropdown(
+                    onTap: (supplier) {
+                      _supplierController.text = supplier.value;
+                      _selectedSupplier = supplier;
+                      context.pop();
+                    },
+                  ),
                 ),
+                isScrollControlled: true,
               ),
               autovalidateMode: AutovalidateMode.onUserInteraction,
               controller: _supplierController,
@@ -278,6 +284,12 @@ class _AddPurchaseNoteManualPageState extends State<AddPurchaseNoteManualPage> {
                   );
                   context.pop();
                   _warehouseCubit.fetchPurchaseNotes();
+                }
+
+                if (state is InsertPurchaseNoteManualError) {
+                  scaffoldMessengerKey.currentState?.showSnackBar(
+                    dangerSnackbar(state.message),
+                  );
                 }
               },
               builder: (context, state) {
