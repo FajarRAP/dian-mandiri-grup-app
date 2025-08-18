@@ -64,7 +64,7 @@ class _AddPurchaseNoteItemDialogState extends State<AddPurchaseNoteItemDialog> {
             TextFormField(
               autovalidateMode: AutovalidateMode.onUserInteraction,
               controller: _nameController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: 'Nama Barang',
               ),
               validator: nullValidator,
@@ -78,7 +78,7 @@ class _AddPurchaseNoteItemDialogState extends State<AddPurchaseNoteItemDialog> {
             TextFormField(
               autovalidateMode: AutovalidateMode.onUserInteraction,
               controller: _priceController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: 'Harga per Barang',
               ),
               keyboardType: TextInputType.number,
@@ -93,7 +93,7 @@ class _AddPurchaseNoteItemDialogState extends State<AddPurchaseNoteItemDialog> {
             TextFormField(
               autovalidateMode: AutovalidateMode.onUserInteraction,
               controller: _totalController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: 'Total Barang (Pcs)',
               ),
               keyboardType: TextInputType.number,
@@ -107,7 +107,7 @@ class _AddPurchaseNoteItemDialogState extends State<AddPurchaseNoteItemDialog> {
             const SizedBox(height: 4),
             TextFormField(
               controller: _totalRejectController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: 'Total Barang Reject (Pcs)',
               ),
               keyboardType: TextInputType.number,
@@ -132,6 +132,7 @@ class _AddPurchaseNoteItemDialogState extends State<AddPurchaseNoteItemDialog> {
           ],
         ),
       ),
+      scrollable: true,
     );
   }
 }

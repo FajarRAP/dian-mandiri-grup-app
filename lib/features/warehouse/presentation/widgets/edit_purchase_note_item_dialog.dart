@@ -71,7 +71,7 @@ class _EditPurchaseNoteItemDialogState
             TextFormField(
               autovalidateMode: AutovalidateMode.onUserInteraction,
               controller: _nameController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: 'Nama Barang',
               ),
               validator: nullValidator,
@@ -85,7 +85,7 @@ class _EditPurchaseNoteItemDialogState
             TextFormField(
               autovalidateMode: AutovalidateMode.onUserInteraction,
               controller: _priceController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: 'Harga per Barang',
               ),
               keyboardType: TextInputType.number,
@@ -100,7 +100,7 @@ class _EditPurchaseNoteItemDialogState
             TextFormField(
               autovalidateMode: AutovalidateMode.onUserInteraction,
               controller: _quantityController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: 'Total Barang (Pcs)',
               ),
               keyboardType: TextInputType.number,
@@ -114,7 +114,7 @@ class _EditPurchaseNoteItemDialogState
             const SizedBox(height: 4),
             TextFormField(
               controller: _rejectController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: 'Total Barang Reject (Pcs)',
               ),
               keyboardType: TextInputType.number,
@@ -137,6 +137,7 @@ class _EditPurchaseNoteItemDialogState
           ],
         ),
       ),
+      scrollable: true,
     );
   }
 }
