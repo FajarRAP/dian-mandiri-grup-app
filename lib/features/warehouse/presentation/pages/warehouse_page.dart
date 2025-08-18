@@ -10,27 +10,41 @@ import '../../../tracker/presentation/widgets/expandable_fab.dart';
 import '../cubit/warehouse_cubit.dart';
 import '../widgets/purchase_note_item.dart';
 
-class WarehousePage extends StatelessWidget {
+class WarehousePage extends StatefulWidget {
   const WarehousePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final warehouseCubit = context.read<WarehouseCubit>();
-    final debouncer = Debouncer(delay: Duration(milliseconds: 500));
-    var column = 'created_at';
-    var order = 'asc';
-    String? search;
+  State<WarehousePage> createState() => _WarehousePageState();
+}
 
+class _WarehousePageState extends State<WarehousePage> {
+  late final WarehouseCubit _warehouseCubit;
+  late final Debouncer _debouncer;
+  var _column = 'created_at';
+  var _order = 'asc';
+  String? _search;
+
+  @override
+  void initState() {
+    super.initState();
+    _warehouseCubit = context.read<WarehouseCubit>()..fetchPurchaseNotes();
+    _debouncer = Debouncer(delay: const Duration(milliseconds: 500));
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         actions: <Widget>[
           PopupMenuButton(
             onSelected: (value) {
-              [column, order] = value.split(',');
-              warehouseCubit.fetchPurchaseNotes(
-                column: column,
-                order: order,
-                search: search,
+              final params = value.split(',');
+              _column = params.first;
+              _order = params.last;
+              _warehouseCubit.fetchPurchaseNotes(
+                column: _column,
+                order: _order,
+                search: _search,
               );
             },
             icon: const Icon(Icons.sort),
@@ -62,10 +76,11 @@ class WarehousePage extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             child: TextFormField(
               onChanged: (value) {
-                search = value;
-                debouncer.run(() => warehouseCubit.fetchPurchaseNotes(
-                    column: column, order: order, search: search));
+                _search = value;
+                _debouncer.run(() => _warehouseCubit.fetchPurchaseNotes(
+                    column: _column, order: _order, search: _search));
               },
+              onTapOutside: (event) => FocusScope.of(context).unfocus(),
               decoration: InputDecoration(
                 hintText: 'Cari Nota',
                 prefixIcon: const Icon(Icons.search),
@@ -75,42 +90,46 @@ class WarehousePage extends StatelessWidget {
         ),
         title: const Text('Barang Masuk'),
       ),
-      body: BlocBuilder<WarehouseCubit, WarehouseState>(
-        bloc: warehouseCubit
-          ..fetchPurchaseNotes(column: column, order: order, search: search),
-        buildWhen: (previous, current) => current is FetchPurchaseNotes,
-        builder: (context, state) {
-          if (state is FetchPurchaseNotesLoading) {
-            return const Center(
-              child: CircularProgressIndicator.adaptive(),
-            );
-          }
-
-          if (state is FetchPurchaseNotesLoaded) {
-            if (state.purchaseNotes.isEmpty) {
+      body: RefreshIndicator(
+        onRefresh: _warehouseCubit.fetchPurchaseNotes,
+        displacement: 10,
+        child: BlocBuilder<WarehouseCubit, WarehouseState>(
+          bloc: _warehouseCubit,
+          buildWhen: (previous, current) => current is FetchPurchaseNotes,
+          builder: (context, state) {
+            if (state is FetchPurchaseNotesLoading) {
               return const Center(
-                child: Text('Belum ada nota'),
+                child: CircularProgressIndicator.adaptive(),
               );
             }
 
-            return ListView.separated(
-              itemBuilder: (context, index) => GestureDetector(
-                onTap: () => context.push(
-                  purchaseNoteDetailRoute,
-                  extra: state.purchaseNotes[index].id,
-                ),
-                child: PurchaseNoteItem(
-                  purchaseNoteSummary: state.purchaseNotes[index],
-                ),
-              ),
-              separatorBuilder: (context, index) => const SizedBox(height: 12),
-              itemCount: state.purchaseNotes.length,
-              padding: const EdgeInsets.all(16),
-            );
-          }
+            if (state is FetchPurchaseNotesLoaded) {
+              if (state.purchaseNotes.isEmpty) {
+                return const Center(
+                  child: Text('Belum ada nota'),
+                );
+              }
 
-          return const SizedBox();
-        },
+              return ListView.separated(
+                itemBuilder: (context, index) => GestureDetector(
+                  onTap: () => context.push(
+                    purchaseNoteDetailRoute,
+                    extra: state.purchaseNotes[index].id,
+                  ),
+                  child: PurchaseNoteItem(
+                    purchaseNoteSummary: state.purchaseNotes[index],
+                  ),
+                ),
+                separatorBuilder: (context, index) =>
+                    const SizedBox(height: 12),
+                itemCount: state.purchaseNotes.length,
+                padding: const EdgeInsets.all(16),
+              );
+            }
+
+            return const SizedBox();
+          },
+        ),
       ),
       floatingActionButton: ExpandableFAB(
         distance: 100,
