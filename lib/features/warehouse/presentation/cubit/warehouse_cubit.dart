@@ -72,7 +72,7 @@ class WarehouseCubit extends Cubit<WarehouseState> {
 
   Future<void> fetchPurchaseNotes({
     String? search,
-    String column = 'name',
+    String column = 'created_at',
     String order = 'asc',
   }) async {
     emit(FetchPurchaseNotesLoading());
