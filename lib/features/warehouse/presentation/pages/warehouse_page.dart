@@ -17,7 +17,7 @@ class WarehousePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final warehouseCubit = context.read<WarehouseCubit>();
     final debouncer = Debouncer(delay: Duration(milliseconds: 500));
-    var column = 'name';
+    var column = 'created_at';
     var order = 'asc';
     String? search;
 
@@ -26,9 +26,7 @@ class WarehousePage extends StatelessWidget {
         actions: <Widget>[
           PopupMenuButton(
             onSelected: (value) {
-              final params = value.split(',');
-              column = params.first;
-              order = params.last;
+              [column, order] = value.split(',');
               warehouseCubit.fetchPurchaseNotes(
                 column: column,
                 order: order,
@@ -39,12 +37,12 @@ class WarehousePage extends StatelessWidget {
             tooltip: 'Urutkan',
             itemBuilder: (context) => <PopupMenuEntry<String>>[
               PopupMenuItem(
-                value: 'name,asc',
-                child: const Text('Nama Naik'),
+                value: 'created_at,asc',
+                child: const Text('Tanggal Ditambahkan Naik'),
               ),
               PopupMenuItem(
-                value: 'name,desc',
-                child: const Text('Nama Turun'),
+                value: 'created_at,desc',
+                child: const Text('Tanggal Ditambahkan Turun'),
               ),
               PopupMenuItem(
                 value: 'total_item,asc',
@@ -65,8 +63,8 @@ class WarehousePage extends StatelessWidget {
             child: TextFormField(
               onChanged: (value) {
                 search = value;
-                debouncer.run(
-                    () => warehouseCubit.fetchPurchaseNotes(search: search));
+                debouncer.run(() => warehouseCubit.fetchPurchaseNotes(
+                    column: column, order: order, search: search));
               },
               decoration: InputDecoration(
                 hintText: 'Cari Nota',
@@ -78,7 +76,8 @@ class WarehousePage extends StatelessWidget {
         title: const Text('Barang Masuk'),
       ),
       body: BlocBuilder<WarehouseCubit, WarehouseState>(
-        bloc: warehouseCubit..fetchPurchaseNotes(),
+        bloc: warehouseCubit
+          ..fetchPurchaseNotes(column: column, order: order, search: search),
         buildWhen: (previous, current) => current is FetchPurchaseNotes,
         builder: (context, state) {
           if (state is FetchPurchaseNotesLoading) {
@@ -88,6 +87,12 @@ class WarehousePage extends StatelessWidget {
           }
 
           if (state is FetchPurchaseNotesLoaded) {
+            if (state.purchaseNotes.isEmpty) {
+              return const Center(
+                child: Text('Belum ada nota'),
+              );
+            }
+
             return ListView.separated(
               itemBuilder: (context, index) => GestureDetector(
                 onTap: () => context.push(
