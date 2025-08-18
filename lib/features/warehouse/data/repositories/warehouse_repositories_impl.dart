@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
+import 'package:ship_tracker/features/warehouse/data/models/purchase_note_detail_model.dart';
 
 import '../../../../core/common/dropdown_entity.dart';
 import '../../../../core/failure/failure.dart';
@@ -11,9 +12,7 @@ import '../../domain/entities/purchase_note_detail_entity.dart';
 import '../../domain/entities/purchase_note_summary_entity.dart';
 import '../../domain/repositories/warehouse_repositories.dart';
 import '../datasources/warehouse_remote_data_sources.dart';
-import '../models/insert_purchase_note_file_model.dart';
 import '../models/insert_purchase_note_manual_model.dart';
-import '../models/purchase_note_detail_model.dart';
 import '../models/purchase_note_summary_model.dart';
 
 class WarehouseRepositoriesImpl extends WarehouseRepositories {
@@ -40,17 +39,16 @@ class WarehouseRepositoriesImpl extends WarehouseRepositories {
   @override
   Future<Either<Failure, PurchaseNoteDetailEntity>> fetchPurchaseNote(
       {required String purchaseNoteId}) async {
-    throw UnimplementedError();
-    // try {
-    //   await Future.delayed(const Duration(milliseconds: 1800));
-    //   final response = await warehouseRemoteDataSources.fetchPurchaseNote(
-    //       purchaseNoteId: purchaseNoteId);
-    //   final data = jsonDecode(response);
+    try {
+      final response = await warehouseRemoteDataSources.fetchPurchaseNote(
+          purchaseNoteId: purchaseNoteId);
 
-    //   return Right(PurchaseNoteDetailModel.fromJson(data));
-    // } catch (e) {
-    //   return Left(Failure());
-    // }
+      return Right(PurchaseNoteDetailModel.fromJson(response.data['data']));
+    } catch (e, s) {
+      print(e);
+      print(s);
+      return Left(Failure());
+    }
   }
 
   @override
@@ -71,9 +69,7 @@ class WarehouseRepositoriesImpl extends WarehouseRepositories {
           List<Map<String, dynamic>>.from(response.data['data']['content']);
 
       return Right(datas.map(PurchaseNoteSummaryModel.fromJson).toList());
-    } catch (e, s) {
-      print(e);
-      print(s);
+    } catch (e) {
       return Left(Failure());
     }
   }
@@ -137,6 +133,26 @@ class WarehouseRepositoriesImpl extends WarehouseRepositories {
         case 400:
           return Left(Failure(message: de.response?.data['message']));
 
+        default:
+          return Left(Failure());
+      }
+    } catch (e) {
+      return Left(Failure());
+    }
+  }
+
+  @override
+  Future<Either<Failure, String>> insertReturnCost(
+      {required String purchaseNoteId, required int amount}) async {
+    try {
+      final response = await warehouseRemoteDataSources.insertReturnCost(
+          purchaseNoteId: purchaseNoteId, amount: amount);
+
+      return Right(response.data['message']);
+    } on DioException catch (de) {
+      switch (de.response?.statusCode) {
+        case 400:
+          return Left(Failure(message: de.response?.data['message']));
         default:
           return Left(Failure());
       }

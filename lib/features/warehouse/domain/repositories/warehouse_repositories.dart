@@ -28,6 +28,8 @@ abstract class WarehouseRepositories {
       {required InsertPurchaseNoteManualEntity purchaseNote});
   Future<Either<Failure, String>> insertPurchaseNoteFile(
       {required InsertPurchaseNoteFileEntity purchaseNote});
+  Future<Either<Failure, String>> insertReturnCost(
+      {required String purchaseNoteId, required int amount});
   Future<Either<Failure, String>> insertShippingFee(
       {required int price, required List<String> purchaseNoteIds});
   Future<Either<Failure, String>> updatePurchaseNote(

@@ -132,3 +132,19 @@ class UpdatePurchaseNoteError extends UpdatePurchaseNote {
 
   UpdatePurchaseNoteError({required this.message});
 }
+
+class InsertReturnCost extends WarehouseState {}
+
+class InsertReturnCostLoading extends InsertReturnCost {}
+
+class InsertReturnCostLoaded extends InsertReturnCost {
+  final String message;
+
+  InsertReturnCostLoaded({required this.message});
+}
+
+class InsertReturnCostError extends InsertReturnCost {
+  final String message;
+
+  InsertReturnCostError({required this.message});
+}

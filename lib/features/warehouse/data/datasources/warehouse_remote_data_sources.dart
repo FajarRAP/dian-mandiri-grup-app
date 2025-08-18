@@ -18,6 +18,8 @@ abstract class WarehouseRemoteDataSources<T> {
   });
   Future<T> insertPurchaseNoteManual({required Map<String, dynamic> data});
   Future<T> insertPurchaseNoteFile({required Map<String, dynamic> data});
+  Future<T> insertReturnCost(
+      {required String purchaseNoteId, required int amount});
   Future<T> insertShippingFee({required Map<String, dynamic> data});
   Future<T> updatePurchaseNote({required Map<String, dynamic> data});
 }
@@ -34,9 +36,8 @@ class WarehouseRemoteDataSourcesImpl
   }
 
   @override
-  Future<Response> fetchPurchaseNote({required String purchaseNoteId}) {
-    // TODO: implement fetchPurchaseNote
-    throw UnimplementedError();
+  Future<Response> fetchPurchaseNote({required String purchaseNoteId}) async {
+    return await dio.get('v1/purchase-note/$purchaseNoteId');
   }
 
   @override
@@ -78,6 +79,15 @@ class WarehouseRemoteDataSourcesImpl
     return await dio.post(
       'v1/purchase-note',
       data: FormData.fromMap(data),
+    );
+  }
+
+  @override
+  Future<Response> insertReturnCost(
+      {required String purchaseNoteId, required int amount}) async {
+    return await dio.patch(
+      'v1/purchase-note/$purchaseNoteId/return-cost',
+      data: {'amount': amount},
     );
   }
 
@@ -144,5 +154,11 @@ class WarehouseRemoteDataSourcesMock
   Future<String> updatePurchaseNote(
       {required Map<String, dynamic> data}) async {
     return '''{"data": null, "message": "Purchase note updated successfully"}''';
+  }
+  
+  @override
+  Future<String> insertReturnCost({required String purchaseNoteId, required int amount}) {
+    // TODO: implement insertReturnCost
+    throw UnimplementedError();
   }
 }

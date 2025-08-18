@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
+import 'package:ship_tracker/features/warehouse/domain/usecases/insert_return_cost_use_case.dart';
 
 import '../../../../core/common/dropdown_entity.dart';
 import '../../../../core/failure/failure.dart';
@@ -27,6 +28,7 @@ class WarehouseCubit extends Cubit<WarehouseState> {
         fetchPurchaseNotesDropdownUseCase,
     required InsertPurchaseNoteManualUseCase insertPurchaseNoteManualUseCase,
     required InsertPurchaseNoteFileUseCase insertPurchaseNoteFileUseCase,
+    required InsertReturnCostUseCase insertReturnCostUseCase,
     required InsertShippingFeeUseCase insertShippingFeeUseCase,
     required UpdatePurchaseNoteUseCase updatePurchaseNoteUseCase,
   })  : _deletePurchaseNoteUseCase = deletePurchaseNoteUseCase,
@@ -35,6 +37,7 @@ class WarehouseCubit extends Cubit<WarehouseState> {
         _fetchPurchaseNotesDropdownUseCase = fetchPurchaseNotesDropdownUseCase,
         _insertPurchaseNoteManualUseCase = insertPurchaseNoteManualUseCase,
         _insertPurchaseNoteFileUseCase = insertPurchaseNoteFileUseCase,
+        _insertReturnCostUseCase = insertReturnCostUseCase,
         _insertShippingFeeUseCase = insertShippingFeeUseCase,
         _updatePurchaseNoteUseCase = updatePurchaseNoteUseCase,
         super(WarehouseInitial());
@@ -45,6 +48,7 @@ class WarehouseCubit extends Cubit<WarehouseState> {
   final FetchPurchaseNotesDropdownUseCase _fetchPurchaseNotesDropdownUseCase;
   final InsertPurchaseNoteManualUseCase _insertPurchaseNoteManualUseCase;
   final InsertPurchaseNoteFileUseCase _insertPurchaseNoteFileUseCase;
+  final InsertReturnCostUseCase _insertReturnCostUseCase;
   final InsertShippingFeeUseCase _insertShippingFeeUseCase;
   final UpdatePurchaseNoteUseCase _updatePurchaseNoteUseCase;
 
@@ -109,7 +113,7 @@ class WarehouseCubit extends Cubit<WarehouseState> {
     emit(InsertPurchaseNoteManualLoading());
 
     final result = await _insertPurchaseNoteManualUseCase(purchaseNote);
-    
+
     result.fold(
       (l) => emit(InsertPurchaseNoteManualError(message: l.message)),
       (r) => emit(InsertPurchaseNoteManualLoaded(message: r)),
@@ -126,6 +130,21 @@ class WarehouseCubit extends Cubit<WarehouseState> {
     result.fold(
       (l) => emit(InsertPurchaseNoteFileError(failure: l)),
       (r) => emit(InsertPurchaseNoteFileLoaded(message: r)),
+    );
+  }
+
+  Future<void> insertReturnCost(
+      {required String purchaseNoteId, required int amount}) async {
+    emit(InsertReturnCostLoading());
+
+    final result = await _insertReturnCostUseCase({
+      'purchase_note_id': purchaseNoteId,
+      'amount': amount,
+    });
+
+    result.fold(
+      (l) => emit(InsertReturnCostError(message: l.message)),
+      (r) => emit(InsertReturnCostLoaded(message: r)),
     );
   }
 
