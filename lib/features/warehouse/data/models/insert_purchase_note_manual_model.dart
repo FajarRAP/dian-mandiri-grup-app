@@ -11,24 +11,21 @@ class InsertPurchaseNoteManualModel extends InsertPurchaseNoteManualEntity {
   });
 
   factory InsertPurchaseNoteManualModel.fromEntity(
-      InsertPurchaseNoteManualEntity entity) {
-    return InsertPurchaseNoteManualModel(
-      date: entity.date,
-      receipt: entity.receipt,
-      note: entity.note,
-      supplierId: entity.supplierId,
-      items: entity.items,
-    );
-  }
+          InsertPurchaseNoteManualEntity entity) =>
+      InsertPurchaseNoteManualModel(
+        date: entity.date,
+        receipt: entity.receipt,
+        note: entity.note,
+        supplierId: entity.supplierId,
+        items: entity.items,
+      );
 
-  Map<String, dynamic> toJson() {
-    return {
-      'supplier_id': supplierId,
-      'date': date.toIso8601String(),
-      'note': note,
-      'items': items
-          .map((item) => WarehouseItemModel.fromEntity(item).toJson())
-          .toList(),
-    };
-  }
+  Map<String, dynamic> toJson() => {
+        'supplier_id': supplierId,
+        'date': date.toUtc().toIso8601String(),
+        'note': note,
+        'items': items
+            .map((item) => WarehouseItemModel.fromEntity(item).toJson())
+            .toList(),
+      };
 }
