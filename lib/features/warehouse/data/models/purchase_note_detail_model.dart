@@ -3,7 +3,7 @@ import '../../domain/entities/purchase_note_detail_entity.dart';
 import 'warehouse_item_model.dart';
 
 class PurchaseNoteDetailModel extends PurchaseNoteDetailEntity {
-  const PurchaseNoteDetailModel({
+  PurchaseNoteDetailModel({
     required super.date,
     required super.receipt,
     required super.note,
@@ -23,7 +23,12 @@ class PurchaseNoteDetailModel extends PurchaseNoteDetailEntity {
         id: json['id'],
         isEditable: json['is_editable'],
         returnCost: json['return_cost'],
-        supplier: SupplierModel.fromJson(json['supplier']),
+        supplier: SupplierModel(
+          id: json['supplier']['id'],
+          avatarUrl: '-',
+          name: json['supplier']['name'],
+          phoneNumber: '-',
+        ),
         totalPrice: json['total_price'],
         items: List<Map<String, dynamic>>.from(json['items'])
             .map(WarehouseItemModel.fromJson)
