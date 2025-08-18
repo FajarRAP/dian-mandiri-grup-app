@@ -96,6 +96,7 @@ class _AddPurchaseNoteManualPageState extends State<AddPurchaseNoteManualPage> {
                 ),
                 isScrollControlled: true,
               ),
+              onTapOutside: (event) => FocusScope.of(context).unfocus(),
               autovalidateMode: AutovalidateMode.onUserInteraction,
               controller: _supplierController,
               decoration: InputDecoration(
@@ -125,6 +126,7 @@ class _AddPurchaseNoteManualPageState extends State<AddPurchaseNoteManualPage> {
                 _dateController.text = dMyFormat.format(pickedDate);
                 _pickedDate = pickedDate;
               },
+              onTapOutside: (event) => FocusScope.of(context).unfocus(),
               autovalidateMode: AutovalidateMode.onUserInteraction,
               controller: _dateController,
               decoration: InputDecoration(
@@ -196,6 +198,7 @@ class _AddPurchaseNoteManualPageState extends State<AddPurchaseNoteManualPage> {
             ),
             const SizedBox(height: 4),
             TextFormField(
+              onTapOutside: (event) => FocusScope.of(context).unfocus(),
               controller: _noteController,
               decoration: InputDecoration(
                 hintText: 'Tuliskan catatan jika ada',
