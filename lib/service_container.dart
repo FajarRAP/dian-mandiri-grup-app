@@ -46,6 +46,7 @@ import 'features/warehouse/domain/usecases/fetch_purchase_notes_dropdown_use_cas
 import 'features/warehouse/domain/usecases/fetch_purchase_notes_use_case.dart';
 import 'features/warehouse/domain/usecases/insert_purchase_note_file_use_case.dart';
 import 'features/warehouse/domain/usecases/insert_purchase_note_manual_use_case.dart';
+import 'features/warehouse/domain/usecases/insert_return_cost_use_case.dart';
 import 'features/warehouse/domain/usecases/insert_shipping_fee_use_case.dart';
 import 'features/warehouse/domain/usecases/update_purchase_note_use_case.dart';
 import 'features/warehouse/presentation/cubit/warehouse_cubit.dart';
@@ -131,9 +132,8 @@ void setup() {
 
   // Warehouse
   getIt
-    ..registerLazySingleton<WarehouseRemoteDataSources>(
-        // () => WarehouseRemoteDataSourcesImpl(dio: getIt.get()))
-        () => WarehouseRemoteDataSourcesMock())
+    ..registerLazySingleton<WarehouseRemoteDataSources<Response>>(
+        () => WarehouseRemoteDataSourcesImpl(dio: getIt.get()))
     ..registerLazySingleton<WarehouseRepositories>(() =>
         WarehouseRepositoriesImpl(warehouseRemoteDataSources: getIt.get()))
     ..registerLazySingleton<WarehouseCubit>(() => WarehouseCubit(
@@ -149,6 +149,8 @@ void setup() {
             InsertPurchaseNoteManualUseCase(warehouseRepositories: getIt.get()),
         insertPurchaseNoteFileUseCase:
             InsertPurchaseNoteFileUseCase(warehouseRepositories: getIt.get()),
+        insertReturnCostUseCase:
+            InsertReturnCostUseCase(warehouseRepositories: getIt.get()),
         insertShippingFeeUseCase:
             InsertShippingFeeUseCase(warehouseRepositories: getIt.get()),
         updatePurchaseNoteUseCase:
