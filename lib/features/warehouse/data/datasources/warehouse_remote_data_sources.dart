@@ -41,13 +41,21 @@ class WarehouseRemoteDataSourcesImpl
 
   @override
   Future<Response> fetchPurchaseNotes(
-      {String column = 'name',
+      {String column = 'created_at',
       String order = 'asc',
       String? search,
       int limit = 10,
-      int page = 1}) {
-    // TODO: implement fetchPurchaseNotes
-    throw UnimplementedError();
+      int page = 1}) async {
+    return await dio.get(
+      'v1/purchase-note',
+      queryParameters: {
+        'column': column,
+        'order': order,
+        'search': search,
+        'limit': limit,
+        'page': page,
+      },
+    );
   }
 
   @override
@@ -66,9 +74,11 @@ class WarehouseRemoteDataSourcesImpl
 
   @override
   Future<Response> insertPurchaseNoteManual(
-      {required Map<String, dynamic> data}) {
-    // TODO: implement insertPurchaseNoteManual
-    throw UnimplementedError();
+      {required Map<String, dynamic> data}) async {
+    return await dio.post(
+      'v1/purchase-note',
+      data: FormData.fromMap(data),
+    );
   }
 
   @override

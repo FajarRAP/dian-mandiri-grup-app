@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:dartz/dartz.dart';
+import 'package:dio/dio.dart';
 
 import '../../../../core/common/dropdown_entity.dart';
 import '../../../../core/failure/failure.dart';
@@ -16,59 +17,63 @@ import '../models/purchase_note_detail_model.dart';
 import '../models/purchase_note_summary_model.dart';
 
 class WarehouseRepositoriesImpl extends WarehouseRepositories {
-  final WarehouseRemoteDataSources warehouseRemoteDataSources;
+  final WarehouseRemoteDataSources<Response> warehouseRemoteDataSources;
 
   WarehouseRepositoriesImpl({required this.warehouseRemoteDataSources});
 
   @override
   Future<Either<Failure, String>> deletePurchaseNote(
       {required String purchaseNoteId}) async {
-    try {
-      await Future.delayed(const Duration(milliseconds: 1800));
-      final response = await warehouseRemoteDataSources.deletePurchaseNote(
-          purchaseNoteId: purchaseNoteId);
-      final data = jsonDecode(response);
+    throw UnimplementedError();
+    // try {
+    //   await Future.delayed(const Duration(milliseconds: 1800));
+    //   final response = await warehouseRemoteDataSources.deletePurchaseNote(
+    //       purchaseNoteId: purchaseNoteId);
+    //   final data = jsonDecode(response);
 
-      return Right(data['message']);
-    } catch (e) {
-      return Left(Failure());
-    }
+    //   return Right(data['message']);
+    // } catch (e) {
+    //   return Left(Failure());
+    // }
   }
 
   @override
   Future<Either<Failure, PurchaseNoteDetailEntity>> fetchPurchaseNote(
       {required String purchaseNoteId}) async {
-    try {
-      await Future.delayed(const Duration(milliseconds: 1800));
-      final response = await warehouseRemoteDataSources.fetchPurchaseNote(
-          purchaseNoteId: purchaseNoteId);
-      final data = jsonDecode(response);
+    throw UnimplementedError();
+    // try {
+    //   await Future.delayed(const Duration(milliseconds: 1800));
+    //   final response = await warehouseRemoteDataSources.fetchPurchaseNote(
+    //       purchaseNoteId: purchaseNoteId);
+    //   final data = jsonDecode(response);
 
-      return Right(PurchaseNoteDetailModel.fromJson(data));
-    } catch (e) {
-      return Left(Failure());
-    }
+    //   return Right(PurchaseNoteDetailModel.fromJson(data));
+    // } catch (e) {
+    //   return Left(Failure());
+    // }
   }
 
   @override
   Future<Either<Failure, List<PurchaseNoteSummaryEntity>>> fetchPurchaseNotes(
-      {String column = 'name',
+      {String column = 'created_at',
       String order = 'asc',
       String? search,
       int limit = 10,
       int page = 1}) async {
     try {
-      await Future.delayed(const Duration(milliseconds: 1800));
       final response = await warehouseRemoteDataSources.fetchPurchaseNotes(
           column: column,
           order: order,
           search: search,
           limit: limit,
           page: page);
-      final datas = List<Map<String, dynamic>>.from(jsonDecode(response));
+      final datas =
+          List<Map<String, dynamic>>.from(response.data['data']['content']);
 
       return Right(datas.map(PurchaseNoteSummaryModel.fromJson).toList());
-    } catch (e) {
+    } catch (e, s) {
+      print(e);
+      print(s);
       return Left(Failure());
     }
   }
@@ -76,41 +81,43 @@ class WarehouseRepositoriesImpl extends WarehouseRepositories {
   @override
   Future<Either<Failure, List<DropdownEntity>>> fetchPurchaseNotesDropdown(
       {String? search, int limit = 10, int page = 1}) async {
-    try {
-      await Future.delayed(const Duration(milliseconds: 1800));
-      final response =
-          await warehouseRemoteDataSources.fetchPurchaseNotesDropdown(
-        search: search,
-        limit: limit,
-        page: page,
-      );
-      final datas = List<Map<String, dynamic>>.from(jsonDecode(response));
+    throw UnimplementedError();
+    // try {
+    //   await Future.delayed(const Duration(milliseconds: 1800));
+    //   final response =
+    //       await warehouseRemoteDataSources.fetchPurchaseNotesDropdown(
+    //     search: search,
+    //     limit: limit,
+    //     page: page,
+    //   );
+    //   final datas = List<Map<String, dynamic>>.from(jsonDecode(response));
 
-      return Right(datas.map(DropdownEntity.fromJson).toList());
-    } catch (e) {
-      return Left(Failure());
-    }
+    //   return Right(datas.map(DropdownEntity.fromJson).toList());
+    // } catch (e) {
+    //   return Left(Failure());
+    // }
   }
 
   @override
   Future<Either<Failure, String>> insertPurchaseNoteFile(
       {required InsertPurchaseNoteFileEntity purchaseNote}) async {
-    try {
-      final payload =
-          InsertPurchaseNoteFileModel.fromEntity(purchaseNote).toJson();
-      payload['receipt'] = purchaseNote.receipt;
-      payload['file'] = purchaseNote.file;
+    throw UnimplementedError();
+    // try {
+    //   final payload =
+    //       InsertPurchaseNoteFileModel.fromEntity(purchaseNote).toJson();
+    //   payload['receipt'] = purchaseNote.receipt;
+    //   payload['file'] = purchaseNote.file;
 
-      await Future.delayed(const Duration(milliseconds: 1800));
+    //   await Future.delayed(const Duration(milliseconds: 1800));
 
-      final response = await warehouseRemoteDataSources.insertPurchaseNoteFile(
-          data: payload);
-      final data = jsonDecode(response);
+    //   final response = await warehouseRemoteDataSources.insertPurchaseNoteFile(
+    //       data: payload);
+    //   final data = jsonDecode(response);
 
-      return Right(data['message']);
-    } catch (e) {
-      return Left(Failure());
-    }
+    //   return Right(data['message']);
+    // } catch (e) {
+    //   return Left(Failure());
+    // }
   }
 
   @override
@@ -119,15 +126,20 @@ class WarehouseRepositoriesImpl extends WarehouseRepositories {
     try {
       final payload =
           InsertPurchaseNoteManualModel.fromEntity(purchaseNote).toJson();
-      payload['receipt'] = purchaseNote.receipt;
-
-      await Future.delayed(const Duration(milliseconds: 1800));
+      payload['receipt'] = await MultipartFile.fromFile(purchaseNote.receipt);
+      payload['items'] = jsonEncode(payload['items']);
 
       final response = await warehouseRemoteDataSources
           .insertPurchaseNoteManual(data: payload);
-      final data = jsonDecode(response);
+      return Right(response.data['message'] ?? 'Berhasil');
+    } on DioException catch (de) {
+      switch (de.response?.statusCode) {
+        case 400:
+          return Left(Failure(message: de.response?.data['message']));
 
-      return Right(data['message']);
+        default:
+          return Left(Failure());
+      }
     } catch (e) {
       return Left(Failure());
     }
@@ -136,30 +148,32 @@ class WarehouseRepositoriesImpl extends WarehouseRepositories {
   @override
   Future<Either<Failure, String>> insertShippingFee(
       {required int price, required List<String> purchaseNoteIds}) async {
-    try {
-      await Future.delayed(const Duration(milliseconds: 1800));
-      final response =
-          await warehouseRemoteDataSources.insertShippingFee(data: {});
-      final data = jsonDecode(response);
+    throw UnimplementedError();
+    // try {
+    //   await Future.delayed(const Duration(milliseconds: 1800));
+    //   final response =
+    //       await warehouseRemoteDataSources.insertShippingFee(data: {});
+    //   final data = jsonDecode(response);
 
-      return Right(data['message']);
-    } catch (e) {
-      return Left(Failure());
-    }
+    //   return Right(data['message']);
+    // } catch (e) {
+    //   return Left(Failure());
+    // }
   }
 
   @override
   Future<Either<Failure, String>> updatePurchaseNote(
       {required InsertPurchaseNoteManualEntity purchaseNote}) async {
-    try {
-      await Future.delayed(const Duration(milliseconds: 1800));
-      final response =
-          await warehouseRemoteDataSources.updatePurchaseNote(data: {});
-      final data = jsonDecode(response);
+    throw UnimplementedError();
+    // try {
+    //   await Future.delayed(const Duration(milliseconds: 1800));
+    //   final response =
+    //       await warehouseRemoteDataSources.updatePurchaseNote(data: {});
+    //   final data = jsonDecode(response);
 
-      return Right(data['message']);
-    } catch (e) {
-      return Left(Failure());
-    }
+    //   return Right(data['message']);
+    // } catch (e) {
+    //   return Left(Failure());
+    // }
   }
 }
