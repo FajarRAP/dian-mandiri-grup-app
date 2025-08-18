@@ -34,7 +34,7 @@ class SupplierDetailModel extends SupplierDetailEntity {
         'id': id,
         'avatar': avatarUrl,
         'name': name,
-        'phone': phoneNumber,
+        'phone_number': phoneNumber,
         'address': address,
         'email': email,
       };
@@ -42,7 +42,7 @@ class SupplierDetailModel extends SupplierDetailEntity {
   Map<String, dynamic> toJsonWithoutAvatar() => {
         'id': id,
         'name': name,
-        'phone': phoneNumber,
+        'phone_number': phoneNumber,
         'address': address,
         'email': email,
       };
