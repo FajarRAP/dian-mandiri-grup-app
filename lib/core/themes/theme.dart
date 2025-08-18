@@ -49,7 +49,17 @@ final theme = ThemeData(
     ),
     focusedBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(10),
-      borderSide: const BorderSide(color: CustomColors.primaryNormalActive),
+      borderSide: const BorderSide(
+        color: CustomColors.primaryNormalActive,
+        width: 2,
+      ),
+    ),
+    focusedErrorBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(10),
+      borderSide: const BorderSide(
+        color: MaterialColors.error,
+        width: 2,
+      ),
     ),
     hintStyle: TextStyle(
       color: MaterialColors.onSurfaceVariant,
