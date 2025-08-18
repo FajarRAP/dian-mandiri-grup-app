@@ -81,6 +81,7 @@ class _WarehousePageState extends State<WarehousePage> {
                     column: _column, order: _order, search: _search));
               },
               onTapOutside: (event) => FocusScope.of(context).unfocus(),
+              autofocus: false,
               decoration: InputDecoration(
                 hintText: 'Cari Nota',
                 prefixIcon: const Icon(Icons.search),
