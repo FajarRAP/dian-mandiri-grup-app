@@ -1,6 +1,6 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
+
+import '../helpers/debouncer.dart';
 
 class DropdownSearchModal extends StatefulWidget {
   const DropdownSearchModal({
@@ -19,23 +19,21 @@ class DropdownSearchModal extends StatefulWidget {
 }
 
 class _DropdownSearchModalState extends State<DropdownSearchModal> {
-  final _searchController = TextEditingController();
-  Timer? _debounce;
+  late final TextEditingController _searchController;
+  late final Debouncer _debouncer;
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController = TextEditingController();
+    _debouncer = Debouncer(delay: const Duration(milliseconds: 500));
+  }
 
   @override
   void dispose() {
     _searchController.dispose();
-    _debounce?.cancel();
+    _debouncer.cancel();
     super.dispose();
-  }
-
-  void _search(String search) {
-    if (_debounce?.isActive ?? false) _debounce?.cancel();
-
-    _debounce = Timer(
-      const Duration(milliseconds: 500),
-      () => widget.search(search),
-    );
   }
 
   @override
@@ -44,6 +42,7 @@ class _DropdownSearchModalState extends State<DropdownSearchModal> {
     final textTheme = theme.textTheme;
 
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         const SizedBox(height: 32),
         Text(
@@ -57,7 +56,7 @@ class _DropdownSearchModalState extends State<DropdownSearchModal> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: TextField(
-            onChanged: _search,
+            onChanged: (value) => _debouncer.run(() => widget.search(value)),
             controller: _searchController,
             decoration: InputDecoration(
               hintText: 'Cari ${widget.title}',
