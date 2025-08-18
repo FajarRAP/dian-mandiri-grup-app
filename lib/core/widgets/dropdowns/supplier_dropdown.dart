@@ -3,11 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../features/supplier/presentation/cubit/supplier_cubit.dart';
 import '../../common/dropdown_entity.dart';
-import '../../helpers/debouncer.dart';
 import '../dropdown_modal_item.dart';
 import '../dropdown_search_modal.dart';
 
-class SupplierDropdown extends StatelessWidget {
+class SupplierDropdown extends StatefulWidget {
   const SupplierDropdown({
     super.key,
     required this.onTap,
@@ -16,42 +15,50 @@ class SupplierDropdown extends StatelessWidget {
   final void Function(DropdownEntity supplier) onTap;
 
   @override
+  State<SupplierDropdown> createState() => _SupplierDropdownState();
+}
+
+class _SupplierDropdownState extends State<SupplierDropdown> {
+  late final SupplierCubit _supplierCubit;
+
+  @override
+  void initState() {
+    super.initState();
+    _supplierCubit = context.read<SupplierCubit>()..fetchSuppliersDropdown();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final debouncer = Debouncer(delay: const Duration(milliseconds: 500));
-    final supplierCubit = context.read<SupplierCubit>();
-
     return DropdownSearchModal(
-      search: (keyword) => debouncer
-          .run(() => supplierCubit.fetchSuppliersDropdown(search: keyword)),
-      title: 'supplier',
-      child: Expanded(
-        child: BlocBuilder<SupplierCubit, SupplierState>(
-          bloc: supplierCubit..fetchSuppliersDropdown(),
-          buildWhen: (previous, current) => current is FetchSuppliersDropdown,
-          builder: (context, state) {
-            if (state is FetchSuppliersDropdownLoading) {
-              return const Center(
-                child: CircularProgressIndicator.adaptive(),
-              );
-            }
+      search: (keyword) =>
+          _supplierCubit.fetchSuppliersDropdown(search: keyword),
+      title: 'Supplier',
+      child: BlocBuilder<SupplierCubit, SupplierState>(
+        bloc: _supplierCubit,
+        buildWhen: (previous, current) => current is FetchSuppliersDropdown,
+        builder: (context, state) {
+          if (state is FetchSuppliersDropdownLoading) {
+            return const Center(
+              child: CircularProgressIndicator.adaptive(),
+            );
+          }
 
-            if (state is FetchSuppliersDropdownLoaded) {
-              return ListView.separated(
-                itemBuilder: (context, index) => GestureDetector(
-                  onTap: () => onTap(state.suppliers[index]),
-                  child: DropdownModalItem(
-                    child: Text(state.suppliers[index].value),
-                  ),
+          if (state is FetchSuppliersDropdownLoaded) {
+            return ListView.separated(
+              itemBuilder: (context, index) => GestureDetector(
+                onTap: () => widget.onTap(state.suppliers[index]),
+                child: DropdownModalItem(
+                  child: Text(state.suppliers[index].value),
                 ),
-                separatorBuilder: (context, index) =>
-                    const SizedBox(height: 12),
-                itemCount: state.suppliers.length,
-              );
-            }
+              ),
+              separatorBuilder: (context, index) => const SizedBox(height: 12),
+              itemCount: state.suppliers.length,
+              shrinkWrap: true,
+            );
+          }
 
-            return const SizedBox();
-          },
-        ),
+          return const SizedBox();
+        },
       ),
     );
   }
