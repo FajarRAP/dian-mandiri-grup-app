@@ -1,6 +1,5 @@
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
-import 'package:ship_tracker/features/warehouse/domain/usecases/insert_return_cost_use_case.dart';
 
 import '../../../../core/common/dropdown_entity.dart';
 import '../../../../core/failure/failure.dart';
@@ -14,6 +13,7 @@ import '../../domain/usecases/fetch_purchase_notes_dropdown_use_case.dart';
 import '../../domain/usecases/fetch_purchase_notes_use_case.dart';
 import '../../domain/usecases/insert_purchase_note_file_use_case.dart';
 import '../../domain/usecases/insert_purchase_note_manual_use_case.dart';
+import '../../domain/usecases/insert_return_cost_use_case.dart';
 import '../../domain/usecases/insert_shipping_fee_use_case.dart';
 import '../../domain/usecases/update_purchase_note_use_case.dart';
 
@@ -52,6 +52,9 @@ class WarehouseCubit extends Cubit<WarehouseState> {
   final InsertShippingFeeUseCase _insertShippingFeeUseCase;
   final UpdatePurchaseNoteUseCase _updatePurchaseNoteUseCase;
 
+  var _currentPage = 1;
+  final purchaseNotes = <PurchaseNoteSummaryEntity>[];
+
   Future<void> deletePurchaseNote({required String purchaseNoteId}) async {
     emit(DeletePurchaseNoteLoading());
 
@@ -79,6 +82,8 @@ class WarehouseCubit extends Cubit<WarehouseState> {
     String column = 'created_at',
     String order = 'asc',
   }) async {
+    _currentPage = 1;
+
     emit(FetchPurchaseNotesLoading());
 
     final result = await _fetchPurchaseNotesUseCase({
@@ -89,7 +94,41 @@ class WarehouseCubit extends Cubit<WarehouseState> {
 
     result.fold(
       (l) => emit(FetchPurchaseNotesError(message: l.message)),
-      (r) => emit(FetchPurchaseNotesLoaded(purchaseNotes: r)),
+      (r) {
+        purchaseNotes
+          ..clear()
+          ..addAll(r);
+        emit(FetchPurchaseNotesLoaded(purchaseNotes: r));
+      },
+    );
+  }
+
+  Future<void> fetchPurchaseNotesPaginate({
+    String? search,
+    String column = 'created_at',
+    String order = 'asc',
+  }) async {
+    emit(ListPaginateLoading());
+
+    final result = await _fetchPurchaseNotesUseCase({
+      'search': search,
+      'column': column,
+      'order': order,
+      'page': ++_currentPage,
+    });
+
+    result.fold(
+      (l) => emit(FetchPurchaseNotesError(message: l.message)),
+      (r) {
+        if (r.isEmpty) {
+          _currentPage = 1;
+          emit(ListPaginateLast());
+        } else {
+          purchaseNotes.addAll(r);
+          emit(ListPaginateLoaded());
+          emit(FetchPurchaseNotesLoaded(purchaseNotes: r));
+        }
+      },
     );
   }
 
