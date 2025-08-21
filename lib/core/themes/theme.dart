@@ -16,7 +16,10 @@ final theme = ThemeData(
       fontWeight: FontWeight.w400,
     ),
   ),
-  colorScheme: ColorScheme.fromSeed(seedColor: CustomColors.primaryNormal),
+  colorScheme: ColorScheme.fromSeed(
+    seedColor: CustomColors.primaryNormal,
+    primary: CustomColors.primaryNormal,
+  ),
   fontFamily: fontFamily,
   floatingActionButtonTheme: const FloatingActionButtonThemeData(
     backgroundColor: CustomColors.primaryNormal,
@@ -35,6 +38,7 @@ final theme = ThemeData(
       ),
     ),
   ),
+  indicatorColor: CustomColors.primaryNormal,
   inputDecorationTheme: InputDecorationTheme(
     border: OutlineInputBorder(
       borderRadius: BorderRadius.circular(10),
@@ -66,6 +70,10 @@ final theme = ThemeData(
       fontSize: 16,
     ),
     prefixIconColor: MaterialColors.outlineVariant,
+  ),
+  progressIndicatorTheme: const ProgressIndicatorThemeData(
+    color: CustomColors.primaryNormal,
+    circularTrackColor: MaterialColors.outlineVariant,
   ),
   textTheme: const TextTheme(
     displayLarge: TextStyle(
