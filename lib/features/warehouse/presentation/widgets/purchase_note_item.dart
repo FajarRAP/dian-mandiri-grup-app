@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/common/shadows.dart';
 import '../../../../core/helpers/helpers.dart';
 import '../../../../core/themes/colors.dart';
 import '../../domain/entities/purchase_note_summary_entity.dart';
@@ -8,9 +7,11 @@ import '../../domain/entities/purchase_note_summary_entity.dart';
 class PurchaseNoteItem extends StatelessWidget {
   const PurchaseNoteItem({
     super.key,
+    this.onDelete,
     required this.purchaseNoteSummary,
   });
 
+  final void Function()? onDelete;
   final PurchaseNoteSummaryEntity purchaseNoteSummary;
 
   @override
@@ -20,30 +21,50 @@ class PurchaseNoteItem extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: Colors.grey.shade300,
+          width: .5,
+        ),
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: <BoxShadow>[
+          BoxShadow(
+            color: MaterialColors.shadow.withValues(alpha: .05),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+            spreadRadius: 0,
+          ),
+        ],
         color: MaterialColors.onPrimary,
-        boxShadow: cardBoxShadow,
       ),
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(16),
       child: Row(
         children: <Widget>[
-          Expanded(
+          // Item Count
+          CircleAvatar(
+            backgroundColor: CustomColors.primaryNormal.withValues(alpha: .1),
+            radius: 24,
             child: Text(
               '${purchaseNoteSummary.totalItems}',
-              style: textTheme.displayMedium?.copyWith(
+              style: textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w700,
+                color: CustomColors.primaryNormal,
               ),
             ),
           ),
+          const SizedBox(width: 16),
+
+          // Supplier info
           Expanded(
-            flex: 2,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Text(
                   purchaseNoteSummary.supplier.name,
-                  style: textTheme.titleLarge,
+                  style: textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
+                const SizedBox(height: 4),
                 Text(
                   dateTimeFormat.format(purchaseNoteSummary.date.toLocal()),
                   style: textTheme.bodySmall?.copyWith(
@@ -53,10 +74,16 @@ class PurchaseNoteItem extends StatelessWidget {
               ],
             ),
           ),
+
+          // Action button
           IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.delete),
-          )
+            onPressed: onDelete,
+            icon: const Icon(
+              Icons.delete_outline,
+              color: MaterialColors.error,
+            ),
+            tooltip: 'Hapus',
+          ),
         ],
       ),
     );
