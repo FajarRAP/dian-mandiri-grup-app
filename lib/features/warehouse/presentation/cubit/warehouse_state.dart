@@ -5,6 +5,14 @@ sealed class WarehouseState {}
 
 final class WarehouseInitial extends WarehouseState {}
 
+class ListPaginate extends WarehouseState {}
+
+class ListPaginateLoading extends ListPaginate {}
+
+class ListPaginateLoaded extends ListPaginate {}
+
+class ListPaginateLast extends ListPaginate {}
+
 class DeletePurchaseNote extends WarehouseState {}
 
 class DeletePurchaseNoteLoading extends DeletePurchaseNote {}
