@@ -13,12 +13,7 @@ class PurchaseNoteSummaryModel extends PurchaseNoteSummaryEntity {
       PurchaseNoteSummaryModel(
         id: json['id'],
         date: DateTime.parse(json['date']),
-        supplier: SupplierModel(
-          avatarUrl: '-',
-          id: '-',
-          name: json['supplier'],
-          phoneNumber: '-',
-        ),
+        supplier: SupplierModel.fromJson(json['supplier']),
         totalItems: json['total'],
       );
 }
