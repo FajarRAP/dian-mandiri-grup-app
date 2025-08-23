@@ -26,120 +26,116 @@ class PurchaseNoteItemCard extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Text(
-                  warehouseItem.name,
-                  style: textTheme.bodyMedium,
-                ),
-                const Spacer(),
-                if (onDelete != null)
-                  InkWell(
-                    onTap: onDelete,
-                    child: Text(
-                      'Hapus',
-                      style: textTheme.bodySmall?.copyWith(
-                        color: MaterialColors.error,
-                      ),
-                    ),
-                  ),
-                const SizedBox(width: 10),
-                if (onEdit != null)
-                  InkWell(
-                    onTap: onEdit,
-                    child: Text(
-                      'Edit',
-                      style: textTheme.bodySmall?.copyWith(
-                        color: CustomColors.primaryNormal,
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-            const Divider(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Text(
-                  'Total Barang (Pcs)',
-                  style: textTheme.bodySmall,
-                ),
-                Text(
-                  '${warehouseItem.quantity}',
-                  style: textTheme.bodySmall,
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Text(
-                  'Total Barang Reject (Pcs)',
-                  style: textTheme.bodySmall,
-                ),
-                Text(
-                  '${warehouseItem.rejectQuantity}',
-                  style: textTheme.bodySmall,
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Text(
-                  'Harga per Barang',
-                  style: textTheme.bodySmall,
-                ),
-                Text(
-                  idrCurrencyFormat.format(warehouseItem.price),
-                  style: textTheme.bodySmall?.copyWith(
-                    color: CustomColors.primaryNormal,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Text(
-                  'Total Harga Barang',
-                  style: textTheme.bodySmall,
-                ),
-                Text(
-                  idrCurrencyFormat
-                      .format(warehouseItem.price * warehouseItem.quantity),
-                  style: textTheme.bodySmall?.copyWith(
-                    color: CustomColors.primaryNormal,
-                  ),
-                ),
-              ],
-            ),
-            if (warehouseItem.shipmentFee != null) ...[
-              const SizedBox(height: 8),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Text(
-                    'Biaya Ongkos Kirim',
-                    style: textTheme.bodySmall,
-                  ),
-                  Text(
-                    idrCurrencyFormat.format(warehouseItem.shipmentFee),
-                    style: textTheme.bodySmall?.copyWith(
-                      color: MaterialColors.tertiary,
-                    ),
-                  ),
-                ],
+            Text(
+              'Informasi Barang',
+              style: textTheme.bodySmall?.copyWith(
+                color: Colors.grey.shade800,
+                fontWeight: FontWeight.w600,
               ),
-            ],
+            ),
+            const SizedBox(height: 6),
+            _InfoRow(
+              icon: Icons.inventory_2_outlined,
+              label: 'Total Barang',
+              value: '${warehouseItem.quantity} pcs',
+            ),
+            const SizedBox(height: 4),
+            _InfoRow(
+              icon: Icons.cancel_outlined,
+              label: 'Barang Reject',
+              value: '${warehouseItem.rejectQuantity} pcs',
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Informasi Harga',
+              style: textTheme.bodySmall?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: Colors.grey.shade800,
+                letterSpacing: 0.5,
+              ),
+            ),
+            const SizedBox(height: 6),
+            _InfoRow(
+              color: CustomColors.primaryNormal,
+              icon: Icons.payments_outlined,
+              label: 'Harga per Barang',
+              value: idrCurrencyFormat.format(warehouseItem.price),
+            ),
+            const SizedBox(height: 4),
+            Container(
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: CustomColors.primaryNormal.withValues(alpha: .3),
+                ),
+                borderRadius: BorderRadius.circular(6),
+              ),
+              padding: const EdgeInsets.all(6),
+              child: _InfoRow(
+                color: CustomColors.primaryNormal,
+                icon: Icons.calculate_outlined,
+                label: 'Total Harga',
+                value: idrCurrencyFormat
+                    .format(warehouseItem.price * warehouseItem.quantity),
+              ),
+            ),
+            const SizedBox(height: 4),
+            _InfoRow(
+              icon: Icons.local_shipping_outlined,
+              label: 'Ongkos Kirim',
+              value: idrCurrencyFormat.format(warehouseItem.shipmentFee ?? 0),
+            ),
           ],
         ),
       ),
+    );
+  }
+}
+
+class _InfoRow extends StatelessWidget {
+  const _InfoRow({
+    this.color,
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
+
+  final Color? color;
+  final IconData icon;
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+
+    return Row(
+      children: <Widget>[
+        Icon(
+          icon,
+          color: color ?? Colors.grey.shade700,
+          size: 16,
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            label,
+            style: textTheme.bodySmall?.copyWith(
+              color: Colors.grey.shade700,
+              fontWeight: color == null ? FontWeight.w400 : FontWeight.w600,
+            ),
+          ),
+        ),
+        Text(
+          value,
+          style: textTheme.bodySmall?.copyWith(
+            color: color ?? Colors.grey.shade800,
+            fontWeight: color == null ? FontWeight.w500 : FontWeight.w700,
+          ),
+        ),
+      ],
     );
   }
 }
