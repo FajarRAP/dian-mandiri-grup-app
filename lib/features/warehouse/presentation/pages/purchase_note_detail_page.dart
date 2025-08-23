@@ -9,6 +9,7 @@ import '../../../../core/themes/colors.dart';
 import '../../../../core/widgets/fab_container.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/widgets/primary_outline_button.dart';
+import '../../../../core/widgets/read_only_field.dart';
 import '../../domain/entities/purchase_note_detail_entity.dart';
 import '../cubit/warehouse_cubit.dart';
 import '../widgets/purchase_note_item_card.dart';
@@ -48,26 +49,14 @@ class PurchaseNoteDetailPage extends StatelessWidget {
             return ListView(
               padding: const EdgeInsets.all(16),
               children: <Widget>[
-                Text(
-                  'Supplier',
-                  style: textTheme.bodyLarge,
-                ),
-                const SizedBox(height: 4),
-                TextFormField(
-                  onTapOutside: (event) => FocusScope.of(context).unfocus(),
-                  initialValue: purchaseNoteDetail.supplier.name,
-                  readOnly: true,
+                ReadOnlyField(
+                  title: 'Supplier',
+                  value: purchaseNoteDetail.supplier.name,
                 ),
                 const SizedBox(height: 12),
-                Text(
-                  'Tanggal',
-                  style: textTheme.bodyLarge,
-                ),
-                const SizedBox(height: 4),
-                TextFormField(
-                  onTapOutside: (event) => FocusScope.of(context).unfocus(),
-                  initialValue: dMyFormat.format(purchaseNoteDetail.date),
-                  readOnly: true,
+                ReadOnlyField(
+                  title: 'Tanggal',
+                  value: dMyFormat.format(purchaseNoteDetail.date),
                 ),
                 const SizedBox(height: 12),
                 Text(
@@ -75,48 +64,53 @@ class PurchaseNoteDetailPage extends StatelessWidget {
                   style: textTheme.bodyLarge,
                 ),
                 const SizedBox(height: 4),
-                Image.network(
-                  purchaseNoteDetail.receipt,
-                  height: 400,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                ),
-                const SizedBox(height: 12),
-                RichText(
-                  text: TextSpan(
-                    children: <InlineSpan>[
-                      TextSpan(
-                        text: 'Jumlah Barang',
-                        style: textTheme.bodyLarge,
-                      ),
-                      WidgetSpan(
-                        alignment: PlaceholderAlignment.middle,
-                        child: Text(
-                          ' ${purchaseNoteDetail.items.length}',
-                          style: textTheme.titleLarge?.copyWith(
-                            color: CustomColors.primaryNormal,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ],
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.network(
+                    purchaseNoteDetail.receipt,
+                    height: 400,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
                   ),
                 ),
                 const SizedBox(height: 12),
-                Text(
-                  'Catatan',
-                  style: textTheme.bodyLarge,
-                ),
-                const SizedBox(height: 4),
-                TextFormField(
-                  onTapOutside: (event) => FocusScope.of(context).unfocus(),
-                  initialValue: purchaseNoteDetail.note,
+                ReadOnlyField(
                   maxLines: 3,
-                  readOnly: true,
+                  title: 'Catatan',
+                  value: purchaseNoteDetail.note,
                 ),
                 const SizedBox(height: 24),
                 Divider(),
                 const SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Daftar Barang',
+                      style: textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: CustomColors.primaryNormal.withValues(alpha: .1),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Text(
+                        '${purchaseNoteDetail.items.length} item',
+                        style: textTheme.bodySmall?.copyWith(
+                          color: CustomColors.primaryNormal,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
                 ListView.separated(
                   itemBuilder: (context, index) => PurchaseNoteItemCard(
                     warehouseItem: purchaseNoteDetail.items[index],
@@ -144,40 +138,61 @@ class PurchaseNoteDetailPage extends StatelessWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Text(
-                          'Total biaya refund',
-                          style: textTheme.bodyMedium,
-                        ),
-                        Text(
-                          idrCurrencyFormat
-                              .format(purchaseNoteDetail.returnCost),
-                          style: textTheme.bodyLarge?.copyWith(
-                            color: MaterialColors.error,
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[50],
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Column(
+                        children: <Widget>[
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Text(
+                                'Refund',
+                                style: textTheme.bodySmall?.copyWith(
+                                  color: Colors.grey[700],
+                                ),
+                              ),
+                              Text(
+                                '- ${idrCurrencyFormat.format(purchaseNoteDetail.returnCost)}',
+                                style: textTheme.bodySmall?.copyWith(
+                                  color: MaterialColors.error,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Text(
-                          'Total semua harga',
-                          style: textTheme.bodyMedium,
-                        ),
-                        Text(
-                          idrCurrencyFormat.format(
-                              purchaseNoteDetail.totalPrice -
-                                  purchaseNoteDetail.returnCost),
-                          style: textTheme.bodyLarge?.copyWith(
-                            color: CustomColors.primaryNormal,
+                          const SizedBox(height: 6),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Text(
+                                'Total Bersih',
+                                style: textTheme.bodyMedium?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.grey[800],
+                                ),
+                              ),
+                              Text(
+                                idrCurrencyFormat.format(
+                                    purchaseNoteDetail.totalPrice -
+                                        purchaseNoteDetail.returnCost),
+                                style: textTheme.bodyLarge?.copyWith(
+                                  color: CustomColors.primaryNormal,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
                     Row(
                       children: <Widget>[
                         Expanded(
@@ -192,7 +207,14 @@ class PurchaseNoteDetailPage extends StatelessWidget {
                                 },
                               ),
                             ),
-                            child: const Text('Refund'),
+                            height: 40,
+                            child: Text(
+                              'Refund',
+                              style: textTheme.bodyMedium?.copyWith(
+                                color: CustomColors.primaryNormal,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
                           ),
                         ),
                         const SizedBox(width: 8),
@@ -215,18 +237,31 @@ class PurchaseNoteDetailPage extends StatelessWidget {
                                 current is InsertReturnCost,
                             builder: (context, state) {
                               if (state is InsertReturnCostLoading) {
-                                return const PrimaryButton(
-                                  child: Text('Simpan'),
+                                return PrimaryButton(
+                                  height: 40,
+                                  child: Text(
+                                    'Simpan',
+                                    style: textTheme.bodyMedium?.copyWith(
+                                      color: Colors.grey.shade700,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
                                 );
                               }
 
                               return PrimaryButton(
-                                onPressed: () async {
-                                  await warehouseCubit.insertReturnCost(
-                                      purchaseNoteId: purchaseNoteId,
-                                      amount: purchaseNoteDetail.returnCost);
-                                },
-                                child: const Text('Simpan'),
+                                onPressed: () async =>
+                                    await warehouseCubit.insertReturnCost(
+                                        purchaseNoteId: purchaseNoteId,
+                                        amount: purchaseNoteDetail.returnCost),
+                                height: 40,
+                                child: Text(
+                                  'Simpan',
+                                  style: textTheme.bodyMedium?.copyWith(
+                                    color: MaterialColors.onPrimary,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
                               );
                             },
                           ),
