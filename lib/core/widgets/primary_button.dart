@@ -5,30 +5,30 @@ import '../themes/colors.dart';
 class PrimaryButton extends StatelessWidget {
   const PrimaryButton({
     super.key,
-    required this.child,
+    this.onPressed,
+    this.icon,
     this.height,
     this.width,
-    this.onPressed,
+    required this.child,
   });
 
-  final Widget child;
+  final void Function()? onPressed;
+  final Widget? icon;
   final double? height;
   final double? width;
-  final void Function()? onPressed;
+  final Widget child;
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
+    return ElevatedButton.icon(
       onPressed: onPressed,
+      icon: icon,
+      label: child,
       style: ElevatedButton.styleFrom(
         backgroundColor: CustomColors.primaryNormal,
         foregroundColor: MaterialColors.onPrimary,
-        fixedSize: Size(
-          width ?? MediaQuery.sizeOf(context).width,
-          height ?? 48,
-        ),
+        fixedSize: Size.fromHeight(height ?? 40),
       ),
-      child: child,
     );
   }
 }
