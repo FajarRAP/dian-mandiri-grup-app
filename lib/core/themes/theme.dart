@@ -27,12 +27,14 @@ final theme = ThemeData(
   ),
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 16,
+        vertical: 8,
+      ),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
       ),
       textStyle: const TextStyle(
-        color: Colors.black,
         fontSize: 16,
         fontWeight: FontWeight.w500,
       ),
@@ -74,6 +76,21 @@ final theme = ThemeData(
   progressIndicatorTheme: const ProgressIndicatorThemeData(
     color: CustomColors.primaryNormal,
     circularTrackColor: MaterialColors.outlineVariant,
+  ),
+  textButtonTheme: TextButtonThemeData(
+    style: TextButton.styleFrom(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 16,
+        vertical: 8,
+      ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+      textStyle: const TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.w500,
+      ),
+    ),
   ),
   textTheme: const TextTheme(
     displayLarge: TextStyle(
