@@ -30,9 +30,8 @@ class WarehouseRemoteDataSourcesImpl
 
   final Dio dio;
   @override
-  Future<Response> deletePurchaseNote({required String purchaseNoteId}) {
-    // TODO: implement deletePurchaseNote
-    throw UnimplementedError();
+  Future<Response> deletePurchaseNote({required String purchaseNoteId}) async {
+    return dio.delete('v1/purchase-note/$purchaseNoteId');
   }
 
   @override
@@ -155,9 +154,10 @@ class WarehouseRemoteDataSourcesMock
       {required Map<String, dynamic> data}) async {
     return '''{"data": null, "message": "Purchase note updated successfully"}''';
   }
-  
+
   @override
-  Future<String> insertReturnCost({required String purchaseNoteId, required int amount}) {
+  Future<String> insertReturnCost(
+      {required String purchaseNoteId, required int amount}) {
     // TODO: implement insertReturnCost
     throw UnimplementedError();
   }

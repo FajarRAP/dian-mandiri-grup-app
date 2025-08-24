@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
-import 'package:ship_tracker/features/warehouse/data/models/purchase_note_detail_model.dart';
 
 import '../../../../core/common/dropdown_entity.dart';
 import '../../../../core/failure/failure.dart';
@@ -13,6 +12,7 @@ import '../../domain/entities/purchase_note_summary_entity.dart';
 import '../../domain/repositories/warehouse_repositories.dart';
 import '../datasources/warehouse_remote_data_sources.dart';
 import '../models/insert_purchase_note_manual_model.dart';
+import '../models/purchase_note_detail_model.dart';
 import '../models/purchase_note_summary_model.dart';
 
 class WarehouseRepositoriesImpl extends WarehouseRepositories {
@@ -23,17 +23,19 @@ class WarehouseRepositoriesImpl extends WarehouseRepositories {
   @override
   Future<Either<Failure, String>> deletePurchaseNote(
       {required String purchaseNoteId}) async {
-    throw UnimplementedError();
-    // try {
-    //   await Future.delayed(const Duration(milliseconds: 1800));
-    //   final response = await warehouseRemoteDataSources.deletePurchaseNote(
-    //       purchaseNoteId: purchaseNoteId);
-    //   final data = jsonDecode(response);
+    try {
+      final response = await warehouseRemoteDataSources.deletePurchaseNote(
+          purchaseNoteId: purchaseNoteId);
 
-    //   return Right(data['message']);
-    // } catch (e) {
-    //   return Left(Failure());
-    // }
+      return Right(response.data['message']);
+    } on DioException catch (de) {
+      switch (de.response?.statusCode) {
+        default:
+          return Left(Failure());
+      }
+    } catch (e) {
+      return Left(Failure());
+    }
   }
 
   @override
@@ -44,9 +46,7 @@ class WarehouseRepositoriesImpl extends WarehouseRepositories {
           purchaseNoteId: purchaseNoteId);
 
       return Right(PurchaseNoteDetailModel.fromJson(response.data['data']));
-    } catch (e, s) {
-      print(e);
-      print(s);
+    } catch (e) {
       return Left(Failure());
     }
   }
