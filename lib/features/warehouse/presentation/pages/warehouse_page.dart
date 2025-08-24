@@ -4,7 +4,9 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/common/constants.dart';
 import '../../../../core/helpers/debouncer.dart';
+import '../../../../core/helpers/helpers.dart';
 import '../../../../core/themes/colors.dart';
+import '../../../../core/widgets/delete_item_dialog.dart';
 import '../../../tracker/presentation/widgets/action_button.dart';
 import '../../../tracker/presentation/widgets/expandable_fab.dart';
 import '../cubit/warehouse_cubit.dart';
@@ -146,15 +148,53 @@ class _WarehousePageState extends State<WarehousePage> {
                     return SliverPadding(
                       padding: const EdgeInsets.all(16),
                       sliver: SliverList.separated(
-                        itemBuilder: (context, index) => GestureDetector(
+                        itemBuilder: (context, index) => PurchaseNoteItem(
                           onTap: () => context.push(
                             purchaseNoteDetailRoute,
                             extra: _warehouseCubit.purchaseNotes[index].id,
                           ),
-                          child: PurchaseNoteItem(
-                            purchaseNoteSummary:
-                                _warehouseCubit.purchaseNotes[index],
+                          onDelete: () => showDialog(
+                            context: context,
+                            builder: (context) =>
+                                BlocConsumer<WarehouseCubit, WarehouseState>(
+                              listener: (context, state) {
+                                if (state is DeletePurchaseNoteLoaded) {
+                                  TopSnackbar.successSnackbar(
+                                      message: state.message);
+                                  context.pop();
+                                  _warehouseCubit.fetchPurchaseNotes();
+                                }
+
+                                if (state is DeletePurchaseNoteError) {
+                                  TopSnackbar.dangerSnackbar(
+                                      message: state.message);
+                                  context.pop();
+                                }
+                              },
+                              builder: (context, state) {
+                                if (state is DeletePurchaseNoteLoading) {
+                                  return DeleteItemDialog(
+                                    body:
+                                        'Apakah Anda yakin ingin menghapus nota ini?',
+                                    title: 'Hapus Nota',
+                                  );
+                                }
+
+                                return DeleteItemDialog(
+                                  onDelete: () =>
+                                      _warehouseCubit.deletePurchaseNote(
+                                    purchaseNoteId:
+                                        _warehouseCubit.purchaseNotes[index].id,
+                                  ),
+                                  body:
+                                      'Apakah Anda yakin ingin menghapus nota ini?',
+                                  title: 'Hapus Nota',
+                                );
+                              },
+                            ),
                           ),
+                          purchaseNoteSummary:
+                              _warehouseCubit.purchaseNotes[index],
                         ),
                         separatorBuilder: (context, index) =>
                             const SizedBox(height: 12),
