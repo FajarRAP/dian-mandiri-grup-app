@@ -8,14 +8,12 @@ class PrimaryButton extends StatelessWidget {
     this.onPressed,
     this.icon,
     this.height,
-    this.width,
     required this.child,
   });
 
   final void Function()? onPressed;
   final Widget? icon;
   final double? height;
-  final double? width;
   final Widget child;
 
   @override
