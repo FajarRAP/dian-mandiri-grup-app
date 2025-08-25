@@ -54,6 +54,7 @@ class WarehouseCubit extends Cubit<WarehouseState> {
 
   var _currentPage = 1;
   final purchaseNotes = <PurchaseNoteSummaryEntity>[];
+  final purchaseNotesDropdown = <DropdownEntity>[];
 
   Future<void> deletePurchaseNote({required String purchaseNoteId}) async {
     emit(DeletePurchaseNoteLoading());
@@ -90,6 +91,7 @@ class WarehouseCubit extends Cubit<WarehouseState> {
       'search': search,
       'column': column,
       'order': order,
+      'page': _currentPage,
     });
 
     result.fold(
@@ -135,15 +137,46 @@ class WarehouseCubit extends Cubit<WarehouseState> {
   Future<void> fetchPurchaseNotesDropdown({
     String? search,
   }) async {
+    _currentPage = 1;
+
     emit(FetchPurchaseNotesDropdownLoading());
 
     final result = await _fetchPurchaseNotesDropdownUseCase({
       'search': search,
+      'page': _currentPage,
     });
 
     result.fold(
       (l) => emit(FetchPurchaseNotesDropdownError(message: l.message)),
-      (r) => emit(FetchPurchaseNotesDropdownLoaded(purchaseNotes: r)),
+      (r) {
+        purchaseNotesDropdown
+          ..clear()
+          ..addAll(r);
+        emit(FetchPurchaseNotesDropdownLoaded(purchaseNotes: r));
+      },
+    );
+  }
+
+  Future<void> fetchPurchaseNotesDropdownPaginate({String? search}) async {
+    emit(ListPaginateLoading());
+
+    final result = await _fetchPurchaseNotesDropdownUseCase({
+      'search': search,
+      'page': ++_currentPage,
+    });
+
+    result.fold(
+      (l) => emit(FetchPurchaseNotesDropdownError(message: l.message)),
+      (r) {
+        if (r.isEmpty) {
+          _currentPage = 1;
+          emit(ListPaginateLast());
+        } else {
+          purchaseNotesDropdown.addAll(r);
+          emit(ListPaginateLoaded());
+          emit(FetchPurchaseNotesDropdownLoaded(purchaseNotes: r));
+        }
+      },
     );
   }
 
