@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/common/constants.dart';
 import '../../../../core/common/dropdown_entity.dart';
-import '../../../../core/common/snackbar.dart';
+import '../../../../core/helpers/top_snackbar.dart';
 import '../../../../core/helpers/validators.dart';
 import '../../../../core/themes/colors.dart';
 import '../../../../core/widgets/dropdowns/purchase_note_dropdown.dart';
@@ -23,17 +22,19 @@ class AddShippingFeePage extends StatefulWidget {
 }
 
 class _AddShippingFeePageState extends State<AddShippingFeePage> {
-  late final WarehouseCubit _warehouseCubit;
-  late final TextEditingController _shippingFeeController;
   late final GlobalKey<FormState> _formKey;
+  late final FocusNode _focusNode;
+  late final TextEditingController _shippingFeeController;
+  late final WarehouseCubit _warehouseCubit;
   final _selectedPurchaseNoteIds = <DropdownEntity>[];
 
   @override
   void initState() {
     super.initState();
-    _warehouseCubit = context.read<WarehouseCubit>();
     _formKey = GlobalKey<FormState>();
+    _focusNode = FocusScope.of(context, createDependency: false);
     _shippingFeeController = TextEditingController();
+    _warehouseCubit = context.read<WarehouseCubit>();
   }
 
   @override
@@ -48,7 +49,9 @@ class _AddShippingFeePageState extends State<AddShippingFeePage> {
     final textTheme = theme.textTheme;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Tambah Ongkos Kirim')),
+      appBar: AppBar(
+        title: const Text('Tambah Ongkos Kirim'),
+      ),
       body: Form(
         key: _formKey,
         child: ListView(
@@ -60,6 +63,7 @@ class _AddShippingFeePageState extends State<AddShippingFeePage> {
             ),
             const SizedBox(height: 8),
             TextFormField(
+              onTapOutside: (event) => _focusNode.unfocus(),
               autovalidateMode: AutovalidateMode.onUserInteraction,
               controller: _shippingFeeController,
               decoration: InputDecoration(
@@ -74,16 +78,19 @@ class _AddShippingFeePageState extends State<AddShippingFeePage> {
               style: textTheme.bodyLarge,
             ),
             const SizedBox(height: 8),
-            TextField(
+            TextFormField(
               onTap: () => showModalBottomSheet(
-                context: context,
                 builder: (context) => PurchaseNoteDropdown(
                   onTap: (purchaseNote) {
                     setState(() => _selectedPurchaseNoteIds.add(purchaseNote));
                     context.pop();
                   },
                 ),
+                constraints: const BoxConstraints(minHeight: 400),
+                context: context,
+                isScrollControlled: true,
               ),
+              onTapOutside: (event) => _focusNode.unfocus(),
               decoration: InputDecoration(
                 hintText: 'Pilih Nota',
                 suffixIcon: const Icon(Icons.arrow_drop_down),
@@ -108,43 +115,46 @@ class _AddShippingFeePageState extends State<AddShippingFeePage> {
         ),
       ),
       floatingActionButton: FABContainer(
-        child: BlocConsumer<WarehouseCubit, WarehouseState>(
-          buildWhen: (previous, current) => current is InsertShippingFee,
-          listenWhen: (previous, current) => current is InsertShippingFee,
-          listener: (context, state) {
-            if (state is InsertShippingFeeLoaded) {
-              scaffoldMessengerKey.currentState?.showSnackBar(
-                successSnackbar(state.message),
-              );
-              context.pop();
-              _warehouseCubit.fetchPurchaseNotes();
-            }
-          },
-          builder: (context, state) {
-            if (state is InsertShippingFeeLoading) {
-              return PrimaryButton(child: const Text('Simpan'));
-            }
+        child: SizedBox(
+          width: double.infinity,
+          child: BlocConsumer<WarehouseCubit, WarehouseState>(
+            buildWhen: (previous, current) => current is InsertShippingFee,
+            listenWhen: (previous, current) => current is InsertShippingFee,
+            listener: (context, state) {
+              if (state is InsertShippingFeeLoaded) {
+                TopSnackbar.successSnackbar(message: state.message);
+                context.pop();
+                _warehouseCubit.fetchPurchaseNotes();
+              }
 
-            return PrimaryButton(
-              onPressed: () async {
-                if (!_formKey.currentState!.validate()) return;
+              if (state is InsertShippingFeeError) {
+                TopSnackbar.dangerSnackbar(message: state.message);
+              }
+            },
+            builder: (context, state) {
+              if (state is InsertShippingFeeLoading) {
+                return const PrimaryButton(child: Text('Simpan'));
+              }
 
-                if (_selectedPurchaseNoteIds.isEmpty) {
-                  scaffoldMessengerKey.currentState?.showSnackBar(
-                    dangerSnackbar('Pilih minimal 1 nota'),
+              return PrimaryButton(
+                onPressed: () async {
+                  if (!_formKey.currentState!.validate()) return;
+
+                  if (_selectedPurchaseNoteIds.isEmpty) {
+                    const message = 'Pilih minimal 1 nota';
+                    return TopSnackbar.dangerSnackbar(message: message);
+                  }
+
+                  _warehouseCubit.insertShippingFee(
+                    price: int.parse(_shippingFeeController.text),
+                    purchaseNoteIds:
+                        _selectedPurchaseNoteIds.map((e) => e.key).toList(),
                   );
-                  return;
-                }
-
-                _warehouseCubit.insertShippingFee(
-                  price: int.parse(_shippingFeeController.text),
-                  purchaseNoteIds:
-                      _selectedPurchaseNoteIds.map((e) => e.key).toList(),
-                );
-              },
-              child: const Text('Simpan'),
-            );
-          },
+                },
+                child: const Text('Simpan'),
+              );
+            },
+          ),
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
