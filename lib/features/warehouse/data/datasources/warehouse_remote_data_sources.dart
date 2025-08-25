@@ -67,9 +67,11 @@ class WarehouseRemoteDataSourcesImpl
 
   @override
   Future<Response> insertPurchaseNoteFile(
-      {required Map<String, dynamic> data}) {
-    // TODO: implement insertPurchaseNoteFile
-    throw UnimplementedError();
+      {required Map<String, dynamic> data}) async {
+    return await dio.post(
+      'v1/purchase-note/spreadsheet',
+      data: FormData.fromMap(data),
+    );
   }
 
   @override
