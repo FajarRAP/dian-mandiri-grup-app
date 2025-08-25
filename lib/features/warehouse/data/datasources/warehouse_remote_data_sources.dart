@@ -60,9 +60,15 @@ class WarehouseRemoteDataSourcesImpl
 
   @override
   Future<Response> fetchPurchaseNotesDropdown(
-      {String? search, int limit = 10, int page = 1}) {
-    // TODO: implement fetchPurchaseNotesDropdown
-    throw UnimplementedError();
+      {String? search, int limit = 10, int page = 1}) async {
+    return await dio.get(
+      'v1/purchase-note/dropdown',
+      queryParameters: {
+        'search': search,
+        'limit': limit,
+        'page': page,
+      },
+    );
   }
 
   @override
@@ -93,9 +99,12 @@ class WarehouseRemoteDataSourcesImpl
   }
 
   @override
-  Future<Response> insertShippingFee({required Map<String, dynamic> data}) {
-    // TODO: implement insertShippingFee
-    throw UnimplementedError();
+  Future<Response> insertShippingFee(
+      {required Map<String, dynamic> data}) async {
+    return dio.post(
+      'v1/purchase-note/shipment-price',
+      data: data,
+    );
   }
 
   @override

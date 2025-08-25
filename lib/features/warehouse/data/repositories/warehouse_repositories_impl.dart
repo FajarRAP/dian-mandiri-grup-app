@@ -78,21 +78,20 @@ class WarehouseRepositoriesImpl extends WarehouseRepositories {
   @override
   Future<Either<Failure, List<DropdownEntity>>> fetchPurchaseNotesDropdown(
       {String? search, int limit = 10, int page = 1}) async {
-    throw UnimplementedError();
-    // try {
-    //   await Future.delayed(const Duration(milliseconds: 1800));
-    //   final response =
-    //       await warehouseRemoteDataSources.fetchPurchaseNotesDropdown(
-    //     search: search,
-    //     limit: limit,
-    //     page: page,
-    //   );
-    //   final datas = List<Map<String, dynamic>>.from(jsonDecode(response));
+    try {
+      final response =
+          await warehouseRemoteDataSources.fetchPurchaseNotesDropdown(
+        search: search,
+        limit: limit,
+        page: page,
+      );
+      final datas =
+          List<Map<String, dynamic>>.from(response.data['data']['content']);
 
-    //   return Right(datas.map(DropdownEntity.fromJson).toList());
-    // } catch (e) {
-    //   return Left(Failure());
-    // }
+      return Right(datas.map(DropdownEntity.fromJson).toList());
+    } catch (e) {
+      return Left(Failure());
+    }
   }
 
   @override
@@ -172,17 +171,27 @@ class WarehouseRepositoriesImpl extends WarehouseRepositories {
   @override
   Future<Either<Failure, String>> insertShippingFee(
       {required int price, required List<String> purchaseNoteIds}) async {
-    throw UnimplementedError();
-    // try {
-    //   await Future.delayed(const Duration(milliseconds: 1800));
-    //   final response =
-    //       await warehouseRemoteDataSources.insertShippingFee(data: {});
-    //   final data = jsonDecode(response);
+    try {
+      final response = await warehouseRemoteDataSources.insertShippingFee(
+        data: {
+          'date': DateTime.now().toUtc().toIso8601String(),
+          'price': price,
+          'receipt': jsonEncode(purchaseNoteIds),
+        },
+      );
 
-    //   return Right(data['message']);
-    // } catch (e) {
-    //   return Left(Failure());
-    // }
+      return Right(response.data['message']);
+    } on DioException catch (de) {
+      switch (de.response?.statusCode) {
+        case 400:
+          return Left(Failure(message: de.response?.data['message']));
+
+        default:
+          return Left(Failure());
+      }
+    } catch (e) {
+      return Left(Failure());
+    }
   }
 
   @override
