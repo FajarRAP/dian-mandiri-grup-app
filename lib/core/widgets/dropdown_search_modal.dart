@@ -19,14 +19,16 @@ class DropdownSearchModal extends StatefulWidget {
 }
 
 class _DropdownSearchModalState extends State<DropdownSearchModal> {
-  late final TextEditingController _searchController;
   late final Debouncer _debouncer;
+  late final FocusNode _focusNode;
+  late final TextEditingController _searchController;
 
   @override
   void initState() {
     super.initState();
-    _searchController = TextEditingController();
     _debouncer = Debouncer(delay: const Duration(milliseconds: 500));
+    _focusNode = FocusScope.of(context, createDependency: false);
+    _searchController = TextEditingController();
   }
 
   @override
@@ -57,6 +59,7 @@ class _DropdownSearchModalState extends State<DropdownSearchModal> {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: TextField(
             onChanged: (value) => _debouncer.run(() => widget.search(value)),
+            onTapOutside: (event) => _focusNode.unfocus(),
             controller: _searchController,
             decoration: InputDecoration(
               hintText: 'Cari ${widget.title}',
