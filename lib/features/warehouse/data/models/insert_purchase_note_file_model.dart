@@ -21,7 +21,7 @@ class InsertPurchaseNoteFileModel extends InsertPurchaseNoteFileEntity {
 
   Map<String, dynamic> toJson() => {
         'supplier_id': supplierId,
-        'date': date.toIso8601String(),
+        'date': date.toUtc().toIso8601String(),
         'note': note,
       };
 }
