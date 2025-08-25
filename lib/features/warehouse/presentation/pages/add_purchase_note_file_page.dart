@@ -4,11 +4,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../../../../core/common/constants.dart';
 import '../../../../core/common/dropdown_entity.dart';
-import '../../../../core/common/snackbar.dart';
 import '../../../../core/failure/failure.dart';
 import '../../../../core/helpers/helpers.dart';
+import '../../../../core/helpers/top_snackbar.dart';
 import '../../../../core/helpers/validators.dart';
 import '../../../../core/themes/colors.dart';
 import '../../../../core/widgets/dropdowns/supplier_dropdown.dart';
@@ -32,6 +31,7 @@ class _AddPurchaseNoteFilePageState extends State<AddPurchaseNoteFilePage> {
   late final WarehouseCubit _warehouseCubit;
   late final ImagePicker _imagePicker;
   late final GlobalKey<FormState> _formKey;
+  late final FocusNode _focusNode;
   late final TextEditingController _dateController;
   late final TextEditingController _noteController;
   late final TextEditingController _supplierController;
@@ -45,6 +45,7 @@ class _AddPurchaseNoteFilePageState extends State<AddPurchaseNoteFilePage> {
     super.initState();
     _warehouseCubit = context.read<WarehouseCubit>();
     _imagePicker = ImagePicker();
+    _focusNode = FocusScope.of(context, createDependency: false);
     _formKey = GlobalKey<FormState>();
     _dateController = TextEditingController();
     _noteController = TextEditingController();
@@ -65,7 +66,9 @@ class _AddPurchaseNoteFilePageState extends State<AddPurchaseNoteFilePage> {
     final textTheme = theme.textTheme;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Tambah Nota')),
+      appBar: AppBar(
+        title: const Text('Tambah Nota (Excel)'),
+      ),
       body: Form(
         key: _formKey,
         child: ListView(
@@ -78,15 +81,22 @@ class _AddPurchaseNoteFilePageState extends State<AddPurchaseNoteFilePage> {
             const SizedBox(height: 4),
             TextFormField(
               onTap: () => showModalBottomSheet(
-                context: context,
-                builder: (context) => SupplierDropdown(
-                  onTap: (supplier) {
-                    _selectedSupplier = supplier;
-                    _supplierController.text = supplier.value;
-                    context.pop();
-                  },
+                builder: (context) => Padding(
+                  padding: EdgeInsets.only(
+                    bottom: MediaQuery.viewInsetsOf(context).bottom,
+                  ),
+                  child: SupplierDropdown(
+                    onTap: (supplier) {
+                      _selectedSupplier = supplier;
+                      _supplierController.text = supplier.value;
+                      context.pop();
+                    },
+                  ),
                 ),
+                context: context,
+                isScrollControlled: true,
               ),
+              onTapOutside: (event) => _focusNode.unfocus(),
               autovalidateMode: AutovalidateMode.onUserInteraction,
               controller: _supplierController,
               decoration: InputDecoration(
@@ -116,6 +126,7 @@ class _AddPurchaseNoteFilePageState extends State<AddPurchaseNoteFilePage> {
                 _dateController.text = dMyFormat.format(pickedDate);
                 _pickedDate = pickedDate;
               },
+              onTapOutside: (event) => _focusNode.unfocus(),
               autovalidateMode: AutovalidateMode.onUserInteraction,
               controller: _dateController,
               decoration: InputDecoration(
@@ -134,28 +145,32 @@ class _AddPurchaseNoteFilePageState extends State<AddPurchaseNoteFilePage> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                PrimaryButton(
-                  onPressed: () async {
-                    final pickedImage = await _imagePicker.pickImage(
-                        source: ImageSource.gallery);
-
-                    if (pickedImage == null) return;
-
-                    setState(() => _pickedImage = pickedImage);
-                  },
+                SizedBox(
                   width: 150,
-                  child: const Text('Pilih Gambar'),
+                  child: PrimaryButton(
+                    onPressed: () async {
+                      final pickedImage = await _imagePicker.pickImage(
+                          source: ImageSource.gallery);
+
+                      if (pickedImage == null) return;
+
+                      setState(() => _pickedImage = pickedImage);
+                    },
+                    child: const Text('Pilih Gambar'),
+                  ),
                 ),
                 const SizedBox(height: 6),
-                PrimaryOutlineButton(
-                  onPressed: () => showDialog(
-                    context: context,
-                    builder: (context) => PreviewPickedImageDialog(
-                      pickedImagePath: _pickedImage?.path,
-                    ),
-                  ),
+                SizedBox(
                   width: 150,
-                  child: const Text('Preview Gambar'),
+                  child: PrimaryOutlineButton(
+                    onPressed: () => showDialog(
+                      context: context,
+                      builder: (context) => PreviewPickedImageDialog(
+                        pickedImagePath: _pickedImage?.path,
+                      ),
+                    ),
+                    child: const Text('Preview Gambar'),
+                  ),
                 ),
               ],
             ),
@@ -166,13 +181,15 @@ class _AddPurchaseNoteFilePageState extends State<AddPurchaseNoteFilePage> {
             ),
             const SizedBox(height: 4),
             TextFormField(
+              onTapOutside: (event) => _focusNode.unfocus(),
+              controller: _noteController,
               decoration: InputDecoration(
                 hintText: 'Tuliskan catatan jika ada',
               ),
               maxLines: 3,
             ),
             const SizedBox(height: 24),
-            Divider(),
+            const Divider(),
             const SizedBox(height: 24),
             PrimaryOutlineIconButton(
               onPressed: () async {
@@ -197,17 +214,14 @@ class _AddPurchaseNoteFilePageState extends State<AddPurchaseNoteFilePage> {
                   current is InsertPurchaseNoteFileError,
               builder: (context, state) {
                 if (state is InsertPurchaseNoteFileError) {
+                  if (state.failure is! SpreadsheetFailure) {
+                    return const SizedBox();
+                  }
+
                   final spreadsheetFailure =
                       state.failure as SpreadsheetFailure;
-                  final headers = spreadsheetFailure.headers
-                      .map((e) => DataColumn(label: Text(e)))
-                      .toList();
-                  final rows = spreadsheetFailure.rows
-                      .map((e) => DataRow(
-                          cells: e
-                              .map((el) => DataCell(Text(el?['value'] ?? '')))
-                              .toList()))
-                      .toList();
+                  final [headers, rows] =
+                      parseSpreadsheetFailure(spreadsheetFailure);
 
                   return SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
@@ -218,18 +232,21 @@ class _AddPurchaseNoteFilePageState extends State<AddPurchaseNoteFilePage> {
                           columns: headers,
                           rows: rows,
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Dan ${spreadsheetFailure.hiddenColumnCount} kolom tersembunyi lainnya',
-                          style: textTheme.bodyMedium?.copyWith(
-                            color: MaterialColors.error,
-                            fontWeight: FontWeight.w500,
+                        if (spreadsheetFailure.hiddenColumnCount > 0) ...[
+                          const SizedBox(height: 8),
+                          Text(
+                            'Dan ${spreadsheetFailure.hiddenColumnCount} kolom tersembunyi lainnya',
+                            style: textTheme.bodyMedium?.copyWith(
+                              color: MaterialColors.error,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
-                        ),
+                        ],
                       ],
                     ),
                   );
                 }
+
                 return const SizedBox();
               },
             ),
@@ -243,56 +260,52 @@ class _AddPurchaseNoteFilePageState extends State<AddPurchaseNoteFilePage> {
           listenWhen: (previous, current) => current is InsertPurchaseNoteFile,
           listener: (context, state) {
             if (state is InsertPurchaseNoteFileLoaded) {
-              scaffoldMessengerKey.currentState?.showSnackBar(
-                successSnackbar(state.message),
-              );
+              TopSnackbar.successSnackbar(message: state.message);
               context.pop();
               _warehouseCubit.fetchPurchaseNotes();
             }
 
             if (state is InsertPurchaseNoteFileError) {
-              scaffoldMessengerKey.currentState?.showSnackBar(
-                dangerSnackbar(state.failure.message),
-              );
+              TopSnackbar.dangerSnackbar(message: state.failure.message);
             }
           },
           builder: (context, state) {
             if (state is InsertPurchaseNoteFileLoading) {
-              return const PrimaryButton(child: Text('Simpan'));
+              return const SizedBox(
+                width: double.infinity,
+                child: PrimaryButton(child: Text('Simpan')),
+              );
             }
 
-            return PrimaryButton(
-              onPressed: () {
-                if (!_formKey.currentState!.validate()) return;
+            return SizedBox(
+              width: double.infinity,
+              child: PrimaryButton(
+                onPressed: () {
+                  if (!_formKey.currentState!.validate()) return;
 
-                if (_pickedImage == null) {
-                  const message = 'Silakan pilih gambar nota terlebih dahulu';
-                  scaffoldMessengerKey.currentState?.showSnackBar(
-                    dangerSnackbar(message),
+                  if (_pickedImage == null) {
+                    const message = 'Silakan pilih gambar nota terlebih dahulu';
+                    return TopSnackbar.dangerSnackbar(message: message);
+                  }
+
+                  if (_pickedFile == null) {
+                    const message = 'Silakan pilih file barang terlebih dahulu';
+                    return TopSnackbar.dangerSnackbar(message: message);
+                  }
+
+                  final purchaseNote = InsertPurchaseNoteFileEntity(
+                    date: _pickedDate!,
+                    note: _noteController.text,
+                    receipt: _pickedImage!.path,
+                    supplierId: _selectedSupplier!.key,
+                    file: _pickedFile!.path,
                   );
-                  return;
-                }
 
-                if (_pickedFile == null) {
-                  const message = 'Silakan pilih file barang terlebih dahulu';
-                  scaffoldMessengerKey.currentState?.showSnackBar(
-                    dangerSnackbar(message),
-                  );
-                  return;
-                }
-
-                final purchaseNote = InsertPurchaseNoteFileEntity(
-                  date: _pickedDate!,
-                  note: _noteController.text,
-                  receipt: _pickedImage!.path,
-                  supplierId: _selectedSupplier!.key,
-                  file: _pickedFile!.path,
-                );
-
-                _warehouseCubit.insertPurchaseNoteFile(
-                    purchaseNote: purchaseNote);
-              },
-              child: const Text('Simpan'),
+                  _warehouseCubit.insertPurchaseNoteFile(
+                      purchaseNote: purchaseNote);
+                },
+                child: const Text('Simpan'),
+              ),
             );
           },
         ),
