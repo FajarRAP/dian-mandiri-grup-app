@@ -67,9 +67,9 @@ class _DropdownSearchModalState extends State<DropdownSearchModal> {
             ),
           ),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: 12),
         widget.child,
-        const SizedBox(height: 24),
+        const SizedBox(height: 12),
       ],
     );
   }
