@@ -23,12 +23,12 @@ class SpreadsheetFailure extends Failure {
 
   factory SpreadsheetFailure.fromJson(Map<String, dynamic> json) {
     return SpreadsheetFailure(
-      statusCode: json['statusCode'] as int? ?? 500,
-      message: json['message'] as String? ?? 'Terjadi kesalahan',
-      headers: List<String>.from(json['header']),
-      hiddenColumnCount: json['hide_column'],
-      rows: List<dynamic>.from(json['content'])
-          .map((e) => List<Map<String, dynamic>?>.from(e))
+      statusCode: json['statusCode'] ?? 500,
+      message: json['message'] ?? 'Terjadi kesalahan',
+      headers: List<String>.from(json['data']['header']),
+      hiddenColumnCount: json['data']['hide_column'],
+      rows: List<dynamic>.from(json['data']['content'])
+          .map((e) => List<Map<String, dynamic>?>.from(e['column']))
           .toList(),
     );
   }
