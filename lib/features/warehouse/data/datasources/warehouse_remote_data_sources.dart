@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/services.dart';
 
 abstract class WarehouseRemoteDataSources<T> {
   Future<T> deletePurchaseNote({required String purchaseNoteId});
@@ -21,7 +20,8 @@ abstract class WarehouseRemoteDataSources<T> {
   Future<T> insertReturnCost(
       {required String purchaseNoteId, required int amount});
   Future<T> insertShippingFee({required Map<String, dynamic> data});
-  Future<T> updatePurchaseNote({required Map<String, dynamic> data});
+  Future<T> updatePurchaseNote(
+      {required String purchaseNoteId, required Map<String, dynamic> data});
 }
 
 class WarehouseRemoteDataSourcesImpl
@@ -108,68 +108,12 @@ class WarehouseRemoteDataSourcesImpl
   }
 
   @override
-  Future<Response> updatePurchaseNote({required Map<String, dynamic> data}) {
-    // TODO: implement updatePurchaseNote
-    throw UnimplementedError();
-  }
-}
-
-class WarehouseRemoteDataSourcesMock
-    extends WarehouseRemoteDataSources<String> {
-  @override
-  Future<String> deletePurchaseNote({required String purchaseNoteId}) async {
-    return '''{"data": null, "message": "Purchase note deleted successfully"}''';
-  }
-
-  @override
-  Future<String> fetchPurchaseNote({required String purchaseNoteId}) async {
-    return await rootBundle.loadString('dummy_json/purchase_note.json');
-  }
-
-  @override
-  Future<String> fetchPurchaseNotes(
-      {String column = 'name',
-      String order = 'asc',
-      String? search,
-      int limit = 10,
-      int page = 1}) async {
-    return await rootBundle.loadString('dummy_json/purchase_notes.json');
-  }
-
-  @override
-  Future<String> fetchPurchaseNotesDropdown(
-      {String? search, int limit = 10, int page = 1}) async {
-    return await rootBundle
-        .loadString('dummy_json/purchase_notes_dropdown.json');
-  }
-
-  @override
-  Future<String> insertPurchaseNoteFile(
-      {required Map<String, dynamic> data}) async {
-    return '''{"data": null, "message": "Purchase note file inserted successfully"}''';
-  }
-
-  @override
-  Future<String> insertPurchaseNoteManual(
-      {required Map<String, dynamic> data}) async {
-    return '''{"data": null, "message": "Purchase note manual inserted successfully"}''';
-  }
-
-  @override
-  Future<String> insertShippingFee({required Map<String, dynamic> data}) async {
-    return '''{"data": null, "message": "Shipping fee inserted successfully"}''';
-  }
-
-  @override
-  Future<String> updatePurchaseNote(
-      {required Map<String, dynamic> data}) async {
-    return '''{"data": null, "message": "Purchase note updated successfully"}''';
-  }
-
-  @override
-  Future<String> insertReturnCost(
-      {required String purchaseNoteId, required int amount}) {
-    // TODO: implement insertReturnCost
-    throw UnimplementedError();
+  Future<Response> updatePurchaseNote(
+      {required String purchaseNoteId,
+      required Map<String, dynamic> data}) async {
+    return await dio.put(
+      'v1/purchase-note/$purchaseNoteId',
+      data: FormData.fromMap(data),
+    );
   }
 }

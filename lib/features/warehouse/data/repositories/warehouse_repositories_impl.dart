@@ -139,7 +139,6 @@ class WarehouseRepositoriesImpl extends WarehouseRepositories {
       switch (de.response?.statusCode) {
         case 400:
           return Left(Failure(message: de.response?.data['message']));
-
         default:
           return Left(Failure());
       }
@@ -176,7 +175,7 @@ class WarehouseRepositoriesImpl extends WarehouseRepositories {
         data: {
           'date': DateTime.now().toUtc().toIso8601String(),
           'price': price,
-          'receipt': jsonEncode(purchaseNoteIds),
+          'receipt': purchaseNoteIds,
         },
       );
 
@@ -196,17 +195,29 @@ class WarehouseRepositoriesImpl extends WarehouseRepositories {
 
   @override
   Future<Either<Failure, String>> updatePurchaseNote(
-      {required InsertPurchaseNoteManualEntity purchaseNote}) async {
-    throw UnimplementedError();
-    // try {
-    //   await Future.delayed(const Duration(milliseconds: 1800));
-    //   final response =
-    //       await warehouseRemoteDataSources.updatePurchaseNote(data: {});
-    //   final data = jsonDecode(response);
+      {required String purchaseNoteId,
+      required InsertPurchaseNoteManualEntity purchaseNote}) async {
+    try {
+      final payload =
+          InsertPurchaseNoteManualModel.fromEntity(purchaseNote).toJson();
+      if (!purchaseNote.receipt.startsWith('https://')) {
+        payload['receipt'] = await MultipartFile.fromFile(purchaseNote.receipt);
+      }
+      payload['items'] = jsonEncode(payload['items']);
 
-    //   return Right(data['message']);
-    // } catch (e) {
-    //   return Left(Failure());
-    // }
+      final response = await warehouseRemoteDataSources.updatePurchaseNote(
+          data: payload, purchaseNoteId: purchaseNoteId);
+
+      return Right(response.data['message']);
+    } on DioException catch (de) {
+      switch (de.response?.statusCode) {
+        case 400:
+          return Left(Failure(message: de.response?.data['message']));
+        default:
+          return Left(Failure());
+      }
+    } catch (e) {
+      return Left(Failure());
+    }
   }
 }
