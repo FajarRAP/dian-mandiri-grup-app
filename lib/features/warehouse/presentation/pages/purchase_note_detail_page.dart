@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../../../core/helpers/helpers.dart';
 import '../../../../core/helpers/top_snackbar.dart';
@@ -32,10 +35,13 @@ class PurchaseNoteDetailPage extends StatefulWidget {
 class _PurchaseNoteDetailPageState extends State<PurchaseNoteDetailPage> {
   late PurchaseNoteDetailEntity _purchaseNoteDetail;
   late final WarehouseCubit _warehouseCubit;
+  late final ImagePicker _imagePicker;
+  XFile? _pickedImage;
 
   @override
   void initState() {
     super.initState();
+    _imagePicker = ImagePicker();
     _warehouseCubit = context.read<WarehouseCubit>()
       ..fetchPurchaseNote(purchaseNoteId: widget.purchaseNoteId);
   }
@@ -79,14 +85,46 @@ class _PurchaseNoteDetailPageState extends State<PurchaseNoteDetailPage> {
                   style: textTheme.bodyLarge,
                 ),
                 const SizedBox(height: 4),
+                // Receipt Image
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8),
-                  child: Image.network(
-                    _purchaseNoteDetail.receipt,
-                    height: 400,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                  ),
+                  child: _pickedImage == null
+                      ? Image.network(
+                          _purchaseNoteDetail.receipt,
+                          height: 400,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) =>
+                              Container(
+                            alignment: Alignment.center,
+                            color: Colors.grey.shade200,
+                            height: 400,
+                            width: double.infinity,
+                            child: Icon(
+                              Icons.broken_image_rounded,
+                              size: 64,
+                              color: Colors.grey.shade400,
+                            ),
+                          ),
+                        )
+                      : Image.file(
+                          File(_pickedImage!.path),
+                          height: 400,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        ),
+                ),
+                const SizedBox(height: 4),
+                PrimaryButton(
+                  onPressed: () async {
+                    final pickedImage = await _imagePicker.pickImage(
+                        source: ImageSource.gallery);
+
+                    if (pickedImage == null) return;
+
+                    setState(() => _pickedImage = pickedImage);
+                  },
+                  child: const Text('Ganti Gambar'),
                 ),
                 const SizedBox(height: 12),
                 ReadOnlyField(
@@ -97,9 +135,10 @@ class _PurchaseNoteDetailPageState extends State<PurchaseNoteDetailPage> {
                 const SizedBox(height: 24),
                 const Divider(),
                 const SizedBox(height: 24),
+                // List Header
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
+                  children: <Widget>[
                     Text(
                       'Daftar Barang',
                       style: textTheme.titleMedium?.copyWith(
@@ -126,10 +165,12 @@ class _PurchaseNoteDetailPageState extends State<PurchaseNoteDetailPage> {
                   ],
                 ),
                 const SizedBox(height: 12),
+                // List Items
                 ListView.separated(
                   itemBuilder: (context, index) => PurchaseNoteItemCard(
                     isEditable: _purchaseNoteDetail.isEditable,
-                    onDelete: () {},
+                    onDelete: () => setState(
+                        () => _purchaseNoteDetail.items.removeAt(index)),
                     onEdit: () => showDialog(
                       context: context,
                       builder: (context) => EditPurchaseNoteItemDialog(
@@ -224,6 +265,7 @@ class _PurchaseNoteDetailPageState extends State<PurchaseNoteDetailPage> {
                   const SizedBox(height: 12),
                   Row(
                     children: <Widget>[
+                      // Refund Button
                       Expanded(
                         child: PrimaryOutlineButton(
                           onPressed: () => showDialog(
@@ -280,6 +322,7 @@ class _PurchaseNoteDetailPageState extends State<PurchaseNoteDetailPage> {
                         ),
                       ),
                       const SizedBox(width: 8),
+                      // Save Button
                       Expanded(
                         child: BlocConsumer<WarehouseCubit, WarehouseState>(
                           listener: (context, state) {
@@ -307,7 +350,8 @@ class _PurchaseNoteDetailPageState extends State<PurchaseNoteDetailPage> {
                                 final purchaseNote =
                                     InsertPurchaseNoteManualEntity(
                                   date: _purchaseNoteDetail.date,
-                                  receipt: _purchaseNoteDetail.receipt,
+                                  receipt: _pickedImage?.path ??
+                                      _purchaseNoteDetail.receipt,
                                   note: _purchaseNoteDetail.note,
                                   supplierId: _purchaseNoteDetail.supplier.id!,
                                   items: _purchaseNoteDetail.items,
