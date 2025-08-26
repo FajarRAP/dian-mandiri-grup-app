@@ -6,8 +6,8 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../../../core/common/constants.dart';
 import '../../../../core/common/dropdown_entity.dart';
-import '../../../../core/common/snackbar.dart';
 import '../../../../core/helpers/helpers.dart';
+import '../../../../core/helpers/top_snackbar.dart';
 import '../../../../core/helpers/validators.dart';
 import '../../../../core/themes/colors.dart';
 import '../../../../core/widgets/dropdowns/supplier_dropdown.dart';
@@ -35,6 +35,7 @@ class _AddPurchaseNoteManualPageState extends State<AddPurchaseNoteManualPage> {
   late final WarehouseCubit _warehouseCubit;
   late final ImagePicker _imagePicker;
   late final GlobalKey<FormState> _formKey;
+  late final FocusNode _focusNode;
   late final TextEditingController _dateController;
   late final TextEditingController _noteController;
   late final TextEditingController _supplierController;
@@ -49,6 +50,7 @@ class _AddPurchaseNoteManualPageState extends State<AddPurchaseNoteManualPage> {
     _warehouseCubit = context.read<WarehouseCubit>();
     _imagePicker = ImagePicker();
     _formKey = GlobalKey<FormState>();
+    _focusNode = FocusScope.of(context, createDependency: false);
     _dateController = TextEditingController();
     _noteController = TextEditingController();
     _supplierController = TextEditingController();
@@ -68,7 +70,9 @@ class _AddPurchaseNoteManualPageState extends State<AddPurchaseNoteManualPage> {
     final textTheme = theme.textTheme;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Tambah Nota')),
+      appBar: AppBar(
+        title: const Text('Tambah Nota'),
+      ),
       body: Form(
         key: _formKey,
         child: ListView(
@@ -82,21 +86,16 @@ class _AddPurchaseNoteManualPageState extends State<AddPurchaseNoteManualPage> {
             TextFormField(
               onTap: () => showModalBottomSheet(
                 context: context,
-                builder: (context) => Padding(
-                  padding: EdgeInsets.only(
-                    bottom: MediaQuery.viewInsetsOf(context).bottom,
-                  ),
-                  child: SupplierDropdown(
-                    onTap: (supplier) {
-                      _supplierController.text = supplier.value;
-                      _selectedSupplier = supplier;
-                      context.pop();
-                    },
-                  ),
+                builder: (context) => SupplierDropdown(
+                  onTap: (supplier) {
+                    _supplierController.text = supplier.value;
+                    _selectedSupplier = supplier;
+                    context.pop();
+                  },
                 ),
                 isScrollControlled: true,
               ),
-              onTapOutside: (event) => FocusScope.of(context).unfocus(),
+              onTapOutside: (event) => _focusNode.unfocus(),
               autovalidateMode: AutovalidateMode.onUserInteraction,
               controller: _supplierController,
               decoration: InputDecoration(
@@ -126,7 +125,7 @@ class _AddPurchaseNoteManualPageState extends State<AddPurchaseNoteManualPage> {
                 _dateController.text = dMyFormat.format(pickedDate);
                 _pickedDate = pickedDate;
               },
-              onTapOutside: (event) => FocusScope.of(context).unfocus(),
+              onTapOutside: (event) => _focusNode.unfocus(),
               autovalidateMode: AutovalidateMode.onUserInteraction,
               controller: _dateController,
               decoration: InputDecoration(
@@ -145,51 +144,36 @@ class _AddPurchaseNoteManualPageState extends State<AddPurchaseNoteManualPage> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                PrimaryButton(
-                  onPressed: () async {
-                    final pickedImage = await _imagePicker.pickImage(
-                        source: ImageSource.gallery);
-
-                    if (pickedImage == null) return;
-
-                    setState(() => _pickedImage = pickedImage);
-                  },
+                SizedBox(
                   width: 150,
-                  child: const Text('Pilih Gambar'),
-                ),
-                const SizedBox(height: 6),
-                PrimaryOutlineButton(
-                  onPressed: () => showDialog(
-                    context: context,
-                    builder: (context) => PreviewPickedImageDialog(
-                      pickedImagePath: _pickedImage?.path,
-                    ),
+                  child: PrimaryButton(
+                    onPressed: () async {
+                      final pickedImage = await _imagePicker.pickImage(
+                          source: ImageSource.gallery);
+
+                      if (pickedImage == null) return;
+
+                      setState(() => _pickedImage = pickedImage);
+                    },
+                    child: const Text('Pilih Gambar'),
                   ),
-                  width: 150,
-                  child: const Text('Preview Gambar'),
                 ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            RichText(
-              text: TextSpan(
-                children: <InlineSpan>[
-                  TextSpan(
-                    text: 'Jumlah Barang',
-                    style: textTheme.bodyLarge,
-                  ),
-                  WidgetSpan(
-                    alignment: PlaceholderAlignment.middle,
-                    child: Text(
-                      ' ${_items.length}',
-                      style: textTheme.titleLarge?.copyWith(
-                        color: CustomColors.primaryNormal,
-                        fontWeight: FontWeight.w600,
+                if (_pickedImage != null) ...[
+                  const SizedBox(height: 6),
+                  SizedBox(
+                    width: 150,
+                    child: PrimaryOutlineButton(
+                      onPressed: () => showDialog(
+                        context: context,
+                        builder: (context) => PreviewPickedImageDialog(
+                          pickedImagePath: _pickedImage?.path,
+                        ),
                       ),
+                      child: const Text('Preview Gambar'),
                     ),
                   ),
                 ],
-              ),
+              ],
             ),
             const SizedBox(height: 12),
             Text(
@@ -198,7 +182,7 @@ class _AddPurchaseNoteManualPageState extends State<AddPurchaseNoteManualPage> {
             ),
             const SizedBox(height: 4),
             TextFormField(
-              onTapOutside: (event) => FocusScope.of(context).unfocus(),
+              onTapOutside: (event) => _focusNode.unfocus(),
               controller: _noteController,
               decoration: InputDecoration(
                 hintText: 'Tuliskan catatan jika ada',
@@ -206,7 +190,7 @@ class _AddPurchaseNoteManualPageState extends State<AddPurchaseNoteManualPage> {
               maxLines: 3,
             ),
             const SizedBox(height: 24),
-            Divider(),
+            const Divider(),
             const SizedBox(height: 24),
             PrimaryOutlineIconButton(
               onPressed: () => showDialog(
@@ -217,7 +201,6 @@ class _AddPurchaseNoteManualPageState extends State<AddPurchaseNoteManualPage> {
                   },
                 ),
                 context: context,
-                useSafeArea: false,
               ),
               icon: SvgPicture.asset(
                 boxSvg,
@@ -246,8 +229,8 @@ class _AddPurchaseNoteManualPageState extends State<AddPurchaseNoteManualPage> {
               ),
               separatorBuilder: (context, index) => const SizedBox(height: 12),
               itemCount: _items.length,
-              shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
             ),
             const SizedBox(height: 144),
           ],
@@ -275,66 +258,61 @@ class _AddPurchaseNoteManualPageState extends State<AddPurchaseNoteManualPage> {
               ],
             ),
             const SizedBox(height: 16),
-            BlocConsumer<WarehouseCubit, WarehouseState>(
-              buildWhen: (previous, current) =>
-                  current is InsertPurchaseNoteManual,
-              listenWhen: (previous, current) =>
-                  current is InsertPurchaseNoteManual,
-              listener: (context, state) {
-                if (state is InsertPurchaseNoteManualLoaded) {
-                  scaffoldMessengerKey.currentState?.showSnackBar(
-                    successSnackbar(state.message),
-                  );
-                  context.pop();
-                  _warehouseCubit.fetchPurchaseNotes();
-                }
+            SizedBox(
+              width: double.infinity,
+              child: BlocConsumer<WarehouseCubit, WarehouseState>(
+                buildWhen: (previous, current) =>
+                    current is InsertPurchaseNoteManual,
+                listenWhen: (previous, current) =>
+                    current is InsertPurchaseNoteManual,
+                listener: (context, state) {
+                  if (state is InsertPurchaseNoteManualLoaded) {
+                    TopSnackbar.successSnackbar(message: state.message);
+                    context.pop();
+                    _warehouseCubit.fetchPurchaseNotes();
+                  }
 
-                if (state is InsertPurchaseNoteManualError) {
-                  scaffoldMessengerKey.currentState?.showSnackBar(
-                    dangerSnackbar(state.message),
-                  );
-                }
-              },
-              builder: (context, state) {
-                if (state is InsertPurchaseNoteManualLoading) {
-                  return const PrimaryButton(child: Text('Simpan'));
-                }
-
-                return PrimaryButton(
-                  onPressed: () async {
-                    if (!_formKey.currentState!.validate()) return;
-
-                    if (_pickedImage == null) {
-                      const message =
-                          'Silakan pilih gambar nota terlebih dahulu';
-                      scaffoldMessengerKey.currentState?.showSnackBar(
-                        dangerSnackbar(message),
-                      );
-                      return;
-                    }
-
-                    if (_items.isEmpty) {
-                      const message =
-                          'Silakan tambahkan barang terlebih dahulu';
-                      scaffoldMessengerKey.currentState?.showSnackBar(
-                        dangerSnackbar(message),
-                      );
-                      return;
-                    }
-
-                    _warehouseCubit.insertPurchaseNoteManual(
-                      purchaseNote: InsertPurchaseNoteManualEntity(
-                        date: _pickedDate!,
-                        receipt: _pickedImage!.path,
-                        note: _noteController.text,
-                        supplierId: _selectedSupplier!.key,
-                        items: _items,
-                      ),
+                  if (state is InsertPurchaseNoteManualError) {
+                    TopSnackbar.dangerSnackbar(message: state.message);
+                  }
+                },
+                builder: (context, state) {
+                  if (state is InsertPurchaseNoteManualLoading) {
+                    return const PrimaryButton(
+                      child: Text('Simpan'),
                     );
-                  },
-                  child: const Text('Simpan'),
-                );
-              },
+                  }
+
+                  return PrimaryButton(
+                    onPressed: () async {
+                      if (!_formKey.currentState!.validate()) return;
+
+                      if (_pickedImage == null) {
+                        const message =
+                            'Silakan pilih gambar nota terlebih dahulu';
+                        return TopSnackbar.dangerSnackbar(message: message);
+                      }
+
+                      if (_items.isEmpty) {
+                        const message =
+                            'Silakan tambahkan barang terlebih dahulu';
+                        return TopSnackbar.dangerSnackbar(message: message);
+                      }
+
+                      _warehouseCubit.insertPurchaseNoteManual(
+                        purchaseNote: InsertPurchaseNoteManualEntity(
+                          date: _pickedDate!,
+                          receipt: _pickedImage!.path,
+                          note: _noteController.text,
+                          supplierId: _selectedSupplier!.key,
+                          items: _items,
+                        ),
+                      );
+                    },
+                    child: const Text('Simpan'),
+                  );
+                },
+              ),
             ),
           ],
         ),
