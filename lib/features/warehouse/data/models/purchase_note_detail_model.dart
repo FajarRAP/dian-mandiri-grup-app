@@ -23,12 +23,7 @@ class PurchaseNoteDetailModel extends PurchaseNoteDetailEntity {
         id: json['id'],
         isEditable: json['is_editable'],
         returnCost: json['return_cost'],
-        supplier: SupplierModel(
-          id: json['supplier']['id'],
-          avatarUrl: '-',
-          name: json['supplier']['name'],
-          phoneNumber: '-',
-        ),
+        supplier: SupplierModel.fromJson(json['supplier']),
         totalPrice: json['total_price'],
         items: List<Map<String, dynamic>>.from(json['items'])
             .map(WarehouseItemModel.fromJson)
