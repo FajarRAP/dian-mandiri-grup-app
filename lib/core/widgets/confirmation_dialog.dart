@@ -3,15 +3,17 @@ import 'package:go_router/go_router.dart';
 
 import 'primary_button.dart';
 
-class DeleteItemDialog extends StatelessWidget {
-  const DeleteItemDialog({
+class ConfirmationDialog extends StatelessWidget {
+  const ConfirmationDialog({
     super.key,
-    this.onDelete,
+    this.onAction,
+    required this.actionText,
     required this.title,
     required this.body,
   });
 
-  final void Function()? onDelete;
+  final void Function()? onAction;
+  final String actionText;
   final String title;
   final String body;
 
@@ -39,8 +41,8 @@ class DeleteItemDialog extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: PrimaryButton(
-              onPressed: onDelete,
-              child: const Text('Hapus'),
+              onPressed: onAction,
+              child: Text(actionText),
             ),
           ),
           SizedBox(
