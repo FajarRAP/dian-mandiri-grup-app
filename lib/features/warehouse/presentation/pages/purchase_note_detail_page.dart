@@ -234,6 +234,8 @@ class _PurchaseNoteDetailPageState extends State<PurchaseNoteDetailPage> {
                                   current is InsertReturnCost,
                               listener: (context, state) {
                                 if (state is InsertReturnCostLoaded) {
+                                  TopSnackbar.successSnackbar(
+                                      message: state.message);
                                   context.pop();
                                 }
 
@@ -253,11 +255,12 @@ class _PurchaseNoteDetailPageState extends State<PurchaseNoteDetailPage> {
 
                                 return ConfirmationInputDialog(
                                   onAction: (value) async {
+                                    final amount = int.parse(value);
                                     await _warehouseCubit.insertReturnCost(
                                         purchaseNoteId: widget.purchaseNoteId,
-                                        amount: _purchaseNoteDetail.returnCost);
+                                        amount: amount);
                                     setState(() => _purchaseNoteDetail
-                                        .returnCost = int.parse(value));
+                                        .returnCost = amount);
                                   },
                                   actionText: 'Ya',
                                   title: 'Refund',
