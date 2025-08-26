@@ -9,11 +9,13 @@ class PurchaseNoteItemCard extends StatelessWidget {
     super.key,
     this.onDelete,
     this.onEdit,
+    this.isEditable = true,
     required this.warehouseItem,
   });
 
   final void Function()? onDelete;
   final void Function()? onEdit;
+  final bool isEditable;
   final WarehouseItemEntity warehouseItem;
 
   @override
@@ -22,12 +24,67 @@ class PurchaseNoteItemCard extends StatelessWidget {
     final textTheme = theme.textTheme;
 
     return Card(
-      color: MaterialColors.onPrimary,
+      color: MaterialColors.surfaceContainerLowest,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
+            Row(
+              children: <Widget>[
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        warehouseItem.name,
+                        style: textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      Text(
+                        'Informasi Detail Barang',
+                        style: textTheme.bodySmall?.copyWith(
+                          color: MaterialColors.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (isEditable)
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      IconButton(
+                        onPressed: onEdit,
+                        icon: const Icon(Icons.edit_outlined),
+                        iconSize: 20,
+                        style: IconButton.styleFrom(
+                          backgroundColor: MaterialColors.primaryContainer
+                              .withValues(alpha: .3),
+                          foregroundColor: MaterialColors.primary,
+                        ),
+                        tooltip: 'Edit',
+                      ),
+                      const SizedBox(width: 4),
+                      IconButton(
+                        onPressed: onDelete,
+                        icon: const Icon(Icons.delete_outline),
+                        iconSize: 20,
+                        style: IconButton.styleFrom(
+                          backgroundColor: MaterialColors.errorContainer
+                              .withValues(alpha: .3),
+                          foregroundColor: MaterialColors.error,
+                        ),
+                        tooltip: 'Hapus',
+                      ),
+                    ],
+                  ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            const Divider(),
+            const SizedBox(height: 12),
             Text(
               'Informasi Barang',
               style: textTheme.bodySmall?.copyWith(
@@ -47,13 +104,12 @@ class PurchaseNoteItemCard extends StatelessWidget {
               label: 'Barang Reject',
               value: '${warehouseItem.rejectQuantity} pcs',
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 16),
             Text(
               'Informasi Harga',
               style: textTheme.bodySmall?.copyWith(
-                fontWeight: FontWeight.w600,
                 color: Colors.grey.shade800,
-                letterSpacing: 0.5,
+                fontWeight: FontWeight.w600,
               ),
             ),
             const SizedBox(height: 6),
