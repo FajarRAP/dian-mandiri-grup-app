@@ -29,36 +29,45 @@ class _SupplierDropdownState extends State<SupplierDropdown> {
 
   @override
   Widget build(BuildContext context) {
-    return DropdownSearchModal(
-      search: (keyword) =>
-          _supplierCubit.fetchSuppliersDropdown(search: keyword),
-      title: 'Supplier',
-      child: BlocBuilder<SupplierCubit, SupplierState>(
-        bloc: _supplierCubit,
-        buildWhen: (previous, current) => current is FetchSuppliersDropdown,
-        builder: (context, state) {
-          if (state is FetchSuppliersDropdownLoading) {
-            return const Center(
-              child: CircularProgressIndicator.adaptive(),
-            );
-          }
+    return Padding(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.viewInsetsOf(context).bottom,
+      ),
+      child: DropdownSearchModal(
+        search: (keyword) =>
+            _supplierCubit.fetchSuppliersDropdown(search: keyword),
+        title: 'Supplier',
+        child: BlocBuilder<SupplierCubit, SupplierState>(
+          bloc: _supplierCubit,
+          buildWhen: (previous, current) => current is FetchSuppliersDropdown,
+          builder: (context, state) {
+            if (state is FetchSuppliersDropdownLoading) {
+              return const Center(
+                child: CircularProgressIndicator.adaptive(),
+              );
+            }
 
-          if (state is FetchSuppliersDropdownLoaded) {
-            return ListView.separated(
-              itemBuilder: (context, index) => GestureDetector(
-                onTap: () => widget.onTap(state.suppliers[index]),
-                child: DropdownModalItem(
-                  child: Text(state.suppliers[index].value),
+            if (state is FetchSuppliersDropdownLoaded) {
+              return Flexible(
+                child: ListView.separated(
+                  itemBuilder: (context, index) => GestureDetector(
+                    onTap: () => widget.onTap(state.suppliers[index]),
+                    child: DropdownModalItem(
+                      child: Text(state.suppliers[index].value),
+                    ),
+                  ),
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: 12),
+                  itemCount: state.suppliers.length,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shrinkWrap: true,
                 ),
-              ),
-              separatorBuilder: (context, index) => const SizedBox(height: 12),
-              itemCount: state.suppliers.length,
-              shrinkWrap: true,
-            );
-          }
+              );
+            }
 
-          return const SizedBox();
-        },
+            return const SizedBox();
+          },
+        ),
       ),
     );
   }
