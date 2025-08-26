@@ -6,6 +6,6 @@ class PurchaseNoteEntity {
   const PurchaseNoteEntity({
     required this.date,
     required this.receipt,
-    required this.note,
+    this.note,
   });
 }

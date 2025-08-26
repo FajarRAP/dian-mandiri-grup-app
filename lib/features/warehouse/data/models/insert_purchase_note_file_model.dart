@@ -4,7 +4,7 @@ class InsertPurchaseNoteFileModel extends InsertPurchaseNoteFileEntity {
   InsertPurchaseNoteFileModel({
     required super.date,
     required super.receipt,
-    required super.note,
+    super.note,
     required super.supplierId,
     required super.file,
   });

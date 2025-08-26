@@ -4,7 +4,7 @@ class InsertPurchaseNoteFileEntity extends PurchaseNoteEntity {
   const InsertPurchaseNoteFileEntity({
     required super.date,
     required super.receipt,
-    required super.note,
+    super.note,
     required this.supplierId,
     required this.file,
   });

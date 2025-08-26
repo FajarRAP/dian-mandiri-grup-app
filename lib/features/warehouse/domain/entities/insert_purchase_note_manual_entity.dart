@@ -5,7 +5,7 @@ class InsertPurchaseNoteManualEntity extends PurchaseNoteEntity {
   const InsertPurchaseNoteManualEntity({
     required super.date,
     required super.receipt,
-    required super.note,
+    super.note,
     required this.supplierId,
     required this.items,
   });
