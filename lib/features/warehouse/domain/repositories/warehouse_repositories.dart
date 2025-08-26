@@ -33,5 +33,6 @@ abstract class WarehouseRepositories {
   Future<Either<Failure, String>> insertShippingFee(
       {required int price, required List<String> purchaseNoteIds});
   Future<Either<Failure, String>> updatePurchaseNote(
-      {required InsertPurchaseNoteManualEntity purchaseNote});
+      {required String purchaseNoteId,
+      required InsertPurchaseNoteManualEntity purchaseNote});
 }
