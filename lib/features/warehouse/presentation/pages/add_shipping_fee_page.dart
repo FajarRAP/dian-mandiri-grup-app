@@ -26,7 +26,7 @@ class _AddShippingFeePageState extends State<AddShippingFeePage> {
   late final FocusNode _focusNode;
   late final TextEditingController _shippingFeeController;
   late final WarehouseCubit _warehouseCubit;
-  final _selectedPurchaseNoteIds = <DropdownEntity>[];
+  final _selectedPurchaseNote = <DropdownEntity>[];
 
   @override
   void initState() {
@@ -82,7 +82,13 @@ class _AddShippingFeePageState extends State<AddShippingFeePage> {
               onTap: () => showModalBottomSheet(
                 builder: (context) => PurchaseNoteDropdown(
                   onTap: (purchaseNote) {
-                    setState(() => _selectedPurchaseNoteIds.add(purchaseNote));
+                    final isSelected = _selectedPurchaseNote
+                        .any((e) => e.key == purchaseNote.key);
+                    if (isSelected) {
+                      const message = 'Nota sudah dipilih';
+                      return TopSnackbar.dangerSnackbar(message: message);
+                    }
+                    setState(() => _selectedPurchaseNote.add(purchaseNote));
                     context.pop();
                   },
                 ),
@@ -103,11 +109,11 @@ class _AddShippingFeePageState extends State<AddShippingFeePage> {
             ListView.separated(
               itemBuilder: (context, index) => SelectedPurchaseNoteItem(
                 onDelete: () =>
-                    setState(() => _selectedPurchaseNoteIds.removeAt(index)),
-                title: _selectedPurchaseNoteIds[index].value,
+                    setState(() => _selectedPurchaseNote.removeAt(index)),
+                title: _selectedPurchaseNote[index].value,
               ),
               separatorBuilder: (context, index) => const SizedBox(height: 12),
-              itemCount: _selectedPurchaseNoteIds.length,
+              itemCount: _selectedPurchaseNote.length,
               physics: const NeverScrollableScrollPhysics(),
               shrinkWrap: true,
             ),
@@ -140,7 +146,7 @@ class _AddShippingFeePageState extends State<AddShippingFeePage> {
                 onPressed: () async {
                   if (!_formKey.currentState!.validate()) return;
 
-                  if (_selectedPurchaseNoteIds.isEmpty) {
+                  if (_selectedPurchaseNote.isEmpty) {
                     const message = 'Pilih minimal 1 nota';
                     return TopSnackbar.dangerSnackbar(message: message);
                   }
@@ -148,7 +154,7 @@ class _AddShippingFeePageState extends State<AddShippingFeePage> {
                   _warehouseCubit.insertShippingFee(
                     price: int.parse(_shippingFeeController.text),
                     purchaseNoteIds:
-                        _selectedPurchaseNoteIds.map((e) => e.key).toList(),
+                        _selectedPurchaseNote.map((e) => e.key).toList(),
                   );
                 },
                 child: const Text('Simpan'),
