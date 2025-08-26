@@ -2,20 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/common/constants.dart';
-import '../../../../core/common/snackbar.dart';
 import '../../../../core/helpers/helpers.dart';
+import '../../../../core/helpers/top_snackbar.dart';
 import '../../../../core/themes/colors.dart';
+import '../../../../core/widgets/confirmation_input_dialog.dart';
 import '../../../../core/widgets/fab_container.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/widgets/primary_outline_button.dart';
 import '../../../../core/widgets/read_only_field.dart';
+import '../../data/models/warehouse_item_model.dart';
+import '../../domain/entities/insert_purchase_note_manual_entity.dart';
 import '../../domain/entities/purchase_note_detail_entity.dart';
 import '../cubit/warehouse_cubit.dart';
+import '../widgets/edit_purchase_note_item_dialog.dart';
 import '../widgets/purchase_note_item_card.dart';
-import '../widgets/refund_purchase_note_dialog.dart';
 
-class PurchaseNoteDetailPage extends StatelessWidget {
+class PurchaseNoteDetailPage extends StatefulWidget {
   const PurchaseNoteDetailPage({
     super.key,
     required this.purchaseNoteId,
@@ -24,9 +26,22 @@ class PurchaseNoteDetailPage extends StatelessWidget {
   final String purchaseNoteId;
 
   @override
+  State<PurchaseNoteDetailPage> createState() => _PurchaseNoteDetailPageState();
+}
+
+class _PurchaseNoteDetailPageState extends State<PurchaseNoteDetailPage> {
+  late PurchaseNoteDetailEntity _purchaseNoteDetail;
+  late final WarehouseCubit _warehouseCubit;
+
+  @override
+  void initState() {
+    super.initState();
+    _warehouseCubit = context.read<WarehouseCubit>()
+      ..fetchPurchaseNote(purchaseNoteId: widget.purchaseNoteId);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    late final PurchaseNoteDetailEntity purchaseNoteDetail;
-    final warehouseCubit = context.read<WarehouseCubit>();
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
@@ -34,7 +49,7 @@ class PurchaseNoteDetailPage extends StatelessWidget {
         title: const Text('Rincian Nota'),
       ),
       body: BlocBuilder<WarehouseCubit, WarehouseState>(
-        bloc: warehouseCubit..fetchPurchaseNote(purchaseNoteId: purchaseNoteId),
+        bloc: _warehouseCubit,
         buildWhen: (previous, current) => current is FetchPurchaseNote,
         builder: (context, state) {
           if (state is FetchPurchaseNoteLoading) {
@@ -44,19 +59,19 @@ class PurchaseNoteDetailPage extends StatelessWidget {
           }
 
           if (state is FetchPurchaseNoteLoaded) {
-            purchaseNoteDetail = state.purchaseNote;
+            _purchaseNoteDetail = state.purchaseNote;
 
             return ListView(
               padding: const EdgeInsets.all(16),
               children: <Widget>[
                 ReadOnlyField(
                   title: 'Supplier',
-                  value: purchaseNoteDetail.supplier.name,
+                  value: _purchaseNoteDetail.supplier.name,
                 ),
                 const SizedBox(height: 12),
                 ReadOnlyField(
                   title: 'Tanggal',
-                  value: dMyFormat.format(purchaseNoteDetail.date),
+                  value: dMyFormat.format(_purchaseNoteDetail.date),
                 ),
                 const SizedBox(height: 12),
                 Text(
@@ -67,7 +82,7 @@ class PurchaseNoteDetailPage extends StatelessWidget {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8),
                   child: Image.network(
-                    purchaseNoteDetail.receipt,
+                    _purchaseNoteDetail.receipt,
                     height: 400,
                     width: double.infinity,
                     fit: BoxFit.cover,
@@ -77,10 +92,10 @@ class PurchaseNoteDetailPage extends StatelessWidget {
                 ReadOnlyField(
                   maxLines: 3,
                   title: 'Catatan',
-                  value: purchaseNoteDetail.note,
+                  value: _purchaseNoteDetail.note,
                 ),
                 const SizedBox(height: 24),
-                Divider(),
+                const Divider(),
                 const SizedBox(height: 24),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -101,7 +116,7 @@ class PurchaseNoteDetailPage extends StatelessWidget {
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Text(
-                        '${purchaseNoteDetail.items.length} item',
+                        '${_purchaseNoteDetail.items.length} item',
                         style: textTheme.bodySmall?.copyWith(
                           color: CustomColors.primaryNormal,
                           fontWeight: FontWeight.w600,
@@ -113,11 +128,24 @@ class PurchaseNoteDetailPage extends StatelessWidget {
                 const SizedBox(height: 12),
                 ListView.separated(
                   itemBuilder: (context, index) => PurchaseNoteItemCard(
-                    warehouseItem: purchaseNoteDetail.items[index],
+                    isEditable: _purchaseNoteDetail.isEditable,
+                    onDelete: () {},
+                    onEdit: () => showDialog(
+                      context: context,
+                      builder: (context) => EditPurchaseNoteItemDialog(
+                        onTap: (edited) {
+                          setState(() => _purchaseNoteDetail.items[index] =
+                              WarehouseItemModel.fromEntity(edited));
+                          context.pop();
+                        },
+                        warehouseItemEntity: _purchaseNoteDetail.items[index],
+                      ),
+                    ),
+                    warehouseItem: _purchaseNoteDetail.items[index],
                   ),
                   separatorBuilder: (context, index) =>
                       const SizedBox(height: 12),
-                  itemCount: purchaseNoteDetail.items.length,
+                  itemCount: _purchaseNoteDetail.items.length,
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                 ),
@@ -129,154 +157,178 @@ class PurchaseNoteDetailPage extends StatelessWidget {
           return const SizedBox();
         },
       ),
-      floatingActionButton: StatefulBuilder(builder: (context, setState) {
-        return BlocBuilder<WarehouseCubit, WarehouseState>(
-          buildWhen: (previous, current) => current is FetchPurchaseNote,
-          builder: (context, state) {
-            if (state is FetchPurchaseNoteLoaded) {
-              return FABContainer(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[50],
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Column(
-                        children: <Widget>[
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Text(
-                                'Refund',
-                                style: textTheme.bodySmall?.copyWith(
-                                  color: Colors.grey[700],
-                                ),
-                              ),
-                              Text(
-                                '- ${idrCurrencyFormat.format(purchaseNoteDetail.returnCost)}',
-                                style: textTheme.bodySmall?.copyWith(
-                                  color: MaterialColors.error,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 6),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Text(
-                                'Total Bersih',
-                                style: textTheme.bodyMedium?.copyWith(
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.grey[800],
-                                ),
-                              ),
-                              Text(
-                                idrCurrencyFormat.format(
-                                    purchaseNoteDetail.totalPrice -
-                                        purchaseNoteDetail.returnCost),
-                                style: textTheme.bodyLarge?.copyWith(
-                                  color: CustomColors.primaryNormal,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
+      floatingActionButton: BlocBuilder<WarehouseCubit, WarehouseState>(
+        buildWhen: (previous, current) => current is FetchPurchaseNote,
+        builder: (context, state) {
+          if (state is FetchPurchaseNoteLoaded) {
+            final totalPrice = _purchaseNoteDetail.items
+                .fold(0, (prev, e) => prev + e.price * e.quantity);
+
+            return FABContainer(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
                     ),
-                    const SizedBox(height: 12),
-                    Row(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: Colors.grey.shade50,
+                    ),
+                    child: Column(
                       children: <Widget>[
-                        Expanded(
-                          child: PrimaryOutlineButton(
-                            onPressed: () => showDialog(
-                              context: context,
-                              builder: (context) => RefundPurchaseNoteDialog(
-                                onRefund: (amount) {
-                                  setState(() =>
-                                      purchaseNoteDetail.returnCost = amount);
-                                  context.pop();
-                                },
-                              ),
-                            ),
-                            height: 40,
-                            child: Text(
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            Text(
                               'Refund',
-                              style: textTheme.bodyMedium?.copyWith(
-                                color: CustomColors.primaryNormal,
-                                fontWeight: FontWeight.w500,
+                              style: textTheme.bodySmall?.copyWith(
+                                color: Colors.grey.shade700,
                               ),
                             ),
-                          ),
+                            Text(
+                              '- ${idrCurrencyFormat.format(_purchaseNoteDetail.returnCost)}',
+                              style: textTheme.bodySmall?.copyWith(
+                                color: MaterialColors.error,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: BlocConsumer<WarehouseCubit, WarehouseState>(
-                            listener: (context, state) {
-                              if (state is InsertReturnCostLoaded) {
-                                scaffoldMessengerKey.currentState?.showSnackBar(
-                                  successSnackbar(state.message),
-                                );
-                              }
-
-                              if (state is InsertReturnCostError) {
-                                scaffoldMessengerKey.currentState?.showSnackBar(
-                                  dangerSnackbar(state.message),
-                                );
-                              }
-                            },
-                            buildWhen: (previous, current) =>
-                                current is InsertReturnCost,
-                            builder: (context, state) {
-                              if (state is InsertReturnCostLoading) {
-                                return PrimaryButton(
-                                  height: 40,
-                                  child: Text(
-                                    'Simpan',
-                                    style: textTheme.bodyMedium?.copyWith(
-                                      color: Colors.grey.shade700,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                );
-                              }
-
-                              return PrimaryButton(
-                                onPressed: () async =>
-                                    await warehouseCubit.insertReturnCost(
-                                        purchaseNoteId: purchaseNoteId,
-                                        amount: purchaseNoteDetail.returnCost),
-                                height: 40,
-                                child: Text(
-                                  'Simpan',
-                                  style: textTheme.bodyMedium?.copyWith(
-                                    color: MaterialColors.onPrimary,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
+                        const SizedBox(height: 6),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            Text(
+                              'Total Bersih',
+                              style: textTheme.bodyMedium?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: Colors.grey.shade800,
+                              ),
+                            ),
+                            Text(
+                              idrCurrencyFormat.format(
+                                  totalPrice - _purchaseNoteDetail.returnCost),
+                              style: textTheme.bodyLarge?.copyWith(
+                                color: CustomColors.primaryNormal,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                  ],
-                ),
-              );
-            }
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: PrimaryOutlineButton(
+                          onPressed: () => showDialog(
+                            context: context,
+                            builder: (context) =>
+                                BlocConsumer<WarehouseCubit, WarehouseState>(
+                              buildWhen: (previous, current) =>
+                                  current is InsertReturnCost,
+                              listener: (context, state) {
+                                if (state is InsertReturnCostLoaded) {
+                                  context.pop();
+                                }
 
-            return const SizedBox();
-          },
-        );
-      }),
+                                if (state is InsertReturnCostError) {
+                                  TopSnackbar.dangerSnackbar(
+                                      message: state.message);
+                                }
+                              },
+                              builder: (context, state) {
+                                if (state is InsertReturnCostLoading) {
+                                  return ConfirmationInputDialog(
+                                    actionText: 'Ya',
+                                    title: 'Refund',
+                                    body: 'Masukkan nominal pengembalian uang',
+                                  );
+                                }
+
+                                return ConfirmationInputDialog(
+                                  onAction: (value) async {
+                                    await _warehouseCubit.insertReturnCost(
+                                        purchaseNoteId: widget.purchaseNoteId,
+                                        amount: _purchaseNoteDetail.returnCost);
+                                    setState(() => _purchaseNoteDetail
+                                        .returnCost = int.parse(value));
+                                  },
+                                  actionText: 'Ya',
+                                  title: 'Refund',
+                                  body: 'Masukkan nominal pengembalian uang',
+                                );
+                              },
+                            ),
+                          ),
+                          height: 40,
+                          child: Text(
+                            'Refund',
+                            style: textTheme.bodyMedium?.copyWith(
+                              color: CustomColors.primaryNormal,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: BlocConsumer<WarehouseCubit, WarehouseState>(
+                          listener: (context, state) {
+                            if (state is UpdatePurchaseNoteLoaded) {
+                              TopSnackbar.successSnackbar(
+                                  message: state.message);
+                            }
+
+                            if (state is UpdatePurchaseNoteError) {
+                              TopSnackbar.dangerSnackbar(
+                                  message: state.message);
+                            }
+                          },
+                          buildWhen: (previous, current) =>
+                              current is UpdatePurchaseNote,
+                          builder: (context, state) {
+                            if (state is UpdatePurchaseNoteLoading) {
+                              return const PrimaryButton(
+                                child: Text('Simpan'),
+                              );
+                            }
+
+                            return PrimaryButton(
+                              onPressed: () async {
+                                final purchaseNote =
+                                    InsertPurchaseNoteManualEntity(
+                                  date: _purchaseNoteDetail.date,
+                                  receipt: _purchaseNoteDetail.receipt,
+                                  note: _purchaseNoteDetail.note,
+                                  supplierId: _purchaseNoteDetail.supplier.id!,
+                                  items: _purchaseNoteDetail.items,
+                                );
+                                await _warehouseCubit.updatePurchaseNote(
+                                  purchaseNoteId: _purchaseNoteDetail.id,
+                                  purchaseNote: purchaseNote,
+                                );
+                              },
+                              child: const Text('Simpan'),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            );
+          }
+
+          return const SizedBox();
+        },
+      ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       resizeToAvoidBottomInset: false,
     );
