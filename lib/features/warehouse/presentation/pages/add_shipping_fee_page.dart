@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/common/dropdown_entity.dart';
 import '../../../../core/helpers/top_snackbar.dart';
 import '../../../../core/helpers/validators.dart';
-import '../../../../core/themes/colors.dart';
 import '../../../../core/widgets/dropdowns/purchase_note_dropdown.dart';
 import '../../../../core/widgets/fab_container.dart';
 import '../../../../core/widgets/primary_button.dart';
@@ -22,8 +21,8 @@ class AddShippingFeePage extends StatefulWidget {
 }
 
 class _AddShippingFeePageState extends State<AddShippingFeePage> {
-  late final GlobalKey<FormState> _formKey;
   late final FocusNode _focusNode;
+  late final GlobalKey<FormState> _formKey;
   late final TextEditingController _shippingFeeController;
   late final WarehouseCubit _warehouseCubit;
   final _selectedPurchaseNote = <DropdownEntity>[];
@@ -31,8 +30,8 @@ class _AddShippingFeePageState extends State<AddShippingFeePage> {
   @override
   void initState() {
     super.initState();
-    _formKey = GlobalKey<FormState>();
     _focusNode = FocusScope.of(context, createDependency: false);
+    _formKey = GlobalKey<FormState>();
     _shippingFeeController = TextEditingController();
     _warehouseCubit = context.read<WarehouseCubit>();
   }
@@ -45,9 +44,6 @@ class _AddShippingFeePageState extends State<AddShippingFeePage> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final textTheme = theme.textTheme;
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Tambah Ongkos Kirim'),
@@ -57,27 +53,17 @@ class _AddShippingFeePageState extends State<AddShippingFeePage> {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: <Widget>[
-            Text(
-              'Harga Ongkos Kirim',
-              style: textTheme.bodyLarge,
-            ),
-            const SizedBox(height: 8),
             TextFormField(
               onTapOutside: (event) => _focusNode.unfocus(),
               autovalidateMode: AutovalidateMode.onUserInteraction,
               controller: _shippingFeeController,
               decoration: InputDecoration(
-                hintText: 'Harga Ongkos Kirim',
+                labelText: 'Harga Ongkos Kirim',
               ),
               keyboardType: TextInputType.number,
               validator: nullValidator,
             ),
             const SizedBox(height: 24),
-            Text(
-              'Pilih Nota',
-              style: textTheme.bodyLarge,
-            ),
-            const SizedBox(height: 8),
             TextFormField(
               onTap: () => showModalBottomSheet(
                 builder: (context) => PurchaseNoteDropdown(
@@ -103,20 +89,23 @@ class _AddShippingFeePageState extends State<AddShippingFeePage> {
               ),
               readOnly: true,
             ),
-            const SizedBox(height: 24),
-            Divider(color: MaterialColors.outlineVariant),
-            const SizedBox(height: 24),
-            ListView.separated(
-              itemBuilder: (context, index) => SelectedPurchaseNoteItem(
-                onDelete: () =>
-                    setState(() => _selectedPurchaseNote.removeAt(index)),
-                title: _selectedPurchaseNote[index].value,
+            if (_selectedPurchaseNote.isNotEmpty) ...[
+              const SizedBox(height: 24),
+              const Divider(),
+              const SizedBox(height: 24),
+              ListView.separated(
+                itemBuilder: (context, index) => SelectedPurchaseNoteItem(
+                  onDelete: () =>
+                      setState(() => _selectedPurchaseNote.removeAt(index)),
+                  title: _selectedPurchaseNote[index].value,
+                ),
+                separatorBuilder: (context, index) =>
+                    const SizedBox(height: 12),
+                itemCount: _selectedPurchaseNote.length,
+                physics: const NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
               ),
-              separatorBuilder: (context, index) => const SizedBox(height: 12),
-              itemCount: _selectedPurchaseNote.length,
-              physics: const NeverScrollableScrollPhysics(),
-              shrinkWrap: true,
-            ),
+            ],
           ],
         ),
       ),
