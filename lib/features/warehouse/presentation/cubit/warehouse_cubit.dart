@@ -238,11 +238,15 @@ class WarehouseCubit extends Cubit<WarehouseState> {
   }
 
   Future<void> updatePurchaseNote({
+    required String purchaseNoteId,
     required InsertPurchaseNoteManualEntity purchaseNote,
   }) async {
     emit(UpdatePurchaseNoteLoading());
 
-    final result = await _updatePurchaseNoteUseCase(purchaseNote);
+    final result = await _updatePurchaseNoteUseCase({
+      'purchase_note_id': purchaseNoteId,
+      'purchase_note': purchaseNote,
+    });
 
     result.fold(
       (l) => emit(UpdatePurchaseNoteError(message: l.message)),
