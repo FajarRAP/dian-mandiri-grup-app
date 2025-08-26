@@ -58,6 +58,7 @@ class SupplierRemoteDataSourcesImpl
         'search': search,
         'limit': limit,
         'page': page,
+        'show_all': true,
       },
     );
   }
