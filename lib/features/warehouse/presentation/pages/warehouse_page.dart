@@ -6,7 +6,7 @@ import '../../../../core/common/constants.dart';
 import '../../../../core/helpers/debouncer.dart';
 import '../../../../core/helpers/top_snackbar.dart';
 import '../../../../core/themes/colors.dart';
-import '../../../../core/widgets/delete_item_dialog.dart';
+import '../../../../core/widgets/confirmation_dialog.dart';
 import '../../../tracker/presentation/widgets/action_button.dart';
 import '../../../tracker/presentation/widgets/expandable_fab.dart';
 import '../cubit/warehouse_cubit.dart';
@@ -173,19 +173,21 @@ class _WarehousePageState extends State<WarehousePage> {
                               },
                               builder: (context, state) {
                                 if (state is DeletePurchaseNoteLoading) {
-                                  return DeleteItemDialog(
+                                  return ConfirmationDialog(
+                                    actionText: 'Hapus',
                                     body:
                                         'Apakah Anda yakin ingin menghapus nota ini?',
                                     title: 'Hapus Nota',
                                   );
                                 }
 
-                                return DeleteItemDialog(
-                                  onDelete: () =>
+                                return ConfirmationDialog(
+                                  onAction: () =>
                                       _warehouseCubit.deletePurchaseNote(
                                     purchaseNoteId:
                                         _warehouseCubit.purchaseNotes[index].id,
                                   ),
+                                  actionText: 'Hapus',
                                   body:
                                       'Apakah Anda yakin ingin menghapus nota ini?',
                                   title: 'Hapus Nota',
