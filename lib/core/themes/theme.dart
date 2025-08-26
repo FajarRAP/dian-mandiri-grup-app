@@ -71,10 +71,6 @@ final theme = ThemeData(
       color: MaterialColors.onSurfaceVariant,
       fontSize: 16,
     ),
-    labelStyle: TextStyle(
-      color: MaterialColors.onSurfaceVariant,
-      fontSize: 16,
-    ),
     prefixIconColor: MaterialColors.outlineVariant,
   ),
   progressIndicatorTheme: const ProgressIndicatorThemeData(
