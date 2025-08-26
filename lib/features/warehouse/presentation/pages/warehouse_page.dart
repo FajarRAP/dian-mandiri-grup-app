@@ -43,212 +43,221 @@ class _WarehousePageState extends State<WarehousePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: RefreshIndicator(
-        onRefresh: _warehouseCubit.fetchPurchaseNotes,
-        child: NotificationListener<ScrollNotification>(
-          onNotification: (scrollState) {
-            if (scrollState.runtimeType == ScrollEndNotification &&
-                _warehouseCubit.state is! ListPaginateLast) {
-              _warehouseCubit.fetchPurchaseNotesPaginate(
-                column: _column,
-                order: _order,
-                search: _search,
-              );
-            }
+    return BlocListener<WarehouseCubit, WarehouseState>(
+      listener: (context, state) {
+        if (state is UpdatePurchaseNoteLoaded) {
+          _warehouseCubit.fetchPurchaseNotes();
+        }
+      },
+      child: Scaffold(
+        body: RefreshIndicator(
+          onRefresh: _warehouseCubit.fetchPurchaseNotes,
+          child: NotificationListener<ScrollNotification>(
+            onNotification: (scrollState) {
+              if (scrollState.runtimeType == ScrollEndNotification &&
+                  _warehouseCubit.state is! ListPaginateLast) {
+                _warehouseCubit.fetchPurchaseNotesPaginate(
+                  column: _column,
+                  order: _order,
+                  search: _search,
+                );
+              }
 
-            return false;
-          },
-          child: CustomScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            slivers: <Widget>[
-              // App Bar
-              SliverAppBar(
-                backgroundColor: MaterialColors.surfaceContainerLowest,
-                floating: true,
-                pinned: true,
-                snap: true,
-                title: const Text('Barang Masuk'),
-                actions: <Widget>[
-                  PopupMenuButton(
-                    onSelected: (value) {
-                      final params = value.split(',');
-                      _column = params.first;
-                      _order = params.last;
-                      _warehouseCubit.fetchPurchaseNotes(
-                        column: _column,
-                        order: _order,
-                        search: _search,
-                      );
-                    },
-                    icon: const Icon(Icons.sort),
-                    tooltip: 'Urutkan',
-                    itemBuilder: (context) => const [
-                      PopupMenuItem(
-                        value: 'created_at,asc',
-                        child: Text('Tanggal Naik'),
-                      ),
-                      PopupMenuItem(
-                        value: 'created_at,desc',
-                        child: Text('Tanggal Turun'),
-                      ),
-                      PopupMenuItem(
-                        value: 'total_item,asc',
-                        child: Text('Barang Naik'),
-                      ),
-                      PopupMenuItem(
-                        value: 'total_item,desc',
-                        child: Text('Barang Turun'),
-                      ),
-                    ],
-                  ),
-                ],
-                bottom: PreferredSize(
-                  preferredSize: const Size.fromHeight(88),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: TextFormField(
-                      onChanged: (value) {
-                        _search = value;
-                        _debouncer.run(() => _warehouseCubit.fetchPurchaseNotes(
-                            column: _column, order: _order, search: _search));
+              return false;
+            },
+            child: CustomScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              slivers: <Widget>[
+                // App Bar
+                SliverAppBar(
+                  backgroundColor: MaterialColors.surfaceContainerLowest,
+                  floating: true,
+                  pinned: true,
+                  snap: true,
+                  title: const Text('Barang Masuk'),
+                  actions: <Widget>[
+                    PopupMenuButton(
+                      onSelected: (value) {
+                        final params = value.split(',');
+                        _column = params.first;
+                        _order = params.last;
+                        _warehouseCubit.fetchPurchaseNotes(
+                          column: _column,
+                          order: _order,
+                          search: _search,
+                        );
                       },
-                      onTapOutside: (event) => _focusNode.unfocus(),
-                      decoration: const InputDecoration(
-                        hintText: 'Cari Nota',
-                        prefixIcon: Icon(Icons.search),
+                      icon: const Icon(Icons.sort),
+                      tooltip: 'Urutkan',
+                      itemBuilder: (context) => const [
+                        PopupMenuItem(
+                          value: 'created_at,asc',
+                          child: Text('Tanggal Naik'),
+                        ),
+                        PopupMenuItem(
+                          value: 'created_at,desc',
+                          child: Text('Tanggal Turun'),
+                        ),
+                        PopupMenuItem(
+                          value: 'total_item,asc',
+                          child: Text('Barang Naik'),
+                        ),
+                        PopupMenuItem(
+                          value: 'total_item,desc',
+                          child: Text('Barang Turun'),
+                        ),
+                      ],
+                    ),
+                  ],
+                  bottom: PreferredSize(
+                    preferredSize: const Size.fromHeight(88),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: TextFormField(
+                        onChanged: (value) {
+                          _search = value;
+                          _debouncer.run(() =>
+                              _warehouseCubit.fetchPurchaseNotes(
+                                  column: _column,
+                                  order: _order,
+                                  search: _search));
+                        },
+                        onTapOutside: (event) => _focusNode.unfocus(),
+                        decoration: const InputDecoration(
+                          hintText: 'Cari Nota',
+                          prefixIcon: Icon(Icons.search),
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-
-              // List
-              BlocBuilder<WarehouseCubit, WarehouseState>(
-                bloc: _warehouseCubit,
-                buildWhen: (previous, current) => current is FetchPurchaseNotes,
-                builder: (context, state) {
-                  if (state is FetchPurchaseNotesLoading) {
-                    return const SliverFillRemaining(
-                      child: Center(
-                        child: CircularProgressIndicator.adaptive(),
-                      ),
-                    );
-                  }
-
-                  if (state is FetchPurchaseNotesLoaded) {
-                    if (state.purchaseNotes.isEmpty) {
+                // List
+                BlocBuilder<WarehouseCubit, WarehouseState>(
+                  bloc: _warehouseCubit,
+                  buildWhen: (previous, current) =>
+                      current is FetchPurchaseNotes,
+                  builder: (context, state) {
+                    if (state is FetchPurchaseNotesLoading) {
                       return const SliverFillRemaining(
                         child: Center(
-                          child: Text('Belum ada nota'),
+                          child: CircularProgressIndicator.adaptive(),
                         ),
                       );
                     }
 
-                    return SliverPadding(
-                      padding: const EdgeInsets.all(16),
-                      sliver: SliverList.separated(
-                        itemBuilder: (context, index) => PurchaseNoteItem(
-                          onTap: () => context.push(
-                            purchaseNoteDetailRoute,
-                            extra: _warehouseCubit.purchaseNotes[index].id,
+                    if (state is FetchPurchaseNotesLoaded) {
+                      if (state.purchaseNotes.isEmpty) {
+                        return const SliverFillRemaining(
+                          child: Center(
+                            child: Text('Belum ada nota'),
                           ),
-                          onDelete: () => showDialog(
-                            context: context,
-                            builder: (context) =>
-                                BlocConsumer<WarehouseCubit, WarehouseState>(
-                              listener: (context, state) {
-                                if (state is DeletePurchaseNoteLoaded) {
-                                  TopSnackbar.successSnackbar(
-                                      message: state.message);
-                                  context.pop();
-                                  _warehouseCubit.fetchPurchaseNotes();
-                                }
+                        );
+                      }
 
-                                if (state is DeletePurchaseNoteError) {
-                                  TopSnackbar.dangerSnackbar(
-                                      message: state.message);
-                                  context.pop();
-                                }
-                              },
-                              builder: (context, state) {
-                                if (state is DeletePurchaseNoteLoading) {
+                      return SliverPadding(
+                        padding: const EdgeInsets.all(16),
+                        sliver: SliverList.separated(
+                          itemBuilder: (context, index) => PurchaseNoteItem(
+                            onTap: () => context.push(
+                              purchaseNoteDetailRoute,
+                              extra: _warehouseCubit.purchaseNotes[index].id,
+                            ),
+                            onDelete: () => showDialog(
+                              context: context,
+                              builder: (context) =>
+                                  BlocConsumer<WarehouseCubit, WarehouseState>(
+                                listener: (context, state) {
+                                  if (state is DeletePurchaseNoteLoaded) {
+                                    TopSnackbar.successSnackbar(
+                                        message: state.message);
+                                    context.pop();
+                                    _warehouseCubit.fetchPurchaseNotes();
+                                  }
+
+                                  if (state is DeletePurchaseNoteError) {
+                                    TopSnackbar.dangerSnackbar(
+                                        message: state.message);
+                                    context.pop();
+                                  }
+                                },
+                                builder: (context, state) {
+                                  if (state is DeletePurchaseNoteLoading) {
+                                    return ConfirmationDialog(
+                                      actionText: 'Hapus',
+                                      body:
+                                          'Apakah Anda yakin ingin menghapus nota ini?',
+                                      title: 'Hapus Nota',
+                                    );
+                                  }
+
                                   return ConfirmationDialog(
+                                    onAction: () =>
+                                        _warehouseCubit.deletePurchaseNote(
+                                      purchaseNoteId: _warehouseCubit
+                                          .purchaseNotes[index].id,
+                                    ),
                                     actionText: 'Hapus',
                                     body:
                                         'Apakah Anda yakin ingin menghapus nota ini?',
                                     title: 'Hapus Nota',
                                   );
-                                }
-
-                                return ConfirmationDialog(
-                                  onAction: () =>
-                                      _warehouseCubit.deletePurchaseNote(
-                                    purchaseNoteId:
-                                        _warehouseCubit.purchaseNotes[index].id,
-                                  ),
-                                  actionText: 'Hapus',
-                                  body:
-                                      'Apakah Anda yakin ingin menghapus nota ini?',
-                                  title: 'Hapus Nota',
-                                );
-                              },
+                                },
+                              ),
                             ),
+                            purchaseNoteSummary:
+                                _warehouseCubit.purchaseNotes[index],
                           ),
-                          purchaseNoteSummary:
-                              _warehouseCubit.purchaseNotes[index],
+                          separatorBuilder: (context, index) =>
+                              const SizedBox(height: 12),
+                          itemCount: _warehouseCubit.purchaseNotes.length,
                         ),
-                        separatorBuilder: (context, index) =>
-                            const SizedBox(height: 12),
-                        itemCount: _warehouseCubit.purchaseNotes.length,
-                      ),
-                    );
-                  }
+                      );
+                    }
 
-                  return const SliverToBoxAdapter();
-                },
-              ),
-
-              // Widget when Pagination
-              BlocBuilder<WarehouseCubit, WarehouseState>(
-                buildWhen: (previous, current) => current is ListPaginate,
-                builder: (context, state) {
-                  if (state is ListPaginateLoading) {
-                    return SliverPadding(
-                      padding: const EdgeInsets.all(16),
-                      sliver: const SliverToBoxAdapter(
-                        child: Center(
-                          child: CircularProgressIndicator.adaptive(),
+                    return const SliverToBoxAdapter();
+                  },
+                ),
+                // Widget when Pagination
+                BlocBuilder<WarehouseCubit, WarehouseState>(
+                  buildWhen: (previous, current) => current is ListPaginate,
+                  builder: (context, state) {
+                    if (state is ListPaginateLoading) {
+                      return SliverPadding(
+                        padding: const EdgeInsets.all(16),
+                        sliver: const SliverToBoxAdapter(
+                          child: Center(
+                            child: CircularProgressIndicator.adaptive(),
+                          ),
                         ),
-                      ),
-                    );
-                  }
+                      );
+                    }
 
-                  return const SliverToBoxAdapter();
-                },
-              ),
-            ],
+                    return const SliverToBoxAdapter();
+                  },
+                ),
+              ],
+            ),
           ),
         ),
+        floatingActionButton: ExpandableFAB(
+          distance: 100,
+          children: <Widget>[
+            ActionButton(
+              onPressed: () => context.push(addPurchaseNoteManualRoute),
+              icon: Icons.add,
+            ),
+            ActionButton(
+              onPressed: () => context.push(addPurchaseNoteFileRoute),
+              icon: Icons.folder,
+            ),
+            ActionButton(
+              onPressed: () => context.push(addShippingFeeRoute),
+              icon: Icons.currency_exchange,
+            ),
+          ],
+        ),
+        resizeToAvoidBottomInset: false,
       ),
-      floatingActionButton: ExpandableFAB(
-        distance: 100,
-        children: <Widget>[
-          ActionButton(
-            onPressed: () => context.push(addPurchaseNoteManualRoute),
-            icon: Icons.add,
-          ),
-          ActionButton(
-            onPressed: () => context.push(addPurchaseNoteFileRoute),
-            icon: Icons.folder,
-          ),
-          ActionButton(
-            onPressed: () => context.push(addShippingFeeRoute),
-            icon: Icons.currency_exchange,
-          ),
-        ],
-      ),
-      resizeToAvoidBottomInset: false,
     );
   }
 }
