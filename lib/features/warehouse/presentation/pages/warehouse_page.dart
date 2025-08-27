@@ -12,54 +12,38 @@ import '../../../tracker/presentation/widgets/expandable_fab.dart';
 import '../cubit/warehouse_cubit.dart';
 import '../widgets/purchase_note_item.dart';
 
-class WarehousePage extends StatefulWidget {
+class WarehousePage extends StatelessWidget {
   const WarehousePage({super.key});
 
   @override
-  State<WarehousePage> createState() => _WarehousePageState();
-}
-
-class _WarehousePageState extends State<WarehousePage> {
-  late final Debouncer _debouncer;
-  late final FocusNode _focusNode;
-  late final WarehouseCubit _warehouseCubit;
-  var _column = 'created_at';
-  var _order = 'asc';
-  String? _search;
-
-  @override
-  void initState() {
-    super.initState();
-    _debouncer = Debouncer(delay: const Duration(milliseconds: 500));
-    _focusNode = FocusScope.of(context, createDependency: false);
-    _warehouseCubit = context.read<WarehouseCubit>()..fetchPurchaseNotes();
-  }
-
-  @override
-  void dispose() {
-    _debouncer.cancel();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final debouncer = Debouncer(delay: const Duration(milliseconds: 500));
+    final focusNode = FocusScope.of(context, createDependency: false);
+    final warehouseCubit = context.read<WarehouseCubit>()..fetchPurchaseNotes();
+    var column = 'created_at';
+    var order = 'asc';
+    String? search;
+
     return BlocListener<WarehouseCubit, WarehouseState>(
       listener: (context, state) {
-        if (state is UpdatePurchaseNoteLoaded) {
-          _warehouseCubit.fetchPurchaseNotes();
+        if (state is UpdatePurchaseNoteLoaded ||
+            state is InsertPurchaseNoteFileLoaded ||
+            state is InsertPurchaseNoteManualLoaded ||
+            state is DeletePurchaseNoteLoaded) {
+          warehouseCubit.fetchPurchaseNotes();
         }
       },
       child: Scaffold(
         body: RefreshIndicator(
-          onRefresh: _warehouseCubit.fetchPurchaseNotes,
+          onRefresh: warehouseCubit.fetchPurchaseNotes,
           child: NotificationListener<ScrollNotification>(
             onNotification: (scrollState) {
               if (scrollState.runtimeType == ScrollEndNotification &&
-                  _warehouseCubit.state is! ListPaginateLast) {
-                _warehouseCubit.fetchPurchaseNotesPaginate(
-                  column: _column,
-                  order: _order,
-                  search: _search,
+                  warehouseCubit.state is! ListPaginateLast) {
+                warehouseCubit.fetchPurchaseNotesPaginate(
+                  column: column,
+                  order: order,
+                  search: search,
                 );
               }
 
@@ -79,12 +63,12 @@ class _WarehousePageState extends State<WarehousePage> {
                     PopupMenuButton(
                       onSelected: (value) {
                         final params = value.split(',');
-                        _column = params.first;
-                        _order = params.last;
-                        _warehouseCubit.fetchPurchaseNotes(
-                          column: _column,
-                          order: _order,
-                          search: _search,
+                        column = params.first;
+                        order = params.last;
+                        warehouseCubit.fetchPurchaseNotes(
+                          column: column,
+                          order: order,
+                          search: search,
                         );
                       },
                       icon: const Icon(Icons.sort),
@@ -115,14 +99,11 @@ class _WarehousePageState extends State<WarehousePage> {
                       padding: const EdgeInsets.all(16),
                       child: TextFormField(
                         onChanged: (value) {
-                          _search = value;
-                          _debouncer.run(() =>
-                              _warehouseCubit.fetchPurchaseNotes(
-                                  column: _column,
-                                  order: _order,
-                                  search: _search));
+                          search = value;
+                          debouncer.run(() => warehouseCubit.fetchPurchaseNotes(
+                              column: column, order: order, search: search));
                         },
-                        onTapOutside: (event) => _focusNode.unfocus(),
+                        onTapOutside: (event) => focusNode.unfocus(),
                         decoration: const InputDecoration(
                           hintText: 'Cari Nota',
                           prefixIcon: Icon(Icons.search),
@@ -133,7 +114,7 @@ class _WarehousePageState extends State<WarehousePage> {
                 ),
                 // List
                 BlocBuilder<WarehouseCubit, WarehouseState>(
-                  bloc: _warehouseCubit,
+                  bloc: warehouseCubit,
                   buildWhen: (previous, current) =>
                       current is FetchPurchaseNotes,
                   builder: (context, state) {
@@ -160,7 +141,7 @@ class _WarehousePageState extends State<WarehousePage> {
                           itemBuilder: (context, index) => PurchaseNoteItem(
                             onTap: () => context.push(
                               purchaseNoteDetailRoute,
-                              extra: _warehouseCubit.purchaseNotes[index].id,
+                              extra: warehouseCubit.purchaseNotes[index].id,
                             ),
                             onDelete: () => showDialog(
                               context: context,
@@ -171,7 +152,7 @@ class _WarehousePageState extends State<WarehousePage> {
                                     TopSnackbar.successSnackbar(
                                         message: state.message);
                                     context.pop();
-                                    _warehouseCubit.fetchPurchaseNotes();
+                                    warehouseCubit.fetchPurchaseNotes();
                                   }
 
                                   if (state is DeletePurchaseNoteError) {
@@ -192,8 +173,8 @@ class _WarehousePageState extends State<WarehousePage> {
 
                                   return ConfirmationDialog(
                                     onAction: () =>
-                                        _warehouseCubit.deletePurchaseNote(
-                                      purchaseNoteId: _warehouseCubit
+                                        warehouseCubit.deletePurchaseNote(
+                                      purchaseNoteId: warehouseCubit
                                           .purchaseNotes[index].id,
                                     ),
                                     actionText: 'Hapus',
@@ -205,11 +186,11 @@ class _WarehousePageState extends State<WarehousePage> {
                               ),
                             ),
                             purchaseNoteSummary:
-                                _warehouseCubit.purchaseNotes[index],
+                                warehouseCubit.purchaseNotes[index],
                           ),
                           separatorBuilder: (context, index) =>
                               const SizedBox(height: 12),
-                          itemCount: _warehouseCubit.purchaseNotes.length,
+                          itemCount: warehouseCubit.purchaseNotes.length,
                         ),
                       );
                     }
