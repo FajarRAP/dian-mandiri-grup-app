@@ -159,19 +159,21 @@ class _AddPurchaseNoteFilePageState extends State<AddPurchaseNoteFilePage> {
                     child: const Text('Pilih Gambar'),
                   ),
                 ),
-                const SizedBox(height: 6),
-                SizedBox(
-                  width: 150,
-                  child: PrimaryOutlineButton(
-                    onPressed: () => showDialog(
-                      context: context,
-                      builder: (context) => PreviewPickedImageDialog(
-                        pickedImagePath: _pickedImage?.path,
+                if (_pickedImage != null) ...[
+                  const SizedBox(height: 6),
+                  SizedBox(
+                    width: 150,
+                    child: PrimaryOutlineButton(
+                      onPressed: () => showDialog(
+                        context: context,
+                        builder: (context) => PreviewPickedImageDialog(
+                          pickedImagePath: _pickedImage?.path,
+                        ),
                       ),
+                      child: const Text('Preview Gambar'),
                     ),
-                    child: const Text('Preview Gambar'),
                   ),
-                ),
+                ],
               ],
             ),
             const SizedBox(height: 12),
@@ -205,7 +207,7 @@ class _AddPurchaseNoteFilePageState extends State<AddPurchaseNoteFilePage> {
               },
               icon: Icon(Icons.folder),
               label: _pickedFile == null
-                  ? Text('Tambah Barang')
+                  ? const Text('Pilih File Excel')
                   : Text(_pickedFile!.name, overflow: TextOverflow.ellipsis),
             ),
             const SizedBox(height: 24),
@@ -254,32 +256,31 @@ class _AddPurchaseNoteFilePageState extends State<AddPurchaseNoteFilePage> {
           ],
         ),
       ),
-      floatingActionButton: FABContainer(
-        child: BlocConsumer<WarehouseCubit, WarehouseState>(
-          buildWhen: (previous, current) => current is InsertPurchaseNoteFile,
-          listenWhen: (previous, current) => current is InsertPurchaseNoteFile,
-          listener: (context, state) {
-            if (state is InsertPurchaseNoteFileLoaded) {
-              TopSnackbar.successSnackbar(message: state.message);
-              context.pop();
-              _warehouseCubit.fetchPurchaseNotes();
-            }
+      floatingActionButton: SizedBox(
+        width: double.infinity,
+        child: FABContainer(
+          child: BlocConsumer<WarehouseCubit, WarehouseState>(
+            buildWhen: (previous, current) => current is InsertPurchaseNoteFile,
+            listenWhen: (previous, current) =>
+                current is InsertPurchaseNoteFile,
+            listener: (context, state) {
+              if (state is InsertPurchaseNoteFileLoaded) {
+                TopSnackbar.successSnackbar(message: state.message);
+                context.pop();
+              }
 
-            if (state is InsertPurchaseNoteFileError) {
-              TopSnackbar.dangerSnackbar(message: state.failure.message);
-            }
-          },
-          builder: (context, state) {
-            if (state is InsertPurchaseNoteFileLoading) {
-              return const SizedBox(
-                width: double.infinity,
-                child: PrimaryButton(child: Text('Simpan')),
-              );
-            }
+              if (state is InsertPurchaseNoteFileError) {
+                TopSnackbar.dangerSnackbar(message: state.failure.message);
+              }
+            },
+            builder: (context, state) {
+              if (state is InsertPurchaseNoteFileLoading) {
+                return const PrimaryButton(
+                  child: Text('Simpan'),
+                );
+              }
 
-            return SizedBox(
-              width: double.infinity,
-              child: PrimaryButton(
+              return PrimaryButton(
                 onPressed: () {
                   if (!_formKey.currentState!.validate()) return;
 
@@ -305,9 +306,9 @@ class _AddPurchaseNoteFilePageState extends State<AddPurchaseNoteFilePage> {
                       purchaseNote: purchaseNote);
                 },
                 child: const Text('Simpan'),
-              ),
-            );
-          },
+              );
+            },
+          ),
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,

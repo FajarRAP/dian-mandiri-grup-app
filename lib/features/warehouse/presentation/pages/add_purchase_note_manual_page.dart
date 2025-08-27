@@ -209,7 +209,7 @@ class _AddPurchaseNoteManualPageState extends State<AddPurchaseNoteManualPage> {
                   BlendMode.srcIn,
                 ),
               ),
-              label: Text('Tambah Barang'),
+              label: const Text('Tambah Barang'),
             ),
             const SizedBox(height: 12),
             ListView.separated(
@@ -269,7 +269,6 @@ class _AddPurchaseNoteManualPageState extends State<AddPurchaseNoteManualPage> {
                   if (state is InsertPurchaseNoteManualLoaded) {
                     TopSnackbar.successSnackbar(message: state.message);
                     context.pop();
-                    _warehouseCubit.fetchPurchaseNotes();
                   }
 
                   if (state is InsertPurchaseNoteManualError) {
