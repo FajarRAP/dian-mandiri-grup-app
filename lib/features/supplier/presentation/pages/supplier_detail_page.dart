@@ -16,9 +16,12 @@ class SupplierDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final supplierCubit = context.read<SupplierCubit>();
+    final focusNode = FocusScope.of(context, createDependency: false);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Detail Supplier')),
+      appBar: AppBar(
+        title: const Text('Detail Supplier'),
+      ),
       body: BlocBuilder<SupplierCubit, SupplierState>(
         bloc: supplierCubit..fetchSupplier(supplierId: supplierId),
         buildWhen: (previous, current) => current is FetchSupplier,
@@ -43,39 +46,43 @@ class SupplierDetailPage extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
                     CircleAvatar(
-                      backgroundColor: Colors.grey[300],
+                      backgroundColor: Colors.grey.shade300,
                       backgroundImage:
                           NetworkImage(state.supplierDetail.avatarUrl),
                       radius: 50,
                     ),
                     const SizedBox(height: 24),
                     TextFormField(
+                      onTapOutside: (event) => focusNode.unfocus(),
                       decoration: InputDecoration(
-                        hintText: 'Nama',
+                        labelText: 'Nama',
                       ),
                       initialValue: state.supplierDetail.name,
                       readOnly: true,
                     ),
                     const SizedBox(height: 12),
                     TextFormField(
+                      onTapOutside: (event) => focusNode.unfocus(),
                       decoration: InputDecoration(
-                        hintText: 'Email',
+                        labelText: 'Email',
                       ),
                       initialValue: state.supplierDetail.email,
                       readOnly: true,
                     ),
                     const SizedBox(height: 12),
                     TextFormField(
+                      onTapOutside: (event) => focusNode.unfocus(),
                       decoration: InputDecoration(
-                        hintText: 'Telepon',
+                        labelText: 'Telepon',
                       ),
                       initialValue: state.supplierDetail.phoneNumber,
                       readOnly: true,
                     ),
                     const SizedBox(height: 12),
                     TextFormField(
+                      onTapOutside: (event) => focusNode.unfocus(),
                       decoration: InputDecoration(
-                        hintText: 'Alamat',
+                        labelText: 'Alamat',
                       ),
                       initialValue: state.supplierDetail.address,
                       readOnly: true,
@@ -89,7 +96,6 @@ class SupplierDetailPage extends StatelessWidget {
           return const SizedBox();
         },
       ),
-      resizeToAvoidBottomInset: true,
     );
   }
 }
