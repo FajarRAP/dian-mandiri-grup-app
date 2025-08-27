@@ -25,7 +25,8 @@ class SupplierItem extends StatelessWidget {
       elevation: 1,
       child: ListTile(
         leading: CircleAvatar(
-          backgroundImage: NetworkImage(supplier.avatarUrl),
+          backgroundImage: AssetImage(appIcon),
+          foregroundImage: NetworkImage(supplier.avatarUrl),
         ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
