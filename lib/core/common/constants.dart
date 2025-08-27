@@ -45,6 +45,8 @@ const cancelReceiptIcon = "$iconsPath/cancel.png";
 const reportReceiptIcon = "$iconsPath/report.png";
 const checkReceiptStatusIcon = "$iconsPath/check.png";
 const googleIcon = "$iconsPath/google.png";
+const personIcon = "$iconsPath/person.png";
+const appIcon = "$iconsPath/app-icon.png";
 
 const soundsPath = "sounds";
 const successSound = "$soundsPath/success.mp3";
