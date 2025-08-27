@@ -5,9 +5,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../../../../core/common/constants.dart';
 import '../../../../core/common/shadows.dart';
-import '../../../../core/common/snackbar.dart';
+import '../../../../core/helpers/top_snackbar.dart';
 import '../../../../core/helpers/validators.dart';
 import '../../../../core/themes/colors.dart';
 import '../../../../core/widgets/primary_button.dart';
@@ -55,142 +54,158 @@ class _AddSupplierPageState extends State<AddSupplierPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Tambah Supplier')),
+      appBar: AppBar(
+        title: const Text('Tambah Supplier'),
+      ),
       body: Center(
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
             boxShadow: cardBoxShadow,
-            color: MaterialColors.onPrimary,
+            color: MaterialColors.surfaceContainerLowest,
           ),
           margin: const EdgeInsets.all(16),
           padding: const EdgeInsets.all(24),
           child: Form(
             key: _formKey,
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  GestureDetector(
-                    onTap: () async {
-                      final pickedImage = await _imagePicker.pickImage(
-                        source: ImageSource.gallery,
-                      );
-
-                      setState(() => _pickedImage = pickedImage);
-                    },
-                    child: CircleAvatar(
-                      backgroundColor: Colors.grey[300],
-                      backgroundImage: _pickedImage == null
-                          ? null
-                          : FileImage(File(_pickedImage!.path)),
-                      radius: 50,
-                      child: Align(
-                        alignment: Alignment.bottomRight,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: CustomColors.primaryNormal,
-                            shape: BoxShape.circle,
-                          ),
-                          padding: const EdgeInsets.all(4),
-                          child: const Icon(
-                            Icons.edit,
-                            color: MaterialColors.onPrimary,
+            child: ListView(
+              shrinkWrap: true,
+              children: <Widget>[
+                // Avatar
+                GestureDetector(
+                  onTap: () async {
+                    final pickedImage = await _imagePicker.pickImage(
+                      imageQuality: 60,
+                      source: ImageSource.gallery,
+                    );
+                    setState(() => _pickedImage = pickedImage);
+                  },
+                  child: UnconstrainedBox(
+                    child: Stack(
+                      children: <Widget>[
+                        CircleAvatar(
+                          radius: 50,
+                          backgroundColor: Colors.grey.shade300,
+                          foregroundImage: _pickedImage != null
+                              ? FileImage(File(_pickedImage!.path))
+                              : null,
+                          child: _pickedImage == null
+                              ? Icon(
+                                  Icons.person_outline,
+                                  color: Colors.grey.shade400,
+                                  size: 50,
+                                )
+                              : null,
+                        ),
+                        Positioned(
+                          right: 0,
+                          bottom: 0,
+                          child: Container(
+                            decoration: const BoxDecoration(
+                              color: CustomColors.primaryNormal,
+                              shape: BoxShape.circle,
+                            ),
+                            padding: const EdgeInsets.all(4),
+                            child: const Icon(
+                              Icons.edit,
+                              color: MaterialColors.onPrimary,
+                            ),
                           ),
                         ),
-                      ),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 24),
-                  TextFormField(
-                    autovalidateMode: AutovalidateMode.onUserInteraction,
-                    controller: _nameController,
-                    decoration: InputDecoration(
-                      hintText: 'Nama',
-                    ),
-                    validator: nullValidator,
+                ),
+                const SizedBox(height: 24),
+                TextFormField(
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  controller: _nameController,
+                  decoration: InputDecoration(
+                    labelText: 'Nama',
                   ),
-                  const SizedBox(height: 12),
-                  TextFormField(
-                    autovalidateMode: AutovalidateMode.onUserInteraction,
-                    controller: _emailController,
-                    decoration: InputDecoration(
-                      hintText: 'Email',
-                    ),
-                    keyboardType: TextInputType.emailAddress,
-                    validator: emailValidator,
+                  textInputAction: TextInputAction.next,
+                  validator: nullValidator,
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  controller: _emailController,
+                  decoration: InputDecoration(
+                    labelText: 'Email',
                   ),
-                  const SizedBox(height: 12),
-                  TextFormField(
-                    autovalidateMode: AutovalidateMode.onUserInteraction,
-                    controller: _phoneController,
-                    decoration: InputDecoration(
-                      hintText: 'Telepon',
-                    ),
-                    keyboardType: TextInputType.phone,
-                    validator: nullValidator,
+                  keyboardType: TextInputType.emailAddress,
+                  textInputAction: TextInputAction.next,
+                  validator: emailValidator,
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  controller: _phoneController,
+                  decoration: InputDecoration(
+                    labelText: 'Telepon',
                   ),
-                  const SizedBox(height: 12),
-                  TextFormField(
-                    autovalidateMode: AutovalidateMode.onUserInteraction,
-                    controller: _addressController,
-                    decoration: InputDecoration(
-                      hintText: 'Alamat',
-                    ),
-                    keyboardType: TextInputType.multiline,
-                    maxLines: 2,
-                    validator: nullValidator,
+                  keyboardType: TextInputType.phone,
+                  textInputAction: TextInputAction.next,
+                  validator: nullValidator,
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  controller: _addressController,
+                  decoration: InputDecoration(
+                    alignLabelWithHint: true,
+                    labelText: 'Alamat',
                   ),
-                  const SizedBox(height: 24),
-                  BlocConsumer<SupplierCubit, SupplierState>(
-                    listener: (context, state) {
-                      if (state is InsertSupplierError) {
-                        scaffoldMessengerKey.currentState
-                            ?.showSnackBar(dangerSnackbar(state.message));
-                      }
+                  keyboardType: TextInputType.multiline,
+                  maxLines: 2,
+                  validator: nullValidator,
+                ),
+                const SizedBox(height: 24),
+                BlocConsumer<SupplierCubit, SupplierState>(
+                  buildWhen: (previous, current) => current is InsertSupplier,
+                  listener: (context, state) {
+                    if (state is InsertSupplierError) {
+                      TopSnackbar.dangerSnackbar(message: state.message);
+                    }
 
-                      if (state is InsertSupplierLoaded) {
-                        scaffoldMessengerKey.currentState
-                            ?.showSnackBar(successSnackbar(state.message));
-                        _supplierCubit.fetchSuppliers();
-                        context.pop();
-                      }
-                    },
-                    buildWhen: (previous, current) => current is InsertSupplier,
-                    builder: (context, state) {
-                      if (state is InsertSupplierLoading) {
-                        return const PrimaryButton(child: Text('Simpan'));
-                      }
-
-                      return PrimaryButton(
-                        onPressed: () {
-                          if (!_formKey.currentState!.validate()) return;
-
-                          if (_pickedImage == null) {
-                            const message =
-                                'Silakan pilih gambar terlebih dahulu';
-                            scaffoldMessengerKey.currentState
-                                ?.showSnackBar(dangerSnackbar(message));
-                            return;
-                          }
-
-                          final supplierDetail = SupplierDetailEntity(
-                            address: _addressController.text,
-                            avatarUrl: _pickedImage!.path,
-                            email: _emailController.text,
-                            name: _nameController.text,
-                            phoneNumber: _phoneController.text,
-                          );
-
-                          _supplierCubit.insertSupplier(
-                              supplierDetailEntity: supplierDetail);
-                        },
-                        child: const Text('Simpan'),
+                    if (state is InsertSupplierLoaded) {
+                      TopSnackbar.successSnackbar(message: state.message);
+                      context.pop();
+                    }
+                  },
+                  builder: (context, state) {
+                    if (state is InsertSupplierLoading) {
+                      return const PrimaryButton(
+                        child: Text('Simpan'),
                       );
-                    },
-                  ),
-                ],
-              ),
+                    }
+
+                    return PrimaryButton(
+                      onPressed: () {
+                        if (!_formKey.currentState!.validate()) return;
+
+                        if (_pickedImage == null) {
+                          const message =
+                              'Silakan pilih gambar terlebih dahulu';
+                          return TopSnackbar.dangerSnackbar(message: message);
+                        }
+
+                        final supplierDetail = SupplierDetailEntity(
+                          address: _addressController.text,
+                          avatarUrl: _pickedImage!.path,
+                          email: _emailController.text,
+                          name: _nameController.text,
+                          phoneNumber: _phoneController.text,
+                        );
+
+                        _supplierCubit.insertSupplier(
+                            supplierDetailEntity: supplierDetail);
+                      },
+                      child: const Text('Simpan'),
+                    );
+                  },
+                ),
+              ],
             ),
           ),
         ),
