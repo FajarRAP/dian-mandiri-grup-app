@@ -38,7 +38,12 @@ class SupplierRepositoriesImpl extends SupplierRepositories {
       int page = 1}) async {
     try {
       final response = await supplierRemoteDataSources.fetchSuppliers(
-          column: column, order: order, search: search);
+        column: column,
+        order: order,
+        search: search,
+        limit: limit,
+        page: page,
+      );
       final datas =
           List<Map<String, dynamic>>.from(response.data['data']['content']);
 
@@ -53,7 +58,10 @@ class SupplierRepositoriesImpl extends SupplierRepositories {
       {String? search, int limit = 10, int page = 1}) async {
     try {
       final response = await supplierRemoteDataSources.fetchSuppliersDropdown(
-          search: search);
+        search: search,
+        limit: limit,
+        page: page,
+      );
       final datas =
           List<Map<String, dynamic>>.from(response.data['data']['content']);
 
@@ -69,7 +77,7 @@ class SupplierRepositoriesImpl extends SupplierRepositories {
     try {
       final supplierDetail =
           SupplierDetailModel.fromEntity(supplierDetailEntity);
-      final payload = supplierDetail.toJsonWithAvatar();
+      final payload = supplierDetail.toJson();
       payload['avatar'] = await MultipartFile.fromFile(payload['avatar']);
 
       final response =
@@ -94,10 +102,8 @@ class SupplierRepositoriesImpl extends SupplierRepositories {
     try {
       final supplierDetail =
           SupplierDetailModel.fromEntity(supplierDetailEntity);
-      final payload = supplierDetail.avatarUrl.startsWith('https://')
-          ? supplierDetail.toJsonWithoutAvatar()
-          : supplierDetail.toJsonWithAvatar();
-      if (payload.containsKey('avatar')) {
+      final payload = supplierDetail.toJson();
+      if (!supplierDetail.avatarUrl.startsWith('https://')) {
         payload['avatar'] = await MultipartFile.fromFile(payload['avatar']);
       }
 
