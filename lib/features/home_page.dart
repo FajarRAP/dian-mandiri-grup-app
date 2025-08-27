@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
 import '../core/common/constants.dart';
@@ -166,29 +165,29 @@ class HomePage extends StatelessWidget {
                             children: <Widget>[
                               GridMenuItem(
                                 onTap: () => context.push(warehouseRoute),
-                                path: boxSvg,
+                                icon: Icons.factory_outlined,
                                 title: 'Barang Mentah',
                               ),
                               GridMenuItem(
-                                path: categorySvg,
+                                icon: Icons.category_outlined,
                                 title: 'Kategori Barang',
                               ),
                               GridMenuItem(
-                                path: boxSvg,
+                                icon: Icons.inventory_2_outlined,
                                 title: 'Manajemen Stok',
                               ),
                               GridMenuItem(
                                 onTap: () => context.push(supplierRoute),
-                                path: personSquareSvg,
+                                icon: Icons.person_outline,
                                 title: 'Supplier',
                               ),
                               GridMenuItem(
-                                path: reportV3Svg,
+                                icon: Icons.receipt_long_outlined,
                                 title: 'Pembelian Barang',
                               ),
                               GridMenuItem(
                                 onTap: () => context.push(trackerRoute),
-                                path: categorySquareSvg,
+                                icon: Icons.local_shipping_outlined,
                                 title: 'Ship Tracker',
                               ),
                             ],
@@ -207,7 +206,7 @@ class HomePage extends StatelessWidget {
                                 child: Text(
                                   'Lihat Semua',
                                   style: textTheme.labelSmall?.copyWith(
-                                    color: Colors.grey[600],
+                                    color: Colors.grey.shade600,
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
@@ -234,37 +233,37 @@ class GridMenuItem extends StatelessWidget {
   const GridMenuItem({
     super.key,
     this.onTap,
-    required this.path,
+    required this.icon,
     required this.title,
   });
 
   final void Function()? onTap;
-  final String path;
+  final IconData icon;
   final String title;
 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
 
-    return InkWell(
-      onTap: onTap,
-      child: Column(
-        children: <Widget>[
-          SvgPicture.asset(
-            path,
-            colorFilter: ColorFilter.mode(
-              CustomColors.primaryNormal,
-              BlendMode.srcIn,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(10),
+        overlayColor: WidgetStatePropertyAll(MaterialColors.primaryContainer),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Icon(icon, color: CustomColors.primaryNormal),
+            const SizedBox(height: 10),
+            Text(
+              title,
+              style: textTheme.labelSmall?.copyWith(
+                fontWeight: FontWeight.w500,
+              ),
             ),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            title,
-            style: textTheme.labelSmall?.copyWith(
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
