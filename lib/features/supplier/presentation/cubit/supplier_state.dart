@@ -5,6 +5,14 @@ sealed class SupplierState {}
 
 final class SupplierInitial extends SupplierState {}
 
+class ListPaginate extends SupplierState {}
+
+class ListPaginateLoading extends ListPaginate {}
+
+class ListPaginateLoaded extends ListPaginate {}
+
+class ListPaginateLast extends ListPaginate {}
+
 class FetchSupplier extends SupplierState {}
 
 class FetchSupplierLoading extends FetchSupplier {}

@@ -32,6 +32,9 @@ class SupplierCubit extends Cubit<SupplierState> {
   final InsertSupplierUseCase _insertSupplierUseCase;
   final UpdateSupplierUseCase _updateSupplierUseCase;
 
+  var _currentPage = 1;
+  final suppliers = <SupplierEntity>[];
+
   Future<void> fetchSupplier({required String supplierId}) async {
     emit(FetchSupplierLoading());
 
@@ -45,20 +48,56 @@ class SupplierCubit extends Cubit<SupplierState> {
 
   Future<void> fetchSuppliers({
     String? search,
-    String? column,
-    String? order,
+    String column = 'name',
+    String order = 'asc',
   }) async {
+    _currentPage = 1;
+
     emit(FetchSuppliersLoading());
 
     final result = await _fetchSuppliersUseCase({
       'search': search,
-      'column': column ?? 'name',
-      'order': order ?? 'asc',
+      'column': column,
+      'order': order,
     });
 
     result.fold(
       (l) => emit(FetchSuppliersError(message: l.message)),
-      (r) => emit(FetchSuppliersLoaded(suppliers: r)),
+      (r) {
+        suppliers
+          ..clear()
+          ..addAll(r);
+        emit(FetchSuppliersLoaded(suppliers: r));
+      },
+    );
+  }
+
+  Future<void> fetchSuppliersPaginate({
+    String? search,
+    String column = 'name',
+    String order = 'asc',
+  }) async {
+    emit(ListPaginateLoading());
+
+    final result = await _fetchSuppliersUseCase({
+      'search': search,
+      'column': column,
+      'order': order,
+      'page': ++_currentPage,
+    });
+
+    result.fold(
+      (l) => emit(FetchSuppliersError(message: l.message)),
+      (r) {
+        if (r.isEmpty) {
+          _currentPage = 1;
+          emit(ListPaginateLast());
+        } else {
+          suppliers.addAll(r);
+          emit(ListPaginateLoaded());
+          emit(FetchSuppliersLoaded(suppliers: r));
+        }
+      },
     );
   }
 
