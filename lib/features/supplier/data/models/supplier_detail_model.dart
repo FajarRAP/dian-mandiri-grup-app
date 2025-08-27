@@ -30,16 +30,7 @@ class SupplierDetailModel extends SupplierDetailEntity {
         email: json['email'],
       );
 
-  Map<String, dynamic> toJsonWithAvatar() => {
-        'id': id,
-        'avatar': avatarUrl,
-        'name': name,
-        'phone_number': phoneNumber,
-        'address': address,
-        'email': email,
-      };
-
-  Map<String, dynamic> toJsonWithoutAvatar() => {
+  Map<String, dynamic> toJson() => {
         'id': id,
         'name': name,
         'phone_number': phoneNumber,
