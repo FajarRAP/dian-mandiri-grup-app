@@ -67,6 +67,8 @@ final theme = ThemeData(
         width: 2,
       ),
     ),
+    filled: true,
+    fillColor: Colors.grey.shade50,
     hintStyle: TextStyle(
       color: MaterialColors.onSurfaceVariant,
       fontSize: 16,
