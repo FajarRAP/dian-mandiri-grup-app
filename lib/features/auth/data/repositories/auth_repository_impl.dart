@@ -8,6 +8,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import '../../../../core/common/constants.dart';
 import '../../../../core/exceptions/refresh_token.dart';
 import '../../../../core/failure/failure.dart';
+import '../../../../core/helpers/top_snackbar.dart';
 import '../../domain/entities/user_entity.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../datasources/auth_remote_data_source.dart';
@@ -83,6 +84,9 @@ class AuthRepositoryImpl implements AuthRepository {
       await storage.write(key: userKey, value: jsonEncode(data['user']));
       await storage.write(key: accessTokenKey, value: data['access_token']);
       await storage.write(key: refreshTokenKey, value: data['refresh_token']);
+
+      // Too lazy to change repositories return type, so i used TopSnackbar here without context
+      TopSnackbar.successSnackbar(message: response.data['message']);
 
       return Right(UserModel.fromJson(data['user']));
     } on DioException {
