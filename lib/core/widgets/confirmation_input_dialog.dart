@@ -9,14 +9,18 @@ class ConfirmationInputDialog extends StatefulWidget {
     super.key,
     this.onAction,
     required this.actionText,
-    required this.title,
     required this.body,
+    this.decoration,
+    this.keyboardType,
+    required this.title,
   });
 
   final void Function(String value)? onAction;
   final String actionText;
-  final String title;
   final String body;
+  final InputDecoration? decoration;
+  final TextInputType? keyboardType;
+  final String title;
 
   @override
   State<ConfirmationInputDialog> createState() =>
@@ -56,26 +60,25 @@ class _ConfirmationInputDialogState extends State<ConfirmationInputDialog> {
           children: <Widget>[
             Text(
               widget.title,
-              style:
-                  textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+              style: textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
             ),
             const SizedBox(height: 8),
             Text(
               widget.body,
-              style:
-                  textTheme.bodyMedium?.copyWith(color: Colors.grey.shade600),
+              style: textTheme.bodyMedium?.copyWith(
+                color: Colors.grey.shade600,
+              ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),
             TextFormField(
               onTapOutside: (_) => _focusNode.unfocus(),
               controller: _controller,
-              decoration: const InputDecoration(
-                label: Text('Nominal Refund'),
-                prefixText: 'Rp. ',
-              ),
-              keyboardType: TextInputType.number,
-              validator: nullValidator,
+              decoration: widget.decoration,
+              keyboardType: widget.keyboardType,
+              validator: inputValidator,
             ),
             const SizedBox(height: 24),
             SizedBox(
