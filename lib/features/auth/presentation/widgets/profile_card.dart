@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/common/shadows.dart';
+import '../../../../core/themes/colors.dart';
+
 class ProfileCard extends StatelessWidget {
   const ProfileCard({
     super.key,
@@ -17,37 +20,31 @@ class ProfileCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
 
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(4),
-        color: Colors.white,
-        boxShadow: <BoxShadow>[
-          BoxShadow(
-            blurRadius: 16,
-            spreadRadius: 0,
-            offset: const Offset(0, 4),
-            color: Colors.black.withValues(alpha: .12),
-          )
-        ],
+        boxShadow: cardBoxShadow,
+        color: MaterialColors.surfaceContainerLowest,
       ),
       padding: const EdgeInsets.all(10),
       width: double.infinity,
       child: Row(
-        children: [
+        children: <Widget>[
           Icon(
             icon,
-            color: colorScheme.primary,
+            color: CustomColors.primaryNormal,
           ),
           const SizedBox(width: 18),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+            children: <Widget>[
               Text(
                 title,
-                style: textTheme.titleMedium,
+                style: textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w500,
+                ),
               ),
               Text(
                 body,
