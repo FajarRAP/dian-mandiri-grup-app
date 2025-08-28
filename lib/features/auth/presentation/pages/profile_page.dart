@@ -3,11 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/common/constants.dart';
-import '../../../../core/common/snackbar.dart';
+import '../../../../core/helpers/top_snackbar.dart';
+import '../../../../core/widgets/confirmation_input_dialog.dart';
 import '../../../../core/widgets/primary_icon_button.dart';
 import '../cubit/auth_cubit.dart';
 import '../widgets/profile_card.dart';
-import '../widgets/update_name_dialog.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -18,12 +18,19 @@ class ProfilePage extends StatelessWidget {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
 
-    return BlocBuilder<AuthCubit, AuthState>(
+    return BlocConsumer<AuthCubit, AuthState>(
       bloc: authCubit..fetchUser(),
       buildWhen: (previous, current) => current is FetchUser,
+      listener: (context, state) {
+        if (state is UpdateProfileLoaded) {
+          authCubit.fetchUser();
+        }
+      },
       builder: (context, state) {
         if (state is FetchUserLoading) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(
+            child: CircularProgressIndicator.adaptive(),
+          );
         }
 
         if (state is FetchUserLoaded) {
@@ -37,12 +44,12 @@ class ProfilePage extends StatelessWidget {
                 child: ListView(
                   padding: const EdgeInsets.all(16),
                   shrinkWrap: true,
-                  children: [
+                  children: <Widget>[
                     UnconstrainedBox(
                       child: Container(
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
-                          color: Colors.grey[600],
+                          color: Colors.grey.shade600,
                           shape: BoxShape.circle,
                         ),
                         height: 100,
@@ -69,7 +76,49 @@ class ProfilePage extends StatelessWidget {
                         title: 'Nama',
                         child: IconButton(
                           onPressed: () => showDialog(
-                            builder: (context) => const UpdateNameDialog(),
+                            builder: (context) =>
+                                BlocConsumer<AuthCubit, AuthState>(
+                              buildWhen: (previous, current) =>
+                                  current is UpdateProfile,
+                              listenWhen: (previous, current) =>
+                                  current is UpdateProfile,
+                              listener: (context, state) {
+                                if (state is UpdateProfileError) {
+                                  TopSnackbar.dangerSnackbar(
+                                      message: state.message);
+                                }
+
+                                if (state is UpdateProfileLoaded) {
+                                  TopSnackbar.successSnackbar(
+                                      message: state.message);
+                                  context.pop();
+                                }
+                              },
+                              builder: (context, state) {
+                                if (state is UpdateProfileLoading) {
+                                  return ConfirmationInputDialog(
+                                    actionText: 'Ganti nama',
+                                    body:
+                                        'Masukkan nama baru Anda di bawah ini.',
+                                    decoration: const InputDecoration(
+                                      labelText: 'Nama Baru',
+                                    ),
+                                    title: 'Ganti Nama',
+                                  );
+                                }
+
+                                return ConfirmationInputDialog(
+                                  onAction: (value) =>
+                                      authCubit.updateProfile(name: value),
+                                  actionText: 'Ganti nama',
+                                  body: 'Masukkan nama baru Anda di bawah ini.',
+                                  decoration: const InputDecoration(
+                                    labelText: 'Nama Baru',
+                                  ),
+                                  title: 'Ganti Nama',
+                                );
+                              },
+                            ),
                             context: context,
                           ),
                           icon: const Icon(Icons.mode_edit_outline_rounded),
@@ -88,30 +137,12 @@ class ProfilePage extends StatelessWidget {
                       listenWhen: (previous, current) => current is SignOut,
                       listener: (context, state) {
                         if (state is SignOutLoaded) {
-                          scaffoldMessengerKey.currentState?.showSnackBar(
-                            successSnackbar(
-                              state.message,
-                              EdgeInsets.only(
-                                left: 16,
-                                right: 16,
-                                bottom: MediaQuery.sizeOf(context).height - 175,
-                              ),
-                            ),
-                          );
+                          TopSnackbar.successSnackbar(message: state.message);
                           context.go(loginRoute);
                         }
 
                         if (state is SignOutError) {
-                          scaffoldMessengerKey.currentState?.showSnackBar(
-                            dangerSnackbar(
-                              state.message,
-                              EdgeInsets.only(
-                                left: 16,
-                                right: 16,
-                                bottom: MediaQuery.sizeOf(context).height - 175,
-                              ),
-                            ),
-                          );
+                          TopSnackbar.dangerSnackbar(message: state.message);
                         }
                       },
                       builder: (context, state) {
@@ -124,7 +155,7 @@ class ProfilePage extends StatelessWidget {
 
                         return PrimaryIconButton(
                           onPressed: authCubit.signOut,
-                          icon: Icon(Icons.exit_to_app_rounded),
+                          icon: const Icon(Icons.exit_to_app_rounded),
                           label: const Text('Sign Out'),
                         );
                       },
