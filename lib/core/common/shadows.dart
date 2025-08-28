@@ -4,9 +4,9 @@ import '../themes/colors.dart';
 
 final cardBoxShadow = <BoxShadow>[
   BoxShadow(
-    color: MaterialColors.shadow.withValues(alpha: .09),
-    offset: Offset(0, 2),
-    blurRadius: 16,
-    spreadRadius: 0,
+    color: MaterialColors.shadow.withValues(alpha: .05),
+    spreadRadius: 1,
+    blurRadius: 8,
+    offset: const Offset(0, 4),
   ),
 ];
