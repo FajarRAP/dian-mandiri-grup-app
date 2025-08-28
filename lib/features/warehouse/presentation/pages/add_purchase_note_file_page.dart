@@ -2,7 +2,6 @@ import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:image_picker/image_picker.dart';
 
 import '../../../../core/common/dropdown_entity.dart';
 import '../../../../core/failure/failure.dart';
@@ -12,6 +11,7 @@ import '../../../../core/helpers/validators.dart';
 import '../../../../core/themes/colors.dart';
 import '../../../../core/widgets/dropdowns/supplier_dropdown.dart';
 import '../../../../core/widgets/fab_container.dart';
+import '../../../../core/widgets/image_picker_bottom_sheet.dart';
 import '../../../../core/widgets/preview_picked_image_dialog.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/widgets/primary_outline_button.dart';
@@ -29,7 +29,6 @@ class AddPurchaseNoteFilePage extends StatefulWidget {
 
 class _AddPurchaseNoteFilePageState extends State<AddPurchaseNoteFilePage> {
   late final WarehouseCubit _warehouseCubit;
-  late final ImagePicker _imagePicker;
   late final GlobalKey<FormState> _formKey;
   late final FocusNode _focusNode;
   late final TextEditingController _dateController;
@@ -44,7 +43,6 @@ class _AddPurchaseNoteFilePageState extends State<AddPurchaseNoteFilePage> {
   void initState() {
     super.initState();
     _warehouseCubit = context.read<WarehouseCubit>();
-    _imagePicker = ImagePicker();
     _focusNode = FocusScope.of(context, createDependency: false);
     _formKey = GlobalKey<FormState>();
     _dateController = TextEditingController();
@@ -148,15 +146,19 @@ class _AddPurchaseNoteFilePageState extends State<AddPurchaseNoteFilePage> {
                 SizedBox(
                   width: 150,
                   child: PrimaryButton(
-                    onPressed: () async {
-                      final pickedImage = await _imagePicker.pickImage(
-                          source: ImageSource.gallery);
-
-                      if (pickedImage == null) return;
-
-                      setState(() => _pickedImage = pickedImage);
-                    },
-                    child: const Text('Pilih Gambar'),
+                    onPressed: () => showModalBottomSheet(
+                      builder: (context) => ImagePickerBottomSheet(
+                        onPicked: (image) =>
+                            setState(() => _pickedImage = image),
+                      ),
+                      context: context,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(16),
+                        ),
+                      ),
+                    ),
+                    child: const Text('Ambil Gambar'),
                   ),
                 ),
                 if (_pickedImage != null) ...[

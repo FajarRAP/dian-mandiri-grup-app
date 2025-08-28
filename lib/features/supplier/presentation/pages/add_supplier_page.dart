@@ -9,6 +9,7 @@ import '../../../../core/common/shadows.dart';
 import '../../../../core/helpers/top_snackbar.dart';
 import '../../../../core/helpers/validators.dart';
 import '../../../../core/themes/colors.dart';
+import '../../../../core/widgets/image_picker_bottom_sheet.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../../domain/entities/supplier_detail_entity.dart';
 import '../cubit/supplier_cubit.dart';
@@ -22,7 +23,7 @@ class AddSupplierPage extends StatefulWidget {
 
 class _AddSupplierPageState extends State<AddSupplierPage> {
   late final SupplierCubit _supplierCubit;
-  late final ImagePicker _imagePicker;
+
   late final TextEditingController _nameController;
   late final TextEditingController _emailController;
   late final TextEditingController _phoneController;
@@ -34,7 +35,6 @@ class _AddSupplierPageState extends State<AddSupplierPage> {
   initState() {
     super.initState();
     _supplierCubit = context.read<SupplierCubit>();
-    _imagePicker = ImagePicker();
     _nameController = TextEditingController();
     _emailController = TextEditingController();
     _phoneController = TextEditingController();
@@ -73,13 +73,17 @@ class _AddSupplierPageState extends State<AddSupplierPage> {
               children: <Widget>[
                 // Avatar
                 GestureDetector(
-                  onTap: () async {
-                    final pickedImage = await _imagePicker.pickImage(
-                      imageQuality: 60,
-                      source: ImageSource.gallery,
-                    );
-                    setState(() => _pickedImage = pickedImage);
-                  },
+                  onTap: () => showModalBottomSheet(
+                    builder: (context) => ImagePickerBottomSheet(
+                      onPicked: (image) => setState(() => _pickedImage = image),
+                    ),
+                    context: context,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(16),
+                      ),
+                    ),
+                  ),
                   child: UnconstrainedBox(
                     child: Stack(
                       children: <Widget>[

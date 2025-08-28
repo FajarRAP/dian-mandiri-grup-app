@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:ship_tracker/core/widgets/image_picker_bottom_sheet.dart';
 
 import '../../../../core/common/shadows.dart';
 import '../../../../core/helpers/top_snackbar.dart';
@@ -26,7 +27,6 @@ class EditSupplierPage extends StatefulWidget {
 
 class _EditSupplierPageState extends State<EditSupplierPage> {
   late final SupplierCubit _supplierCubit;
-  late final ImagePicker _imagePicker;
   late final TextEditingController _nameController;
   late final TextEditingController _emailController;
   late final TextEditingController _phoneController;
@@ -39,7 +39,6 @@ class _EditSupplierPageState extends State<EditSupplierPage> {
   initState() {
     super.initState();
     _supplierCubit = context.read<SupplierCubit>();
-    _imagePicker = ImagePicker();
     _nameController = TextEditingController();
     _emailController = TextEditingController();
     _phoneController = TextEditingController();
@@ -94,14 +93,18 @@ class _EditSupplierPageState extends State<EditSupplierPage> {
                     shrinkWrap: true,
                     children: <Widget>[
                       GestureDetector(
-                        onTap: () async {
-                          final pickedImage = await _imagePicker.pickImage(
-                            imageQuality: 60,
-                            source: ImageSource.gallery,
-                          );
-
-                          setState(() => _pickedImage = pickedImage);
-                        },
+                        onTap: () => showModalBottomSheet(
+                          builder: (context) => ImagePickerBottomSheet(
+                            onPicked: (image) =>
+                                setState(() => _pickedImage = image),
+                          ),
+                          context: context,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.vertical(
+                              top: Radius.circular(16),
+                            ),
+                          ),
+                        ),
                         child: UnconstrainedBox(
                           child: Stack(
                             children: <Widget>[
