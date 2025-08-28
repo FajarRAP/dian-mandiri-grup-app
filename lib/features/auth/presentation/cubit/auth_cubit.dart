@@ -94,7 +94,8 @@ class AuthCubit extends Cubit<AuthState> {
       (l) => emit(SignInError(message: l.message)),
       (r) {
         user = r;
-        emit(SignInLoaded(message: 'Berhasil sign in'));
+        // Already called Topsnackbar in repositories
+        emit(SignInLoaded(message: 'Sign in successful'));
       },
     );
   }
@@ -106,7 +107,7 @@ class AuthCubit extends Cubit<AuthState> {
 
     result.fold(
       (l) => emit(SignOutError(message: l.message)),
-      (r) => emit(SignOutLoaded(message: 'Berhasil sign out')),
+      (r) => emit(SignOutLoaded(message: r)),
     );
   }
 
