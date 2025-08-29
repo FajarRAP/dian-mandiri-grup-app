@@ -7,8 +7,8 @@ import '../../../../core/helpers/debouncer.dart';
 import '../../../../core/helpers/top_snackbar.dart';
 import '../../../../core/themes/colors.dart';
 import '../../../../core/widgets/confirmation_dialog.dart';
-import '../../../tracker/presentation/widgets/action_button.dart';
-import '../../../tracker/presentation/widgets/expandable_fab.dart';
+import '../../../../core/widgets/expanded_fab/action_button.dart';
+import '../../../../core/widgets/expanded_fab/expandable_fab.dart';
 import '../cubit/warehouse_cubit.dart';
 import '../widgets/purchase_note_item.dart';
 
