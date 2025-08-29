@@ -1,42 +1,57 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 
 import '../../../../core/common/constants.dart';
-import '../../../../core/common/snackbar.dart';
-import '../../../../core/widgets/danger_button.dart';
+import '../../../../core/common/shadows.dart';
+import '../../../../core/helpers/helpers.dart';
+import '../../../../core/helpers/top_snackbar.dart';
+import '../../../../core/themes/colors.dart';
+import '../../../../core/widgets/buttons/danger_button.dart';
+import '../../../../core/widgets/confirmation_dialog.dart';
+import '../../../../core/widgets/confirmation_input_dialog.dart';
+import '../../../../core/widgets/expanded_fab/action_button.dart';
+import '../../../../core/widgets/expanded_fab/expandable_fab.dart';
 import '../../../auth/presentation/cubit/auth_cubit.dart';
 import '../../data/models/shipment_detail_status_model.dart';
 import '../cubit/shipment_cubit.dart';
-import '../widgets/action_button.dart';
-import '../widgets/check_receipt_from_scanner_alert_dialog.dart';
-import '../widgets/expandable_fab.dart';
-import '../widgets/receipt_history_row.dart';
-import '../widgets/receipt_info_row.dart';
+import '../widgets/receipt_status_history_timeline.dart';
+import '../widgets/receipt_status_info_row.dart';
 
 class ReceiptStatusPage extends StatelessWidget {
   const ReceiptStatusPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final shipmentCubit = context.read<ShipmentCubit>();
-    final authCubit = context.read<AuthCubit>();
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
-    final isSuperAdmin =
-        authCubit.user.permissions.contains(superAdminPermission);
+    final authCubit = context.read<AuthCubit>();
+    final shipmentCubit = context.read<ShipmentCubit>();
+    final permissions = authCubit.user.permissions;
+    final isSuperAdmin = permissions.contains(superAdminPermission);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Status Resi'),
       ),
       body: Center(
-        child: BlocBuilder<ShipmentCubit, ShipmentState>(
+        child: BlocConsumer<ShipmentCubit, ShipmentState>(
           buildWhen: (previous, current) => current is FetchReceiptStatus,
+          listenWhen: (previous, current) => current is FetchReceiptStatus,
+          listener: (context, state) {
+            if (state is FetchReceiptStatusError) {
+              switch (state.failure.statusCode) {
+                case 404:
+                  return TopSnackbar.dangerSnackbar(
+                      message: state.failure.message);
+              }
+            }
+          },
           builder: (context, state) {
             if (state is FetchReceiptStatusLoading) {
-              return const CircularProgressIndicator();
+              return const CircularProgressIndicator.adaptive();
             }
 
             if (state is FetchReceiptStatusLoaded) {
@@ -48,26 +63,28 @@ class ReceiptStatusPage extends StatelessWidget {
 
               return SingleChildScrollView(
                 child: Card(
+                  color: MaterialColors.surfaceContainerLow,
                   elevation: 2,
                   margin: const EdgeInsets.all(16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Column(
-                    children: [
+                    children: <Widget>[
+                      // Header
                       Container(
                         decoration: BoxDecoration(
                           borderRadius: const BorderRadius.vertical(
                             top: Radius.circular(16),
                           ),
-                          color: Colors.green,
+                          color: CustomColors.primaryNormal,
                         ),
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         width: double.infinity,
                         child: Text(
                           'Informasi Resi',
                           style: textTheme.headlineSmall?.copyWith(
-                            color: Colors.white,
+                            color: MaterialColors.onPrimary,
                             fontWeight: FontWeight.w700,
                           ),
                           textAlign: TextAlign.center,
@@ -77,47 +94,57 @@ class ReceiptStatusPage extends StatelessWidget {
                         padding: const EdgeInsets.all(16),
                         physics: const NeverScrollableScrollPhysics(),
                         shrinkWrap: true,
-                        children: [
+                        children: <Widget>[
+                          // Shipment Detail
                           Container(
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(12),
-                              boxShadow: [
-                                BoxShadow(
-                                  blurRadius: 8,
-                                  color: Colors.black.withValues(alpha: 0.05),
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
-                              color: Colors.white,
+                              boxShadow: cardBoxShadow,
+                              color: MaterialColors.surfaceContainerLowest,
                             ),
                             padding: const EdgeInsets.all(16),
                             child: Column(
-                              children: [
+                              children: <Widget>[
                                 Row(
-                                  children: [
+                                  children: <Widget>[
                                     const Icon(
                                       Icons.receipt_long,
-                                      color: Colors.green,
+                                      color: CustomColors.primaryNormal,
                                     ),
                                     const SizedBox(width: 8),
                                     Text(
                                       'Detail Pengiriman',
                                       style: textTheme.titleMedium?.copyWith(
-                                        color: Colors.green,
+                                        color: CustomColors.primaryNormal,
                                         fontWeight: FontWeight.w700,
                                       ),
                                     ),
                                   ],
                                 ),
                                 const Divider(height: 24),
-                                ReceiptInfoRow(
+                                ReceiptStatusInfoRow(
                                   icon: Icons.numbers,
                                   label: 'Nomor Resi',
+                                  trailing: IconButton(
+                                    onPressed: () {
+                                      Clipboard.setData(ClipboardData(
+                                          text: state
+                                              .shipmentDetail.receiptNumber));
+                                      final message =
+                                          'Nomor Resi disalin ke clipboard';
+                                      TopSnackbar.successSnackbar(
+                                          message: message);
+                                    },
+                                    icon: const Icon(
+                                      Icons.copy,
+                                      size: 16,
+                                      color: CustomColors.primaryNormal,
+                                    ),
+                                  ),
                                   value: state.shipmentDetail.receiptNumber,
-                                  isSelectable: true,
                                 ),
                                 const SizedBox(height: 12),
-                                ReceiptInfoRow(
+                                ReceiptStatusInfoRow(
                                   icon: Icons.local_shipping,
                                   label: 'Nama Ekspedisi',
                                   value: state.shipmentDetail.courier,
@@ -125,78 +152,119 @@ class ReceiptStatusPage extends StatelessWidget {
                               ],
                             ),
                           ),
+                          const SizedBox(height: 12),
+                          // Cancel Button
                           if (isSuperAdmin && !isCanceled) ...[
-                            const SizedBox(height: 24),
+                            const SizedBox(height: 12),
                             DangerButton(
                               onPressed: () => showDialog(
                                 context: context,
-                                builder: (context) => AlertDialog(
-                                  title: const Text('Konfirmasi'),
-                                  content: const Text(
-                                    'Apakah Anda yakin ingin membatalkan resi ini?',
-                                  ),
-                                  actions: <Widget>[
-                                    TextButton(
-                                      onPressed: context.pop,
-                                      child: const Text('Tidak'),
-                                    ),
+                                builder: (context) =>
                                     BlocConsumer<ShipmentCubit, ShipmentState>(
-                                      listener: (context, cancelState) {
-                                        if (cancelState
-                                            is InsertShipmentLoaded) {
-                                          context.pop();
-                                          shipmentCubit
-                                              .fetchShipmentByReceiptNumber(
-                                            receipNumber: state
-                                                .shipmentDetail.receiptNumber,
-                                          );
-                                        }
-                                        if (cancelState
-                                            is InsertShipmentError) {
-                                          context.pop();
-                                          scaffoldMessengerKey.currentState
-                                              ?.showSnackBar(
-                                            dangerSnackbar(
-                                                cancelState.failure.message),
-                                          );
-                                        }
-                                      },
-                                      builder: (context, cancelState) {
-                                        if (cancelState
-                                            is InsertShipmentLoading) {
-                                          return const CircularProgressIndicator
-                                              .adaptive();
-                                        }
+                                  buildWhen: (previous, current) =>
+                                      current is InsertShipment,
+                                  listenWhen: (previous, current) =>
+                                      current is InsertShipment,
+                                  listener: (context, state) {
+                                    if (state is InsertShipmentLoaded) {
+                                      TopSnackbar.successSnackbar(
+                                          message: state.message);
+                                      context.pop();
+                                      shipmentCubit
+                                          .fetchShipmentByReceiptNumber(
+                                        receiptNumber:
+                                            shipmentDetail.receiptNumber,
+                                      );
+                                    }
 
-                                        return TextButton(
-                                          onPressed: () =>
-                                              shipmentCubit.insertShipment(
-                                            receiptNumber: state
-                                                .shipmentDetail.receiptNumber,
-                                            stage: cancelStage,
-                                          ),
-                                          child: const Text('Ya'),
-                                        );
-                                      },
-                                    ),
-                                  ],
+                                    if (state is InsertShipmentError) {
+                                      TopSnackbar.dangerSnackbar(
+                                          message: state.failure.message);
+                                    }
+                                  },
+                                  builder: (context, state) {
+                                    return ConfirmationDialog(
+                                      onAction: () async =>
+                                          await shipmentCubit.insertShipment(
+                                        receiptNumber:
+                                            shipmentDetail.receiptNumber,
+                                        stage: cancelStage,
+                                      ),
+                                      actionText: 'Cancel',
+                                      body: 'Yakin ingin cancel resi ini?',
+                                      title: 'Cancel Resi',
+                                    );
+                                  },
                                 ),
+                                // AlertDialog(
+                                //   title: const Text('Konfirmasi'),
+                                //   content: const Text(
+                                //     'Apakah Anda yakin ingin membatalkan resi ini?',
+                                //   ),
+                                //   actions: <Widget>[
+                                //     TextButton(
+                                //       onPressed: context.pop,
+                                //       child: const Text('Tidak'),
+                                //     ),
+                                //     BlocConsumer<ShipmentCubit, ShipmentState>(
+                                //       listener: (context, cancelState) {
+                                //         if (cancelState
+                                //             is InsertShipmentLoaded) {
+                                //           context.pop();
+                                //           shipmentCubit
+                                //               .fetchShipmentByReceiptNumber(
+                                //             receiptNumber: state
+                                //                 .shipmentDetail.receiptNumber,
+                                //           );
+                                //         }
+                                //         if (cancelState
+                                //             is InsertShipmentError) {
+                                //           context.pop();
+                                //           scaffoldMessengerKey.currentState
+                                //               ?.showSnackBar(
+                                //             dangerSnackbar(
+                                //                 cancelState.failure.message),
+                                //           );
+                                //         }
+                                //       },
+                                //       builder: (context, cancelState) {
+                                //         if (cancelState
+                                //             is InsertShipmentLoading) {
+                                //           return const CircularProgressIndicator
+                                //               .adaptive();
+                                //         }
+
+                                //         return TextButton(
+                                //           onPressed: () =>
+                                //               shipmentCubit.insertShipment(
+                                //             receiptNumber: state
+                                //                 .shipmentDetail.receiptNumber,
+                                //             stage: cancelStage,
+                                //           ),
+                                //           child: const Text('Ya'),
+                                //         );
+                                //       },
+                                //     ),
+                                //   ],
+                                // ),
                               ),
                               child: const Text('Cancel Resi'),
                             ),
+                            const SizedBox(height: 12),
                           ],
-                          const SizedBox(height: 24),
+                          const SizedBox(height: 12),
+                          // Shipment Histories
                           Row(
-                            children: [
+                            children: <Widget>[
                               Icon(
                                 Icons.history,
-                                color: Colors.green,
+                                color: CustomColors.primaryNormal,
                               ),
                               const SizedBox(width: 8),
                               Text(
                                 'Riwayat Status',
                                 style: textTheme.titleMedium?.copyWith(
-                                  color: Colors.green,
+                                  color: CustomColors.primaryNormal,
                                   fontWeight: FontWeight.w700,
                                 ),
                               ),
@@ -208,7 +276,7 @@ class ReceiptStatusPage extends StatelessWidget {
                               final stage = stages[index];
                               final isLast = index == stages.length - 1;
 
-                              return ReceiptHistoryRow(
+                              return ReceiptStatusHistoryTimeline(
                                 isLast: isLast,
                                 stage: stage,
                               );
@@ -227,6 +295,13 @@ class ReceiptStatusPage extends StatelessWidget {
               );
             }
 
+            if (state is FetchReceiptStatusError) {
+              return Text(
+                'Silakan coba lagi',
+                style: textTheme.titleMedium,
+              );
+            }
+
             return Text(
               'Scan terlebih dahulu',
               style: textTheme.titleMedium,
@@ -236,28 +311,73 @@ class ReceiptStatusPage extends StatelessWidget {
       ),
       floatingActionButton: ExpandableFAB(
         distance: 90,
-        children: [
+        children: <Widget>[
           ActionButton(
             onPressed: () async {
-              final receiptNumber =
-                  await SimpleBarcodeScanner.scanBarcode(context);
+              final receiptNumber = await SimpleBarcodeScanner.scanBarcode(
+                context,
+                cameraFace: CameraFace.back,
+                cancelButtonText: 'Batal',
+                isShowFlashIcon: true,
+              );
 
               if (receiptNumber == null) return;
 
               await shipmentCubit.fetchShipmentByReceiptNumber(
-                  receipNumber: receiptNumber);
+                  receiptNumber: receiptNumber);
             },
             icon: Icons.document_scanner_rounded,
           ),
           ActionButton(
             onPressed: () => showDialog(
+              builder: (context) => BlocConsumer<ShipmentCubit, ShipmentState>(
+                buildWhen: (previous, current) => current is FetchReceiptStatus,
+                listenWhen: (previous, current) =>
+                    current is FetchReceiptStatus,
+                listener: (context, state) {
+                  if (state is FetchReceiptStatusLoaded) {
+                    context.pop();
+                  }
+                },
+                builder: (context, state) {
+                  if (state is FetchReceiptStatusLoading) {
+                    return _buildConfirmationInputDialog(
+                        shipmentCubit: shipmentCubit);
+                  }
+
+                  return _buildConfirmationInputDialog(
+                      onAction: (value) async => await shipmentCubit
+                          .fetchShipmentByReceiptNumber(receiptNumber: value),
+                      shipmentCubit: shipmentCubit);
+                },
+              ),
               context: context,
-              builder: (context) => const CheckReceiptFromScannerAlertDialog(),
             ),
             icon: Icons.barcode_reader,
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildConfirmationInputDialog({
+    void Function(String value)? onAction,
+    required ShipmentCubit shipmentCubit,
+  }) {
+    return ConfirmationInputDialog(
+      onAction: onAction,
+      actionText: 'Cari',
+      body: 'Silakan scan nomor resi menggunakan scanner',
+      textFormFieldConfig: TextFormFieldConfig(
+        onFieldSubmitted: (value) =>
+            shipmentCubit.fetchShipmentByReceiptNumber(receiptNumber: value),
+        autoFocus: true,
+        decoration: const InputDecoration(
+          labelText: 'Hasil Scan',
+        ),
+        textInputAction: TextInputAction.send,
+      ),
+      title: 'Cari Resi',
     );
   }
 }
