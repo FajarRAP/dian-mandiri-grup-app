@@ -5,9 +5,9 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 import 'core/common/constants.dart';
 import 'core/helpers/dio_interceptor.dart';
-import 'features/auth/data/datasources/auth_remote_data_source.dart';
-import 'features/auth/data/repositories/auth_repository_impl.dart';
-import 'features/auth/domain/repositories/auth_repository.dart';
+import 'features/auth/data/datasources/auth_remote_data_sources.dart';
+import 'features/auth/data/repositories/auth_repositories_impl.dart';
+import 'features/auth/domain/repositories/auth_repositories.dart';
 import 'features/auth/domain/usecases/fetch_user_from_storage_use_case.dart';
 import 'features/auth/domain/usecases/fetch_user_use_case.dart';
 import 'features/auth/domain/usecases/refresh_token_use_case.dart';
@@ -68,21 +68,21 @@ void setup() {
 
   // Auth
   getIt
-    ..registerLazySingleton<AuthRemoteDataSource<Response>>(
-        () => AuthRemoteDataSourceImpl(dio: getIt.get()))
-    ..registerLazySingleton<AuthRepository>(() => AuthRepositoryImpl(
+    ..registerLazySingleton<AuthRemoteDataSources<Response>>(
+        () => AuthRemoteDataSourcesImpl(dio: getIt.get()))
+    ..registerLazySingleton<AuthRepositories>(() => AuthRepositoriesImpl(
         authRemoteDataSource: getIt.get(),
         googleSignIn: GoogleSignIn(),
         storage: getIt.get()))
     ..registerLazySingleton<AuthCubit>(() => AuthCubit(
-        fetchUserUseCase: FetchUserUseCase(authRepository: getIt.get()),
+        fetchUserUseCase: FetchUserUseCase(authRepositories: getIt.get()),
         fetchUserFromStorageUseCase:
-            FetchUserFromStorageUseCase(authRepository: getIt.get()),
-        refreshTokenUseCase: RefreshTokenUseCase(authRepository: getIt.get()),
-        signInUseCase: SignInUseCase(authRepository: getIt.get()),
-        signOutUseCase: SignOutUseCase(authRepository: getIt.get()),
-        updateProfileUseCase: UpdateProfileUseCase(authRepository: getIt.get()),
-        storage: getIt.get()));
+            FetchUserFromStorageUseCase(authRepositories: getIt.get()),
+        refreshTokenUseCase: RefreshTokenUseCase(authRepositories: getIt.get()),
+        signInUseCase: SignInUseCase(authRepositories: getIt.get()),
+        signOutUseCase: SignOutUseCase(authRepositories: getIt.get()),
+        updateProfileUseCase:
+            UpdateProfileUseCase(authRepositories: getIt.get())));
 
   // Ship
   getIt
@@ -109,8 +109,7 @@ void setup() {
         insertShipmentUseCase:
             InsertShipmentUseCase(shipmentRepository: getIt.get()),
         downloadShipmentReportUseCase:
-            DownloadShipmentReportUseCase(shipmentRepository: getIt.get()),
-        storage: getIt.get()));
+            DownloadShipmentReportUseCase(shipmentRepository: getIt.get())));
 
   // Supplier
   getIt
