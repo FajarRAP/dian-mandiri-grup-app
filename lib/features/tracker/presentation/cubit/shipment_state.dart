@@ -3,6 +3,14 @@ part of 'shipment_cubit.dart';
 @immutable
 sealed class ShipmentState {}
 
+class ListPaginate extends ShipmentState {}
+
+class ListPaginateLoading extends ListPaginate {}
+
+class ListPaginateLoaded extends ListPaginate {}
+
+class ListPaginateLast extends ListPaginate {}
+
 final class ShipInitial extends ShipmentState {}
 
 class FetchShipments extends ShipmentState {}
@@ -150,7 +158,7 @@ class FetchReceiptStatusLoaded extends FetchReceiptStatus {
 }
 
 class FetchReceiptStatusError extends FetchReceiptStatus {
-  final String message;
+  final Failure failure;
 
-  FetchReceiptStatusError({required this.message});
+  FetchReceiptStatusError({required this.failure});
 }
