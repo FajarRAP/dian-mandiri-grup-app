@@ -9,7 +9,7 @@ import '../../../../core/common/shadows.dart';
 import '../../../../core/helpers/top_snackbar.dart';
 import '../../../../core/helpers/validators.dart';
 import '../../../../core/themes/colors.dart';
-import '../../../../core/widgets/primary_button.dart';
+import '../../../../core/widgets/buttons/primary_button.dart';
 import '../../domain/entities/supplier_detail_entity.dart';
 import '../cubit/supplier_cubit.dart';
 

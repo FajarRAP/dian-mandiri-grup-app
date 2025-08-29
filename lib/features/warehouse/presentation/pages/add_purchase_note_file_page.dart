@@ -13,9 +13,8 @@ import '../../../../core/widgets/dropdowns/supplier_dropdown.dart';
 import '../../../../core/widgets/fab_container.dart';
 import '../../../../core/widgets/image_picker_bottom_sheet.dart';
 import '../../../../core/widgets/preview_picked_image_dialog.dart';
-import '../../../../core/widgets/primary_button.dart';
-import '../../../../core/widgets/primary_outline_button.dart';
-import '../../../../core/widgets/primary_outline_icon_button.dart';
+import '../../../../core/widgets/buttons/primary_button.dart';
+import '../../../../core/widgets/buttons/primary_outline_button.dart';
 import '../../domain/entities/insert_purchase_note_file_entity.dart';
 import '../cubit/warehouse_cubit.dart';
 
@@ -195,7 +194,7 @@ class _AddPurchaseNoteFilePageState extends State<AddPurchaseNoteFilePage> {
             const SizedBox(height: 24),
             const Divider(),
             const SizedBox(height: 24),
-            PrimaryOutlineIconButton(
+            PrimaryOutlineButton(
               onPressed: () async {
                 final file = await openFile(acceptedTypeGroups: [
                   XTypeGroup(
@@ -208,7 +207,7 @@ class _AddPurchaseNoteFilePageState extends State<AddPurchaseNoteFilePage> {
                 setState(() => _pickedFile = file);
               },
               icon: Icon(Icons.folder),
-              label: _pickedFile == null
+              child: _pickedFile == null
                   ? const Text('Pilih File Excel')
                   : Text(_pickedFile!.name, overflow: TextOverflow.ellipsis),
             ),

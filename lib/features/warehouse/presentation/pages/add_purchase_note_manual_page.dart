@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:ship_tracker/core/widgets/image_picker_bottom_sheet.dart';
 
 import '../../../../core/common/constants.dart';
 import '../../../../core/common/dropdown_entity.dart';
@@ -13,10 +12,10 @@ import '../../../../core/helpers/validators.dart';
 import '../../../../core/themes/colors.dart';
 import '../../../../core/widgets/dropdowns/supplier_dropdown.dart';
 import '../../../../core/widgets/fab_container.dart';
+import '../../../../core/widgets/image_picker_bottom_sheet.dart';
 import '../../../../core/widgets/preview_picked_image_dialog.dart';
-import '../../../../core/widgets/primary_button.dart';
-import '../../../../core/widgets/primary_outline_button.dart';
-import '../../../../core/widgets/primary_outline_icon_button.dart';
+import '../../../../core/widgets/buttons/primary_button.dart';
+import '../../../../core/widgets/buttons/primary_outline_button.dart';
 import '../../domain/entities/insert_purchase_note_manual_entity.dart';
 import '../../domain/entities/warehouse_item_entity.dart';
 import '../cubit/warehouse_cubit.dart';
@@ -194,7 +193,7 @@ class _AddPurchaseNoteManualPageState extends State<AddPurchaseNoteManualPage> {
             const SizedBox(height: 24),
             const Divider(),
             const SizedBox(height: 24),
-            PrimaryOutlineIconButton(
+            PrimaryOutlineButton(
               onPressed: () => showDialog(
                 builder: (context) => AddPurchaseNoteItemDialog(
                   onTap: (item) {
@@ -211,7 +210,7 @@ class _AddPurchaseNoteManualPageState extends State<AddPurchaseNoteManualPage> {
                   BlendMode.srcIn,
                 ),
               ),
-              label: const Text('Tambah Barang'),
+              child: const Text('Tambah Barang'),
             ),
             const SizedBox(height: 12),
             ListView.separated(

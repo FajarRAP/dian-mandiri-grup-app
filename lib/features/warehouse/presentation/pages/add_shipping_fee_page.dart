@@ -7,7 +7,7 @@ import '../../../../core/helpers/top_snackbar.dart';
 import '../../../../core/helpers/validators.dart';
 import '../../../../core/widgets/dropdowns/purchase_note_dropdown.dart';
 import '../../../../core/widgets/fab_container.dart';
-import '../../../../core/widgets/primary_button.dart';
+import '../../../../core/widgets/buttons/primary_button.dart';
 import '../cubit/warehouse_cubit.dart';
 import '../widgets/selected_purchase_note_item.dart';
 

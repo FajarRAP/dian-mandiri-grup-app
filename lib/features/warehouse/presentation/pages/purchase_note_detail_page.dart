@@ -10,8 +10,8 @@ import '../../../../core/helpers/top_snackbar.dart';
 import '../../../../core/themes/colors.dart';
 import '../../../../core/widgets/confirmation_input_dialog.dart';
 import '../../../../core/widgets/fab_container.dart';
-import '../../../../core/widgets/primary_button.dart';
-import '../../../../core/widgets/primary_outline_button.dart';
+import '../../../../core/widgets/buttons/primary_button.dart';
+import '../../../../core/widgets/buttons/primary_outline_button.dart';
 import '../../../../core/widgets/read_only_field.dart';
 import '../../data/models/warehouse_item_model.dart';
 import '../../domain/entities/insert_purchase_note_manual_entity.dart';
@@ -49,6 +49,13 @@ class _PurchaseNoteDetailPageState extends State<PurchaseNoteDetailPage> {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final textFormFieldConfig = TextFormFieldConfig(
+      decoration: const InputDecoration(
+        labelText: 'Nominal Refund',
+        prefixText: 'Rp. ',
+      ),
+      keyboardType: TextInputType.number,
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -291,10 +298,7 @@ class _PurchaseNoteDetailPageState extends State<PurchaseNoteDetailPage> {
                                   return ConfirmationInputDialog(
                                     actionText: 'Ya',
                                     body: 'Masukkan nominal pengembalian uang',
-                                    decoration: const InputDecoration(
-                                      labelText: 'Nominal Refund',
-                                    ),
-                                    keyboardType: TextInputType.number,
+                                    textFormFieldConfig: textFormFieldConfig,
                                     title: 'Refund',
                                   );
                                 }
@@ -310,10 +314,7 @@ class _PurchaseNoteDetailPageState extends State<PurchaseNoteDetailPage> {
                                   },
                                   actionText: 'Ya',
                                   body: 'Masukkan nominal pengembalian uang',
-                                  decoration: const InputDecoration(
-                                    labelText: 'Nominal Refund',
-                                  ),
-                                  keyboardType: TextInputType.number,
+                                  textFormFieldConfig: textFormFieldConfig,
                                   title: 'Refund',
                                 );
                               },

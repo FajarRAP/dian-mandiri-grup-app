@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/helpers/validators.dart';
 import '../../../../core/themes/colors.dart';
-import '../../../../core/widgets/primary_button.dart';
+import '../../../../core/widgets/buttons/primary_button.dart';
 import '../../domain/entities/warehouse_item_entity.dart';
 
 class PurchaseNoteItemDialog extends StatelessWidget {
