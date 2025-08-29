@@ -1,12 +1,12 @@
 import 'dart:async';
 
-import 'package:camera/camera.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:path_provider/path_provider.dart';
 
 import 'core/common/constants.dart';
 import 'core/helpers/top_snackbar.dart';
@@ -19,15 +19,19 @@ import 'features/warehouse/presentation/cubit/warehouse_cubit.dart';
 import 'firebase_options.dart';
 import 'service_container.dart';
 
-late List<CameraDescription> cameras;
 late String initialLocation;
+late String externalPath;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  cameras = await availableCameras();
+
+  final dir = await getExternalStorageDirectory();
+  externalPath = '${dir?.path}';
+
   await initializeDateFormatting('id_ID', null);
 
   setup();
@@ -45,7 +49,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
-      providers: [
+      providers: <BlocProvider>[
         BlocProvider(create: (context) => getIt.get<AuthCubit>()),
         BlocProvider(create: (context) => getIt.get<ShipmentCubit>()),
         BlocProvider(create: (context) => getIt.get<SupplierCubit>()),
@@ -62,7 +66,7 @@ class MyApp extends StatelessWidget {
             ),
           ],
         ),
-        localizationsDelegates: const [
+        localizationsDelegates: const <LocalizationsDelegate<dynamic>>[
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
