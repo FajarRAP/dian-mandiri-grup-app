@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 
@@ -10,16 +8,19 @@ import '../../domain/entities/insert_purchase_note_manual_entity.dart';
 import '../../domain/entities/purchase_note_detail_entity.dart';
 import '../../domain/entities/purchase_note_summary_entity.dart';
 import '../../domain/repositories/warehouse_repositories.dart';
+import '../../domain/usecases/fetch_purchase_notes_dropdown_use_case.dart';
+import '../../domain/usecases/fetch_purchase_notes_use_case.dart';
+import '../../domain/usecases/insert_return_cost_use_case.dart';
+import '../../domain/usecases/insert_shipping_fee_use_case.dart';
+import '../../domain/usecases/update_purchase_note_use_case.dart';
 import '../datasources/warehouse_remote_data_sources.dart';
-import '../models/insert_purchase_note_file_model.dart';
-import '../models/insert_purchase_note_manual_model.dart';
 import '../models/purchase_note_detail_model.dart';
 import '../models/purchase_note_summary_model.dart';
 
 class WarehouseRepositoriesImpl extends WarehouseRepositories {
-  final WarehouseRemoteDataSources<Response> warehouseRemoteDataSources;
-
   WarehouseRepositoriesImpl({required this.warehouseRemoteDataSources});
+
+  final WarehouseRemoteDataSources<Response> warehouseRemoteDataSources;
 
   @override
   Future<Either<Failure, String>> deletePurchaseNote(
@@ -32,10 +33,10 @@ class WarehouseRepositoriesImpl extends WarehouseRepositories {
     } on DioException catch (de) {
       switch (de.response?.statusCode) {
         default:
-          return Left(Failure());
+          return const Left(Failure());
       }
     } catch (e) {
-      return Left(Failure());
+      return const Left(Failure());
     }
   }
 
@@ -48,49 +49,37 @@ class WarehouseRepositoriesImpl extends WarehouseRepositories {
 
       return Right(PurchaseNoteDetailModel.fromJson(response.data['data']));
     } catch (e) {
-      return Left(Failure());
+      return const Left(Failure());
     }
   }
 
   @override
   Future<Either<Failure, List<PurchaseNoteSummaryEntity>>> fetchPurchaseNotes(
-      {String column = 'created_at',
-      String order = 'asc',
-      String? search,
-      int limit = 10,
-      int page = 1}) async {
+      {required FetchPurchaseNotesUseCaseParams params}) async {
     try {
-      final response = await warehouseRemoteDataSources.fetchPurchaseNotes(
-          column: column,
-          order: order,
-          search: search,
-          limit: limit,
-          page: page);
-      final datas =
+      final response =
+          await warehouseRemoteDataSources.fetchPurchaseNotes(params: params);
+      final contents =
           List<Map<String, dynamic>>.from(response.data['data']['content']);
 
-      return Right(datas.map(PurchaseNoteSummaryModel.fromJson).toList());
+      return Right(contents.map(PurchaseNoteSummaryModel.fromJson).toList());
     } catch (e) {
-      return Left(Failure());
+      return const Left(Failure());
     }
   }
 
   @override
   Future<Either<Failure, List<DropdownEntity>>> fetchPurchaseNotesDropdown(
-      {String? search, int limit = 10, int page = 1}) async {
+      {required FetchPurchaseNotesDropdownUseCaseParams params}) async {
     try {
-      final response =
-          await warehouseRemoteDataSources.fetchPurchaseNotesDropdown(
-        search: search,
-        limit: limit,
-        page: page,
-      );
-      final datas =
+      final response = await warehouseRemoteDataSources
+          .fetchPurchaseNotesDropdown(params: params);
+      final contents =
           List<Map<String, dynamic>>.from(response.data['data']['content']);
 
-      return Right(datas.map(DropdownEntity.fromJson).toList());
+      return Right(contents.map(DropdownEntity.fromJson).toList());
     } catch (e) {
-      return Left(Failure());
+      return const Left(Failure());
     }
   }
 
@@ -98,13 +87,8 @@ class WarehouseRepositoriesImpl extends WarehouseRepositories {
   Future<Either<Failure, String>> insertPurchaseNoteFile(
       {required InsertPurchaseNoteFileEntity purchaseNote}) async {
     try {
-      final payload =
-          InsertPurchaseNoteFileModel.fromEntity(purchaseNote).toJson();
-      payload['receipt'] = await MultipartFile.fromFile(purchaseNote.receipt);
-      payload['spreadsheet'] = await MultipartFile.fromFile(purchaseNote.file);
-
       final response = await warehouseRemoteDataSources.insertPurchaseNoteFile(
-          data: payload);
+          params: purchaseNote);
 
       return Right(response.data['message']);
     } on DioException catch (de) {
@@ -116,10 +100,10 @@ class WarehouseRepositoriesImpl extends WarehouseRepositories {
 
           return Left(Failure(message: de.response?.data['message']));
         default:
-          return Left(Failure());
+          return const Left(Failure());
       }
     } catch (e) {
-      return Left(Failure());
+      return const Left(Failure());
     }
   }
 
@@ -127,32 +111,28 @@ class WarehouseRepositoriesImpl extends WarehouseRepositories {
   Future<Either<Failure, String>> insertPurchaseNoteManual(
       {required InsertPurchaseNoteManualEntity purchaseNote}) async {
     try {
-      final payload =
-          InsertPurchaseNoteManualModel.fromEntity(purchaseNote).toJson();
-      payload['receipt'] = await MultipartFile.fromFile(purchaseNote.receipt);
-      payload['items'] = jsonEncode(payload['items']);
-
       final response = await warehouseRemoteDataSources
-          .insertPurchaseNoteManual(data: payload);
+          .insertPurchaseNoteManual(params: purchaseNote);
+
       return Right(response.data['message'] ?? 'Berhasil');
     } on DioException catch (de) {
       switch (de.response?.statusCode) {
         case 400:
           return Left(Failure(message: de.response?.data['message']));
         default:
-          return Left(Failure());
+          return const Left(Failure());
       }
     } catch (e) {
-      return Left(Failure());
+      return const Left(Failure());
     }
   }
 
   @override
   Future<Either<Failure, String>> insertReturnCost(
-      {required String purchaseNoteId, required int amount}) async {
+      {required InsertReturnCostUseCaseParams params}) async {
     try {
-      final response = await warehouseRemoteDataSources.insertReturnCost(
-          purchaseNoteId: purchaseNoteId, amount: amount);
+      final response =
+          await warehouseRemoteDataSources.insertReturnCost(params: params);
 
       return Right(response.data['message']);
     } on DioException catch (de) {
@@ -160,53 +140,39 @@ class WarehouseRepositoriesImpl extends WarehouseRepositories {
         case 400:
           return Left(Failure(message: de.response?.data['message']));
         default:
-          return Left(Failure());
+          return const Left(Failure());
       }
     } catch (e) {
-      return Left(Failure());
+      return const Left(Failure());
     }
   }
 
   @override
   Future<Either<Failure, String>> insertShippingFee(
-      {required int price, required List<String> purchaseNoteIds}) async {
+      {required InsertShippingFeeUseCaseParams params}) async {
     try {
-      final response = await warehouseRemoteDataSources.insertShippingFee(
-        data: {
-          'date': DateTime.now().toUtc().toIso8601String(),
-          'price': price,
-          'receipt': purchaseNoteIds,
-        },
-      );
+      final response =
+          await warehouseRemoteDataSources.insertShippingFee(params: params);
 
       return Right(response.data['message']);
     } on DioException catch (de) {
       switch (de.response?.statusCode) {
         case 400:
           return Left(Failure(message: de.response?.data['message']));
-
         default:
-          return Left(Failure());
+          return const Left(Failure());
       }
     } catch (e) {
-      return Left(Failure());
+      return const Left(Failure());
     }
   }
 
   @override
   Future<Either<Failure, String>> updatePurchaseNote(
-      {required String purchaseNoteId,
-      required InsertPurchaseNoteManualEntity purchaseNote}) async {
+      {required UpdatePurchaseNoteUseCaseParams params}) async {
     try {
-      final payload =
-          InsertPurchaseNoteManualModel.fromEntity(purchaseNote).toJson();
-      if (!purchaseNote.receipt.startsWith('https://')) {
-        payload['receipt'] = await MultipartFile.fromFile(purchaseNote.receipt);
-      }
-      payload['items'] = jsonEncode(payload['items']);
-
-      final response = await warehouseRemoteDataSources.updatePurchaseNote(
-          data: payload, purchaseNoteId: purchaseNoteId);
+      final response =
+          await warehouseRemoteDataSources.updatePurchaseNote(params: params);
 
       return Right(response.data['message']);
     } on DioException catch (de) {
@@ -214,10 +180,10 @@ class WarehouseRepositoriesImpl extends WarehouseRepositories {
         case 400:
           return Left(Failure(message: de.response?.data['message']));
         default:
-          return Left(Failure());
+          return const Left(Failure());
       }
     } catch (e) {
-      return Left(Failure());
+      return const Left(Failure());
     }
   }
 }

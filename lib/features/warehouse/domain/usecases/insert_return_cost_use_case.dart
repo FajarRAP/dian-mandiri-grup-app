@@ -5,17 +5,24 @@ import '../../../../core/failure/failure.dart';
 import '../repositories/warehouse_repositories.dart';
 
 class InsertReturnCostUseCase
-    implements AsyncUseCaseParams<String, Map<String, dynamic>> {
+    implements AsyncUseCaseParams<String, InsertReturnCostUseCaseParams> {
   InsertReturnCostUseCase({required this.warehouseRepositories});
 
   final WarehouseRepositories warehouseRepositories;
 
   @override
-  Future<Either<Failure, String>> call(Map<String, dynamic> params) async {
-    final purchaseNoteId = params['purchase_note_id'];
-    final amount = params['amount'];
-
-    return await warehouseRepositories.insertReturnCost(
-        purchaseNoteId: purchaseNoteId, amount: amount);
+  Future<Either<Failure, String>> call(
+      InsertReturnCostUseCaseParams params) async {
+    return await warehouseRepositories.insertReturnCost(params: params);
   }
+}
+
+final class InsertReturnCostUseCaseParams {
+  const InsertReturnCostUseCaseParams({
+    required this.purchaseNoteId,
+    required this.amount,
+  });
+
+  final String purchaseNoteId;
+  final int amount;
 }

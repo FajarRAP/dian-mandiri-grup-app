@@ -6,7 +6,9 @@ import '../../../../core/failure/failure.dart';
 import '../repositories/warehouse_repositories.dart';
 
 class FetchPurchaseNotesDropdownUseCase
-    implements AsyncUseCaseParams<List<DropdownEntity>, Map<String, dynamic>> {
+    implements
+        AsyncUseCaseParams<List<DropdownEntity>,
+            FetchPurchaseNotesDropdownUseCaseParams> {
   const FetchPurchaseNotesDropdownUseCase(
       {required this.warehouseRepositories});
 
@@ -14,11 +16,20 @@ class FetchPurchaseNotesDropdownUseCase
 
   @override
   Future<Either<Failure, List<DropdownEntity>>> call(
-      Map<String, dynamic> params) async {
+      FetchPurchaseNotesDropdownUseCaseParams params) async {
     return await warehouseRepositories.fetchPurchaseNotesDropdown(
-      search: params['search'],
-      limit: params['limit'] ?? 10,
-      page: params['page'] ?? 1,
-    );
+        params: params);
   }
+}
+
+final class FetchPurchaseNotesDropdownUseCaseParams {
+  const FetchPurchaseNotesDropdownUseCaseParams({
+    this.search,
+    this.limit = 10,
+    this.page = 1,
+  });
+
+  final String? search;
+  final int limit;
+  final int page;
 }

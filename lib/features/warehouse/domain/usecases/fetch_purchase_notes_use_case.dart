@@ -8,20 +8,30 @@ import '../repositories/warehouse_repositories.dart';
 class FetchPurchaseNotesUseCase
     implements
         AsyncUseCaseParams<List<PurchaseNoteSummaryEntity>,
-            Map<String, dynamic>> {
+            FetchPurchaseNotesUseCaseParams> {
   const FetchPurchaseNotesUseCase({required this.warehouseRepositories});
 
   final WarehouseRepositories warehouseRepositories;
 
   @override
   Future<Either<Failure, List<PurchaseNoteSummaryEntity>>> call(
-      Map<String, dynamic> params) async {
-    return await warehouseRepositories.fetchPurchaseNotes(
-      column: params['column'] ?? 'name',
-      order: params['order'] ?? 'asc',
-      search: params['search'],
-      limit: params['limit'] ?? 10,
-      page: params['page'] ?? 1,
-    );
+      FetchPurchaseNotesUseCaseParams params) async {
+    return await warehouseRepositories.fetchPurchaseNotes(params: params);
   }
+}
+
+final class FetchPurchaseNotesUseCaseParams {
+  const FetchPurchaseNotesUseCaseParams({
+    this.column = 'name',
+    this.search,
+    this.sort = 'asc',
+    this.limit = 10,
+    this.page = 1,
+  });
+
+  final String column;
+  final String? search;
+  final String sort;
+  final int limit;
+  final int page;
 }

@@ -9,9 +9,9 @@ class WarehouseItemEntity {
   });
 
   final String? id;
-  final int? shipmentFee;
+  final num? shipmentFee;
   final String name;
   final int quantity;
   final int rejectQuantity;
-  final int price;
+  final num price;
 }
