@@ -52,3 +52,19 @@ List parseSpreadsheetFailure(SpreadsheetFailure spreadsheetFailure) {
 
   return [headers, rows];
 }
+
+class TextFormFieldConfig {
+  const TextFormFieldConfig({
+    this.onFieldSubmitted,
+    this.autoFocus,
+    this.decoration,
+    this.keyboardType,
+    this.textInputAction,
+  });
+
+  final void Function(String value)? onFieldSubmitted;
+  final bool? autoFocus;
+  final InputDecoration? decoration;
+  final TextInputType? keyboardType;
+  final TextInputAction? textInputAction;
+}
