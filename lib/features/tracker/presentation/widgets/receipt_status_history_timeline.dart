@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/common/shadows.dart';
 import '../../../../core/helpers/helpers.dart';
+import '../../../../core/themes/colors.dart';
 import '../../data/models/stage_model.dart';
 import '../../domain/entities/stage_entity.dart';
 
-class ReceiptHistoryRow extends StatelessWidget {
-  const ReceiptHistoryRow({
+class ReceiptStatusHistoryTimeline extends StatelessWidget {
+  const ReceiptStatusHistoryTimeline({
     super.key,
     required this.isLast,
     required this.stage,
@@ -16,27 +18,28 @@ class ReceiptHistoryRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
     final stageName = evaluateStage(stage.stage);
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
+      children: <Widget>[
         Column(
-          children: [
+          children: <Widget>[
             Container(
               decoration: BoxDecoration(
                 border: Border.all(
                   color: Colors.white,
                   width: 3,
                 ),
-                boxShadow: [
+                boxShadow: <BoxShadow>[
                   BoxShadow(
                     blurRadius: 5,
-                    color: Colors.green.withValues(alpha: 0.3),
+                    color: CustomColors.primaryNormal.withValues(alpha: .3),
                   )
                 ],
-                color: Colors.green.withValues(alpha: 0.6),
+                color: CustomColors.primaryNormal.withValues(alpha: .6),
                 shape: BoxShape.circle,
               ),
               height: 24,
@@ -49,7 +52,7 @@ class ReceiptHistoryRow extends StatelessWidget {
             ),
             if (!isLast)
               Container(
-                color: Colors.green.withValues(alpha: 0.3),
+                color: CustomColors.primaryNormal.withValues(alpha: .3),
                 height: 60,
                 width: 2,
               ),
@@ -59,18 +62,12 @@ class ReceiptHistoryRow extends StatelessWidget {
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+            children: <Widget>[
               Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 5,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                  color: Colors.white,
+                  boxShadow: cardBoxShadow,
+                  color: MaterialColors.surfaceContainerLowest,
                 ),
                 padding: const EdgeInsets.symmetric(
                   horizontal: 16,
@@ -79,17 +76,17 @@ class ReceiptHistoryRow extends StatelessWidget {
                 width: double.infinity,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+                  children: <Widget>[
                     Text(
                       stageName,
-                      style: textTheme.titleLarge?.copyWith(
-                        color: Colors.green.withValues(alpha: 0.8),
+                      style: textTheme.titleMedium?.copyWith(
+                        color: CustomColors.primaryNormal.withValues(alpha: .8),
                         fontWeight: FontWeight.w700,
                       ),
                     ),
                     const SizedBox(height: 8),
                     Row(
-                      children: [
+                      children: <Widget>[
                         Icon(
                           Icons.person,
                           color: Colors.grey.shade600,
@@ -106,7 +103,7 @@ class ReceiptHistoryRow extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Row(
-                      children: [
+                      children: <Widget>[
                         Icon(
                           Icons.access_time,
                           color: Colors.grey.shade600,
