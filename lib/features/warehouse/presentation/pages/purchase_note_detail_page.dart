@@ -290,8 +290,12 @@ class _PurchaseNoteDetailPageState extends State<PurchaseNoteDetailPage> {
                                 if (state is InsertReturnCostLoading) {
                                   return ConfirmationInputDialog(
                                     actionText: 'Ya',
-                                    title: 'Refund',
                                     body: 'Masukkan nominal pengembalian uang',
+                                    decoration: const InputDecoration(
+                                      labelText: 'Nominal Refund',
+                                    ),
+                                    keyboardType: TextInputType.number,
+                                    title: 'Refund',
                                   );
                                 }
 
@@ -305,8 +309,12 @@ class _PurchaseNoteDetailPageState extends State<PurchaseNoteDetailPage> {
                                         .returnCost = amount);
                                   },
                                   actionText: 'Ya',
-                                  title: 'Refund',
                                   body: 'Masukkan nominal pengembalian uang',
+                                  decoration: const InputDecoration(
+                                    labelText: 'Nominal Refund',
+                                  ),
+                                  keyboardType: TextInputType.number,
+                                  title: 'Refund',
                                 );
                               },
                             ),
