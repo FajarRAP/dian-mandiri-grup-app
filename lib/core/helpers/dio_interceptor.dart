@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-import '../../features/auth/domain/repositories/auth_repository.dart';
 import '../../features/auth/presentation/cubit/auth_cubit.dart';
 import '../../service_container.dart';
 import '../common/constants.dart';
@@ -12,15 +11,14 @@ class DioInterceptor implements Interceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
     final refreshToken = await _storage.read(key: refreshTokenKey);
+    final authCubit = getIt.get<AuthCubit>();
 
     if (err.response?.statusCode == 401) {
       if (err.requestOptions.path == '$authEndpoint/refresh') {
         await _storage.deleteAll();
-        getIt.get<AuthCubit>().refreshTokenExpired();
+        authCubit.refreshTokenExpired();
       } else if (refreshToken != null) {
-        await getIt
-            .get<AuthRepository>()
-            .refreshToken(refreshToken: refreshToken);
+        await authCubit.refreshToken(refreshToken: refreshToken);
         final accessToken = await _storage.read(key: accessTokenKey);
         return handler.resolve(await Dio().fetch(err.requestOptions
           ..headers['Authorization'] = 'Bearer $accessToken'));
