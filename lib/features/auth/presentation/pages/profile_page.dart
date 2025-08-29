@@ -3,9 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/common/constants.dart';
+import '../../../../core/helpers/helpers.dart';
 import '../../../../core/helpers/top_snackbar.dart';
+import '../../../../core/widgets/buttons/primary_button.dart';
 import '../../../../core/widgets/confirmation_input_dialog.dart';
-import '../../../../core/widgets/primary_icon_button.dart';
 import '../cubit/auth_cubit.dart';
 import '../widgets/profile_card.dart';
 
@@ -14,9 +15,9 @@ class ProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final authCubit = context.read<AuthCubit>();
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
+    final authCubit = context.read<AuthCubit>();
 
     return BlocConsumer<AuthCubit, AuthState>(
       bloc: authCubit..fetchUser(),
@@ -96,26 +97,14 @@ class ProfilePage extends StatelessWidget {
                               },
                               builder: (context, state) {
                                 if (state is UpdateProfileLoading) {
-                                  return ConfirmationInputDialog(
-                                    actionText: 'Ganti nama',
-                                    body:
-                                        'Masukkan nama baru Anda di bawah ini.',
-                                    decoration: const InputDecoration(
-                                      labelText: 'Nama Baru',
-                                    ),
-                                    title: 'Ganti Nama',
-                                  );
+                                  return _buildUpdateConfirmationDialog(
+                                      authCubit: authCubit);
                                 }
 
-                                return ConfirmationInputDialog(
+                                return _buildUpdateConfirmationDialog(
+                                  authCubit: authCubit,
                                   onAction: (value) =>
                                       authCubit.updateProfile(name: value),
-                                  actionText: 'Ganti nama',
-                                  body: 'Masukkan nama baru Anda di bawah ini.',
-                                  decoration: const InputDecoration(
-                                    labelText: 'Nama Baru',
-                                  ),
-                                  title: 'Ganti Nama',
                                 );
                               },
                             ),
@@ -147,16 +136,16 @@ class ProfilePage extends StatelessWidget {
                       },
                       builder: (context, state) {
                         if (state is SignOutLoading) {
-                          return const PrimaryIconButton(
+                          return const PrimaryButton(
                             icon: Icon(Icons.exit_to_app_rounded),
-                            label: Text('Sign Out'),
+                            child: Text('Sign Out'),
                           );
                         }
 
-                        return PrimaryIconButton(
+                        return PrimaryButton(
                           onPressed: authCubit.signOut,
                           icon: const Icon(Icons.exit_to_app_rounded),
-                          label: const Text('Sign Out'),
+                          child: const Text('Sign Out'),
                         );
                       },
                     ),
@@ -169,6 +158,25 @@ class ProfilePage extends StatelessWidget {
 
         return const SizedBox();
       },
+    );
+  }
+
+  Widget _buildUpdateConfirmationDialog(
+      {void Function(String value)? onAction, required AuthCubit authCubit}) {
+    final textFormFieldConfig = TextFormFieldConfig(
+      onFieldSubmitted: (value) => authCubit.updateProfile(name: value),
+      decoration: const InputDecoration(
+        labelText: 'Nama Baru',
+      ),
+      textInputAction: TextInputAction.send,
+    );
+
+    return ConfirmationInputDialog(
+      onAction: onAction,
+      actionText: 'Ganti nama',
+      body: 'Masukkan nama baru Anda di bawah ini.',
+      textFormFieldConfig: textFormFieldConfig,
+      title: 'Ganti Nama',
     );
   }
 }
