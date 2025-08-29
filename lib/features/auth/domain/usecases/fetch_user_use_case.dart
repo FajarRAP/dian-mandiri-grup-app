@@ -3,15 +3,15 @@ import 'package:dartz/dartz.dart';
 import '../../../../core/common/use_cases.dart';
 import '../../../../core/failure/failure.dart';
 import '../entities/user_entity.dart';
-import '../repositories/auth_repository.dart';
+import '../repositories/auth_repositories.dart';
 
 class FetchUserUseCase implements AsyncUseCaseNoParams<UserEntity> {
-  const FetchUserUseCase({required this.authRepository});
+  const FetchUserUseCase({required this.authRepositories});
 
-  final AuthRepository authRepository;
+  final AuthRepositories authRepositories;
 
   @override
   Future<Either<Failure, UserEntity>> call() async {
-    return authRepository.fetchUser();
+    return authRepositories.fetchUser();
   }
 }

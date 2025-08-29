@@ -2,15 +2,15 @@ import 'package:dartz/dartz.dart';
 
 import '../../../../core/common/use_cases.dart';
 import '../../../../core/failure/failure.dart';
-import '../repositories/auth_repository.dart';
+import '../repositories/auth_repositories.dart';
 
 class RefreshTokenUseCase implements AsyncUseCaseParams<String, String> {
-  const RefreshTokenUseCase({required this.authRepository});
+  const RefreshTokenUseCase({required this.authRepositories});
 
-  final AuthRepository authRepository;
+  final AuthRepositories authRepositories;
 
   @override
   Future<Either<Failure, String>> call(String params) async {
-    return await authRepository.refreshToken(refreshToken: params);
+    return await authRepositories.refreshToken(refreshToken: params);
   }
 }

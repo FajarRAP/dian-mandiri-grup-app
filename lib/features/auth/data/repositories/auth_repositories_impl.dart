@@ -6,22 +6,21 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import '../../../../core/common/constants.dart';
-import '../../../../core/exceptions/refresh_token.dart';
 import '../../../../core/failure/failure.dart';
 import '../../../../core/helpers/top_snackbar.dart';
 import '../../domain/entities/user_entity.dart';
-import '../../domain/repositories/auth_repository.dart';
-import '../datasources/auth_remote_data_source.dart';
+import '../../domain/repositories/auth_repositories.dart';
+import '../datasources/auth_remote_data_sources.dart';
 import '../models/user_model.dart';
 
-class AuthRepositoryImpl implements AuthRepository {
-  const AuthRepositoryImpl({
+class AuthRepositoriesImpl implements AuthRepositories {
+  const AuthRepositoriesImpl({
     required this.authRemoteDataSource,
     required this.googleSignIn,
     required this.storage,
   });
 
-  final AuthRemoteDataSource<Response> authRemoteDataSource;
+  final AuthRemoteDataSources<Response> authRemoteDataSource;
   final GoogleSignIn googleSignIn;
   final FlutterSecureStorage storage;
 
@@ -33,8 +32,6 @@ class AuthRepositoryImpl implements AuthRepository {
       return Right(UserModel.fromJson(response.data['data']));
     } on DioException catch (de) {
       switch (de.response?.statusCode) {
-        case 401:
-          return Left(RefreshToken());
         default:
           return Left(Failure());
       }
@@ -119,8 +116,6 @@ class AuthRepositoryImpl implements AuthRepository {
       return Right(response.data['message']);
     } on DioException catch (de) {
       switch (de.response?.statusCode) {
-        case 401:
-          return Left(RefreshToken());
         default:
           return const Left(Failure());
       }

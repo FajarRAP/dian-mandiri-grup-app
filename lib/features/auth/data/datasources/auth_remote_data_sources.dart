@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 
 import '../../../../core/common/constants.dart';
 
-abstract class AuthRemoteDataSource<T> {
+abstract class AuthRemoteDataSources<T> {
   Future<T> signIn({required String googleAccessToken});
   Future<T> signOut();
   Future<T> fetchUser();
@@ -10,8 +10,8 @@ abstract class AuthRemoteDataSource<T> {
   Future<T> updateProfile({required String name});
 }
 
-class AuthRemoteDataSourceImpl implements AuthRemoteDataSource<Response> {
-  const AuthRemoteDataSourceImpl({required this.dio});
+class AuthRemoteDataSourcesImpl implements AuthRemoteDataSources<Response> {
+  const AuthRemoteDataSourcesImpl({required this.dio});
 
   final Dio dio;
 
