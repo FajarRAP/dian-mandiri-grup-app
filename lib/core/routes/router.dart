@@ -1,6 +1,6 @@
-import 'package:camera/camera.dart';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../features/auth/presentation/pages/profile_page.dart';
 import '../../features/auth/presentation/pages/sign_in_page.dart';
@@ -22,7 +22,6 @@ import '../../features/tracker/presentation/pages/send_page.dart';
 import '../../features/tracker/presentation/pages/shipment_detail_page.dart';
 import '../../features/tracker/presentation/pages/tracker_page.dart';
 import '../../features/tracker/presentation/pages/upload_page.dart';
-import '../../features/tracker/presentation/widgets/open_camera.dart';
 import '../../features/warehouse/presentation/pages/add_purchase_note_file_page.dart';
 import '../../features/warehouse/presentation/pages/add_purchase_note_manual_page.dart';
 import '../../features/warehouse/presentation/pages/add_shipping_fee_page.dart';
@@ -30,7 +29,7 @@ import '../../features/warehouse/presentation/pages/purchase_note_detail_page.da
 import '../../features/warehouse/presentation/pages/warehouse_page.dart';
 import '../../main.dart';
 import '../common/constants.dart';
-import '../common/scaffold_with_bottom_navigation_bar.dart';
+import '../widgets/scaffold_with_bottom_navigation_bar.dart';
 
 FadeTransition transition(Animation<double> animation, Widget child) =>
     FadeTransition(
@@ -59,17 +58,10 @@ final router = GoRouter(
           transitionsBuilder: transitionsBuilder),
     ),
     GoRoute(
-      path: cameraRoute,
-      pageBuilder: (context, state) => CustomTransitionPage(
-          key: state.pageKey,
-          child: TakePictureScreen(camera: cameras.first),
-          transitionsBuilder: transitionsBuilder),
-    ),
-    GoRoute(
       path: displayPictureRoute,
       pageBuilder: (context, state) => CustomTransitionPage(
           key: state.pageKey,
-          child: DisplayPictureScreen(image: state.extra as XFile),
+          child: UploadPage(image: state.extra as XFile),
           transitionsBuilder: transitionsBuilder),
     ),
     StatefulShellRoute.indexedStack(
