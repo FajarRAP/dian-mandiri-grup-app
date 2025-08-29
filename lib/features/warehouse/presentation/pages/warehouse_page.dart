@@ -21,7 +21,7 @@ class WarehousePage extends StatelessWidget {
     final focusNode = FocusScope.of(context, createDependency: false);
     final warehouseCubit = context.read<WarehouseCubit>()..fetchPurchaseNotes();
     var column = 'created_at';
-    var order = 'asc';
+    var sort = 'asc';
     String? search;
 
     return BlocListener<WarehouseCubit, WarehouseState>(
@@ -29,7 +29,8 @@ class WarehousePage extends StatelessWidget {
         if (state is UpdatePurchaseNoteLoaded ||
             state is InsertPurchaseNoteFileLoaded ||
             state is InsertPurchaseNoteManualLoaded ||
-            state is DeletePurchaseNoteLoaded) {
+            state is DeletePurchaseNoteLoaded ||
+            state is InsertShippingFeeLoaded) {
           warehouseCubit.fetchPurchaseNotes();
         }
       },
@@ -42,7 +43,7 @@ class WarehousePage extends StatelessWidget {
                   warehouseCubit.state is! ListPaginateLast) {
                 warehouseCubit.fetchPurchaseNotesPaginate(
                   column: column,
-                  order: order,
+                  sort: sort,
                   search: search,
                 );
               }
@@ -64,10 +65,10 @@ class WarehousePage extends StatelessWidget {
                       onSelected: (value) {
                         final params = value.split(',');
                         column = params.first;
-                        order = params.last;
+                        sort = params.last;
                         warehouseCubit.fetchPurchaseNotes(
                           column: column,
-                          order: order,
+                          sort: sort,
                           search: search,
                         );
                       },
@@ -84,24 +85,32 @@ class WarehousePage extends StatelessWidget {
                         ),
                         PopupMenuItem(
                           value: 'total_item,asc',
-                          child: Text('Barang Naik'),
+                          child: Text('Total Barang Naik'),
                         ),
                         PopupMenuItem(
                           value: 'total_item,desc',
-                          child: Text('Barang Turun'),
+                          child: Text('Total Barang Turun'),
                         ),
                       ],
                     ),
                   ],
                   bottom: PreferredSize(
                     preferredSize: const Size.fromHeight(88),
-                    child: Padding(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: const Border(
+                          bottom: BorderSide(
+                            color: MaterialColors.outlineVariant,
+                            width: 1,
+                          ),
+                        ),
+                      ),
                       padding: const EdgeInsets.all(16),
                       child: TextFormField(
                         onChanged: (value) {
                           search = value;
                           debouncer.run(() => warehouseCubit.fetchPurchaseNotes(
-                              column: column, order: order, search: search));
+                              column: column, sort: sort, search: search));
                         },
                         onTapOutside: (event) => focusNode.unfocus(),
                         decoration: const InputDecoration(
