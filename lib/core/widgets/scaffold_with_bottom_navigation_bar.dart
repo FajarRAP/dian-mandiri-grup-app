@@ -6,12 +6,9 @@ import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import '../../features/auth/presentation/cubit/auth_cubit.dart';
-import '../../features/supplier/presentation/cubit/supplier_cubit.dart';
-import '../../features/tracker/presentation/cubit/shipment_cubit.dart';
-import '../../features/warehouse/presentation/cubit/warehouse_cubit.dart';
 import '../../service_container.dart';
 import '../themes/colors.dart';
-import 'constants.dart';
+import '../common/constants.dart';
 
 class ScaffoldWithBottomNavigationBar extends StatelessWidget {
   final StatefulNavigationShell child;
@@ -21,36 +18,20 @@ class ScaffoldWithBottomNavigationBar extends StatelessWidget {
     required this.child,
   });
 
-  void listener<T>(BuildContext context, T state) async {
-    final storage = getIt.get<FlutterSecureStorage>();
-    final refresh = await storage.read(key: refreshTokenKey);
-
-    if (refresh == null) await GoogleSignIn().signOut();
-    if (!context.mounted) return;
-    if (refresh == null) context.go(loginRoute);
-  }
-
   @override
   Widget build(BuildContext context) {
-    return MultiBlocListener(
-      listeners: [
-        BlocListener<AuthCubit, AuthState>(
-          bloc: context.read<AuthCubit>(),
-          listener: listener<AuthState>,
-        ),
-        BlocListener<ShipmentCubit, ShipmentState>(
-          bloc: context.read<ShipmentCubit>(),
-          listener: listener<ShipmentState>,
-        ),
-        BlocListener<SupplierCubit, SupplierState>(
-          bloc: context.read<SupplierCubit>(),
-          listener: listener<SupplierState>,
-        ),
-        BlocListener<WarehouseCubit, WarehouseState>(
-          bloc: context.read<WarehouseCubit>(),
-          listener: listener<WarehouseState>,
-        ),
-      ],
+    return BlocListener<AuthCubit, AuthState>(
+      bloc: context.read<AuthCubit>(),
+      listener: (context, state) async {
+        if (state is RefreshTokenExpired) {
+          final storage = getIt.get<FlutterSecureStorage>();
+          final refresh = await storage.read(key: refreshTokenKey);
+
+          if (refresh == null) await GoogleSignIn().signOut();
+          if (!context.mounted) return;
+          if (refresh == null) context.go(loginRoute);
+        }
+      },
       child: Scaffold(
         body: child,
         bottomNavigationBar: NavigationBar(
@@ -64,19 +45,20 @@ class ScaffoldWithBottomNavigationBar extends StatelessWidget {
             NavigationDestination(
               icon: _boxIcon(MaterialColors.onSurface),
               label: 'Home',
-              selectedIcon: _boxIcon(MaterialColors.onPrimary),
+              selectedIcon: _boxIcon(MaterialColors.surfaceContainerLowest),
               tooltip: 'Beranda',
             ),
             NavigationDestination(
               icon: _personMenuIcon(MaterialColors.onSurface),
               label: 'Staff',
-              selectedIcon: _personMenuIcon(MaterialColors.onPrimary),
+              selectedIcon:
+                  _personMenuIcon(MaterialColors.surfaceContainerLowest),
               tooltip: 'Kelola Staf',
             ),
             NavigationDestination(
               icon: _personIcon(MaterialColors.onSurface),
               label: 'Profile',
-              selectedIcon: _personIcon(MaterialColors.onPrimary),
+              selectedIcon: _personIcon(MaterialColors.surfaceContainerLowest),
               tooltip: 'Profil',
             ),
           ],
