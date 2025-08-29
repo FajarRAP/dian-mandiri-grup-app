@@ -1,12 +1,12 @@
-import 'package:camera/camera.dart';
 import 'package:dartz/dartz.dart';
 
 import '../../../../core/failure/failure.dart';
 import '../entities/shipment_detail_entity.dart';
+import '../entities/shipment_entity.dart';
 import '../entities/shipment_report_entity.dart';
 
-abstract class ShipmentRepository {
-  Future<Either<Failure, Map<String, dynamic>>> fetchShipments(
+abstract class ShipmentRepositories {
+  Future<Either<Failure, List<ShipmentEntity>>> fetchShipments(
       {required String date,
       required String stage,
       int page = 1,
@@ -26,7 +26,7 @@ abstract class ShipmentRepository {
   Future<Either<Failure, String>> deleteShipment({required String shipmentId});
   Future<Either<Failure, String>> insertShipmentDocument(
       {required String shipmentId,
-      required XFile document,
+      required String documentPath,
       required String stage});
   Future<Either<Failure, String>> downloadShipmentReport(
       {required ShipmentReportEntity shipmentReportEntity});

@@ -1,4 +1,3 @@
-import 'package:camera/camera.dart';
 import 'package:dio/dio.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -6,7 +5,7 @@ import '../../../../core/common/constants.dart';
 import '../../../../core/helpers/helpers.dart';
 import '../models/shipment_report_model.dart';
 
-abstract class ShipmentRemoteDataSource<T> {
+abstract class ShipmentRemoteDataSources<T> {
   Future<T> fetchShipments(
       {required String date,
       required String stage,
@@ -25,14 +24,15 @@ abstract class ShipmentRemoteDataSource<T> {
   Future<T> deleteShipment({required String shipmentId});
   Future<T> insertShipmentDocument(
       {required String shipmentId,
-      required XFile document,
+      required String documentPath,
       required String stage});
   Future<T> downloadShipmentReport(
       {required ShipmentReportModel shipmentReportModel});
 }
 
-class ShipmentRemoteDataSourceImpl extends ShipmentRemoteDataSource<Response> {
-  ShipmentRemoteDataSourceImpl({required this.dio});
+class ShipmentRemoteDataSourcesImpl
+    extends ShipmentRemoteDataSources<Response> {
+  ShipmentRemoteDataSourcesImpl({required this.dio});
 
   final Dio dio;
 
@@ -100,15 +100,17 @@ class ShipmentRemoteDataSourceImpl extends ShipmentRemoteDataSource<Response> {
   @override
   Future<Response> insertShipmentDocument(
       {required String shipmentId,
-      required XFile document,
+      required String documentPath,
       required String stage}) async {
     final formData = FormData.fromMap({
-      'document': await MultipartFile.fromFile(document.path),
+      'document': await MultipartFile.fromFile(documentPath),
       'stage': stage,
     });
 
-    return await dio.post('$shipmentEndpoint/$shipmentId/document',
-        data: formData);
+    return await dio.post(
+      '$shipmentEndpoint/$shipmentId/document',
+      data: formData,
+    );
   }
 
   @override
