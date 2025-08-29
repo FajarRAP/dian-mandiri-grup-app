@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../helpers/helpers.dart';
 import '../helpers/validators.dart';
-import 'primary_button.dart';
+import 'buttons/primary_button.dart';
 
 class ConfirmationInputDialog extends StatefulWidget {
   const ConfirmationInputDialog({
@@ -10,16 +11,14 @@ class ConfirmationInputDialog extends StatefulWidget {
     this.onAction,
     required this.actionText,
     required this.body,
-    this.decoration,
-    this.keyboardType,
+    this.textFormFieldConfig,
     required this.title,
   });
 
   final void Function(String value)? onAction;
   final String actionText;
   final String body;
-  final InputDecoration? decoration;
-  final TextInputType? keyboardType;
+  final TextFormFieldConfig? textFormFieldConfig;
   final String title;
 
   @override
@@ -74,10 +73,13 @@ class _ConfirmationInputDialogState extends State<ConfirmationInputDialog> {
             ),
             const SizedBox(height: 24),
             TextFormField(
+              onFieldSubmitted: widget.textFormFieldConfig?.onFieldSubmitted,
               onTapOutside: (_) => _focusNode.unfocus(),
+              autofocus: widget.textFormFieldConfig?.autoFocus ?? false,
               controller: _controller,
-              decoration: widget.decoration,
-              keyboardType: widget.keyboardType,
+              decoration: widget.textFormFieldConfig?.decoration,
+              keyboardType: widget.textFormFieldConfig?.keyboardType,
+              textInputAction: widget.textFormFieldConfig?.textInputAction,
               validator: inputValidator,
             ),
             const SizedBox(height: 24),
