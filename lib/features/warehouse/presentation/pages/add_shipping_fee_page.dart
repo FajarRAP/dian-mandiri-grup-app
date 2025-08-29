@@ -57,7 +57,7 @@ class _AddShippingFeePageState extends State<AddShippingFeePage> {
               onTapOutside: (event) => _focusNode.unfocus(),
               autovalidateMode: AutovalidateMode.onUserInteraction,
               controller: _shippingFeeController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Harga Ongkos Kirim',
               ),
               keyboardType: TextInputType.number,
@@ -74,6 +74,7 @@ class _AddShippingFeePageState extends State<AddShippingFeePage> {
                       const message = 'Nota sudah dipilih';
                       return TopSnackbar.dangerSnackbar(message: message);
                     }
+
                     setState(() => _selectedPurchaseNote.add(purchaseNote));
                     context.pop();
                   },
@@ -119,7 +120,6 @@ class _AddShippingFeePageState extends State<AddShippingFeePage> {
               if (state is InsertShippingFeeLoaded) {
                 TopSnackbar.successSnackbar(message: state.message);
                 context.pop();
-                _warehouseCubit.fetchPurchaseNotes();
               }
 
               if (state is InsertShippingFeeError) {
