@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../../features/auth/domain/repositories/auth_repository.dart';
+import '../../features/auth/presentation/cubit/auth_cubit.dart';
 import '../../service_container.dart';
 import '../common/constants.dart';
 
@@ -15,6 +16,7 @@ class DioInterceptor implements Interceptor {
     if (err.response?.statusCode == 401) {
       if (err.requestOptions.path == '$authEndpoint/refresh') {
         await _storage.deleteAll();
+        getIt.get<AuthCubit>().refreshTokenExpired();
       } else if (refreshToken != null) {
         await getIt
             .get<AuthRepository>()
