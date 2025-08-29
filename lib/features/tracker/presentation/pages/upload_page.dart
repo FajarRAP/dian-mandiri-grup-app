@@ -56,7 +56,7 @@ class UploadPage extends StatelessWidget {
                 onPressed: () async =>
                     await shipmentCubit.insertShipmentDocument(
                   shipmentId: shipmentId,
-                  image: image,
+                  documentPath: image.path,
                   stage: (shipmentCubit.shipmentDetail as ShipmentDetailModel)
                       .stage
                       .stage,
