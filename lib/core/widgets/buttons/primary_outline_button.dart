@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../themes/colors.dart';
+import '../../themes/colors.dart';
 
 class PrimaryOutlineButton extends StatelessWidget {
   const PrimaryOutlineButton({
@@ -24,7 +24,7 @@ class PrimaryOutlineButton extends StatelessWidget {
         backgroundColor: MaterialColors.onPrimary,
         elevation: 0,
         foregroundColor: CustomColors.primaryNormal,
-        fixedSize: Size.fromHeight(height ?? 40),
+        fixedSize: height == null ? null : Size.fromHeight(height!),
         side: BorderSide(
           color: CustomColors.primaryNormal,
           width: 1.5,

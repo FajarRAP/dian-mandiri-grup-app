@@ -1,30 +1,30 @@
 import 'package:flutter/material.dart';
 
-import '../themes/colors.dart';
+import '../../themes/colors.dart';
 
-class LightButton extends StatelessWidget {
-  const LightButton({
+class DangerButton extends StatelessWidget {
+  const DangerButton({
     super.key,
     this.onPressed,
     this.height,
-    required this.icon,
-    required this.label,
+    this.icon,
+    required this.child,
   });
 
   final void Function()? onPressed;
   final double? height;
-  final Widget icon;
-  final Widget label;
+  final Widget? icon;
+  final Widget child;
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton.icon(
       onPressed: onPressed,
       icon: icon,
-      label: label,
+      label: child,
       style: ElevatedButton.styleFrom(
-        backgroundColor: MaterialColors.surfaceContainerLowest,
-        foregroundColor: MaterialColors.onSurface,
+        backgroundColor: MaterialColors.error,
+        foregroundColor: MaterialColors.onError,
         fixedSize: height == null ? null : Size.fromHeight(height!),
       ),
     );
