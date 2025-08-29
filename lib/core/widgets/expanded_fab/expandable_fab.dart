@@ -58,7 +58,7 @@ class _ExpandableFABState extends State<ExpandableFAB>
     return SizedBox.expand(
       child: Stack(
         alignment: Alignment.bottomRight,
-        children: [
+        children: <Widget>[
           _buildCloseFab(),
           ..._buildExpandingIconButtons(),
           _buildOpenFab(),

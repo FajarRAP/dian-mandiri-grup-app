@@ -30,7 +30,7 @@ class TrackerMenuCard extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
-            children: [
+            children: <Widget>[
               Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8),
