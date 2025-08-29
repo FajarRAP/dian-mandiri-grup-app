@@ -49,7 +49,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
-      providers: <BlocProvider>[
+      providers: [
         BlocProvider(create: (context) => getIt.get<AuthCubit>()),
         BlocProvider(create: (context) => getIt.get<ShipmentCubit>()),
         BlocProvider(create: (context) => getIt.get<SupplierCubit>()),
