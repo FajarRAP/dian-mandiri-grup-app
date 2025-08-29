@@ -49,13 +49,6 @@ class _PurchaseNoteDetailPageState extends State<PurchaseNoteDetailPage> {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    final textFormFieldConfig = TextFormFieldConfig(
-      decoration: const InputDecoration(
-        labelText: 'Nominal Refund',
-        prefixText: 'Rp. ',
-      ),
-      keyboardType: TextInputType.number,
-    );
 
     return Scaffold(
       appBar: AppBar(
@@ -210,7 +203,7 @@ class _PurchaseNoteDetailPageState extends State<PurchaseNoteDetailPage> {
         builder: (context, state) {
           if (state is FetchPurchaseNoteLoaded) {
             final totalPrice = _purchaseNoteDetail.items
-                .fold(0, (prev, e) => prev + e.price * e.quantity);
+                .fold(0.0, (prev, e) => prev + e.price * e.quantity);
 
             return FABContainer(
               child: Column(
@@ -295,15 +288,10 @@ class _PurchaseNoteDetailPageState extends State<PurchaseNoteDetailPage> {
                               },
                               builder: (context, state) {
                                 if (state is InsertReturnCostLoading) {
-                                  return ConfirmationInputDialog(
-                                    actionText: 'Ya',
-                                    body: 'Masukkan nominal pengembalian uang',
-                                    textFormFieldConfig: textFormFieldConfig,
-                                    title: 'Refund',
-                                  );
+                                  return _buildInsertReturnCostDialog();
                                 }
 
-                                return ConfirmationInputDialog(
+                                return _buildInsertReturnCostDialog(
                                   onAction: (value) async {
                                     final amount = int.parse(value);
                                     await _warehouseCubit.insertReturnCost(
@@ -312,10 +300,6 @@ class _PurchaseNoteDetailPageState extends State<PurchaseNoteDetailPage> {
                                     setState(() => _purchaseNoteDetail
                                         .returnCost = amount);
                                   },
-                                  actionText: 'Ya',
-                                  body: 'Masukkan nominal pengembalian uang',
-                                  textFormFieldConfig: textFormFieldConfig,
-                                  title: 'Refund',
                                 );
                               },
                             ),
@@ -387,6 +371,26 @@ class _PurchaseNoteDetailPageState extends State<PurchaseNoteDetailPage> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       resizeToAvoidBottomInset: false,
+    );
+  }
+
+  Widget _buildInsertReturnCostDialog({void Function(String value)? onAction}) {
+    final textFormFieldConfig = TextFormFieldConfig(
+      onFieldSubmitted: onAction,
+      decoration: const InputDecoration(
+        labelText: 'Nominal Refund',
+        prefixText: 'Rp. ',
+      ),
+      keyboardType: TextInputType.number,
+      textInputAction: TextInputAction.send,
+    );
+
+    return ConfirmationInputDialog(
+      onAction: onAction,
+      actionText: 'Ya',
+      body: 'Masukkan nominal pengembalian uang',
+      textFormFieldConfig: textFormFieldConfig,
+      title: 'Refund',
     );
   }
 }
