@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import 'primary_button.dart';
+import 'buttons/primary_button.dart';
 
 class ConfirmationDialog extends StatelessWidget {
   const ConfirmationDialog({
     super.key,
     this.onAction,
     required this.actionText,
-    required this.title,
     required this.body,
+    required this.title,
   });
 
   final void Function()? onAction;
   final String actionText;
-  final String title;
   final String body;
+  final String title;
 
   @override
   Widget build(BuildContext context) {
