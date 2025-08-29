@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-class HomeMenuCard extends StatelessWidget {
-  const HomeMenuCard({
+class TrackerMenuCard extends StatelessWidget {
+  const TrackerMenuCard({
     super.key,
     required this.title,
     required this.route,
@@ -34,7 +34,7 @@ class HomeMenuCard extends StatelessWidget {
               Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8),
-                  color: color[100],
+                  color: color.shade100,
                 ),
                 padding: const EdgeInsets.all(6),
                 child: Image.asset(
@@ -46,7 +46,9 @@ class HomeMenuCard extends StatelessWidget {
               const SizedBox(height: 14),
               Text(
                 title,
-                style: textTheme.titleLarge,
+                style: textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ],
           ),
