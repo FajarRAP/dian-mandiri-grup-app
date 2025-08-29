@@ -10,10 +10,10 @@ class DioInterceptor implements Interceptor {
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
-    final refreshToken = await _storage.read(key: refreshTokenKey);
-    final authCubit = getIt.get<AuthCubit>();
-
     if (err.response?.statusCode == 401) {
+      final refreshToken = await _storage.read(key: refreshTokenKey);
+      final authCubit = getIt.get<AuthCubit>();
+
       if (err.requestOptions.path == '$authEndpoint/refresh') {
         await _storage.deleteAll();
         authCubit.refreshTokenExpired();
