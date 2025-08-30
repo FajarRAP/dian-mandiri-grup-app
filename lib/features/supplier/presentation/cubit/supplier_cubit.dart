@@ -33,7 +33,7 @@ class SupplierCubit extends Cubit<SupplierState> {
   final UpdateSupplierUseCase _updateSupplierUseCase;
 
   var _currentPage = 1;
-  final suppliers = <SupplierEntity>[];
+  final _suppliers = <SupplierEntity>[];
 
   Future<void> fetchSupplier({required String supplierId}) async {
     emit(FetchSupplierLoading());
@@ -41,77 +41,75 @@ class SupplierCubit extends Cubit<SupplierState> {
     final result = await _fetchSupplierUseCase(supplierId);
 
     result.fold(
-      (l) => emit(FetchSupplierError(message: l.message)),
-      (r) => emit(FetchSupplierLoaded(supplierDetail: r)),
+      (failure) => emit(FetchSupplierError(message: failure.message)),
+      (supplierDetail) =>
+          emit(FetchSupplierLoaded(supplierDetail: supplierDetail)),
     );
   }
 
   Future<void> fetchSuppliers({
     String? search,
     String column = 'name',
-    String order = 'asc',
+    String sort = 'asc',
   }) async {
     _currentPage = 1;
 
     emit(FetchSuppliersLoading());
 
-    final result = await _fetchSuppliersUseCase({
-      'search': search,
-      'column': column,
-      'order': order,
-    });
+    final params = FetchSuppliersUseCaseParams(
+      search: search,
+      column: column,
+      sort: sort,
+    );
+    final result = await _fetchSuppliersUseCase(params);
 
     result.fold(
-      (l) => emit(FetchSuppliersError(message: l.message)),
-      (r) {
-        suppliers
-          ..clear()
-          ..addAll(r);
-        emit(FetchSuppliersLoaded(suppliers: r));
-      },
+      (failure) => emit(FetchSuppliersError(message: failure.message)),
+      (suppliers) => emit(FetchSuppliersLoaded(
+          suppliers: _suppliers
+            ..clear()
+            ..addAll(suppliers))),
     );
   }
 
   Future<void> fetchSuppliersPaginate({
     String? search,
     String column = 'name',
-    String order = 'asc',
+    String sort = 'asc',
   }) async {
     emit(ListPaginateLoading());
 
-    final result = await _fetchSuppliersUseCase({
-      'search': search,
-      'column': column,
-      'order': order,
-      'page': ++_currentPage,
-    });
+    final params = FetchSuppliersUseCaseParams(
+      column: column,
+      search: search,
+      sort: sort,
+      page: ++_currentPage,
+    );
+    final result = await _fetchSuppliersUseCase(params);
 
     result.fold(
-      (l) => emit(FetchSuppliersError(message: l.message)),
-      (r) {
-        if (r.isEmpty) {
+      (failure) => emit(FetchSuppliersError(message: failure.message)),
+      (suppliers) {
+        if (suppliers.isEmpty) {
           _currentPage = 1;
           emit(ListPaginateLast());
         } else {
-          suppliers.addAll(r);
           emit(ListPaginateLoaded());
-          emit(FetchSuppliersLoaded(suppliers: r));
+          emit(FetchSuppliersLoaded(suppliers: _suppliers..addAll(suppliers)));
         }
       },
     );
   }
 
-  Future<void> fetchSuppliersDropdown({
-    String? search,
-  }) async {
+  Future<void> fetchSuppliersDropdown({String? search}) async {
     emit(FetchSuppliersDropdownLoading());
-    final result = await _fetchSuppliersDropdownUseCase({
-      'search': search,
-    });
+
+    final params = FetchSuppliersDropdownUseCaseParams(search: search);
+    final result = await _fetchSuppliersDropdownUseCase(params);
 
     result.fold(
-      (l) => emit(FetchSuppliersDropdownError(message: l.message)),
-      (r) => emit(FetchSuppliersDropdownLoaded(suppliers: r)),
+      (failure) => emit(FetchSuppliersDropdownError(message: failure.message)),
+      (suppliers) => emit(FetchSuppliersDropdownLoaded(suppliers: suppliers)),
     );
   }
 
@@ -122,8 +120,8 @@ class SupplierCubit extends Cubit<SupplierState> {
     final result = await _insertSupplierUseCase(supplierDetailEntity);
 
     result.fold(
-      (l) => emit(InsertSupplierError(message: l.message)),
-      (r) => emit(InsertSupplierLoaded(message: r)),
+      (failure) => emit(InsertSupplierError(message: failure.message)),
+      (message) => emit(InsertSupplierLoaded(message: message)),
     );
   }
 
@@ -134,8 +132,8 @@ class SupplierCubit extends Cubit<SupplierState> {
     final result = await _updateSupplierUseCase(supplierDetailEntity);
 
     result.fold(
-      (l) => emit(UpdateSupplierError(message: l.message)),
-      (r) => emit(UpdateSupplierLoaded(message: r)),
+      (failure) => emit(UpdateSupplierError(message: failure.message)),
+      (message) => emit(UpdateSupplierLoaded(message: message)),
     );
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/common/constants.dart';
 import '../../../../core/common/shadows.dart';
 import '../../../../core/themes/colors.dart';
 import '../cubit/supplier_cubit.dart';
@@ -47,7 +48,8 @@ class SupplierDetailPage extends StatelessWidget {
                   children: <Widget>[
                     CircleAvatar(
                       backgroundColor: Colors.grey.shade300,
-                      backgroundImage:
+                      backgroundImage: AssetImage(appIcon),
+                      foregroundImage:
                           NetworkImage(state.supplierDetail.avatarUrl),
                       radius: 50,
                     ),

@@ -6,6 +6,8 @@ import '../../../../core/failure/failure.dart';
 import '../../domain/entities/supplier_detail_entity.dart';
 import '../../domain/entities/supplier_entity.dart';
 import '../../domain/repositories/supplier_repositories.dart';
+import '../../domain/usecases/fetch_suppliers_dropdown_use_case.dart';
+import '../../domain/usecases/fetch_suppliers_use_case.dart';
 import '../datasources/supplier_remote_data_sources.dart';
 import '../models/supplier_detail_model.dart';
 import '../models/supplier_model.dart';
@@ -31,19 +33,10 @@ class SupplierRepositoriesImpl extends SupplierRepositories {
 
   @override
   Future<Either<Failure, List<SupplierEntity>>> fetchSuppliers(
-      {String column = 'name',
-      String order = 'asc',
-      String? search,
-      int limit = 10,
-      int page = 1}) async {
+      {required FetchSuppliersUseCaseParams params}) async {
     try {
-      final response = await supplierRemoteDataSources.fetchSuppliers(
-        column: column,
-        order: order,
-        search: search,
-        limit: limit,
-        page: page,
-      );
+      final response =
+          await supplierRemoteDataSources.fetchSuppliers(params: params);
       final datas =
           List<Map<String, dynamic>>.from(response.data['data']['content']);
 
@@ -55,13 +48,10 @@ class SupplierRepositoriesImpl extends SupplierRepositories {
 
   @override
   Future<Either<Failure, List<DropdownEntity>>> fetchSuppliersDropdown(
-      {String? search, int limit = 10, int page = 1}) async {
+      {required FetchSuppliersDropdownUseCaseParams params}) async {
     try {
       final response = await supplierRemoteDataSources.fetchSuppliersDropdown(
-        search: search,
-        limit: limit,
-        page: page,
-      );
+          params: params);
       final datas =
           List<Map<String, dynamic>>.from(response.data['data']['content']);
 
@@ -75,13 +65,8 @@ class SupplierRepositoriesImpl extends SupplierRepositories {
   Future<Either<Failure, String>> insertSupplier(
       {required SupplierDetailEntity supplierDetailEntity}) async {
     try {
-      final supplierDetail =
-          SupplierDetailModel.fromEntity(supplierDetailEntity);
-      final payload = supplierDetail.toJson();
-      payload['avatar'] = await MultipartFile.fromFile(payload['avatar']);
-
-      final response =
-          await supplierRemoteDataSources.insertSupplier(data: payload);
+      final response = await supplierRemoteDataSources.insertSupplier(
+          params: supplierDetailEntity);
 
       return Right(response.data['message']);
     } on DioException catch (de) {
@@ -100,15 +85,8 @@ class SupplierRepositoriesImpl extends SupplierRepositories {
   Future<Either<Failure, String>> updateSupplier(
       {required SupplierDetailEntity supplierDetailEntity}) async {
     try {
-      final supplierDetail =
-          SupplierDetailModel.fromEntity(supplierDetailEntity);
-      final payload = supplierDetail.toJson();
-      if (!supplierDetail.avatarUrl.startsWith('https://')) {
-        payload['avatar'] = await MultipartFile.fromFile(payload['avatar']);
-      }
-
-      final response =
-          await supplierRemoteDataSources.updateSupplier(data: payload);
+      final response = await supplierRemoteDataSources.updateSupplier(
+          params: supplierDetailEntity);
 
       return Right(response.data['message']);
     } on DioException catch (de) {

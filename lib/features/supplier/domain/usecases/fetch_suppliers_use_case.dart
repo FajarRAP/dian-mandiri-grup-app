@@ -6,20 +6,31 @@ import '../entities/supplier_entity.dart';
 import '../repositories/supplier_repositories.dart';
 
 class FetchSuppliersUseCase
-    implements AsyncUseCaseParams<List<SupplierEntity>, Map<String, dynamic>> {
+    implements
+        AsyncUseCaseParams<List<SupplierEntity>, FetchSuppliersUseCaseParams> {
   const FetchSuppliersUseCase({required this.supplierRepositories});
 
   final SupplierRepositories supplierRepositories;
 
   @override
   Future<Either<Failure, List<SupplierEntity>>> call(
-      Map<String, dynamic> params) async {
-    return supplierRepositories.fetchSuppliers(
-      column: params['column'] ?? 'name',
-      order: params['order'] ?? 'asc',
-      search: params['search'],
-      limit: params['limit'] ?? 10,
-      page: params['page'] ?? 1,
-    );
+      FetchSuppliersUseCaseParams params) async {
+    return supplierRepositories.fetchSuppliers(params: params);
   }
+}
+
+final class FetchSuppliersUseCaseParams {
+  const FetchSuppliersUseCaseParams({
+    this.column = 'name',
+    this.sort = 'asc',
+    this.search,
+    this.limit = 10,
+    this.page = 1,
+  });
+
+  final String column;
+  final String sort;
+  final String? search;
+  final int limit;
+  final int page;
 }

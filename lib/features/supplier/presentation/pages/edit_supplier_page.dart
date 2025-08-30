@@ -3,13 +3,13 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:ship_tracker/core/widgets/image_picker_bottom_sheet.dart';
 
 import '../../../../core/common/shadows.dart';
 import '../../../../core/helpers/top_snackbar.dart';
 import '../../../../core/helpers/validators.dart';
 import '../../../../core/themes/colors.dart';
 import '../../../../core/widgets/buttons/primary_button.dart';
+import '../../../../core/widgets/image_picker_bottom_sheet.dart';
 import '../../domain/entities/supplier_detail_entity.dart';
 import '../cubit/supplier_cubit.dart';
 

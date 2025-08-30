@@ -17,7 +17,7 @@ class SupplierPage extends StatelessWidget {
     final supplierCubit = context.read<SupplierCubit>()..fetchSuppliers();
     final focusNode = FocusScope.of(context, createDependency: false);
     var column = 'name';
-    var order = 'asc';
+    var sort = 'asc';
     String? search;
 
     return Scaffold(
@@ -34,7 +34,7 @@ class SupplierPage extends StatelessWidget {
               if (scrollState.runtimeType == ScrollEndNotification &&
                   supplierCubit.state is! ListPaginateLast) {
                 supplierCubit.fetchSuppliersPaginate(
-                    column: column, order: order, search: search);
+                    column: column, sort: sort, search: search);
               }
 
               return false;
@@ -49,10 +49,10 @@ class SupplierPage extends StatelessWidget {
                       onSelected: (value) {
                         final params = value.split(',');
                         column = params.first;
-                        order = params.last;
+                        sort = params.last;
                         supplierCubit.fetchSuppliers(
                           column: column,
-                          order: order,
+                          sort: sort,
                           search: search,
                         );
                       },
@@ -81,13 +81,21 @@ class SupplierPage extends StatelessWidget {
                   backgroundColor: MaterialColors.surfaceContainerLowest,
                   bottom: PreferredSize(
                     preferredSize: const Size.fromHeight(88),
-                    child: Padding(
+                    child: Container(
+                      decoration: const BoxDecoration(
+                        border: Border(
+                          bottom: BorderSide(
+                            color: MaterialColors.outlineVariant,
+                            width: 1,
+                          ),
+                        ),
+                      ),
                       padding: const EdgeInsets.all(16),
                       child: TextFormField(
                         onChanged: (value) {
                           search = value;
                           debouncer.run(() => supplierCubit.fetchSuppliers(
-                              search: search, column: column, order: order));
+                              search: search, column: column, sort: sort));
                         },
                         onTapOutside: (event) => focusNode.unfocus(),
                         decoration: InputDecoration(

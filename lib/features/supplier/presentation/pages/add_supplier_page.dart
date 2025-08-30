@@ -9,8 +9,8 @@ import '../../../../core/common/shadows.dart';
 import '../../../../core/helpers/top_snackbar.dart';
 import '../../../../core/helpers/validators.dart';
 import '../../../../core/themes/colors.dart';
-import '../../../../core/widgets/image_picker_bottom_sheet.dart';
 import '../../../../core/widgets/buttons/primary_button.dart';
+import '../../../../core/widgets/image_picker_bottom_sheet.dart';
 import '../../domain/entities/supplier_detail_entity.dart';
 import '../cubit/supplier_cubit.dart';
 
@@ -78,7 +78,7 @@ class _AddSupplierPageState extends State<AddSupplierPage> {
                       onPicked: (image) => setState(() => _pickedImage = image),
                     ),
                     context: context,
-                    shape: RoundedRectangleBorder(
+                    shape: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.vertical(
                         top: Radius.circular(16),
                       ),
