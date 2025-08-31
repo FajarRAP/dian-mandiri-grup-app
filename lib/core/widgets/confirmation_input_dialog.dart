@@ -51,7 +51,7 @@ class _ConfirmationInputDialogState extends State<ConfirmationInputDialog> {
     final textTheme = theme.textTheme;
 
     return AlertDialog(
-      contentPadding: EdgeInsets.all(24),
+      contentPadding: const EdgeInsets.all(24),
       content: Form(
         key: _formKey,
         child: Column(

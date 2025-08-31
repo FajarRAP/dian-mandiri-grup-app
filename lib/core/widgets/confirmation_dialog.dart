@@ -23,7 +23,7 @@ class ConfirmationDialog extends StatelessWidget {
     final textTheme = theme.textTheme;
 
     return AlertDialog(
-      contentPadding: EdgeInsets.all(24),
+      contentPadding: const EdgeInsets.all(24),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
