@@ -42,13 +42,27 @@ Future<bool> isInternetConnected() async {
 }
 
 List parseSpreadsheetFailure(SpreadsheetFailure spreadsheetFailure) {
+  DataCell mapCell(el) => DataCell(SizedBox(
+      width: double.infinity,
+      child: Tooltip(
+          triggerMode: TooltipTriggerMode.tap,
+          message: el?['error'] ?? '',
+          child: Text(el?['value'] ?? ''))));
+
   final headers = spreadsheetFailure.headers
       .map((e) => DataColumn(label: Text(e)))
       .toList();
-  final rows = spreadsheetFailure.rows
-      .map((e) => DataRow(
-          cells: e.map((el) => DataCell(Text(el?['value'] ?? ''))).toList()))
-      .toList();
+  final rows = List.generate(
+    spreadsheetFailure.rows.length,
+    (index) {
+      final row = spreadsheetFailure.rows[index];
+      final color = index % 2 == 0 ? Colors.white : Colors.grey.shade50;
+
+      return DataRow(
+          color: WidgetStateProperty.all(color),
+          cells: row.map(mapCell).toList());
+    },
+  );
 
   return [headers, rows];
 }
