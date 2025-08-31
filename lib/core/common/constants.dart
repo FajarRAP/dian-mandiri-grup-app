@@ -98,4 +98,6 @@ const accessTokenKey = String.fromEnvironment('ACCESS_TOKEN_KEY');
 const refreshTokenKey = String.fromEnvironment('REFRESH_TOKEN_KEY');
 const userKey = String.fromEnvironment('USER_KEY');
 
+const kSpaceBarHeight = 88.0;
+
 final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
