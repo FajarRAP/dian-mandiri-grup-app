@@ -42,10 +42,7 @@ class WarehousePage extends StatelessWidget {
               if (scrollState.runtimeType == ScrollEndNotification &&
                   warehouseCubit.state is! ListPaginateLast) {
                 warehouseCubit.fetchPurchaseNotesPaginate(
-                  column: column,
-                  sort: sort,
-                  search: search,
-                );
+                    column: column, sort: sort, search: search);
               }
 
               return false;
@@ -55,11 +52,6 @@ class WarehousePage extends StatelessWidget {
               slivers: <Widget>[
                 // App Bar
                 SliverAppBar(
-                  backgroundColor: MaterialColors.surfaceContainerLowest,
-                  floating: true,
-                  pinned: true,
-                  snap: true,
-                  title: const Text('Barang Masuk'),
                   actions: <Widget>[
                     PopupMenuButton(
                       onSelected: (value) {
@@ -94,32 +86,41 @@ class WarehousePage extends StatelessWidget {
                       ],
                     ),
                   ],
-                  bottom: PreferredSize(
-                    preferredSize: const Size.fromHeight(88),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        border: const Border(
-                          bottom: BorderSide(
-                            color: MaterialColors.outlineVariant,
-                            width: 1,
+                  backgroundColor: MaterialColors.surfaceContainerLowest,
+                  expandedHeight: kToolbarHeight + kSpaceBarHeight,
+                  floating: true,
+                  flexibleSpace: FlexibleSpaceBar(
+                    background: Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: TextFormField(
+                          onChanged: (value) {
+                            search = value;
+                            debouncer.run(() =>
+                                warehouseCubit.fetchPurchaseNotes(
+                                    column: column,
+                                    sort: sort,
+                                    search: search));
+                          },
+                          onTapOutside: (event) => focusNode.unfocus(),
+                          decoration: const InputDecoration(
+                            hintText: 'Cari Nota',
+                            prefixIcon: Icon(Icons.search),
                           ),
-                        ),
-                      ),
-                      padding: const EdgeInsets.all(16),
-                      child: TextFormField(
-                        onChanged: (value) {
-                          search = value;
-                          debouncer.run(() => warehouseCubit.fetchPurchaseNotes(
-                              column: column, sort: sort, search: search));
-                        },
-                        onTapOutside: (event) => focusNode.unfocus(),
-                        decoration: const InputDecoration(
-                          hintText: 'Cari Nota',
-                          prefixIcon: Icon(Icons.search),
                         ),
                       ),
                     ),
                   ),
+                  pinned: true,
+                  snap: true,
+                  shape: const RoundedRectangleBorder(
+                    side: BorderSide(
+                      color: MaterialColors.outlineVariant,
+                      width: 1,
+                    ),
+                  ),
+                  title: const Text('Barang Masuk'),
                 ),
                 // List
                 BlocBuilder<WarehouseCubit, WarehouseState>(
