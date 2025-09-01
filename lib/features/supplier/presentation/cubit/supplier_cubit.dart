@@ -34,6 +34,7 @@ class SupplierCubit extends Cubit<SupplierState> {
 
   var _currentPage = 1;
   final _suppliers = <SupplierEntity>[];
+  final _supplierDropdowns = <DropdownEntity>[];
 
   Future<void> fetchSupplier({required String supplierId}) async {
     emit(FetchSupplierLoading());
@@ -102,14 +103,46 @@ class SupplierCubit extends Cubit<SupplierState> {
   }
 
   Future<void> fetchSuppliersDropdown({String? search}) async {
+    _currentPage = 1;
+
     emit(FetchSuppliersDropdownLoading());
 
-    final params = FetchSuppliersDropdownUseCaseParams(search: search);
+    final params = FetchSuppliersDropdownUseCaseParams(
+      search: search,
+      page: _currentPage,
+    );
     final result = await _fetchSuppliersDropdownUseCase(params);
 
     result.fold(
       (failure) => emit(FetchSuppliersDropdownError(message: failure.message)),
-      (suppliers) => emit(FetchSuppliersDropdownLoaded(suppliers: suppliers)),
+      (suppliers) => emit(FetchSuppliersDropdownLoaded(
+          suppliers: _supplierDropdowns
+            ..clear()
+            ..addAll(suppliers))),
+    );
+  }
+
+  Future<void> fetchSuppliersDropdownPaginate({String? search}) async {
+    emit(ListPaginateLoading());
+
+    final params = FetchSuppliersDropdownUseCaseParams(
+      search: search,
+      page: ++_currentPage,
+    );
+    final result = await _fetchSuppliersDropdownUseCase(params);
+
+    result.fold(
+      (failure) => emit(FetchSuppliersDropdownError(message: failure.message)),
+      (suppliers) {
+        if (suppliers.isEmpty) {
+          _currentPage = 1;
+          emit(ListPaginateLast());
+        } else {
+          emit(ListPaginateLoaded());
+          emit(FetchSuppliersDropdownLoaded(
+              suppliers: _supplierDropdowns..addAll(suppliers)));
+        }
+      },
     );
   }
 
