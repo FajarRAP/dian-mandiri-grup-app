@@ -139,7 +139,9 @@ class _AddSupplierPageState extends State<AddSupplierPage> {
                   ),
                   keyboardType: TextInputType.emailAddress,
                   textInputAction: TextInputAction.next,
-                  validator: emailValidator,
+                  validator: (value) => value == null || value.isEmpty
+                      ? null
+                      : emailValidator(value),
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
@@ -162,7 +164,6 @@ class _AddSupplierPageState extends State<AddSupplierPage> {
                   ),
                   keyboardType: TextInputType.multiline,
                   maxLines: 2,
-                  validator: nullValidator,
                 ),
                 const SizedBox(height: 24),
                 BlocConsumer<SupplierCubit, SupplierState>(
@@ -188,15 +189,9 @@ class _AddSupplierPageState extends State<AddSupplierPage> {
                       onPressed: () {
                         if (!_formKey.currentState!.validate()) return;
 
-                        if (_pickedImage == null) {
-                          const message =
-                              'Silakan pilih gambar terlebih dahulu';
-                          return TopSnackbar.dangerSnackbar(message: message);
-                        }
-
                         final supplierDetail = SupplierDetailEntity(
                           address: _addressController.text,
-                          avatarUrl: _pickedImage!.path,
+                          avatarUrl: _pickedImage?.path,
                           email: _emailController.text,
                           name: _nameController.text,
                           phoneNumber: _phoneController.text,

@@ -77,7 +77,7 @@ class _EditSupplierPageState extends State<EditSupplierPage> {
               _emailController.text = state.supplierDetail.email;
               _phoneController.text = state.supplierDetail.phoneNumber;
               _addressController.text = state.supplierDetail.address;
-              _avatarUrl = state.supplierDetail.avatarUrl;
+              _avatarUrl = state.supplierDetail.avatarUrl ?? '';
 
               return Container(
                 decoration: BoxDecoration(
@@ -113,8 +113,10 @@ class _EditSupplierPageState extends State<EditSupplierPage> {
                                 backgroundColor: Colors.grey.shade300,
                                 foregroundImage: _pickedImage != null
                                     ? FileImage(File(_pickedImage!.path))
-                                    : NetworkImage(
-                                        state.supplierDetail.avatarUrl),
+                                    : state.supplierDetail.avatarUrl != null
+                                        ? NetworkImage(
+                                            state.supplierDetail.avatarUrl!)
+                                        : null,
                                 child: _pickedImage == null
                                     ? Icon(
                                         Icons.person_outline,

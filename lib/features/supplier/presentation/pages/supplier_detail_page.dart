@@ -49,9 +49,17 @@ class SupplierDetailPage extends StatelessWidget {
                     CircleAvatar(
                       backgroundColor: Colors.grey.shade300,
                       backgroundImage: AssetImage(appIcon),
-                      foregroundImage:
-                          NetworkImage(state.supplierDetail.avatarUrl),
+                      foregroundImage: state.supplierDetail.avatarUrl != null
+                          ? NetworkImage(state.supplierDetail.avatarUrl!)
+                          : null,
                       radius: 50,
+                      child: state.supplierDetail.avatarUrl == null
+                          ? Icon(
+                              Icons.person_outline,
+                              color: Colors.grey.shade400,
+                              size: 50,
+                            )
+                          : null,
                     ),
                     const SizedBox(height: 24),
                     TextFormField(
