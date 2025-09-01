@@ -48,8 +48,7 @@ class SupplierPage extends StatelessWidget {
                     PopupMenuButton(
                       onSelected: (value) {
                         final params = value.split(',');
-                        column = params.first;
-                        sort = params.last;
+                        [column, sort] = params;
                         supplierCubit.fetchSuppliers(
                           column: column,
                           sort: sort,
@@ -79,17 +78,11 @@ class SupplierPage extends StatelessWidget {
                     ),
                   ],
                   backgroundColor: MaterialColors.surfaceContainerLowest,
-                  bottom: PreferredSize(
-                    preferredSize: const Size.fromHeight(88),
-                    child: Container(
-                      decoration: const BoxDecoration(
-                        border: Border(
-                          bottom: BorderSide(
-                            color: MaterialColors.outlineVariant,
-                            width: 1,
-                          ),
-                        ),
-                      ),
+                  expandedHeight: kToolbarHeight + kSpaceBarHeight,
+                  floating: true,
+                  flexibleSpace: FlexibleSpaceBar(
+                    background: Container(
+                      alignment: Alignment.bottomCenter,
                       padding: const EdgeInsets.all(16),
                       child: TextFormField(
                         onChanged: (value) {
@@ -105,8 +98,13 @@ class SupplierPage extends StatelessWidget {
                       ),
                     ),
                   ),
-                  floating: true,
                   pinned: true,
+                  shape: const RoundedRectangleBorder(
+                    side: BorderSide(
+                      color: MaterialColors.outlineVariant,
+                      width: 1,
+                    ),
+                  ),
                   snap: true,
                   title: const Text('Supplier'),
                 ),
