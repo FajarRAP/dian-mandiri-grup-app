@@ -20,6 +20,7 @@ class SupplierDropdown extends StatefulWidget {
 
 class _SupplierDropdownState extends State<SupplierDropdown> {
   late final SupplierCubit _supplierCubit;
+  String? _search;
 
   @override
   void initState() {
@@ -34,8 +35,10 @@ class _SupplierDropdownState extends State<SupplierDropdown> {
         bottom: MediaQuery.viewInsetsOf(context).bottom,
       ),
       child: DropdownSearchModal(
-        search: (keyword) =>
-            _supplierCubit.fetchSuppliersDropdown(search: keyword),
+        search: (keyword) {
+          _search = keyword;
+          _supplierCubit.fetchSuppliersDropdown(search: _search);
+        },
         title: 'Supplier',
         child: BlocBuilder<SupplierCubit, SupplierState>(
           bloc: _supplierCubit,
@@ -49,18 +52,48 @@ class _SupplierDropdownState extends State<SupplierDropdown> {
 
             if (state is FetchSuppliersDropdownLoaded) {
               return Flexible(
-                child: ListView.separated(
-                  itemBuilder: (context, index) => GestureDetector(
-                    onTap: () => widget.onTap(state.suppliers[index]),
-                    child: DropdownModalItem(
-                      child: Text(state.suppliers[index].value),
-                    ),
+                child: NotificationListener<ScrollNotification>(
+                  onNotification: (scrollState) {
+                    if (scrollState.runtimeType == ScrollEndNotification &&
+                        _supplierCubit.state is! ListPaginateLast) {
+                      _supplierCubit.fetchSuppliersDropdownPaginate(
+                          search: _search);
+                    }
+
+                    return false;
+                  },
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      ListView.separated(
+                        itemBuilder: (context, index) => GestureDetector(
+                          onTap: () => widget.onTap(state.suppliers[index]),
+                          child: DropdownModalItem(
+                            child: Text(state.suppliers[index].value),
+                          ),
+                        ),
+                        separatorBuilder: (context, index) =>
+                            const SizedBox(height: 12),
+                        itemCount: state.suppliers.length,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shrinkWrap: true,
+                      ),
+                      // Widget when Pagination
+                      BlocBuilder<SupplierCubit, SupplierState>(
+                        buildWhen: (previous, current) =>
+                            current is ListPaginate,
+                        builder: (context, state) {
+                          if (state is ListPaginateLoading) {
+                            return const Center(
+                              child: CircularProgressIndicator.adaptive(),
+                            );
+                          }
+
+                          return const SizedBox();
+                        },
+                      ),
+                    ],
                   ),
-                  separatorBuilder: (context, index) =>
-                      const SizedBox(height: 12),
-                  itemCount: state.suppliers.length,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  shrinkWrap: true,
                 ),
               );
             }
