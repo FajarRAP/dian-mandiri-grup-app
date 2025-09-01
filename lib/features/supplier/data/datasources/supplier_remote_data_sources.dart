@@ -49,7 +49,6 @@ class SupplierRemoteDataSourcesImpl
         'search': params.search,
         'limit': params.limit,
         'page': params.page,
-        'show_all': true,
       },
     );
   }
@@ -59,7 +58,10 @@ class SupplierRemoteDataSourcesImpl
       {required SupplierDetailEntity params}) async {
     final supplierDetail = SupplierDetailModel.fromEntity(params);
     final payload = supplierDetail.toJson();
-    payload['avatar'] = await MultipartFile.fromFile(payload['avatar']);
+    if (supplierDetail.avatarUrl != null) {
+      payload['avatar'] =
+          await MultipartFile.fromFile(supplierDetail.avatarUrl!);
+    }
 
     return await dio.post(
       'v1/supplier',
@@ -72,8 +74,10 @@ class SupplierRemoteDataSourcesImpl
       {required SupplierDetailEntity params}) async {
     final supplierDetail = SupplierDetailModel.fromEntity(params);
     final payload = supplierDetail.toJson();
-    if (!supplierDetail.avatarUrl.startsWith('https://')) {
-      payload['avatar'] = await MultipartFile.fromFile(payload['avatar']);
+    final isAvatarNull = supplierDetail.avatarUrl != null;
+    if (isAvatarNull && !supplierDetail.avatarUrl!.startsWith('https://')) {
+      payload['avatar'] =
+          await MultipartFile.fromFile(supplierDetail.avatarUrl!);
     }
 
     return await dio.put(
