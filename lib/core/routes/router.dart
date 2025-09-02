@@ -1,6 +1,5 @@
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
-import 'package:image_picker/image_picker.dart';
 
 import '../../features/auth/presentation/pages/profile_page.dart';
 import '../../features/auth/presentation/pages/sign_in_page.dart';
@@ -59,10 +58,18 @@ final router = GoRouter(
     ),
     GoRoute(
       path: displayPictureRoute,
-      pageBuilder: (context, state) => CustomTransitionPage(
-          key: state.pageKey,
-          child: UploadPage(image: state.extra as XFile),
-          transitionsBuilder: transitionsBuilder),
+      pageBuilder: (context, state) {
+        final params = state.extra as Map<String, dynamic>;
+
+        return CustomTransitionPage(
+            key: state.pageKey,
+            child: UploadPage(
+              imagePath: '${params['image_path']}',
+              shipmentId: '${params['shipment_id']}',
+              stage: '${params['stage']}',
+            ),
+            transitionsBuilder: transitionsBuilder);
+      },
     ),
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) =>
