@@ -53,21 +53,23 @@ class ShipmentCubit extends Cubit<ShipmentState> {
   final InsertShipmentUseCase _insertShipmentUseCase;
   final DownloadShipmentReportUseCase _downloadShipmentReportUseCase;
 
-  late ShipmentDetailEntity shipmentDetail;
   var _currentPage = 1;
   final _shipments = <ShipmentEntity>[];
+  final _shipmentReports = <ShipmentReportEntity>[];
 
   Future<void> createShipmentReport(
       {required String startDate, required String endDate}) async {
     emit(CreateShipmentReportLoading());
 
-    final params =
-        CreateShipmentReportParams(startDate: startDate, endDate: endDate);
+    final params = CreateShipmentReportUseCaseParams(
+      startDate: startDate,
+      endDate: endDate,
+    );
     final result = await _createShipmentReportUseCase(params);
 
     result.fold(
-      (l) => emit(CreateShipmentReportError(message: l.message)),
-      (r) => emit(CreateShipmentReportLoaded(message: r)),
+      (failure) => emit(CreateShipmentReportError(message: failure.message)),
+      (message) => emit(CreateShipmentReportLoaded(message: message)),
     );
   }
 
@@ -77,20 +79,26 @@ class ShipmentCubit extends Cubit<ShipmentState> {
     final result = await _deleteShipmentUseCase(shipmentId);
 
     result.fold(
-      (l) => emit(DeleteShipmentError(message: l.message)),
-      (r) => emit(DeleteShipmentLoaded(message: r)),
+      (failure) => emit(DeleteShipmentError(message: failure.message)),
+      (message) => emit(DeleteShipmentLoaded(message: message)),
     );
   }
 
   Future<void> downloadShipmentReport(
       {required ShipmentReportEntity shipmentReportEntity}) async {
-    emit(DownloadShipmentReportLoading());
+    emit(DownloadShipmentReportLoading(
+        shipmentReportId: shipmentReportEntity.id));
 
-    final result = await _downloadShipmentReportUseCase(shipmentReportEntity);
+    final params = DownloadShipmentReportUseCaseParams(
+      fileUrl: shipmentReportEntity.file,
+      filename: shipmentReportEntity.name,
+      createdAt: shipmentReportEntity.date,
+    );
+    final result = await _downloadShipmentReportUseCase(params);
 
     result.fold(
-      (l) => emit(DownloadShipmentReportError(message: l.message)),
-      (r) => emit(DownloadShipmentReportLoaded(message: r)),
+      (failure) => emit(DownloadShipmentReportError(message: failure.message)),
+      (message) => emit(DownloadShipmentReportLoaded(message: message)),
     );
   }
 
@@ -100,8 +108,9 @@ class ShipmentCubit extends Cubit<ShipmentState> {
     final result = await _fetchShipmentByIdUseCase(shipmentId);
 
     result.fold(
-      (l) => emit(FetchShipmentDetailError(message: l.message)),
-      (r) => emit(FetchShipmentDetailLoaded(shipmentDetail: r)),
+      (failure) => emit(FetchShipmentDetailError(message: failure.message)),
+      (shipmentDetail) =>
+          emit(FetchShipmentDetailLoaded(shipmentDetail: shipmentDetail)),
     );
   }
 
@@ -112,8 +121,9 @@ class ShipmentCubit extends Cubit<ShipmentState> {
     final result = await _fetchShipmentByReceiptNumberUseCase(receiptNumber);
 
     result.fold(
-      (l) => emit(FetchReceiptStatusError(failure: l)),
-      (r) => emit(FetchReceiptStatusLoaded(shipmentDetail: r)),
+      (failure) => emit(FetchReceiptStatusError(failure: failure)),
+      (shipmentDetail) =>
+          emit(FetchReceiptStatusLoaded(shipmentDetail: shipmentDetail)),
     );
   }
 
@@ -121,15 +131,53 @@ class ShipmentCubit extends Cubit<ShipmentState> {
       {required String startDate,
       required String endDate,
       required String status}) async {
+    _currentPage = 1;
+
     emit(FetchShipmentReportsLoading());
 
-    final params = FetchShipmentReportsParams(
-        startDate: startDate, endDate: endDate, status: status);
+    final params = FetchShipmentReportsUseCaseParams(
+      startDate: startDate,
+      endDate: endDate,
+      status: status,
+      page: _currentPage,
+    );
     final result = await _fetchShipmentReportsUseCase(params);
 
     result.fold(
-      (l) => emit(FetchShipmentReportsError(message: l.message)),
-      (r) => emit(FetchShipmentReportsLoaded(shipmentReports: r)),
+      (failure) => emit(FetchShipmentReportsError(message: failure.message)),
+      (shipmentReports) => emit(FetchShipmentReportsLoaded(
+          shipmentReports: _shipmentReports
+            ..clear()
+            ..addAll(shipmentReports))),
+    );
+  }
+
+  Future<void> fetchShipmentReportsPaginate(
+      {required String startDate,
+      required String endDate,
+      required String status}) async {
+    emit(ListPaginateLoading());
+
+    final params = FetchShipmentReportsUseCaseParams(
+      startDate: startDate,
+      endDate: endDate,
+      status: status,
+      page: ++_currentPage,
+    );
+    final result = await _fetchShipmentReportsUseCase(params);
+
+    result.fold(
+      (failure) => emit(FetchShipmentReportsError(message: failure.message)),
+      (shipmentReports) {
+        if (shipmentReports.isEmpty) {
+          _currentPage = 1;
+          emit(ListPaginateLast());
+        } else {
+          emit(ListPaginateLoaded());
+          emit(FetchShipmentReportsLoaded(
+              shipmentReports: _shipmentReports..addAll(shipmentReports)));
+        }
+      },
     );
   }
 
@@ -140,17 +188,15 @@ class ShipmentCubit extends Cubit<ShipmentState> {
     emit(FetchShipmentsLoading());
 
     final params =
-        FetchShipmentsParams(date: date, stage: stage, keyword: keyword);
+        FetchShipmentsUseCaseParams(date: date, stage: stage, keyword: keyword);
     final result = await _fetchShipmentsUseCase(params);
 
     result.fold(
-      (l) => emit(FetchShipmentsError(message: l.message)),
-      (r) {
-        _shipments
-          ..clear()
-          ..addAll(r);
-        emit(FetchShipmentsLoaded(shipments: _shipments));
-      },
+      (failure) => emit(FetchShipmentsError(message: failure.message)),
+      (shipments) => emit(FetchShipmentsLoaded(
+          shipments: _shipments
+            ..clear()
+            ..addAll(shipments))),
     );
   }
 
@@ -158,20 +204,19 @@ class ShipmentCubit extends Cubit<ShipmentState> {
       {required String date, required String stage, String? keyword}) async {
     emit(ListPaginateLoading());
 
-    final params = FetchShipmentsParams(
+    final params = FetchShipmentsUseCaseParams(
         date: date, stage: stage, keyword: keyword, page: ++_currentPage);
     final result = await _fetchShipmentsUseCase(params);
 
     result.fold(
-      (l) => emit(FetchShipmentsError(message: l.message)),
-      (r) {
-        if (r.isEmpty) {
+      (failure) => emit(FetchShipmentsError(message: failure.message)),
+      (shipments) {
+        if (shipments.isEmpty) {
           _currentPage = 1;
           emit(ListPaginateLast());
         } else {
-          _shipments.addAll(r);
           emit(ListPaginateLoaded());
-          emit(FetchShipmentsLoaded(shipments: _shipments));
+          emit(FetchShipmentsLoaded(shipments: _shipments..addAll(shipments)));
         }
       },
     );
@@ -182,13 +227,13 @@ class ShipmentCubit extends Cubit<ShipmentState> {
     emit(InsertShipmentLoading());
 
     final params =
-        InsertShipmentParams(receiptNumber: receiptNumber, stage: stage);
+        InsertShipmentUseCaseParams(receiptNumber: receiptNumber, stage: stage);
 
     final result = await _insertShipmentUseCase(params);
 
     result.fold(
-      (l) => emit(InsertShipmentError(failure: l)),
-      (r) => emit(InsertShipmentLoaded(message: r)),
+      (failure) => emit(InsertShipmentError(failure: failure)),
+      (message) => emit(InsertShipmentLoaded(message: message)),
     );
   }
 
@@ -198,14 +243,14 @@ class ShipmentCubit extends Cubit<ShipmentState> {
       required String stage}) async {
     emit(InsertShipmentDocumentLoading());
 
-    final params = InsertShipmentDocumentParams(
+    final params = InsertShipmentDocumentUseCaseParams(
         shipmentId: shipmentId, documentPath: documentPath, stage: stage);
 
     final result = await _insertShipmentDocumentUseCase(params);
 
     result.fold(
-      (l) => emit(InsertShipmentDocumentError(message: l.message)),
-      (r) => emit(InsertShipmentDocumentLoaded(message: r)),
+      (failure) => emit(InsertShipmentDocumentError(message: failure.message)),
+      (message) => emit(InsertShipmentDocumentLoaded(message: message)),
     );
   }
 }

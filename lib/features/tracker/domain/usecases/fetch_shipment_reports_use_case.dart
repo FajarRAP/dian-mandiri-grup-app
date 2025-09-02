@@ -8,29 +8,28 @@ import '../repositories/shipment_repositories.dart';
 class FetchShipmentReportsUseCase
     implements
         AsyncUseCaseParams<List<ShipmentReportEntity>,
-            FetchShipmentReportsParams> {
+            FetchShipmentReportsUseCaseParams> {
   const FetchShipmentReportsUseCase({required this.shipmentRepositories});
 
   final ShipmentRepositories shipmentRepositories;
 
   @override
   Future<Either<Failure, List<ShipmentReportEntity>>> call(
-      FetchShipmentReportsParams params) async {
-    return await shipmentRepositories.fetchShipmentReports(
-        startDate: params.startDate,
-        endDate: params.endDate,
-        status: params.status);
+      FetchShipmentReportsUseCaseParams params) async {
+    return await shipmentRepositories.fetchShipmentReports(params: params);
   }
 }
 
-class FetchShipmentReportsParams {
-  const FetchShipmentReportsParams({
-    required this.startDate,
+class FetchShipmentReportsUseCaseParams {
+  const FetchShipmentReportsUseCaseParams({
     required this.endDate,
+    required this.page,
+    required this.startDate,
     required this.status,
   });
 
-  final String startDate;
   final String endDate;
+  final int page;
+  final String startDate;
   final String status;
 }

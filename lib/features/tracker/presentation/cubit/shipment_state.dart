@@ -135,7 +135,11 @@ class CreateShipmentReportError extends CreateShipmentReport {
   CreateShipmentReportError({required this.message});
 }
 
-class DownloadShipmentReportLoading extends DownloadShipmentReport {}
+class DownloadShipmentReportLoading extends DownloadShipmentReport {
+  DownloadShipmentReportLoading({required this.shipmentReportId});
+
+  final String shipmentReportId;
+}
 
 class DownloadShipmentReportLoaded extends DownloadShipmentReport {
   final String message;

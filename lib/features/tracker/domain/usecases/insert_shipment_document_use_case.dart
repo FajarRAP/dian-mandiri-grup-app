@@ -5,23 +5,20 @@ import '../../../../core/failure/failure.dart';
 import '../repositories/shipment_repositories.dart';
 
 class InsertShipmentDocumentUseCase
-    implements AsyncUseCaseParams<String, InsertShipmentDocumentParams> {
+    implements AsyncUseCaseParams<String, InsertShipmentDocumentUseCaseParams> {
   const InsertShipmentDocumentUseCase({required this.shipmentRepositories});
 
   final ShipmentRepositories shipmentRepositories;
 
   @override
   Future<Either<Failure, String>> call(
-      InsertShipmentDocumentParams params) async {
-    return await shipmentRepositories.insertShipmentDocument(
-        shipmentId: params.shipmentId,
-        documentPath: params.documentPath,
-        stage: params.stage);
+      InsertShipmentDocumentUseCaseParams params) async {
+    return await shipmentRepositories.insertShipmentDocument(params: params);
   }
 }
 
-class InsertShipmentDocumentParams {
-  const InsertShipmentDocumentParams({
+class InsertShipmentDocumentUseCaseParams {
+  const InsertShipmentDocumentUseCaseParams({
     required this.shipmentId,
     required this.documentPath,
     required this.stage,
