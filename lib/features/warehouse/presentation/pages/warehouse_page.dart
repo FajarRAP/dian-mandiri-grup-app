@@ -151,7 +151,7 @@ class WarehousePage extends StatelessWidget {
                           itemBuilder: (context, index) => PurchaseNoteItem(
                             onTap: () => context.push(
                               purchaseNoteDetailRoute,
-                              extra: warehouseCubit.purchaseNotes[index].id,
+                              extra: state.purchaseNotes[index].id,
                             ),
                             onDelete: () => showDialog(
                               context: context,
@@ -171,8 +171,9 @@ class WarehousePage extends StatelessWidget {
                                     context.pop();
                                   }
                                 },
-                                builder: (context, state) {
-                                  if (state is DeletePurchaseNoteLoading) {
+                                builder: (context, deleteState) {
+                                  if (deleteState
+                                      is DeletePurchaseNoteLoading) {
                                     return ConfirmationDialog(
                                       actionText: 'Hapus',
                                       body:
@@ -184,8 +185,8 @@ class WarehousePage extends StatelessWidget {
                                   return ConfirmationDialog(
                                     onAction: () =>
                                         warehouseCubit.deletePurchaseNote(
-                                      purchaseNoteId: warehouseCubit
-                                          .purchaseNotes[index].id,
+                                      purchaseNoteId:
+                                          state.purchaseNotes[index].id,
                                     ),
                                     actionText: 'Hapus',
                                     body:
@@ -195,12 +196,11 @@ class WarehousePage extends StatelessWidget {
                                 },
                               ),
                             ),
-                            purchaseNoteSummary:
-                                warehouseCubit.purchaseNotes[index],
+                            purchaseNoteSummary: state.purchaseNotes[index],
                           ),
                           separatorBuilder: (context, index) =>
                               const SizedBox(height: 12),
-                          itemCount: warehouseCubit.purchaseNotes.length,
+                          itemCount: state.purchaseNotes.length,
                         ),
                       );
                     }
