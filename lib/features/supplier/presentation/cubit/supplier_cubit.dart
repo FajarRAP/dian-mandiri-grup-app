@@ -147,10 +147,10 @@ class SupplierCubit extends Cubit<SupplierState> {
   }
 
   Future<void> insertSupplier(
-      {required SupplierDetailEntity supplierDetailEntity}) async {
+      {required InsertSupplierUseCaseParams params}) async {
     emit(InsertSupplierLoading());
 
-    final result = await _insertSupplierUseCase(supplierDetailEntity);
+    final result = await _insertSupplierUseCase(params);
 
     result.fold(
       (failure) => emit(InsertSupplierError(message: failure.message)),

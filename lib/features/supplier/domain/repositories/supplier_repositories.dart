@@ -6,6 +6,7 @@ import '../entities/supplier_detail_entity.dart';
 import '../entities/supplier_entity.dart';
 import '../usecases/fetch_suppliers_dropdown_use_case.dart';
 import '../usecases/fetch_suppliers_use_case.dart';
+import '../usecases/insert_supplier_use_case.dart';
 
 abstract class SupplierRepositories {
   Future<Either<Failure, SupplierDetailEntity>> fetchSupplier(
@@ -15,7 +16,7 @@ abstract class SupplierRepositories {
   Future<Either<Failure, List<DropdownEntity>>> fetchSuppliersDropdown(
       {required FetchSuppliersDropdownUseCaseParams params});
   Future<Either<Failure, String>> insertSupplier(
-      {required SupplierDetailEntity supplierDetailEntity});
+      {required InsertSupplierUseCaseParams params});
   Future<Either<Failure, String>> updateSupplier(
       {required SupplierDetailEntity supplierDetailEntity});
 }

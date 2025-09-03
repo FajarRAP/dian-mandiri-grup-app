@@ -3,11 +3,11 @@ import '../../domain/entities/supplier_detail_entity.dart';
 class SupplierDetailModel extends SupplierDetailEntity {
   const SupplierDetailModel({
     required super.id,
-    required super.avatarUrl,
+    super.avatarUrl,
     required super.name,
     required super.phoneNumber,
-    required super.address,
-    required super.email,
+    super.address,
+    super.email,
   });
 
   factory SupplierDetailModel.fromEntity(SupplierDetailEntity entity) =>

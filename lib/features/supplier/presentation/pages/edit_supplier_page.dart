@@ -60,7 +60,7 @@ class _EditSupplierPageState extends State<EditSupplierPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Sunting Supplier'),
+        title: const Text('Edit Supplier'),
       ),
       body: Center(
         child: BlocBuilder<SupplierCubit, SupplierState>(
@@ -74,9 +74,9 @@ class _EditSupplierPageState extends State<EditSupplierPage> {
 
             if (state is FetchSupplierLoaded) {
               _nameController.text = state.supplierDetail.name;
-              _emailController.text = state.supplierDetail.email;
+              _emailController.text = state.supplierDetail.email ?? '';
               _phoneController.text = state.supplierDetail.phoneNumber;
-              _addressController.text = state.supplierDetail.address;
+              _addressController.text = state.supplierDetail.address ?? '';
               _avatarUrl = state.supplierDetail.avatarUrl ?? '';
 
               return Container(

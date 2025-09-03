@@ -113,7 +113,7 @@ void setup() {
 
   // Supplier
   getIt
-    ..registerLazySingleton<SupplierRemoteDataSources<Response>>(
+    ..registerLazySingleton<SupplierRemoteDataSources>(
         () => SupplierRemoteDataSourcesImpl(dio: getIt.get()))
     ..registerLazySingleton<SupplierRepositories>(
         () => SupplierRepositoriesImpl(supplierRemoteDataSources: getIt.get()))

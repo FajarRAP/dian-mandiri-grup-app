@@ -11,7 +11,7 @@ import '../../../../core/helpers/validators.dart';
 import '../../../../core/themes/colors.dart';
 import '../../../../core/widgets/buttons/primary_button.dart';
 import '../../../../core/widgets/image_picker_bottom_sheet.dart';
-import '../../domain/entities/supplier_detail_entity.dart';
+import '../../domain/usecases/insert_supplier_use_case.dart';
 import '../cubit/supplier_cubit.dart';
 
 class AddSupplierPage extends StatefulWidget {
@@ -189,16 +189,15 @@ class _AddSupplierPageState extends State<AddSupplierPage> {
                       onPressed: () {
                         if (!_formKey.currentState!.validate()) return;
 
-                        final supplierDetail = SupplierDetailEntity(
+                        final params = InsertSupplierUseCaseParams(
                           address: _addressController.text,
-                          avatarUrl: _pickedImage?.path,
+                          avatar: _pickedImage?.path,
                           email: _emailController.text,
                           name: _nameController.text,
                           phoneNumber: _phoneController.text,
                         );
 
-                        _supplierCubit.insertSupplier(
-                            supplierDetailEntity: supplierDetail);
+                        _supplierCubit.insertSupplier(params: params);
                       },
                       child: const Text('Simpan'),
                     );

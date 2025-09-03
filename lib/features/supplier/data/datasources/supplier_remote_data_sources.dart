@@ -1,77 +1,133 @@
 import 'package:dio/dio.dart';
 
+import '../../../../core/common/dropdown_entity.dart';
+import '../../../../core/exceptions/server_exception.dart';
 import '../../domain/entities/supplier_detail_entity.dart';
 import '../../domain/usecases/fetch_suppliers_dropdown_use_case.dart';
 import '../../domain/usecases/fetch_suppliers_use_case.dart';
+import '../../domain/usecases/insert_supplier_use_case.dart';
 import '../models/supplier_detail_model.dart';
+import '../models/supplier_model.dart';
 
-abstract class SupplierRemoteDataSources<T> {
-  Future<T> fetchSupplier({required String supplierId});
-  Future<T> fetchSuppliers({required FetchSuppliersUseCaseParams params});
-  Future<T> fetchSuppliersDropdown(
+abstract class SupplierRemoteDataSources {
+  Future<SupplierDetailModel> fetchSupplier({required String supplierId});
+  Future<List<SupplierModel>> fetchSuppliers(
+      {required FetchSuppliersUseCaseParams params});
+  Future<List<DropdownEntity>> fetchSuppliersDropdown(
       {required FetchSuppliersDropdownUseCaseParams params});
-  Future<T> insertSupplier({required SupplierDetailEntity params});
-  Future<T> updateSupplier({required SupplierDetailEntity params});
+  Future<String> insertSupplier({required InsertSupplierUseCaseParams params});
+  Future<String> updateSupplier({required SupplierDetailEntity params});
 }
 
-class SupplierRemoteDataSourcesImpl
-    implements SupplierRemoteDataSources<Response> {
+class SupplierRemoteDataSourcesImpl implements SupplierRemoteDataSources {
   SupplierRemoteDataSourcesImpl({required this.dio});
 
   final Dio dio;
 
   @override
-  Future<Response> fetchSupplier({required String supplierId}) async {
-    return await dio.get('v1/supplier/$supplierId');
-  }
+  Future<SupplierDetailModel> fetchSupplier(
+      {required String supplierId}) async {
+    try {
+      final response = await dio.get('v1/supplier/$supplierId');
 
-  @override
-  Future<Response> fetchSuppliers(
-      {required FetchSuppliersUseCaseParams params}) async {
-    return await dio.get(
-      'v1/supplier',
-      queryParameters: {
-        'column': params.column,
-        'order': params.sort,
-        'search': params.search,
-        'limit': params.limit,
-        'page': params.page,
-      },
-    );
-  }
-
-  @override
-  Future<Response> fetchSuppliersDropdown(
-      {required FetchSuppliersDropdownUseCaseParams params}) async {
-    return await dio.get(
-      'v1/supplier/dropdown',
-      queryParameters: {
-        'search': params.search,
-        'limit': params.limit,
-        'page': params.page,
-      },
-    );
-  }
-
-  @override
-  Future<Response> insertSupplier(
-      {required SupplierDetailEntity params}) async {
-    final supplierDetail = SupplierDetailModel.fromEntity(params);
-    final payload = supplierDetail.toJson();
-    if (supplierDetail.avatarUrl != null) {
-      payload['avatar'] =
-          await MultipartFile.fromFile(supplierDetail.avatarUrl!);
+      return SupplierDetailModel.fromJson(response.data['data']);
+    } on DioException catch (de) {
+      switch (de.response?.statusCode) {
+        default:
+          throw ServerException(message: de.response?.data['message']);
+      }
+    } catch (e) {
+      rethrow;
     }
-
-    return await dio.post(
-      'v1/supplier',
-      data: FormData.fromMap(payload),
-    );
   }
 
   @override
-  Future<Response> updateSupplier(
-      {required SupplierDetailEntity params}) async {
+  Future<List<SupplierModel>> fetchSuppliers(
+      {required FetchSuppliersUseCaseParams params}) async {
+    try {
+      final response = await dio.get(
+        'v1/supplier',
+        queryParameters: {
+          'column': params.column,
+          'order': params.sort,
+          'search': params.search,
+          'limit': params.limit,
+          'page': params.page,
+        },
+      );
+      final contents =
+          List<Map<String, dynamic>>.from(response.data['data']['content']);
+
+      return contents.map(SupplierModel.fromJson).toList();
+    } on DioException catch (de) {
+      switch (de.response?.statusCode) {
+        default:
+          throw ServerException(message: de.response?.data['message']);
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<List<DropdownEntity>> fetchSuppliersDropdown(
+      {required FetchSuppliersDropdownUseCaseParams params}) async {
+    try {
+      final response = await dio.get(
+        'v1/supplier/dropdown',
+        queryParameters: {
+          'search': params.search,
+          'limit': params.limit,
+          'page': params.page,
+        },
+      );
+      final contents =
+          List<Map<String, dynamic>>.from(response.data['data']['content']);
+
+      return contents.map(DropdownEntity.fromJson).toList();
+    } on DioException catch (de) {
+      switch (de.response?.statusCode) {
+        default:
+          throw ServerException(message: de.response?.data['message']);
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<String> insertSupplier(
+      {required InsertSupplierUseCaseParams params}) async {
+    try {
+      final response = await dio.post(
+        'v1/supplier',
+        data: FormData.fromMap({
+          'address': params.address,
+          'avatar': params.avatar != null
+              ? await MultipartFile.fromFile(params.avatar!)
+              : null,
+          'email': params.email,
+          'name': params.name,
+          'phoneNumber': params.phoneNumber,
+        }),
+      );
+
+      return response.data['message'];
+    } on DioException catch (de) {
+      switch (de.response?.statusCode) {
+        default:
+          throw ServerException(
+            message: de.response?.data['message'],
+            statusCode: de.response?.statusCode,
+          );
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<String> updateSupplier({required SupplierDetailEntity params}) async {
     final supplierDetail = SupplierDetailModel.fromEntity(params);
     final payload = supplierDetail.toJson();
     final isAvatarNull = supplierDetail.avatarUrl != null;
@@ -80,9 +136,23 @@ class SupplierRemoteDataSourcesImpl
           await MultipartFile.fromFile(supplierDetail.avatarUrl!);
     }
 
-    return await dio.put(
-      'v1/supplier/${params.id}',
-      data: FormData.fromMap(payload),
-    );
+    try {
+      final response = await dio.put(
+        'v1/supplier/${params.id}',
+        data: FormData.fromMap(payload),
+      );
+
+      return response.data['message'];
+    } on DioException catch (de) {
+      switch (de.response?.statusCode) {
+        default:
+          throw ServerException(
+            message: de.response?.data['message'],
+            statusCode: de.response?.statusCode,
+          );
+      }
+    } catch (e) {
+      rethrow;
+    }
   }
 }
