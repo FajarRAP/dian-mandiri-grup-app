@@ -60,9 +60,6 @@ class _StageLayoutState extends State<StageLayout> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final textTheme = theme.textTheme;
-
     return BlocListener<ShipmentCubit, ShipmentState>(
       listener: (context, state) {
         if (state is InsertShipmentLoaded || state is DeleteShipmentLoaded) {
@@ -182,12 +179,9 @@ class _StageLayoutState extends State<StageLayout> {
 
                     if (state is FetchShipmentsLoaded) {
                       if (state.shipments.isEmpty) {
-                        return SliverFillRemaining(
+                        return const SliverFillRemaining(
                           child: Center(
-                            child: Text(
-                              'Belum Ada Data',
-                              style: textTheme.bodyLarge,
-                            ),
+                            child: Text('Belum Ada Data'),
                           ),
                         );
                       }
