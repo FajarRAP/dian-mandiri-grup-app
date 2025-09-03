@@ -64,9 +64,9 @@ class _StageLayoutState extends State<StageLayout> {
     final textTheme = theme.textTheme;
 
     return BlocListener<ShipmentCubit, ShipmentState>(
-      listener: (context, state) async {
+      listener: (context, state) {
         if (state is InsertShipmentLoaded || state is DeleteShipmentLoaded) {
-          await _shipmentCubit.fetchShipments(
+          _shipmentCubit.fetchShipments(
             date: dateFormat.format(DateTime.now()),
             stage: widget.stage,
           );
@@ -78,9 +78,13 @@ class _StageLayoutState extends State<StageLayout> {
               date: _pickedDate, stage: widget.stage),
           child: NotificationListener<ScrollNotification>(
             onNotification: (scrollState) {
-              if (scrollState.runtimeType == ScrollEndNotification) {
+              if (scrollState.runtimeType == ScrollEndNotification &&
+                  _shipmentCubit.state is! ListPaginateLast) {
                 _shipmentCubit.fetchShipmentsPaginate(
-                    date: _pickedDate, stage: widget.stage, keyword: _search);
+                  date: _pickedDate,
+                  stage: widget.stage,
+                  keyword: _search,
+                );
               }
 
               return false;
@@ -91,23 +95,14 @@ class _StageLayoutState extends State<StageLayout> {
                 // AppBar
                 SliverAppBar(
                   backgroundColor: MaterialColors.surfaceContainerLowest,
+                  expandedHeight: kToolbarHeight + kSpaceBarHeight + 24,
                   floating: true,
-                  pinned: true,
-                  snap: true,
-                  title: Text(widget.appBarTitle),
-                  bottom: PreferredSize(
-                    preferredSize: const Size.fromHeight(110),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        border: Border(
-                          bottom: BorderSide(
-                            color: MaterialColors.outlineVariant,
-                            width: 1,
-                          ),
-                        ),
-                      ),
+                  flexibleSpace: FlexibleSpaceBar(
+                    background: Align(
+                      alignment: Alignment.bottomCenter,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
+                        mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -153,7 +148,7 @@ class _StageLayoutState extends State<StageLayout> {
                             icon: const Icon(Icons.calendar_month_outlined),
                             label: Text(
                               _dMyDate,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 color: CustomColors.primaryNormal,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -163,6 +158,14 @@ class _StageLayoutState extends State<StageLayout> {
                       ),
                     ),
                   ),
+                  pinned: true,
+                  shape: const RoundedRectangleBorder(
+                    side: BorderSide(
+                      color: MaterialColors.outlineVariant,
+                    ),
+                  ),
+                  snap: true,
+                  title: Text(widget.appBarTitle),
                 ),
                 // List
                 BlocBuilder<ShipmentCubit, ShipmentState>(
