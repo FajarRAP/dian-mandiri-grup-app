@@ -226,27 +226,65 @@ class _AddPurchaseNoteFilePageState extends State<AddPurchaseNoteFilePage> {
                   final [headers, rows] =
                       parseSpreadsheetFailure(spreadsheetFailure);
 
-                  return SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        DataTable(
-                          columns: headers,
-                          rows: rows,
-                        ),
-                        if (spreadsheetFailure.hiddenColumnCount > 0) ...[
-                          const SizedBox(height: 8),
-                          Text(
-                            'Dan ${spreadsheetFailure.hiddenColumnCount} kolom tersembunyi lainnya',
-                            style: textTheme.bodyMedium?.copyWith(
-                              color: MaterialColors.error,
-                              fontWeight: FontWeight.w500,
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      // Information
+                      Row(
+                        children: <Widget>[
+                          const Icon(
+                            Icons.info_outline,
+                            color: CustomColors.primaryNormal,
+                            size: 18,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              'Ketuk data pada setiap kolom untuk melihat detail error',
+                              style: textTheme.bodySmall?.copyWith(
+                                color: Colors.grey.shade700,
+                              ),
                             ),
                           ),
                         ],
+                      ),
+                      const SizedBox(height: 16),
+                      // Table
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: DataTable(
+                          border: TableBorder.all(
+                            borderRadius: BorderRadius.circular(8.0),
+                            color: MaterialColors.outlineVariant,
+                          ),
+                          clipBehavior: Clip.antiAlias,
+                          columns: headers,
+                          headingRowColor: WidgetStateProperty.all(
+                              MaterialColors.surfaceContainer),
+                          rows: rows,
+                        ),
+                      ),
+                      if (spreadsheetFailure.hiddenColumnCount > 0) ...[
+                        const SizedBox(height: 16),
+                        Row(
+                          children: <Widget>[
+                            const Icon(
+                              Icons.warning_amber_rounded,
+                              color: MaterialColors.error,
+                              size: 18,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Dan ${spreadsheetFailure.hiddenColumnCount} kolom lainnya tidak ditampilkan',
+                              style: textTheme.bodyMedium?.copyWith(
+                                color: MaterialColors.error,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
                       ],
-                    ),
+                    ],
                   );
                 }
 
