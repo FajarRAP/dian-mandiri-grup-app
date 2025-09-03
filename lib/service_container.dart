@@ -25,7 +25,7 @@ import 'features/supplier/domain/usecases/insert_supplier_use_case.dart';
 import 'features/supplier/domain/usecases/update_supplier_use_case.dart';
 import 'features/supplier/presentation/cubit/supplier_cubit.dart';
 import 'features/tracker/data/datasources/shipment_remote_data_sources.dart';
-import 'features/tracker/data/repositories/shipment_repository_impl.dart';
+import 'features/tracker/data/repositories/shipment_repositories_impl.dart';
 import 'features/tracker/domain/repositories/shipment_repositories.dart';
 import 'features/tracker/domain/usecases/create_shipment_report_use_case.dart';
 import 'features/tracker/domain/usecases/delete_shipment_use_case.dart';
