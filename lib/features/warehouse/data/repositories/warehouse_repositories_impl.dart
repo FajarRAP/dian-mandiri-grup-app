@@ -33,10 +33,10 @@ class WarehouseRepositoriesImpl extends WarehouseRepositories {
     } on DioException catch (de) {
       switch (de.response?.statusCode) {
         default:
-          return const Left(Failure());
+          return Left(Failure(message: '$de'));
       }
     } catch (e) {
-      return const Left(Failure());
+      return Left(Failure(message: '$e'));
     }
   }
 
@@ -49,7 +49,7 @@ class WarehouseRepositoriesImpl extends WarehouseRepositories {
 
       return Right(PurchaseNoteDetailModel.fromJson(response.data['data']));
     } catch (e) {
-      return const Left(Failure());
+      return Left(Failure(message: '$e'));
     }
   }
 
@@ -64,7 +64,7 @@ class WarehouseRepositoriesImpl extends WarehouseRepositories {
 
       return Right(contents.map(PurchaseNoteSummaryModel.fromJson).toList());
     } catch (e) {
-      return const Left(Failure());
+      return Left(Failure(message: '$e'));
     }
   }
 
@@ -79,7 +79,7 @@ class WarehouseRepositoriesImpl extends WarehouseRepositories {
 
       return Right(contents.map(DropdownEntity.fromJson).toList());
     } catch (e) {
-      return const Left(Failure());
+      return Left(Failure(message: '$e'));
     }
   }
 
@@ -100,10 +100,10 @@ class WarehouseRepositoriesImpl extends WarehouseRepositories {
 
           return Left(Failure(message: de.response?.data['message']));
         default:
-          return const Left(Failure());
+          return Left(Failure(message: '$de'));
       }
     } catch (e) {
-      return const Left(Failure());
+      return Left(Failure(message: '$e'));
     }
   }
 
@@ -120,10 +120,10 @@ class WarehouseRepositoriesImpl extends WarehouseRepositories {
         case 400:
           return Left(Failure(message: de.response?.data['message']));
         default:
-          return const Left(Failure());
+          return Left(Failure(message: '$de'));
       }
     } catch (e) {
-      return const Left(Failure());
+      return Left(Failure(message: '$e'));
     }
   }
 
@@ -140,10 +140,10 @@ class WarehouseRepositoriesImpl extends WarehouseRepositories {
         case 400:
           return Left(Failure(message: de.response?.data['message']));
         default:
-          return const Left(Failure());
+          return Left(Failure(message: '$de'));
       }
     } catch (e) {
-      return const Left(Failure());
+      return Left(Failure(message: '$e'));
     }
   }
 
@@ -160,10 +160,10 @@ class WarehouseRepositoriesImpl extends WarehouseRepositories {
         case 400:
           return Left(Failure(message: de.response?.data['message']));
         default:
-          return const Left(Failure());
+          return Left(Failure(message: '$de'));
       }
     } catch (e) {
-      return const Left(Failure());
+      return Left(Failure(message: '$e'));
     }
   }
 
@@ -180,10 +180,10 @@ class WarehouseRepositoriesImpl extends WarehouseRepositories {
         case 400:
           return Left(Failure(message: de.response?.data['message']));
         default:
-          return const Left(Failure());
+          return Left(Failure(message: '$de'));
       }
     } catch (e) {
-      return const Left(Failure());
+      return Left(Failure(message: '$e'));
     }
   }
 }
