@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../features/warehouse/presentation/cubit/warehouse_cubit.dart';
 import '../../common/dropdown_entity.dart';
-import '../../helpers/debouncer.dart';
 import '../dropdown_modal_item.dart';
 import '../dropdown_search_modal.dart';
 
@@ -20,29 +19,26 @@ class PurchaseNoteDropdown extends StatefulWidget {
 }
 
 class _PurchaseNoteDropdownState extends State<PurchaseNoteDropdown> {
-  late final Debouncer _debouncer;
   late final WarehouseCubit _warehouseCubit;
   String? _search;
 
   @override
   void initState() {
     super.initState();
-    _debouncer = Debouncer(delay: const Duration(milliseconds: 500));
     _warehouseCubit = context.read<WarehouseCubit>()
       ..fetchPurchaseNotesDropdown();
   }
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-
     return Padding(
-      padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.viewInsetsOf(context).bottom,
+      ),
       child: DropdownSearchModal(
         search: (keyword) {
           _search = keyword;
-          _debouncer.run(() =>
-              _warehouseCubit.fetchPurchaseNotesDropdown(search: _search));
+          _warehouseCubit.fetchPurchaseNotesDropdown(search: _search);
         },
         title: 'Nota',
         child: BlocBuilder<WarehouseCubit, WarehouseState>(
@@ -68,24 +64,37 @@ class _PurchaseNoteDropdownState extends State<PurchaseNoteDropdown> {
 
                     return false;
                   },
-                  child: ListView.separated(
-                    itemBuilder: (context, index) => GestureDetector(
-                      onTap: () => widget
-                          .onTap(_warehouseCubit.purchaseNotesDropdown[index]),
-                      child: DropdownModalItem(
-                        child: Text(
-                          _warehouseCubit.purchaseNotesDropdown[index].value,
-                          style: textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w500,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      ListView.separated(
+                        itemBuilder: (context, index) => GestureDetector(
+                          onTap: () => widget.onTap(state.purchaseNotes[index]),
+                          child: DropdownModalItem(
+                            child: Text(state.purchaseNotes[index].value),
                           ),
                         ),
+                        separatorBuilder: (context, index) =>
+                            const SizedBox(height: 12),
+                        itemCount: state.purchaseNotes.length,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shrinkWrap: true,
                       ),
-                    ),
-                    separatorBuilder: (context, index) =>
-                        const SizedBox(height: 12),
-                    itemCount: _warehouseCubit.purchaseNotesDropdown.length,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    shrinkWrap: true,
+                      // Widget when Pagination
+                      BlocBuilder<WarehouseCubit, WarehouseState>(
+                        buildWhen: (previous, current) =>
+                            current is ListPaginate,
+                        builder: (context, state) {
+                          if (state is ListPaginateLoading) {
+                            return const Center(
+                              child: CircularProgressIndicator.adaptive(),
+                            );
+                          }
+
+                          return const SizedBox();
+                        },
+                      ),
+                    ],
                   ),
                 ),
               );
