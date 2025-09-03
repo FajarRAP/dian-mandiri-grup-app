@@ -83,7 +83,6 @@ class _AddPurchaseNoteManualPageState extends State<AddPurchaseNoteManualPage> {
             const SizedBox(height: 4),
             TextFormField(
               onTap: () => showModalBottomSheet(
-                context: context,
                 builder: (context) => SupplierDropdown(
                   onTap: (supplier) {
                     _supplierController.text = supplier.value;
@@ -91,6 +90,8 @@ class _AddPurchaseNoteManualPageState extends State<AddPurchaseNoteManualPage> {
                     context.pop();
                   },
                 ),
+                constraints: const BoxConstraints(minHeight: 400),
+                context: context,
                 isScrollControlled: true,
               ),
               onTapOutside: (event) => _focusNode.unfocus(),
@@ -250,7 +251,8 @@ class _AddPurchaseNoteManualPageState extends State<AddPurchaseNoteManualPage> {
                 ),
                 Text(
                   idrCurrencyFormat.format(
-                    _items.fold(0.0, (prev, e) => prev + (e.price * e.quantity)),
+                    _items.fold(
+                        0.0, (prev, e) => prev + (e.price * e.quantity)),
                   ),
                   style: textTheme.bodyLarge?.copyWith(
                     color: CustomColors.primaryNormal,

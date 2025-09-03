@@ -90,6 +90,7 @@ class _AddPurchaseNoteFilePageState extends State<AddPurchaseNoteFilePage> {
                     },
                   ),
                 ),
+                constraints: const BoxConstraints(minHeight: 400),
                 context: context,
                 isScrollControlled: true,
               ),
