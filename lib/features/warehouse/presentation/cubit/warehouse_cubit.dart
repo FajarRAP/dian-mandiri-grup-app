@@ -53,8 +53,8 @@ class WarehouseCubit extends Cubit<WarehouseState> {
   final UpdatePurchaseNoteUseCase _updatePurchaseNoteUseCase;
 
   var _currentPage = 1;
-  final purchaseNotes = <PurchaseNoteSummaryEntity>[];
-  final purchaseNotesDropdown = <DropdownEntity>[];
+  final _purchaseNotes = <PurchaseNoteSummaryEntity>[];
+  final _purchaseNotesDropdown = <DropdownEntity>[];
 
   Future<void> deletePurchaseNote({required String purchaseNoteId}) async {
     emit(DeletePurchaseNoteLoading());
@@ -98,12 +98,10 @@ class WarehouseCubit extends Cubit<WarehouseState> {
 
     result.fold(
       (failure) => emit(FetchPurchaseNotesError(message: failure.message)),
-      (purchaseNotes) {
-        this.purchaseNotes
-          ..clear()
-          ..addAll(purchaseNotes);
-        emit(FetchPurchaseNotesLoaded(purchaseNotes: this.purchaseNotes));
-      },
+      (purchaseNotes) => emit(FetchPurchaseNotesLoaded(
+          purchaseNotes: _purchaseNotes
+            ..clear()
+            ..addAll(purchaseNotes))),
     );
   }
 
@@ -129,9 +127,9 @@ class WarehouseCubit extends Cubit<WarehouseState> {
           _currentPage = 1;
           emit(ListPaginateLast());
         } else {
-          this.purchaseNotes.addAll(purchaseNotes);
           emit(ListPaginateLoaded());
-          emit(FetchPurchaseNotesLoaded(purchaseNotes: this.purchaseNotes));
+          emit(FetchPurchaseNotesLoaded(
+              purchaseNotes: _purchaseNotes..addAll(purchaseNotes)));
         }
       },
     );
@@ -151,12 +149,10 @@ class WarehouseCubit extends Cubit<WarehouseState> {
     result.fold(
       (failure) =>
           emit(FetchPurchaseNotesDropdownError(message: failure.message)),
-      (dropdowns) {
-        purchaseNotesDropdown
-          ..clear()
-          ..addAll(dropdowns);
-        emit(FetchPurchaseNotesDropdownLoaded(purchaseNotes: dropdowns));
-      },
+      (purchaseNotesDropdown) => emit(FetchPurchaseNotesDropdownLoaded(
+          purchaseNotes: _purchaseNotesDropdown
+            ..clear()
+            ..addAll(purchaseNotesDropdown))),
     );
   }
 
@@ -172,14 +168,15 @@ class WarehouseCubit extends Cubit<WarehouseState> {
     result.fold(
       (failure) =>
           emit(FetchPurchaseNotesDropdownError(message: failure.message)),
-      (dropdowns) {
-        if (dropdowns.isEmpty) {
+      (purchaseNotesDropdown) {
+        if (purchaseNotesDropdown.isEmpty) {
           _currentPage = 1;
           emit(ListPaginateLast());
         } else {
-          purchaseNotesDropdown.addAll(dropdowns);
           emit(ListPaginateLoaded());
-          emit(FetchPurchaseNotesDropdownLoaded(purchaseNotes: dropdowns));
+          emit(FetchPurchaseNotesDropdownLoaded(
+              purchaseNotes: _purchaseNotesDropdown
+                ..addAll(purchaseNotesDropdown)));
         }
       },
     );
