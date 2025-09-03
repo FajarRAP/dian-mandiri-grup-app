@@ -59,6 +59,7 @@ class _AddShippingFeePageState extends State<AddShippingFeePage> {
               controller: _shippingFeeController,
               decoration: const InputDecoration(
                 labelText: 'Harga Ongkos Kirim',
+                prefixText: 'Rp. ',
               ),
               keyboardType: TextInputType.number,
               validator: nullValidator,
