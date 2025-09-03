@@ -7,6 +7,7 @@ import 'package:share_plus/share_plus.dart';
 
 import '../../../../core/common/constants.dart';
 import '../../../../core/helpers/helpers.dart';
+import '../../../../core/helpers/top_snackbar.dart';
 import '../../../../core/themes/colors.dart';
 import '../../../../main.dart';
 import '../../domain/entities/shipment_report_entity.dart';
@@ -28,8 +29,17 @@ class ShipmentReportListItem extends StatelessWidget {
     final formattedDate = dMyFormat.format(shipmentReport.date.toLocal());
     final savedFilename = '${shipmentReport.name}_$formattedDate.xlsx';
 
-    return BlocBuilder<ShipmentCubit, ShipmentState>(
+    return BlocConsumer<ShipmentCubit, ShipmentState>(
       bloc: shipmentCubit,
+      listener: (context, state) {
+        if (state is DownloadShipmentReportLoaded) {
+          TopSnackbar.successSnackbar(message: state.message);
+        }
+
+        if (state is DownloadShipmentReportError) {
+          TopSnackbar.dangerSnackbar(message: state.message);
+        }
+      },
       builder: (context, state) {
         final file = File('$externalPath/$savedFilename');
         final isFileDownloaded = file.existsSync();
