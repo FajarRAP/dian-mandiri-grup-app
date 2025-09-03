@@ -58,7 +58,6 @@ class ShipmentDetailPage extends StatelessWidget {
               //     authCubit.user.permissions.contains(superAdminPermission);
               final isHasUploadPermission =
                   authCubit.user.id == shipmentDetail.stage.user.id;
-              shipmentCubit.shipmentDetail = shipmentDetail;
 
               return RefreshIndicator(
                 onRefresh: () async => await shipmentCubit.fetchShipmentById(
@@ -86,7 +85,11 @@ class ShipmentDetailPage extends StatelessWidget {
                             builder: (context) => ImagePickerBottomSheet(
                               onPicked: (image) => context.push(
                                 displayPictureRoute,
-                                extra: image,
+                                extra: {
+                                  'image_path': image.path,
+                                  'shipment_id': shipmentId,
+                                  'stage': shipmentDetail.stage.stage,
+                                },
                               ),
                             ),
                             context: context,

@@ -3,26 +3,26 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:image_picker/image_picker.dart';
 
 import '../../../../core/helpers/top_snackbar.dart';
 import '../../../../core/widgets/buttons/primary_button.dart';
-import '../../data/models/shipment_detail_model.dart';
 import '../cubit/shipment_cubit.dart';
 
 class UploadPage extends StatelessWidget {
   const UploadPage({
     super.key,
-    required this.image,
+    required this.imagePath,
+    required this.shipmentId,
+    required this.stage,
   });
 
-  final XFile image;
+  final String imagePath;
+  final String shipmentId;
+  final String stage;
 
   @override
   Widget build(BuildContext context) {
     final shipmentCubit = context.read<ShipmentCubit>();
-    final shipmentId = shipmentCubit.shipmentDetail.id;
-    final file = File(image.path);
 
     return Scaffold(
       appBar: AppBar(
@@ -31,7 +31,7 @@ class UploadPage extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: <Widget>[
-          Image.file(file),
+          Image.file(File(imagePath)),
           const SizedBox(height: 24),
           BlocConsumer<ShipmentCubit, ShipmentState>(
             buildWhen: (previous, current) => current is InsertShipmentDocument,
@@ -56,10 +56,8 @@ class UploadPage extends StatelessWidget {
                 onPressed: () async =>
                     await shipmentCubit.insertShipmentDocument(
                   shipmentId: shipmentId,
-                  documentPath: image.path,
-                  stage: (shipmentCubit.shipmentDetail as ShipmentDetailModel)
-                      .stage
-                      .stage,
+                  documentPath: imagePath,
+                  stage: stage,
                 ),
                 child: const Text('Unggah'),
               );
