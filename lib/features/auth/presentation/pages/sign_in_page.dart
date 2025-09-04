@@ -26,7 +26,7 @@ class SignInPage extends StatelessWidget {
             child: BlocConsumer<AuthCubit, AuthState>(
               listener: (context, state) {
                 if (state is SignInLoaded) {
-                  // Already called Topsnackbar in repositories
+                  TopSnackbar.successSnackbar(message: state.message);
                   context.go(homeRoute);
                 }
 
