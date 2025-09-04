@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
 
+import '../../../../core/common/use_cases.dart';
 import '../../domain/entities/user_entity.dart';
 import '../../domain/usecases/fetch_user_from_storage_use_case.dart';
 import '../../domain/usecases/fetch_user_use_case.dart';
@@ -38,28 +39,22 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> fetchUser() async {
     emit(FetchUserLoading());
 
-    final result = await _fetchUserUseCase();
+    final result = await _fetchUserUseCase(NoParams());
 
     result.fold(
-      (l) => emit(FetchUserError(message: l.message)),
-      (r) {
-        user = r;
-        emit(FetchUserLoaded());
-      },
+      (failure) => emit(FetchUserError(message: failure.message)),
+      (user) => emit(FetchUserLoaded(user: this.user = user)),
     );
   }
 
   Future<void> fetchUserFromStorage() async {
     emit(FetchUserLoading());
 
-    final userFromStorage = await _fetchUserFromStorageUseCase();
+    final userFromStorage = await _fetchUserFromStorageUseCase(NoParams());
 
     userFromStorage.fold(
-      (l) => emit(FetchUserError(message: l.message)),
-      (r) {
-        user = r;
-        emit(FetchUserLoaded());
-      },
+      (failure) => emit(FetchUserError(message: failure.message)),
+      (user) => emit(FetchUserLoaded(user: this.user = user)),
     );
   }
 
@@ -69,34 +64,30 @@ class AuthCubit extends Cubit<AuthState> {
     final result = await _refreshTokenUseCase('$refreshToken');
 
     result.fold(
-      (l) => emit(RefreshTokenError(message: l.message)),
-      (r) => emit(RefreshTokenLoaded()),
+      (failure) => emit(RefreshTokenError(message: failure.message)),
+      (message) => emit(RefreshTokenLoaded()),
     );
   }
 
   Future<void> signIn() async {
     emit(SignInLoading());
 
-    final result = await _signInUseCase();
+    final result = await _signInUseCase(NoParams());
 
     result.fold(
-      (l) => emit(SignInError(message: l.message)),
-      (r) {
-        user = r;
-        // Already called Topsnackbar in repositories
-        emit(SignInLoaded(message: 'Sign in successful'));
-      },
+      (failure) => emit(SignInError(message: failure.message)),
+      (message) => emit(SignInLoaded(message: message)),
     );
   }
 
   Future<void> signOut() async {
     emit(SignOutLoading());
 
-    final result = await _signOutUseCase();
+    final result = await _signOutUseCase(NoParams());
 
     result.fold(
-      (l) => emit(SignOutError(message: l.message)),
-      (r) => emit(SignOutLoaded(message: r)),
+      (failure) => emit(SignOutError(message: failure.message)),
+      (message) => emit(SignOutLoaded(message: message)),
     );
   }
 
@@ -106,8 +97,8 @@ class AuthCubit extends Cubit<AuthState> {
     final result = await _updateProfileUseCase(name);
 
     result.fold(
-      (l) => emit(UpdateProfileError(message: l.message)),
-      (r) => emit(UpdateProfileLoaded(message: r)),
+      (failure) => emit(UpdateProfileError(message: failure.message)),
+      (message) => emit(UpdateProfileLoaded(message: message)),
     );
   }
 
