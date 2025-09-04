@@ -1,13 +1,25 @@
-import 'package:flutter/foundation.dart';
-
 class Failure {
   const Failure({
+    this.message = 'Terjadi kesalahan',
     this.statusCode = 500,
-    String? message = 'Terjadi kesalahan',
-  }) : message = (kDebugMode ? message : null) ?? 'Terjadi kesalahan';
+  });
 
-  final int statusCode;
   final String message;
+  final int statusCode;
+}
+
+class ServerFailure extends Failure {
+  const ServerFailure({
+    super.message,
+    super.statusCode,
+  });
+}
+
+class CacheFailure extends Failure {
+  const CacheFailure({
+    super.message,
+    super.statusCode,
+  });
 }
 
 class SpreadsheetFailure extends Failure {
