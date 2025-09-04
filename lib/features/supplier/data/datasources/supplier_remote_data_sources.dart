@@ -1,7 +1,8 @@
 import 'package:dio/dio.dart';
 
 import '../../../../core/common/dropdown_entity.dart';
-import '../../../../core/exceptions/server_exception.dart';
+import '../../../../core/exceptions/internal_exception.dart';
+import '../../../../core/helpers/helpers.dart';
 import '../../domain/entities/supplier_detail_entity.dart';
 import '../../domain/usecases/fetch_suppliers_dropdown_use_case.dart';
 import '../../domain/usecases/fetch_suppliers_use_case.dart';
@@ -32,12 +33,9 @@ class SupplierRemoteDataSourcesImpl implements SupplierRemoteDataSources {
 
       return SupplierDetailModel.fromJson(response.data['data']);
     } on DioException catch (de) {
-      switch (de.response?.statusCode) {
-        default:
-          throw ServerException(message: de.response?.data['message']);
-      }
+      throw handleDioException(de);
     } catch (e) {
-      rethrow;
+      throw InternalException(message: '$e');
     }
   }
 
@@ -60,12 +58,9 @@ class SupplierRemoteDataSourcesImpl implements SupplierRemoteDataSources {
 
       return contents.map(SupplierModel.fromJson).toList();
     } on DioException catch (de) {
-      switch (de.response?.statusCode) {
-        default:
-          throw ServerException(message: de.response?.data['message']);
-      }
+      throw handleDioException(de);
     } catch (e) {
-      rethrow;
+      throw InternalException(message: '$e');
     }
   }
 
@@ -86,12 +81,9 @@ class SupplierRemoteDataSourcesImpl implements SupplierRemoteDataSources {
 
       return contents.map(DropdownEntity.fromJson).toList();
     } on DioException catch (de) {
-      switch (de.response?.statusCode) {
-        default:
-          throw ServerException(message: de.response?.data['message']);
-      }
+      throw handleDioException(de);
     } catch (e) {
-      rethrow;
+      throw InternalException(message: '$e');
     }
   }
 
@@ -114,15 +106,9 @@ class SupplierRemoteDataSourcesImpl implements SupplierRemoteDataSources {
 
       return response.data['message'];
     } on DioException catch (de) {
-      switch (de.response?.statusCode) {
-        default:
-          throw ServerException(
-            message: de.response?.data['message'],
-            statusCode: de.response?.statusCode,
-          );
-      }
+      throw handleDioException(de);
     } catch (e) {
-      rethrow;
+      throw InternalException(message: '$e');
     }
   }
 
@@ -144,15 +130,9 @@ class SupplierRemoteDataSourcesImpl implements SupplierRemoteDataSources {
 
       return response.data['message'];
     } on DioException catch (de) {
-      switch (de.response?.statusCode) {
-        default:
-          throw ServerException(
-            message: de.response?.data['message'],
-            statusCode: de.response?.statusCode,
-          );
-      }
+      throw handleDioException(de);
     } catch (e) {
-      rethrow;
+      throw InternalException(message: '$e');
     }
   }
 }
