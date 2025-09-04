@@ -7,8 +7,7 @@ import '../repositories/supplier_repositories.dart';
 
 class FetchSuppliersDropdownUseCase
     implements
-        AsyncUseCaseParams<List<DropdownEntity>,
-            FetchSuppliersDropdownUseCaseParams> {
+        UseCase<List<DropdownEntity>, FetchSuppliersDropdownUseCaseParams> {
   const FetchSuppliersDropdownUseCase({required this.supplierRepositories});
 
   final SupplierRepositories supplierRepositories;

@@ -5,7 +5,7 @@ import '../../../../core/failure/failure.dart';
 import '../repositories/supplier_repositories.dart';
 
 class InsertSupplierUseCase
-    implements AsyncUseCaseParams<String, InsertSupplierUseCaseParams> {
+    implements UseCase<String, InsertSupplierUseCaseParams> {
   const InsertSupplierUseCase({required this.supplierRepositories});
 
   final SupplierRepositories supplierRepositories;

@@ -5,8 +5,7 @@ import '../../../../core/failure/failure.dart';
 import '../entities/supplier_detail_entity.dart';
 import '../repositories/supplier_repositories.dart';
 
-class FetchSupplierUseCase
-    implements AsyncUseCaseParams<SupplierDetailEntity, String> {
+class FetchSupplierUseCase implements UseCase<SupplierDetailEntity, String> {
   const FetchSupplierUseCase({required this.supplierRepositories});
 
   final SupplierRepositories supplierRepositories;
