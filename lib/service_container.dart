@@ -5,6 +5,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 import 'core/common/constants.dart';
 import 'core/helpers/dio_interceptor.dart';
+import 'features/auth/data/datasources/auth_local_data_sources.dart';
 import 'features/auth/data/datasources/auth_remote_data_sources.dart';
 import 'features/auth/data/repositories/auth_repositories_impl.dart';
 import 'features/auth/domain/repositories/auth_repositories.dart';
@@ -68,12 +69,20 @@ void setup() {
 
   // Auth
   getIt
-    ..registerLazySingleton<AuthRemoteDataSources<Response>>(
-        () => AuthRemoteDataSourcesImpl(dio: getIt.get()))
-    ..registerLazySingleton<AuthRepositories>(() => AuthRepositoriesImpl(
-        authRemoteDataSource: getIt.get(),
+    ..registerLazySingleton<AuthLocalDataSources>(
+        () => AuthLocalDataSourcesImpl(storage: getIt.get()))
+    ..registerLazySingleton<AuthRemoteDataSources>(
+      () => AuthRemoteDataSourcesImpl(
+        dio: getIt.get(),
         googleSignIn: GoogleSignIn(),
-        storage: getIt.get()))
+      ),
+    )
+    ..registerLazySingleton<AuthRepositories>(
+      () => AuthRepositoriesImpl(
+        authLocalDataSources: getIt.get(),
+        authRemoteDataSources: getIt.get(),
+      ),
+    )
     ..registerLazySingleton<AuthCubit>(() => AuthCubit(
         fetchUserUseCase: FetchUserUseCase(authRepositories: getIt.get()),
         fetchUserFromStorageUseCase:
