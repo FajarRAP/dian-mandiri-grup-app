@@ -5,13 +5,13 @@ import '../../../../core/failure/failure.dart';
 import '../entities/user_entity.dart';
 import '../repositories/auth_repositories.dart';
 
-class FetchUserUseCase implements AsyncUseCaseNoParams<UserEntity> {
+class FetchUserUseCase implements UseCase<UserEntity, NoParams> {
   const FetchUserUseCase({required this.authRepositories});
 
   final AuthRepositories authRepositories;
 
   @override
-  Future<Either<Failure, UserEntity>> call() async {
+  Future<Either<Failure, UserEntity>> call(NoParams params) async {
     return authRepositories.fetchUser();
   }
 }

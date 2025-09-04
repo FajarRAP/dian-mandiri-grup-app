@@ -4,13 +4,13 @@ import '../../../../core/common/use_cases.dart';
 import '../../../../core/failure/failure.dart';
 import '../repositories/auth_repositories.dart';
 
-class SignOutUseCase implements AsyncUseCaseNoParams<String> {
+class SignOutUseCase implements UseCase<String, NoParams> {
   const SignOutUseCase({required this.authRepositories});
 
   final AuthRepositories authRepositories;
 
   @override
-  Future<Either<Failure, String>> call() async {
+  Future<Either<Failure, String>> call(NoParams params) async {
     return await authRepositories.signOut();
   }
 }

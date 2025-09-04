@@ -4,7 +4,7 @@ import '../../../../core/common/use_cases.dart';
 import '../../../../core/failure/failure.dart';
 import '../repositories/auth_repositories.dart';
 
-class UpdateProfileUseCase implements AsyncUseCaseParams<String, String> {
+class UpdateProfileUseCase implements UseCase<String, String> {
   const UpdateProfileUseCase({required this.authRepositories});
 
   final AuthRepositories authRepositories;
