@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 
 import '../../../../core/common/dropdown_entity.dart';
+import '../../../../core/exceptions/internal_exception.dart';
 import '../../../../core/exceptions/server_exception.dart';
 import '../../../../core/failure/failure.dart';
 import '../../domain/entities/supplier_detail_entity.dart';
@@ -22,11 +23,18 @@ class SupplierRepositoriesImpl extends SupplierRepositories {
     try {
       final result =
           await supplierRemoteDataSources.fetchSupplier(supplierId: supplierId);
+
       return Right(result);
     } on ServerException catch (se) {
-      return Left(Failure(message: se.message));
-    } catch (e) {
-      return Left(Failure(message: '$e'));
+      return Left(ServerFailure(
+        message: se.message,
+        statusCode: se.statusCode,
+      ));
+    } on InternalException catch (ie) {
+      return Left(Failure(
+        message: ie.message,
+        statusCode: ie.statusCode,
+      ));
     }
   }
 
@@ -36,11 +44,18 @@ class SupplierRepositoriesImpl extends SupplierRepositories {
     try {
       final result =
           await supplierRemoteDataSources.fetchSuppliers(params: params);
+
       return Right(result);
     } on ServerException catch (se) {
-      return Left(Failure(message: se.message));
-    } catch (e) {
-      return Left(Failure(message: '$e'));
+      return Left(ServerFailure(
+        message: se.message,
+        statusCode: se.statusCode,
+      ));
+    } on InternalException catch (ie) {
+      return Left(Failure(
+        message: ie.message,
+        statusCode: ie.statusCode,
+      ));
     }
   }
 
@@ -50,11 +65,18 @@ class SupplierRepositoriesImpl extends SupplierRepositories {
     try {
       final result = await supplierRemoteDataSources.fetchSuppliersDropdown(
           params: params);
+
       return Right(result);
     } on ServerException catch (se) {
-      return Left(Failure(message: se.message));
-    } catch (e) {
-      return Left(Failure(message: '$e'));
+      return Left(ServerFailure(
+        message: se.message,
+        statusCode: se.statusCode,
+      ));
+    } on InternalException catch (ie) {
+      return Left(Failure(
+        message: ie.message,
+        statusCode: ie.statusCode,
+      ));
     }
   }
 
@@ -64,11 +86,18 @@ class SupplierRepositoriesImpl extends SupplierRepositories {
     try {
       final result =
           await supplierRemoteDataSources.insertSupplier(params: params);
+
       return Right(result);
     } on ServerException catch (se) {
-      return Left(Failure(message: se.message));
-    } catch (e) {
-      return Left(Failure(message: '$e'));
+      return Left(ServerFailure(
+        message: se.message,
+        statusCode: se.statusCode,
+      ));
+    } on InternalException catch (ie) {
+      return Left(Failure(
+        message: ie.message,
+        statusCode: ie.statusCode,
+      ));
     }
   }
 
@@ -78,11 +107,18 @@ class SupplierRepositoriesImpl extends SupplierRepositories {
     try {
       final result = await supplierRemoteDataSources.updateSupplier(
           params: supplierDetailEntity);
+
       return Right(result);
     } on ServerException catch (se) {
-      return Left(Failure(message: se.message));
-    } catch (e) {
-      return Left(Failure(message: '$e'));
+      return Left(ServerFailure(
+        message: se.message,
+        statusCode: se.statusCode,
+      ));
+    } on InternalException catch (ie) {
+      return Left(Failure(
+        message: ie.message,
+        statusCode: ie.statusCode,
+      ));
     }
   }
 }
