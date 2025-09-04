@@ -14,14 +14,22 @@ class DioInterceptor implements Interceptor {
       final refreshToken = await _storage.read(key: refreshTokenKey);
       final authCubit = getIt.get<AuthCubit>();
 
-      if (err.requestOptions.path == '$authEndpoint/refresh') {
+      if (err.requestOptions.path.endsWith('/refresh')) {
         await _storage.deleteAll();
         authCubit.refreshTokenExpired();
-      } else if (refreshToken != null) {
+        return handler.next(err);
+      }
+
+      try {
         await authCubit.refreshToken(refreshToken: refreshToken);
-        final accessToken = await _storage.read(key: accessTokenKey);
-        return handler.resolve(await Dio().fetch(err.requestOptions
-          ..headers['Authorization'] = 'Bearer $accessToken'));
+        final newAccessToken = await _storage.read(key: accessTokenKey);
+        final newOptions = err.requestOptions
+          ..headers['Authorization'] = 'Bearer $newAccessToken';
+        final response = await Dio().fetch(newOptions);
+
+        return handler.resolve(response);
+      } catch (e) {
+        return handler.next(err);
       }
     }
 
@@ -32,14 +40,14 @@ class DioInterceptor implements Interceptor {
   void onRequest(
       RequestOptions options, RequestInterceptorHandler handler) async {
     final accessToken = await _storage.read(key: accessTokenKey);
+    final isLogin = options.path.endsWith('/google');
+    final isRefresh = options.path.endsWith('/refresh');
 
-    if (options.path != '$authEndpoint/refresh') {
-      options.headers = {
-        'Accept': 'application/json',
-        'Authorization': 'Bearer $accessToken',
-      };
+    if (accessToken != null && !isLogin && !isRefresh) {
+      options.headers['Authorization'] = 'Bearer $accessToken';
     }
 
+    options.headers['Accept'] = 'application/json';
     return handler.next(options);
   }
 
