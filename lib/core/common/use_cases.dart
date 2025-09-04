@@ -17,3 +17,9 @@ abstract interface class UseCaseParams<ReturnType, Params> {
 abstract interface class UseCaseNoParams<ReturnType> {
   ReturnType call();
 }
+
+abstract interface class UseCase<ReturnType, Params> {
+  Future<Either<Failure, ReturnType>> call(Params params);
+}
+
+final class NoParams {}
