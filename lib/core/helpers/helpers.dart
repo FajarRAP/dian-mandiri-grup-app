@@ -1,8 +1,10 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../common/constants.dart';
+import '../exceptions/server_exception.dart';
 import '../failure/failure.dart';
 
 final dateFormat = DateFormat('y-MM-dd', 'id_ID');
@@ -81,4 +83,17 @@ class TextFormFieldConfig {
   final InputDecoration? decoration;
   final TextInputType? keyboardType;
   final TextInputAction? textInputAction;
+}
+
+ServerException handleDioException(DioException de) {
+  final data = de.response?.data;
+  final isMap = data is Map<String, dynamic>;
+
+  switch (de.response?.statusCode) {
+    default:
+      return ServerException(
+        message: isMap ? data['message'] : null,
+        statusCode: de.response?.statusCode,
+      );
+  }
 }
