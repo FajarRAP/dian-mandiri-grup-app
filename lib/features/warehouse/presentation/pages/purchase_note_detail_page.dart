@@ -346,7 +346,7 @@ class _PurchaseNoteDetailPageState extends State<PurchaseNoteDetailPage> {
                                   receipt: _pickedImage?.path ??
                                       _purchaseNoteDetail.receipt,
                                   note: _purchaseNoteDetail.note,
-                                  supplierId: _purchaseNoteDetail.supplier.id!,
+                                  supplierId: _purchaseNoteDetail.supplier.id,
                                   items: _purchaseNoteDetail.items,
                                 );
                                 await _warehouseCubit.updatePurchaseNote(
