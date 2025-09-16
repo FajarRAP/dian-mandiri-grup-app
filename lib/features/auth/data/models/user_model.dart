@@ -13,4 +13,11 @@ class UserModel extends UserEntity {
       name: json['name'],
       email: json['email'],
       permissions: (json['permissions'] as List).map((e) => '$e').toList());
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'name': name,
+        'email': email,
+        'permissions': permissions,
+      };
 }

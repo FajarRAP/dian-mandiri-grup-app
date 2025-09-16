@@ -1,33 +1,30 @@
-import 'package:camera/camera.dart';
 import 'package:dartz/dartz.dart';
 
 import '../../../../core/common/use_cases.dart';
 import '../../../../core/failure/failure.dart';
-import '../repositories/shipment_repository.dart';
+import '../repositories/shipment_repositories.dart';
 
 class InsertShipmentDocumentUseCase
-    implements AsyncUseCaseParams<String, InsertShipmentDocumentParams> {
-  final ShipmentRepository shipmentRepository;
+    implements AsyncUseCaseParams<String, InsertShipmentDocumentUseCaseParams> {
+  const InsertShipmentDocumentUseCase({required this.shipmentRepositories});
 
-  const InsertShipmentDocumentUseCase({required this.shipmentRepository});
+  final ShipmentRepositories shipmentRepositories;
+
   @override
   Future<Either<Failure, String>> call(
-      InsertShipmentDocumentParams params) async {
-    return await shipmentRepository.insertShipmentDocument(
-        shipmentId: params.shipmentId,
-        document: params.document,
-        stage: params.stage);
+      InsertShipmentDocumentUseCaseParams params) async {
+    return await shipmentRepositories.insertShipmentDocument(params: params);
   }
 }
 
-class InsertShipmentDocumentParams {
-  const InsertShipmentDocumentParams({
+class InsertShipmentDocumentUseCaseParams {
+  const InsertShipmentDocumentUseCaseParams({
     required this.shipmentId,
-    required this.document,
+    required this.documentPath,
     required this.stage,
   });
 
   final String shipmentId;
-  final XFile document;
+  final String documentPath;
   final String stage;
 }

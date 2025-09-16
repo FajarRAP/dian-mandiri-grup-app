@@ -2,16 +2,15 @@ import 'package:dartz/dartz.dart';
 
 import '../../../../core/common/use_cases.dart';
 import '../../../../core/failure/failure.dart';
-import '../entities/user_entity.dart';
-import '../repositories/auth_repository.dart';
+import '../repositories/auth_repositories.dart';
 
-class SignInUseCase implements AsyncUseCaseNoParams<UserEntity> {
-  const SignInUseCase({required this.authRepository});
+class SignInUseCase implements UseCase<String, NoParams> {
+  const SignInUseCase({required this.authRepositories});
 
-  final AuthRepository authRepository;
+  final AuthRepositories authRepositories;
 
   @override
-  Future<Either<Failure, UserEntity>> call() async {
-    return await authRepository.signIn();
+  Future<Either<Failure, String>> call(NoParams params) async {
+    return await authRepositories.signIn();
   }
 }

@@ -1,13 +1,21 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../common/constants.dart';
-import '../exceptions/refresh_token.dart';
+import '../exceptions/server_exception.dart';
+import '../failure/failure.dart';
 
 final dateFormat = DateFormat('y-MM-dd', 'id_ID');
 final dateTimeFormat = DateFormat('dd-MM-y HH:mm:ss', 'id_ID');
 final dMyFormat = DateFormat('dd-MM-y', 'id_ID');
 final timeFormat = DateFormat('HH:mm:ss', 'id_ID');
+final idrCurrencyFormat = NumberFormat.currency(
+  locale: 'id_ID',
+  symbol: 'Rp ',
+  decimalDigits: 0,
+);
 
 String evaluateStage(String stage) {
   switch (stage) {
@@ -35,6 +43,57 @@ Future<bool> isInternetConnected() async {
   return !connectivity.contains(ConnectivityResult.none);
 }
 
-bool isRefreshed<T>(T state, String? refreshToken) {
-  return state is RefreshToken && refreshToken != null;
+List parseSpreadsheetFailure(SpreadsheetFailure spreadsheetFailure) {
+  DataCell mapCell(el) => DataCell(SizedBox(
+      width: double.infinity,
+      child: Tooltip(
+          triggerMode: TooltipTriggerMode.tap,
+          message: el?['error'] ?? '',
+          child: Text(el?['value'] ?? ''))));
+
+  final headers = spreadsheetFailure.headers
+      .map((e) => DataColumn(label: Text(e)))
+      .toList();
+  final rows = List.generate(
+    spreadsheetFailure.rows.length,
+    (index) {
+      final row = spreadsheetFailure.rows[index];
+      final color = index % 2 == 0 ? Colors.white : Colors.grey.shade50;
+
+      return DataRow(
+          color: WidgetStateProperty.all(color),
+          cells: row.map(mapCell).toList());
+    },
+  );
+
+  return [headers, rows];
+}
+
+class TextFormFieldConfig {
+  const TextFormFieldConfig({
+    this.onFieldSubmitted,
+    this.autoFocus,
+    this.decoration,
+    this.keyboardType,
+    this.textInputAction,
+  });
+
+  final void Function(String value)? onFieldSubmitted;
+  final bool? autoFocus;
+  final InputDecoration? decoration;
+  final TextInputType? keyboardType;
+  final TextInputAction? textInputAction;
+}
+
+ServerException handleDioException(DioException de) {
+  final data = de.response?.data;
+  final isMap = data is Map<String, dynamic>;
+
+  switch (de.response?.statusCode) {
+    default:
+      return ServerException(
+        message: isMap ? data['message'] : null,
+        statusCode: de.response?.statusCode,
+      );
+  }
 }

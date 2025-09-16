@@ -1,49 +1,34 @@
 name: ship_tracker
 description: "Dian Mandiri Grup Internal System"
-# The following line prevents the package from being accidentally published to
-# pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
-# The following defines the version and build number for your application.
-# A version number is three numbers separated by dots, like 1.2.43
-# followed by an optional build number separated by a +.
-# Both the version and the builder number may be overridden in flutter
-# build by specifying --build-name and --build-number, respectively.
-# In Android, build-name is used as versionName while build-number used as versionCode.
-# Read more about Android versioning at https://developer.android.com/studio/publish/versioning
-# In iOS, build-name is used as CFBundleShortVersionString while build-number is used as CFBundleVersion.
-# Read more about iOS versioning at
-# https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-# In Windows, build-name is used as the major, minor, and patch parts
-# of the product and file versions while build-number is used as the build suffix.
+publish_to: "none"
+
 version: 1.6.5+11
 
 environment:
   sdk: ^3.5.0
 
-# Dependencies specify other packages that your package needs in order to work.
-# To automatically upgrade your package dependencies to the latest versions
-# consider running `flutter pub upgrade --major-versions`. Alternatively,
-# dependencies can be manually updated by changing the version numbers below to
-# the latest version available on pub.dev. To see which dependencies have newer
-# versions available, run `flutter pub outdated`.
 dependencies:
   flutter:
     sdk: flutter
 
   audioplayers: ^6.1.0
   bloc: ^9.0.0
-  camera: ^0.11.0+2
   connectivity_plus: ^6.0.5
   cupertino_icons: ^1.0.8
   dartz: ^0.10.1
   dio: ^5.7.0
+  file_selector: ^1.0.3
+  flutter_animate: ^4.5.2
   flutter_bloc: ^9.1.0
   flutter_secure_storage: ^9.2.2
+  flutter_svg: ^2.2.0
+  firebase_core: ^3.13.0
   get_it: ^8.0.0
   go_router: ^14.2.7
   google_sign_in: ^6.2.2
-  intl: ^0.19.0
+  intl: any
+  image_picker: ^1.1.2
   meta: ^1.15.0
   open_filex: ^4.5.0
   path_provider: ^2.1.4
@@ -51,7 +36,6 @@ dependencies:
   simple_barcode_scanner: ^0.3.0
   flutter_localizations:
     sdk: flutter
-  firebase_core: ^3.13.0
 
 dev_dependencies:
   flutter_test:
@@ -66,29 +50,128 @@ flutter:
   assets:
     - assets/icons/
     - assets/sounds/
+    - assets/svgs/
+    # - dummy_json/
 
-  # An image asset can refer to one or more resolution-specific "variants", see
-  # https://flutter.dev/to/resolution-aware-images
-
-  # For details regarding adding assets from package dependencies, see
-  # https://flutter.dev/to/asset-from-package
-
-  # To add custom fonts to your application, add a fonts section here,
-  # in this "flutter" section. Each entry in this list should have a
-  # "family" key with the font family name, and a "fonts" key with a
-  # list giving the asset and other descriptors for the font. For
-  # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
-  #         style: italic
-  #   - family: Trajan Pro
-  #     fonts:
-  #       - asset: fonts/TrajanPro.ttf
-  #       - asset: fonts/TrajanPro_Bold.ttf
-  #         weight: 700
-  #
-  # For details regarding fonts from package dependencies,
-  # see https://flutter.dev/to/font-from-package
+  fonts:
+    - family: Inter18pt
+      fonts:
+        - asset: fonts/Inter_18pt-ExtraBold.ttf
+          weight: 800
+        - asset: fonts/Inter_18pt-ExtraBoldItalic.ttf
+          weight: 800
+          style: italic
+        - asset: fonts/Inter_18pt-Bold.ttf
+          weight: 700
+        - asset: fonts/Inter_18pt-BoldItalic.ttf
+          weight: 700
+          style: italic
+        - asset: fonts/Inter_18pt-SemiBold.ttf
+          weight: 600
+        - asset: fonts/Inter_18pt-SemiBoldItalic.ttf
+          weight: 600
+          style: italic
+        - asset: fonts/Inter_18pt-Medium.ttf
+          weight: 500
+        - asset: fonts/Inter_18pt-MediumItalic.ttf
+          weight: 500
+          style: italic
+        - asset: fonts/Inter_18pt-Regular.ttf
+          weight: 400
+        - asset: fonts/Inter_18pt-Italic.ttf
+          weight: 400
+          style: italic
+        - asset: fonts/Inter_18pt-Light.ttf
+          weight: 300
+        - asset: fonts/Inter_18pt-LightItalic.ttf
+          weight: 300
+          style: italic
+        - asset: fonts/Inter_18pt-ExtraLight.ttf
+          weight: 200
+        - asset: fonts/Inter_18pt-ExtraLightItalic.ttf
+          weight: 200
+          style: italic
+        - asset: fonts/Inter_18pt-Thin.ttf
+          weight: 100
+        - asset: fonts/Inter_18pt-ThinItalic.ttf
+          style: italic
+    # - family: Inter24pt
+    #   fonts:
+    #     - asset: fonts/Inter_24pt-ExtraBold.ttf
+    #       weight: 800
+    #     - asset: fonts/Inter_24pt-ExtraBoldItalic.ttf
+    #       weight: 800
+    #       style: italic
+    #     - asset: fonts/Inter_24pt-Bold.ttf
+    #       weight: 700
+    #     - asset: fonts/Inter_24pt-BoldItalic.ttf
+    #       weight: 700
+    #       style: italic
+    #     - asset: fonts/Inter_24pt-SemiBold.ttf
+    #       weight: 600
+    #     - asset: fonts/Inter_24pt-SemiBoldItalic.ttf
+    #       weight: 600
+    #       style: italic
+    #     - asset: fonts/Inter_24pt-Medium.ttf
+    #       weight: 500
+    #     - asset: fonts/Inter_24pt-MediumItalic.ttf
+    #       weight: 500
+    #       style: italic
+    #     - asset: fonts/Inter_24pt-Light.ttf
+    #       weight: 300
+    #     - asset: fonts/Inter_24pt-LightItalic.ttf
+    #       weight: 300
+    #       style: italic
+    #     - asset: fonts/Inter_24pt-ExtraLight.ttf
+    #       weight: 200
+    #     - asset: fonts/Inter_24pt-ExtraLightItalic.ttf
+    #       weight: 200
+    #       style: italic
+    #     - asset: fonts/Inter_24pt-Thin.ttf
+    #       weight: 100
+    #     - asset: fonts/Inter_24pt-ThinItalic.ttf
+    #       weight: 100
+    #       style: italic
+    #     - asset: fonts/Inter_24pt-Regular.ttf
+    #     - asset: fonts/Inter_24pt-Italic.ttf
+    #       style: italic
+    # - family: Inter28pt
+    #   fonts:
+    #     - asset: fonts/Inter_28pt-ExtraBold.ttf
+    #       weight: 800
+    #     - asset: fonts/Inter_28pt-ExtraBoldItalic.ttf
+    #       weight: 800
+    #       style: italic
+    #     - asset: fonts/Inter_28pt-Bold.ttf
+    #       weight: 700
+    #     - asset: fonts/Inter_28pt-BoldItalic.ttf
+    #       weight: 700
+    #       style: italic
+    #     - asset: fonts/Inter_28pt-SemiBold.ttf
+    #       weight: 600
+    #     - asset: fonts/Inter_28pt-SemiBoldItalic.ttf
+    #       weight: 600
+    #       style: italic
+    #     - asset: fonts/Inter_28pt-Medium.ttf
+    #       weight: 500
+    #     - asset: fonts/Inter_28pt-MediumItalic.ttf
+    #       weight: 500
+    #       style: italic
+    #     - asset: fonts/Inter_28pt-Light.ttf
+    #       weight: 300
+    #     - asset: fonts/Inter_28pt-LightItalic.ttf
+    #       weight: 300
+    #       style: italic
+    #     - asset: fonts/Inter_28pt-ExtraLight.ttf
+    #       weight: 200
+    #     - asset: fonts/Inter_28pt-ExtraLightItalic.ttf
+    #       weight: 200
+    #       style: italic
+    #     - asset: fonts/Inter_28pt-Thin.ttf
+    #       weight: 100
+    #     - asset: fonts/Inter_28pt-ThinItalic.ttf
+    #       weight: 100
+    #       style: italic
+    #     - asset: fonts/Inter_28pt-Regular.ttf
+    #     - asset: fonts/Inter_28pt-Italic.ttf
+    #       style: italic

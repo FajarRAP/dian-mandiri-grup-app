@@ -1,9 +1,7 @@
 import 'package:bloc/bloc.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:meta/meta.dart';
 
-import '../../../../core/common/constants.dart';
-import '../../../../core/helpers/helpers.dart';
+import '../../../../core/common/use_cases.dart';
 import '../../domain/entities/user_entity.dart';
 import '../../domain/usecases/fetch_user_from_storage_use_case.dart';
 import '../../domain/usecases/fetch_user_use_case.dart';
@@ -22,14 +20,12 @@ class AuthCubit extends Cubit<AuthState> {
     required SignInUseCase signInUseCase,
     required SignOutUseCase signOutUseCase,
     required UpdateProfileUseCase updateProfileUseCase,
-    required FlutterSecureStorage storage,
   })  : _fetchUserUseCase = fetchUserUseCase,
         _fetchUserFromStorageUseCase = fetchUserFromStorageUseCase,
         _refreshTokenUseCase = refreshTokenUseCase,
         _signInUseCase = signInUseCase,
         _signOutUseCase = signOutUseCase,
         _updateProfileUseCase = updateProfileUseCase,
-        _storage = storage,
         super(AuthInitial());
 
   final FetchUserUseCase _fetchUserUseCase;
@@ -38,89 +34,73 @@ class AuthCubit extends Cubit<AuthState> {
   final SignInUseCase _signInUseCase;
   final SignOutUseCase _signOutUseCase;
   final UpdateProfileUseCase _updateProfileUseCase;
-  final FlutterSecureStorage _storage;
-
   late UserEntity user;
 
   Future<void> fetchUser() async {
     emit(FetchUserLoading());
 
-    final refreshToken = await _storage.read(key: refreshTokenKey);
-    final result = await _fetchUserUseCase();
+    final result = await _fetchUserUseCase(NoParams());
 
     result.fold(
-      (l) => isRefreshed(l, refreshToken)
-          ? fetchUser()
-          : emit(FetchUserError(message: l.message)),
-      (r) {
-        user = r;
-        emit(FetchUserLoaded());
-      },
+      (failure) => emit(FetchUserError(message: failure.message)),
+      (user) => emit(FetchUserLoaded(user: this.user = user)),
     );
   }
 
   Future<void> fetchUserFromStorage() async {
     emit(FetchUserLoading());
 
-    final userFromStorage = await _fetchUserFromStorageUseCase();
+    final userFromStorage = await _fetchUserFromStorageUseCase(NoParams());
 
     userFromStorage.fold(
-      (l) => emit(FetchUserError(message: l.message)),
-      (r) {
-        user = r;
-        emit(FetchUserLoaded());
-      },
+      (failure) => emit(FetchUserError(message: failure.message)),
+      (user) => emit(FetchUserLoaded(user: this.user = user)),
     );
   }
 
-  Future<void> refreshToken() async {
+  Future<void> refreshToken({required String? refreshToken}) async {
     emit(RefreshTokenLoading());
 
-    final refreshToken = await _storage.read(key: refreshTokenKey);
     final result = await _refreshTokenUseCase('$refreshToken');
 
     result.fold(
-      (l) => emit(RefreshTokenError(message: l.message)),
-      (r) => emit(RefreshTokenLoaded()),
+      (failure) => emit(RefreshTokenError(message: failure.message)),
+      (message) => emit(RefreshTokenLoaded()),
     );
   }
 
   Future<void> signIn() async {
     emit(SignInLoading());
 
-    final result = await _signInUseCase();
+    final result = await _signInUseCase(NoParams());
 
     result.fold(
-      (l) => emit(SignInError(message: l.message)),
-      (r) {
-        user = r;
-        emit(SignInLoaded(message: 'Berhasil sign in'));
-      },
+      (failure) => emit(SignInError(message: failure.message)),
+      (message) => emit(SignInLoaded(message: message)),
     );
   }
 
   Future<void> signOut() async {
     emit(SignOutLoading());
 
-    final result = await _signOutUseCase();
+    final result = await _signOutUseCase(NoParams());
 
     result.fold(
-      (l) => emit(SignOutError(message: l.message)),
-      (r) => emit(SignOutLoaded(message: 'Berhasil sign out')),
+      (failure) => emit(SignOutError(message: failure.message)),
+      (message) => emit(SignOutLoaded(message: message)),
     );
   }
 
   Future<void> updateProfile({required String name}) async {
     emit(UpdateProfileLoading());
 
-    final refreshToken = await _storage.read(key: refreshTokenKey);
     final result = await _updateProfileUseCase(name);
 
     result.fold(
-      (l) => isRefreshed(l, refreshToken)
-          ? updateProfile(name: name)
-          : emit(UpdateProfileError(message: l.message)),
-      (r) => emit(UpdateProfileLoaded(message: r)),
+      (failure) => emit(UpdateProfileError(message: failure.message)),
+      (message) => emit(UpdateProfileLoaded(message: message)),
     );
   }
+
+  void refreshTokenExpired() => emit(RefreshTokenExpired());
 }

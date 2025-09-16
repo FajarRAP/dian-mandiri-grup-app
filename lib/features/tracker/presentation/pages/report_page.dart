@@ -1,15 +1,12 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:open_filex/open_filex.dart';
-import 'package:share_plus/share_plus.dart';
 
 import '../../../../core/common/constants.dart';
-import '../../../../core/common/snackbar.dart';
 import '../../../../core/helpers/helpers.dart';
+import '../../../../core/themes/colors.dart';
 import '../cubit/shipment_cubit.dart';
-import '../widgets/date_range_dialog.dart';
+import '../widgets/create_report_date_range_dialog.dart';
+import '../widgets/shipment_report_list_item.dart';
 
 class ReportPage extends StatefulWidget {
   const ReportPage({super.key});
@@ -19,6 +16,7 @@ class ReportPage extends StatefulWidget {
 }
 
 class _ReportPageState extends State<ReportPage> {
+  late final ShipmentCubit _shipmentCubit;
   var _dateTimeRange = DateTimeRange(
     start: DateTime.now(),
     end: DateTime.now(),
@@ -27,200 +25,213 @@ class _ReportPageState extends State<ReportPage> {
   var _dateTimeRangePicked = 'Pilih Range Tanggal';
 
   @override
+  void initState() {
+    super.initState();
+    _shipmentCubit = context.read<ShipmentCubit>()
+      ..fetchShipmentReports(
+        endDate: dateFormat.format(_dateTimeRange.end),
+        startDate: dateFormat.format(_dateTimeRange.start),
+        status: _status,
+      );
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final shipmentCubit = context.read<ShipmentCubit>();
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
 
     return Scaffold(
-      appBar: AppBar(
-        actions: [
-          PopupMenuButton(
-            itemBuilder: (context) => <PopupMenuItem>[
-              PopupMenuItem(
-                onTap: () => showDialog(
-                  context: context,
-                  builder: (context) => DateRangeDialog(status: _status),
+      body: BlocListener<ShipmentCubit, ShipmentState>(
+        listener: (context, state) {
+          if (state is CreateShipmentReportLoaded) {
+            _shipmentCubit.fetchShipmentReports(
+              endDate: dateFormat.format(DateTime.now()),
+              startDate: dateFormat.format(DateTime.now()),
+              status: _status,
+            );
+          }
+        },
+        child: NotificationListener<ScrollNotification>(
+          onNotification: (scrollState) {
+            if (scrollState.runtimeType == ScrollEndNotification &&
+                _shipmentCubit.state is! ListPaginateLast) {
+              _shipmentCubit.fetchShipmentReportsPaginate(
+                endDate: dateFormat.format(_dateTimeRange.end),
+                startDate: dateFormat.format(_dateTimeRange.start),
+                status: _status,
+              );
+            }
+
+            return false;
+          },
+          child: CustomScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            slivers: <Widget>[
+              SliverAppBar(
+                actions: <Widget>[
+                  PopupMenuButton(
+                    itemBuilder: (context) => <PopupMenuItem>[
+                      PopupMenuItem(
+                        onTap: () => showDialog(
+                          context: context,
+                          builder: (context) =>
+                              CreateReportDateRangeDialog(status: _status),
+                        ),
+                        child: const Text('Buat Laporan'),
+                      ),
+                    ],
+                  ),
+                ],
+                backgroundColor: MaterialColors.surfaceContainerLowest,
+                expandedHeight: kToolbarHeight + kSpaceBarHeight,
+                flexibleSpace: FlexibleSpaceBar(
+                  background: Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          TextButton.icon(
+                            onPressed: () async {
+                              final dateTimeRangePicked =
+                                  await showDateRangePicker(
+                                      context: context,
+                                      firstDate: DateTime(2000),
+                                      lastDate: DateTime.now(),
+                                      locale: const Locale('id'));
+
+                              if (dateTimeRangePicked == null) return;
+
+                              _dateTimeRange = dateTimeRangePicked;
+                              final startDate =
+                                  dMyFormat.format(dateTimeRangePicked.start);
+                              final endDate =
+                                  dMyFormat.format(dateTimeRangePicked.end);
+                              setState(() => _dateTimeRangePicked =
+                                  '$startDate s.d.\n$endDate');
+
+                              _shipmentCubit.fetchShipmentReports(
+                                endDate: endDate,
+                                startDate: startDate,
+                                status: _status,
+                              );
+                            },
+                            icon: const Icon(Icons.calendar_month_rounded),
+                            label: Text(_dateTimeRangePicked),
+                          ),
+                          SizedBox(
+                            width: 150,
+                            child: DropdownButtonFormField<String>(
+                              onChanged: (value) {
+                                if (value == null) return;
+
+                                _status = value;
+                                _shipmentCubit.fetchShipmentReports(
+                                  endDate: dMyFormat.format(_dateTimeRange.end),
+                                  startDate:
+                                      dMyFormat.format(_dateTimeRange.start),
+                                  status: _status,
+                                );
+                              },
+                              style: textTheme.bodyMedium?.copyWith(
+                                fontWeight: FontWeight.w500,
+                              ),
+                              items: <DropdownMenuItem<String>>[
+                                DropdownMenuItem(
+                                  value: pendingReport,
+                                  child: const Text('Pending'),
+                                ),
+                                DropdownMenuItem(
+                                  value: processingReport,
+                                  child: const Text('Processing'),
+                                ),
+                                DropdownMenuItem(
+                                  value: completedReport,
+                                  child: const Text('Compeleted'),
+                                ),
+                                DropdownMenuItem(
+                                  value: failedReport,
+                                  child: const Text('Failed'),
+                                ),
+                              ],
+                              value: _status,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
-                child: const Text('Buat Laporan'),
+                floating: true,
+                pinned: true,
+                shape: const RoundedRectangleBorder(
+                  side: BorderSide(
+                    color: MaterialColors.outlineVariant,
+                    width: 1,
+                  ),
+                ),
+                snap: true,
+                title: const Text('Laporan'),
+              ),
+              // List
+              BlocBuilder<ShipmentCubit, ShipmentState>(
+                bloc: _shipmentCubit,
+                buildWhen: (previous, current) =>
+                    current is FetchShipmentReports,
+                builder: (context, state) {
+                  if (state is FetchShipmentReportsLoading) {
+                    return const SliverFillRemaining(
+                      child: Center(
+                        child: CircularProgressIndicator.adaptive(),
+                      ),
+                    );
+                  }
+
+                  if (state is FetchShipmentReportsLoaded) {
+                    if (state.shipmentReports.isEmpty) {
+                      return const SliverFillRemaining(
+                        child: Center(
+                          child: Text('Belum ada laporan'),
+                        ),
+                      );
+                    }
+                    
+                    return SliverPadding(
+                      padding: const EdgeInsets.all(16),
+                      sliver: SliverList.builder(
+                        itemBuilder: (context, index) => ShipmentReportListItem(
+                          shipmentReport: state.shipmentReports[index],
+                        ),
+                        itemCount: state.shipmentReports.length,
+                      ),
+                    );
+                  }
+
+                  return const SizedBox();
+                },
+              ),
+              // Widget when Pagination
+              BlocBuilder<ShipmentCubit, ShipmentState>(
+                buildWhen: (previous, current) => current is ListPaginate,
+                builder: (context, state) {
+                  if (state is ListPaginateLoading) {
+                    return SliverPadding(
+                      padding: const EdgeInsets.all(16),
+                      sliver: const SliverToBoxAdapter(
+                        child: Center(
+                          child: CircularProgressIndicator.adaptive(),
+                        ),
+                      ),
+                    );
+                  }
+
+                  return const SliverToBoxAdapter();
+                },
               ),
             ],
           ),
-        ],
-        title: const Text('Laporan'),
-      ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: <Widget>[
-          const SizedBox(height: 6),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                TextButton.icon(
-                  onPressed: () async {
-                    final dateTimeRangePicked = await showDateRangePicker(
-                        context: context,
-                        firstDate: DateTime(2000),
-                        lastDate: DateTime(2100),
-                        locale: const Locale('id'));
-
-                    if (dateTimeRangePicked == null) return;
-
-                    _dateTimeRange = dateTimeRangePicked;
-                    final startDate =
-                        dMyFormat.format(dateTimeRangePicked.start);
-                    final endDate = dMyFormat.format(dateTimeRangePicked.end);
-                    setState(() =>
-                        _dateTimeRangePicked = '$startDate s.d.\n $endDate');
-                  },
-                  icon: const Icon(Icons.calendar_month_rounded),
-                  label: Text(_dateTimeRangePicked),
-                ),
-                SizedBox(
-                  width: 150,
-                  child: DropdownButtonFormField<String>(
-                    onChanged: (value) {
-                      if (value == null) return;
-
-                      _status = value;
-                      shipmentCubit.fetchShipmentReports(
-                        endDate: dateFormat.format(_dateTimeRange.end),
-                        startDate: dateFormat.format(_dateTimeRange.start),
-                        status: _status,
-                      );
-                    },
-                    items: <DropdownMenuItem<String>>[
-                      DropdownMenuItem(
-                        value: pendingReport,
-                        child: const Text('Pending'),
-                      ),
-                      DropdownMenuItem(
-                        value: processingReport,
-                        child: const Text('Processing'),
-                      ),
-                      DropdownMenuItem(
-                        value: completedReport,
-                        child: const Text('Compeleted'),
-                      ),
-                      DropdownMenuItem(
-                        value: failedReport,
-                        child: const Text('Failed'),
-                      ),
-                    ],
-                    value: _status,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 12),
-          Expanded(
-            child: BlocConsumer<ShipmentCubit, ShipmentState>(
-              bloc: shipmentCubit
-                ..getExternalPath()
-                ..fetchShipmentReports(
-                  endDate: dateFormat.format(_dateTimeRange.end),
-                  startDate: dateFormat.format(_dateTimeRange.start),
-                  status: _status,
-                ),
-              buildWhen: (previous, current) => current is FetchShipmentReports,
-              listenWhen: (previous, current) =>
-                  current is DownloadShipmentReport,
-              listener: (context, state) {
-                if (state is DownloadShipmentReportLoaded) {
-                  scaffoldMessengerKey.currentState?.showSnackBar(
-                    successSnackbar(
-                      state.message,
-                      EdgeInsets.only(
-                        left: 16,
-                        right: 16,
-                        bottom: MediaQuery.sizeOf(context).height - 175,
-                      ),
-                    ),
-                  );
-                }
-
-                if (state is DownloadShipmentReportError) {
-                  scaffoldMessengerKey.currentState?.showSnackBar(
-                    dangerSnackbar(
-                      state.message,
-                      EdgeInsets.only(
-                        left: 16,
-                        right: 16,
-                        bottom: MediaQuery.sizeOf(context).height - 175,
-                      ),
-                    ),
-                  );
-                }
-              },
-              builder: (context, state) {
-                if (state is FetchShipmentReportsLoading) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
-
-                if (state is FetchShipmentReportsLoaded) {
-                  final path = shipmentCubit.externalPath;
-
-                  return RefreshIndicator(
-                    onRefresh: () async => shipmentCubit.fetchShipmentReports(
-                      endDate: dateFormat.format(_dateTimeRange.end),
-                      startDate: dateFormat.format(_dateTimeRange.start),
-                      status: _status,
-                    ),
-                    displacement: 10,
-                    child: ListView.builder(
-                      itemBuilder: (context, index) {
-                        final shipmentReport = state.shipmentReports[index];
-                        final filename = shipmentReport.name;
-                        final date = shipmentReport.date;
-                        final formattedDate = timeFormat.format(date.toLocal());
-                        final savedFilename = '${filename}_$formattedDate.xlsx';
-                        final file = File('$path/$savedFilename');
-
-                        return ListTile(
-                          contentPadding: const EdgeInsets.only(left: 16),
-                          leading: Image.asset(spreadsheetIcon),
-                          title: Text(savedFilename),
-                          trailing: PopupMenuButton<String>(
-                            itemBuilder: (context) => <PopupMenuItem<String>>[
-                              if (!file.existsSync())
-                                PopupMenuItem(
-                                  onTap: () async => await shipmentCubit
-                                      .downloadShipmentReport(
-                                    shipmentReportEntity: shipmentReport,
-                                  ),
-                                  child: const Text('Unduh'),
-                                )
-                              else ...[
-                                PopupMenuItem(
-                                  onTap: () async =>
-                                      await OpenFilex.open(file.path),
-                                  child: const Text('Buka'),
-                                ),
-                                PopupMenuItem(
-                                  onTap: () async => await Share.shareXFiles(
-                                    <XFile>[XFile(file.path)],
-                                    text: 'Laporan Pengiriman',
-                                  ),
-                                  child: const Text('Bagikan'),
-                                ),
-                              ]
-                            ],
-                          ),
-                        );
-                      },
-                      itemCount: state.shipmentReports.length,
-                    ),
-                  );
-                }
-
-                return const SizedBox();
-              },
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

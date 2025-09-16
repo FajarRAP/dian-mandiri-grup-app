@@ -3,13 +3,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/common/constants.dart';
-import '../../../../core/common/snackbar.dart';
 import '../../../../core/helpers/helpers.dart';
+import '../../../../core/helpers/top_snackbar.dart';
+import '../../../../core/widgets/buttons/primary_button.dart';
+import '../../../../core/widgets/image_picker_bottom_sheet.dart';
 import '../../../auth/presentation/cubit/auth_cubit.dart';
 import '../../data/models/shipment_detail_model.dart';
 import '../cubit/shipment_cubit.dart';
 import '../widgets/image_not_found.dart';
-import '../widgets/ship_detail_info_item.dart';
+import '../widgets/shipment_detail_info_row.dart';
 
 class ShipmentDetailPage extends StatelessWidget {
   const ShipmentDetailPage({
@@ -27,17 +29,12 @@ class ShipmentDetailPage extends StatelessWidget {
 
     return BlocListener<ShipmentCubit, ShipmentState>(
       listener: (context, state) {
+        if (state is InsertShipmentDocumentLoaded) {
+          shipmentCubit.fetchShipmentById(shipmentId: shipmentId);
+        }
+
         if (state is FetchShipmentDetailError) {
-          scaffoldMessengerKey.currentState?.showSnackBar(
-            dangerSnackbar(
-              state.message,
-              EdgeInsets.only(
-                left: 16,
-                right: 16,
-                bottom: MediaQuery.sizeOf(context).height - 175,
-              ),
-            ),
-          );
+          TopSnackbar.dangerSnackbar(message: state.message);
         }
       },
       child: Scaffold(
@@ -50,19 +47,17 @@ class ShipmentDetailPage extends StatelessWidget {
           builder: (context, state) {
             if (state is FetchShipmentDetailLoading) {
               return const Center(
-                child: CircularProgressIndicator(),
+                child: CircularProgressIndicator.adaptive(),
               );
             }
 
             if (state is FetchShipmentDetailLoaded) {
               final shipmentDetail =
                   state.shipmentDetail as ShipmentDetailModel;
-              final isHavePermission =
-                  authCubit.user.id == shipmentDetail.stage.user.id;
               // final isSuperAdmin =
               //     authCubit.user.permissions.contains(superAdminPermission);
-              shipmentCubit.shipmentDetail =
-                  state.shipmentDetail as ShipmentDetailModel;
+              final isHasUploadPermission =
+                  authCubit.user.id == shipmentDetail.stage.user.id;
 
               return RefreshIndicator(
                 onRefresh: () async => await shipmentCubit.fetchShipmentById(
@@ -70,7 +65,7 @@ class ShipmentDetailPage extends StatelessWidget {
                 displacement: 10,
                 child: ListView(
                   padding: const EdgeInsets.all(16),
-                  children: [
+                  children: <Widget>[
                     Center(
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(8),
@@ -82,13 +77,30 @@ class ShipmentDetailPage extends StatelessWidget {
                         ),
                       ),
                     ),
-                    if (isHavePermission) ...[
+                    if (isHasUploadPermission) ...[
                       const SizedBox(height: 10),
                       Center(
-                        child: ElevatedButton.icon(
-                          onPressed: () => context.push(cameraRoute),
+                        child: PrimaryButton(
+                          onPressed: () => showModalBottomSheet(
+                            builder: (context) => ImagePickerBottomSheet(
+                              onPicked: (image) => context.push(
+                                displayPictureRoute,
+                                extra: {
+                                  'image_path': image.path,
+                                  'shipment_id': shipmentId,
+                                  'stage': shipmentDetail.stage.stage,
+                                },
+                              ),
+                            ),
+                            context: context,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.vertical(
+                                top: Radius.circular(16),
+                              ),
+                            ),
+                          ),
                           icon: const Icon(Icons.camera_alt),
-                          label: const Text('Upload Resi'),
+                          child: const Text('Upload Resi'),
                         ),
                       )
                     ],
@@ -97,31 +109,32 @@ class ShipmentDetailPage extends StatelessWidget {
                     const SizedBox(height: 16),
                     Text(
                       'Informasi Resi',
-                      style: textTheme.headlineSmall
-                          ?.copyWith(fontWeight: FontWeight.w700),
+                      style: textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                     const SizedBox(height: 12),
-                    ShipDetailInfoItem(
+                    ShipmentDetailInfoRow(
                       label: 'Di Scan Oleh',
                       value: shipmentDetail.stage.user.name,
                     ),
                     const SizedBox(height: 8),
-                    ShipDetailInfoItem(
+                    ShipmentDetailInfoRow(
                       label: 'Nomor Resi',
                       value: shipmentDetail.receiptNumber,
                     ),
                     const SizedBox(height: 8),
-                    ShipDetailInfoItem(
+                    ShipmentDetailInfoRow(
                       label: 'Nama Ekspedisi',
                       value: shipmentDetail.courier,
                     ),
                     const SizedBox(height: 8),
-                    ShipDetailInfoItem(
+                    ShipmentDetailInfoRow(
                       label: 'Stage',
                       value: shipmentDetail.stage.stage,
                     ),
                     const SizedBox(height: 8),
-                    ShipDetailInfoItem(
+                    ShipmentDetailInfoRow(
                       label: 'Tanggal Scan',
                       value: dateTimeFormat
                           .format(shipmentDetail.stage.date.toLocal()),

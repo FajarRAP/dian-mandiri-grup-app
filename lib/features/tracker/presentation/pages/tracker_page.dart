@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/common/constants.dart';
 import '../../../auth/presentation/cubit/auth_cubit.dart';
-import '../widgets/home_menu_card.dart';
+import '../widgets/tracker_menu_card.dart';
 
 class TrackerPage extends StatelessWidget {
   const TrackerPage({super.key});
@@ -20,21 +20,31 @@ class TrackerPage extends StatelessWidget {
           buildWhen: (previous, current) => current is FetchUser,
           builder: (context, state) {
             if (state is FetchUserLoading) {
-              return const CircularProgressIndicator();
+              return const CircularProgressIndicator.adaptive();
             }
 
-            final permissions =
-                authCubit.user.permissions.map((e) => e).toList();
-            final isSinglePermission = authCubit.user.permissions.length == 1;
-            final isSuperAdmin =
-                authCubit.user.permissions.contains(superAdminPermission);
+            final permissions = authCubit.user.permissions;
+            final isSinglePermission = permissions.length == 1;
+            final isSuperAdmin = permissions.contains(superAdminPermission);
+
+            if (isSinglePermission && !isSuperAdmin) {
+              final singleMenu =
+                  menus.firstWhere((e) => e.permission == permissions.first);
+              return TrackerMenuCard(
+                size: 150,
+                title: singleMenu.title,
+                route: singleMenu.route,
+                color: singleMenu.color,
+                assetName: singleMenu.assetName,
+              );
+            }
+
             return GridView.count(
               childAspectRatio: isSinglePermission && !isSuperAdmin ? 2 : 1,
               crossAxisCount: isSinglePermission && !isSuperAdmin ? 1 : 2,
               crossAxisSpacing: 10,
               mainAxisSpacing: 16,
               padding: const EdgeInsets.all(16),
-              shrinkWrap: true,
               children: _buildMenuCard(permissions, menus),
             );
           },
@@ -52,8 +62,8 @@ class TrackerPage extends StatelessWidget {
 
     if (permissions.contains(currentPermission)) {
       permissions.remove(currentPermission);
-      return [
-        HomeMenuCard(
+      return <Widget>[
+        TrackerMenuCard(
           title: config.title,
           route: config.route,
           color: config.color,
@@ -68,55 +78,55 @@ class TrackerPage extends StatelessWidget {
 
   List<Widget> _buildAdminPage() {
     return <Widget>[
-      HomeMenuCard(
+      TrackerMenuCard(
         title: 'Scan Resi',
         route: scanReceiptRoute,
         color: Colors.blue,
         assetName: scanReceiptIcon,
       ),
-      HomeMenuCard(
+      TrackerMenuCard(
         title: 'Scan Ambil Barang',
         route: pickUpReceiptRoute,
         color: Colors.brown,
         assetName: pickUpReceiptIcon,
       ),
-      HomeMenuCard(
+      TrackerMenuCard(
         title: 'Scan Checker',
         route: checkReceiptRoute,
         color: Colors.red,
         assetName: checkReceiptIcon,
       ),
-      HomeMenuCard(
+      TrackerMenuCard(
         title: 'Scan Packing',
         route: packReceiptRoute,
         color: Colors.green,
         assetName: packReceiptIcon,
       ),
-      HomeMenuCard(
+      TrackerMenuCard(
         title: 'Scan Kirim',
         route: sendReceiptRoute,
         color: Colors.orange,
         assetName: sendReceiptIcon,
       ),
-      HomeMenuCard(
+      TrackerMenuCard(
         title: 'Scan Retur',
         route: returnReceiptRoute,
         color: Colors.purple,
         assetName: returnReceiptIcon,
       ),
-      HomeMenuCard(
+      TrackerMenuCard(
         title: 'Barang Cancel',
         route: cancelReceiptRoute,
         color: Colors.deepOrange,
         assetName: cancelReceiptIcon,
       ),
-      HomeMenuCard(
+      TrackerMenuCard(
         title: 'Laporan',
         route: reportRoute,
         color: Colors.teal,
         assetName: reportReceiptIcon,
       ),
-      HomeMenuCard(
+      TrackerMenuCard(
         title: 'Status Resi',
         route: receiptStatusRoute,
         color: Colors.indigo,

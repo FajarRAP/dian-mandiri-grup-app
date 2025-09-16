@@ -1,68 +1,160 @@
 import 'package:flutter/material.dart';
 
+import 'colors.dart';
+
+const fontFamily = 'Inter18pt';
+
 final theme = ThemeData(
   appBarTheme: const AppBarTheme(
+    centerTitle: true,
+    iconTheme: IconThemeData(color: CustomColors.primaryNormal),
+    scrolledUnderElevation: 0,
     titleTextStyle: TextStyle(
-      color: Colors.black,
-      fontSize: 24,
-      fontWeight: FontWeight.w600,
+      color: CustomColors.primaryNormal,
+      fontFamily: fontFamily,
+      fontSize: 16,
+      fontWeight: FontWeight.w400,
     ),
   ),
-  colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
+  colorScheme: ColorScheme.fromSeed(
+    seedColor: CustomColors.primaryNormal,
+    primary: CustomColors.primaryNormal,
+  ),
+  fontFamily: fontFamily,
+  floatingActionButtonTheme: const FloatingActionButtonThemeData(
+    backgroundColor: CustomColors.primaryNormal,
+    foregroundColor: MaterialColors.onPrimary,
+  ),
+  elevatedButtonTheme: ElevatedButtonThemeData(
+    style: ElevatedButton.styleFrom(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 16,
+        vertical: 8,
+      ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+      textStyle: const TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.w500,
+      ),
+    ),
+  ),
+  indicatorColor: CustomColors.primaryNormal,
   inputDecorationTheme: InputDecorationTheme(
     border: OutlineInputBorder(
       borderRadius: BorderRadius.circular(10),
     ),
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(10),
+      borderSide: const BorderSide(color: MaterialColors.outlineVariant),
+    ),
+    errorBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(10),
+      borderSide: const BorderSide(color: MaterialColors.error),
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(10),
+      borderSide: const BorderSide(
+        color: CustomColors.primaryNormalActive,
+        width: 2,
+      ),
+    ),
+    focusedErrorBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(10),
+      borderSide: const BorderSide(
+        color: MaterialColors.error,
+        width: 2,
+      ),
+    ),
+    filled: true,
+    fillColor: Colors.grey.shade50,
     hintStyle: TextStyle(
-      color: Colors.grey[400],
+      color: MaterialColors.onSurfaceVariant,
+      fontSize: 16,
+    ),
+    prefixIconColor: MaterialColors.outlineVariant,
+  ),
+  progressIndicatorTheme: const ProgressIndicatorThemeData(
+    color: CustomColors.primaryNormal,
+    circularTrackColor: MaterialColors.outlineVariant,
+  ),
+  textButtonTheme: TextButtonThemeData(
+    style: TextButton.styleFrom(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 16,
+        vertical: 8,
+      ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+      textStyle: const TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.w500,
+      ),
     ),
   ),
-  useMaterial3: true,
   textTheme: const TextTheme(
+    displayLarge: TextStyle(
+      color: Colors.black,
+      fontSize: 57,
+    ),
+    displayMedium: TextStyle(
+      color: Colors.black,
+      fontSize: 45,
+    ),
+    displaySmall: TextStyle(
+      color: Colors.black,
+      fontSize: 36,
+    ),
     headlineLarge: TextStyle(
       color: Colors.black,
-      fontSize: 24,
-      fontWeight: FontWeight.w600,
+      fontSize: 32,
     ),
     headlineMedium: TextStyle(
       color: Colors.black,
-      fontSize: 22,
-      fontWeight: FontWeight.w600,
+      fontSize: 28,
     ),
     headlineSmall: TextStyle(
       color: Colors.black,
-      fontSize: 20,
-      fontWeight: FontWeight.w600,
+      fontSize: 24,
+    ),
+    titleLarge: TextStyle(
+      color: Colors.black,
+      fontSize: 22,
+    ),
+    titleMedium: TextStyle(
+      color: Colors.black,
+      fontSize: 16,
+    ),
+    titleSmall: TextStyle(
+      color: Colors.black,
+      fontSize: 14,
     ),
     bodyLarge: TextStyle(
       color: Colors.black,
       fontSize: 16,
-      fontWeight: FontWeight.w400,
     ),
     bodyMedium: TextStyle(
       color: Colors.black,
       fontSize: 14,
-      fontWeight: FontWeight.w400,
     ),
     bodySmall: TextStyle(
       color: Colors.black,
       fontSize: 12,
-      fontWeight: FontWeight.w400,
     ),
-    titleLarge: TextStyle(
+    labelLarge: TextStyle(
       color: Colors.black,
-      fontSize: 17,
-      fontWeight: FontWeight.w500,
+      fontSize: 14,
     ),
-    titleMedium: TextStyle(
+    labelMedium: TextStyle(
       color: Colors.black,
-      fontSize: 15,
-      fontWeight: FontWeight.w500,
+      fontSize: 12,
     ),
-    titleSmall: TextStyle(
+    labelSmall: TextStyle(
       color: Colors.black,
-      fontSize: 13,
-      fontWeight: FontWeight.w500,
+      fontSize: 11,
     ),
   ),
+  useMaterial3: true,
 );

@@ -2,24 +2,23 @@ import 'package:dartz/dartz.dart';
 
 import '../../../../core/common/use_cases.dart';
 import '../../../../core/failure/failure.dart';
-import '../repositories/shipment_repository.dart';
+import '../repositories/shipment_repositories.dart';
 
 class CreateShipmentReportUseCase
-    implements AsyncUseCaseParams<String, CreateShipmentReportParams> {
-  const CreateShipmentReportUseCase({required this.shipmentRepository});
+    implements AsyncUseCaseParams<String, CreateShipmentReportUseCaseParams> {
+  const CreateShipmentReportUseCase({required this.shipmentRepositories});
 
-  final ShipmentRepository shipmentRepository;
+  final ShipmentRepositories shipmentRepositories;
 
   @override
   Future<Either<Failure, String>> call(
-      CreateShipmentReportParams params) async {
-    return await shipmentRepository.createShipmentReport(
-        startDate: params.startDate, endDate: params.endDate);
+      CreateShipmentReportUseCaseParams params) async {
+    return await shipmentRepositories.createShipmentReport(params: params);
   }
 }
 
-class CreateShipmentReportParams {
-  const CreateShipmentReportParams({
+class CreateShipmentReportUseCaseParams {
+  const CreateShipmentReportUseCaseParams({
     required this.startDate,
     required this.endDate,
   });

@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -7,15 +5,16 @@ import 'package:go_router/go_router.dart';
 import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 
 import '../../../../core/common/constants.dart';
-import '../../../../core/common/snackbar.dart';
+import '../../../../core/helpers/debouncer.dart';
 import '../../../../core/helpers/helpers.dart';
-import '../../../auth/presentation/cubit/auth_cubit.dart';
-import '../../domain/entities/shipment_entity.dart';
+import '../../../../core/helpers/top_snackbar.dart';
+import '../../../../core/themes/colors.dart';
+import '../../../../core/widgets/confirmation_dialog.dart';
+import '../../../../core/widgets/expanded_fab/action_button.dart';
+import '../../../../core/widgets/expanded_fab/expandable_fab.dart';
 import '../cubit/shipment_cubit.dart';
-import 'action_button.dart';
-import 'delete_data_alert_dialog.dart';
-import 'expandable_fab.dart';
-import 'insert_data_from_scanner_alert_dialog.dart';
+import 'insert_shipment_from_scanner_dialog.dart';
+import 'shipment_list_item.dart';
 
 class StageLayout extends StatefulWidget {
   const StageLayout({
@@ -32,333 +31,344 @@ class StageLayout extends StatefulWidget {
 }
 
 class _StageLayoutState extends State<StageLayout> {
-  final _controller = TextEditingController();
-  late String dMyDate;
-  late String date;
-  Timer? _debounce;
+  late final AudioPlayer _audioPlayer;
+  late final Debouncer _debouncer;
+  late final FocusNode _focusNode;
+  late final ShipmentCubit _shipmentCubit;
+  late String _dMyDate;
+  late String _pickedDate;
+  String? _search;
 
   @override
   void initState() {
     super.initState();
-    date = dateFormat.format(DateTime.now());
-    dMyDate = dMyFormat.format(DateTime.now());
+    _pickedDate = dateFormat.format(DateTime.now());
+    _dMyDate = dMyFormat.format(DateTime.now());
+    _audioPlayer = AudioPlayer();
+    _debouncer = Debouncer(delay: const Duration(milliseconds: 500));
+    _focusNode = FocusScope.of(context, createDependency: false);
+    _shipmentCubit = context.read<ShipmentCubit>()
+      ..fetchShipments(date: _pickedDate, stage: widget.stage);
   }
 
   @override
   void dispose() {
-    _controller.dispose();
-    _debounce?.cancel();
+    _audioPlayer.dispose();
+    _debouncer.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final audioPlayer = AudioPlayer();
-    final shipmentCubit = context.read<ShipmentCubit>();
-    final theme = Theme.of(context);
-    final textTheme = theme.textTheme;
-
     return BlocListener<ShipmentCubit, ShipmentState>(
-      listenWhen: (previous, current) => current is InsertShipment,
-      listener: (context, state) async {
-        if (state is InsertShipmentLoaded) {
-          scaffoldMessengerKey.currentState?.showSnackBar(
-            successSnackbar(
-              state.message,
-              EdgeInsets.only(
-                left: 16,
-                right: 16,
-                bottom: MediaQuery.sizeOf(context).height - 175,
-              ),
-            ),
-          );
-          await audioPlayer.play(AssetSource(successSound));
-          await shipmentCubit.fetchShipments(
+      listener: (context, state) {
+        if (state is InsertShipmentLoaded || state is DeleteShipmentLoaded) {
+          _shipmentCubit.fetchShipments(
             date: dateFormat.format(DateTime.now()),
             stage: widget.stage,
           );
         }
-
-        if (state is InsertShipmentError) {
-          if (!context.mounted) return;
-
-          scaffoldMessengerKey.currentState?.showSnackBar(
-            dangerSnackbar(
-              state.failure.message,
-              EdgeInsets.only(
-                left: 16,
-                right: 16,
-                bottom: MediaQuery.sizeOf(context).height - 175,
-              ),
-            ),
-          );
-
-          switch (state.failure.statusCode) {
-            case 422:
-              await audioPlayer.play(AssetSource(repeatSound));
-              break;
-            case 423:
-              await audioPlayer.play(AssetSource(skipSound));
-              break;
-          }
-        }
       },
       child: Scaffold(
-        appBar: AppBar(
-          title: Text(widget.appBarTitle),
-        ),
-        body: Column(
-          children: [
-            Container(
-              color: theme.colorScheme.surface,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                children: [
-                  const SizedBox(height: 16),
-                  TextField(
-                    onChanged: (value) {
-                      if (_debounce?.isActive ?? false) _debounce?.cancel();
+        body: RefreshIndicator(
+          onRefresh: () async => await _shipmentCubit.fetchShipments(
+              date: _pickedDate, stage: widget.stage),
+          child: NotificationListener<ScrollNotification>(
+            onNotification: (scrollState) {
+              if (scrollState.runtimeType == ScrollEndNotification &&
+                  _shipmentCubit.state is! ListPaginateLast) {
+                _shipmentCubit.fetchShipmentsPaginate(
+                  date: _pickedDate,
+                  stage: widget.stage,
+                  keyword: _search,
+                );
+              }
 
-                      void callback() => shipmentCubit.searchShipments(
-                          date: date,
-                          stage: widget.stage,
-                          keyword: value.trim());
-
-                      _debounce = Timer(
-                        const Duration(milliseconds: 500),
-                        callback,
-                      );
-                    },
-                    controller: _controller,
-                    decoration: const InputDecoration(
-                      hintText: 'Cari Resi',
-                      suffixIcon: Icon(Icons.search),
-                    ),
-                  ),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: StatefulBuilder(
-                      builder: (context, setState) => TextButton.icon(
-                        onPressed: () async {
-                          final datePicked = await showDatePicker(
-                            context: context,
-                            confirmText: 'Oke',
-                            firstDate: DateTime(2000),
-                            lastDate: DateTime(2100),
-                            locale: const Locale('id'),
-                          );
-
-                          if (datePicked == null) return;
-
-                          setState(() {
-                            dMyDate = dMyFormat.format(datePicked);
-                            date = dateFormat.format(datePicked);
-                          });
-
-                          await shipmentCubit.fetchShipments(
-                            date: date,
-                            stage: widget.stage,
-                          );
-                        },
-                        iconAlignment: IconAlignment.end,
-                        icon: const Icon(Icons.calendar_month_outlined),
-                        label: Text(
-                          dMyDate,
-                          style: TextStyle(
-                            color: theme.colorScheme.primary,
-                            fontWeight: FontWeight.w500,
+              return false;
+            },
+            child: CustomScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              slivers: <Widget>[
+                // AppBar
+                SliverAppBar(
+                  backgroundColor: MaterialColors.surfaceContainerLowest,
+                  expandedHeight: kToolbarHeight + kSpaceBarHeight + 24,
+                  floating: true,
+                  flexibleSpace: FlexibleSpaceBar(
+                    background: Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: TextFormField(
+                              onChanged: (value) {
+                                _search = value;
+                                _debouncer.run(() =>
+                                    _shipmentCubit.fetchShipments(
+                                        date: _pickedDate,
+                                        stage: widget.stage,
+                                        keyword: _search));
+                              },
+                              onTapOutside: (event) => _focusNode.unfocus(),
+                              decoration: const InputDecoration(
+                                hintText: 'Cari Resi',
+                                prefixIcon: Icon(Icons.search),
+                              ),
+                            ),
                           ),
-                        ),
+                          TextButton.icon(
+                            onPressed: () async {
+                              final datePicked = await showDatePicker(
+                                context: context,
+                                confirmText: 'Oke',
+                                firstDate: DateTime(2000),
+                                lastDate: DateTime(2100),
+                                locale: const Locale('id'),
+                              );
+
+                              if (datePicked == null) return;
+
+                              setState(() {
+                                _dMyDate = dMyFormat.format(datePicked);
+                                _pickedDate = dateFormat.format(datePicked);
+                              });
+
+                              await _shipmentCubit.fetchShipments(
+                                date: _pickedDate,
+                                stage: widget.stage,
+                              );
+                            },
+                            iconAlignment: IconAlignment.end,
+                            icon: const Icon(Icons.calendar_month_outlined),
+                            label: Text(
+                              _dMyDate,
+                              style: const TextStyle(
+                                color: CustomColors.primaryNormal,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: BlocBuilder<ShipmentCubit, ShipmentState>(
-                bloc: shipmentCubit
-                  ..fetchShipments(date: date, stage: widget.stage),
-                buildWhen: (previous, current) => current is FetchShipments,
-                builder: (context, state) {
-                  if (state is FetchShipmentsLoading) {
-                    return const Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  }
-
-                  if (state is FetchShipmentsLoaded) {
-                    if (shipmentCubit.shipments.isEmpty) {
-                      return Center(
-                        child: Text(
-                          'Belum Ada Data',
-                          style: textTheme.titleLarge,
+                  pinned: true,
+                  shape: const RoundedRectangleBorder(
+                    side: BorderSide(
+                      color: MaterialColors.outlineVariant,
+                    ),
+                  ),
+                  snap: true,
+                  title: Text(widget.appBarTitle),
+                ),
+                // List
+                BlocBuilder<ShipmentCubit, ShipmentState>(
+                  bloc: _shipmentCubit,
+                  buildWhen: (previous, current) => current is FetchShipments,
+                  builder: (context, state) {
+                    if (state is FetchShipmentsLoading) {
+                      return const SliverFillRemaining(
+                        child: Center(
+                          child: CircularProgressIndicator.adaptive(),
                         ),
                       );
                     }
 
-                    return _buildListItemWrapper(
-                      itemBuilder: (context, index) {
-                        if (index != shipmentCubit.shipments.length) {
-                          final shipment = state.shipments[index];
-                          return _buildListItem(shipment: shipment);
-                        }
+                    if (state is FetchShipmentsLoaded) {
+                      if (state.shipments.isEmpty) {
+                        return const SliverFillRemaining(
+                          child: Center(
+                            child: Text('Belum Ada Data'),
+                          ),
+                        );
+                      }
 
-                        if (!shipmentCubit.isEndPage) {
-                          shipmentCubit.fetchShipmentsPaginate(
-                            date: date,
-                            stage: widget.stage,
-                          );
+                      return SliverPadding(
+                        padding: const EdgeInsets.all(16),
+                        sliver: SliverList.builder(
+                          itemBuilder: (context, index) => GestureDetector(
+                            onTap: () => context.push(
+                              detailReceiptRoute,
+                              extra: state.shipments[index].id,
+                            ),
+                            child: ShipmentListItem(
+                              onCancel: () => showDialog(
+                                builder: (context) =>
+                                    BlocConsumer<ShipmentCubit, ShipmentState>(
+                                  listenWhen: (previous, current) =>
+                                      current is InsertShipment,
+                                  listener: (context, state) {
+                                    if (state is InsertShipmentLoaded) {
+                                      TopSnackbar.successSnackbar(
+                                          message: state.message);
+                                      context.pop();
+                                    }
 
-                          return const Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        }
+                                    if (state is InsertShipmentError) {
+                                      TopSnackbar.dangerSnackbar(
+                                          message: state.failure.message);
+                                    }
+                                  },
+                                  builder: (context, cancelState) {
+                                    if (cancelState is InsertShipmentLoading) {
+                                      return ConfirmationDialog(
+                                        actionText: 'Cancel',
+                                        body: 'Yakin ingin cancel resi ini?',
+                                        title: 'Cancel Resi',
+                                      );
+                                    }
 
-                        return const SizedBox();
-                      },
-                      itemCount: state.shipments.length + 1,
-                    );
-                  }
+                                    return ConfirmationDialog(
+                                      onAction: () async =>
+                                          await _shipmentCubit.insertShipment(
+                                        receiptNumber: state
+                                            .shipments[index].receiptNumber,
+                                        stage: cancelStage,
+                                      ),
+                                      actionText: 'Cancel',
+                                      body: 'Yakin ingin cancel resi ini?',
+                                      title: 'Cancel Resi',
+                                    );
+                                  },
+                                ),
+                                context: context,
+                              ),
+                              onDelete: () => showDialog(
+                                builder: (context) =>
+                                    BlocConsumer<ShipmentCubit, ShipmentState>(
+                                  buildWhen: (previous, current) =>
+                                      current is DeleteShipment,
+                                  listenWhen: (previous, current) =>
+                                      current is DeleteShipment,
+                                  listener: (context, state) {
+                                    if (state is DeleteShipmentLoaded) {
+                                      TopSnackbar.successSnackbar(
+                                          message: state.message);
+                                      context.pop();
+                                    }
 
-                  if (state is SearchShipmentsLoaded) {
-                    return _buildListItemWrapper(
-                      itemBuilder: (context, index) =>
-                          _buildListItem(shipment: state.shipments[index]),
-                      itemCount: state.shipments.length,
-                    );
-                  }
+                                    if (state is DeleteShipmentError) {
+                                      TopSnackbar.dangerSnackbar(
+                                          message: state.message);
+                                    }
+                                  },
+                                  builder: (context, deleteState) {
+                                    if (deleteState is DeleteShipmentLoading) {
+                                      return ConfirmationDialog(
+                                        actionText: 'Hapus',
+                                        body: 'Yakin ingin menghapus resi ini?',
+                                        title: 'Hapus Resi',
+                                      );
+                                    }
 
-                  if (state is FetchShipmentsError) {
-                    return Center(
-                      child: ElevatedButton(
-                        onPressed: () => shipmentCubit.fetchShipments(
-                            date: dateFormat.format(DateTime.now()),
-                            stage: widget.stage),
-                        child: const Text('Muat Ulang'),
-                      ),
-                    );
-                  }
+                                    return ConfirmationDialog(
+                                      onAction: () async =>
+                                          await _shipmentCubit.deleteShipment(
+                                        shipmentId: state.shipments[index].id,
+                                      ),
+                                      actionText: 'Hapus',
+                                      body: 'Yakin ingin menghapus resi ini?',
+                                      title: 'Hapus Resi',
+                                    );
+                                  },
+                                ),
+                                context: context,
+                              ),
+                              shipment: state.shipments[index],
+                            ),
+                          ),
+                          itemCount: state.shipments.length,
+                        ),
+                      );
+                    }
 
-                  return const SizedBox();
-                },
-              ),
+                    return const SliverToBoxAdapter();
+                  },
+                ),
+                // Widget when Pagination
+                BlocBuilder<ShipmentCubit, ShipmentState>(
+                  buildWhen: (previous, current) => current is ListPaginate,
+                  builder: (context, state) {
+                    if (state is ListPaginateLoading) {
+                      return SliverPadding(
+                        padding: const EdgeInsets.all(16),
+                        sliver: const SliverToBoxAdapter(
+                          child: Center(
+                            child: CircularProgressIndicator.adaptive(),
+                          ),
+                        ),
+                      );
+                    }
+
+                    return const SliverToBoxAdapter();
+                  },
+                ),
+              ],
             ),
-          ],
+          ),
         ),
         floatingActionButton: widget.stage == cancelStage
             ? null
             : ExpandableFAB(
                 distance: 90,
-                children: [
-                  ActionButton(
-                    onPressed: () async {
-                      final receiptCamera =
-                          await SimpleBarcodeScanner.scanBarcode(
-                        context,
-                        cameraFace: CameraFace.back,
-                      );
+                children: <Widget>[
+                  BlocListener<ShipmentCubit, ShipmentState>(
+                    listenWhen: (previous, current) =>
+                        current is InsertShipment,
+                    listener: (context, state) async {
+                      if (state is InsertShipmentLoaded) {
+                        TopSnackbar.successSnackbar(message: state.message);
+                        await _audioPlayer.play(AssetSource(successSound));
+                      }
 
-                      if (receiptCamera == null) return;
+                      if (state is InsertShipmentError) {
+                        TopSnackbar.dangerSnackbar(
+                            message: state.failure.message);
 
-                      await shipmentCubit.insertShipment(
-                        receiptNumber: receiptCamera,
-                        stage: widget.stage,
-                      );
+                        switch (state.failure.statusCode) {
+                          case 422:
+                            return await _audioPlayer
+                                .play(AssetSource(repeatSound));
+                          case 423:
+                            return await _audioPlayer
+                                .play(AssetSource(skipSound));
+                        }
+                      }
                     },
-                    icon: Icons.document_scanner_rounded,
+                    child: ActionButton(
+                      onPressed: () async {
+                        final receiptCamera =
+                            await SimpleBarcodeScanner.scanBarcode(
+                          context,
+                          cameraFace: CameraFace.back,
+                          cancelButtonText: 'Batal',
+                          isShowFlashIcon: true,
+                        );
+
+                        if (receiptCamera == null) return;
+
+                        await _shipmentCubit.insertShipment(
+                          receiptNumber: receiptCamera,
+                          stage: widget.stage,
+                        );
+                      },
+                      icon: Icons.document_scanner_rounded,
+                    ),
                   ),
                   ActionButton(
                     onPressed: () => showDialog(
                       builder: (context) =>
-                          InsertDataFromScannerAlertDialog(stage: widget.stage),
+                          InsertShipmentFromScannerDialog(stage: widget.stage),
                       context: context,
-                      useRootNavigator: false,
                     ),
                     icon: Icons.barcode_reader,
                   ),
                 ],
               ),
       ),
-    );
-  }
-
-  Widget _buildListItemWrapper({
-    required Widget Function(BuildContext context, int index) itemBuilder,
-    required int itemCount,
-  }) {
-    return ListTileTheme(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-      ),
-      tileColor: Colors.green,
-      child: RefreshIndicator(
-        displacement: 12,
-        onRefresh: () async => context
-            .read<ShipmentCubit>()
-            .fetchShipments(date: date, stage: widget.stage),
-        child: ListView.separated(
-          padding: const EdgeInsets.all(16),
-          separatorBuilder: (context, index) => const SizedBox(height: 8),
-          itemBuilder: itemBuilder,
-          itemCount: itemCount,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildListItem({required ShipmentEntity shipment}) {
-    final textTheme = Theme.of(context).textTheme;
-    final shipmentCubit = context.read<ShipmentCubit>();
-    final authCubit = context.read<AuthCubit>();
-    final isSuperAdmin =
-        authCubit.user.permissions.contains(superAdminPermission);
-
-    return ListTile(
-      onTap: () => context.push(detailReceiptRoute, extra: shipment.id),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-      title: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            shipment.courier,
-            style: textTheme.titleLarge,
-          ),
-          Text(
-            timeFormat.format(shipment.date),
-            style: textTheme.bodyMedium,
-          ),
-        ],
-      ),
-      subtitle: Text(
-        shipment.receiptNumber,
-        style: textTheme.titleMedium,
-      ),
-      trailing: isSuperAdmin
-          ? PopupMenuButton(
-              padding: const EdgeInsets.all(0),
-              itemBuilder: (context) => <PopupMenuItem>[
-                PopupMenuItem(
-                  onTap: () async => await shipmentCubit.insertShipment(
-                    receiptNumber: shipment.receiptNumber,
-                    stage: cancelStage,
-                  ),
-                  child: const Text('Cancel'),
-                ),
-                PopupMenuItem(
-                  onTap: () => showDialog(
-                    context: context,
-                    builder: (context) => DeleteDataAlertDialog(
-                      date: date,
-                      shipment: shipment,
-                      stage: widget.stage,
-                    ),
-                  ),
-                  child: const Text('Hapus'),
-                ),
-              ],
-            )
-          : null,
     );
   }
 }

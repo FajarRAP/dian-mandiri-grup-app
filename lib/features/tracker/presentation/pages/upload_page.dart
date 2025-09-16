@@ -1,83 +1,63 @@
 import 'dart:io';
 
-import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/common/constants.dart';
-import '../../../../core/common/snackbar.dart';
-import '../../data/models/shipment_detail_model.dart';
+import '../../../../core/helpers/top_snackbar.dart';
+import '../../../../core/widgets/buttons/primary_button.dart';
 import '../cubit/shipment_cubit.dart';
 
-class DisplayPictureScreen extends StatelessWidget {
-  const DisplayPictureScreen({
+class UploadPage extends StatelessWidget {
+  const UploadPage({
     super.key,
-    required this.image,
+    required this.imagePath,
+    required this.shipmentId,
+    required this.stage,
   });
 
-  final XFile image;
+  final String imagePath;
+  final String shipmentId;
+  final String stage;
 
   @override
   Widget build(BuildContext context) {
     final shipmentCubit = context.read<ShipmentCubit>();
-    final shipmentId = shipmentCubit.shipmentDetail.id;
-    final file = File(image.path);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Upload Gambar Resi'),
       ),
-      body: Column(
-        children: [
-          Image.file(file),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: <Widget>[
+          Image.file(File(imagePath)),
           const SizedBox(height: 24),
           BlocConsumer<ShipmentCubit, ShipmentState>(
             buildWhen: (previous, current) => current is InsertShipmentDocument,
             listener: (context, state) {
               if (state is InsertShipmentDocumentLoaded) {
-                scaffoldMessengerKey.currentState?.showSnackBar(
-                  successSnackbar(
-                    state.message,
-                    EdgeInsets.only(
-                      left: 16,
-                      right: 16,
-                      bottom: MediaQuery.sizeOf(context).height - 175,
-                    ),
-                  ),
-                );
-                shipmentCubit.fetchShipmentById(shipmentId: shipmentId);
-                context
-                  ..pop()
-                  ..pop();
+                TopSnackbar.successSnackbar(message: state.message);
+                context.pop();
               }
 
               if (state is InsertShipmentDocumentError) {
-                scaffoldMessengerKey.currentState?.showSnackBar(
-                  dangerSnackbar(
-                    state.message,
-                    EdgeInsets.only(
-                      left: 16,
-                      right: 16,
-                      bottom: MediaQuery.sizeOf(context).height - 175,
-                    ),
-                  ),
-                );
+                TopSnackbar.dangerSnackbar(message: state.message);
               }
             },
             builder: (context, state) {
               if (state is InsertShipmentDocumentLoading) {
-                return const CircularProgressIndicator();
+                return const PrimaryButton(
+                  child: Text('Unggah'),
+                );
               }
 
-              return ElevatedButton(
+              return PrimaryButton(
                 onPressed: () async =>
                     await shipmentCubit.insertShipmentDocument(
                   shipmentId: shipmentId,
-                  image: image,
-                  stage: (shipmentCubit.shipmentDetail as ShipmentDetailModel)
-                      .stage
-                      .stage,
+                  documentPath: imagePath,
+                  stage: stage,
                 ),
                 child: const Text('Unggah'),
               );
