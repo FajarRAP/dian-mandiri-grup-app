@@ -16,6 +16,19 @@ final theme = ThemeData(
       fontWeight: FontWeight.w400,
     ),
   ),
+  bottomSheetTheme: const BottomSheetThemeData(
+    constraints: BoxConstraints(
+      maxHeight: 550,
+    ),
+    dragHandleColor: Color(0xFFE0E0E0),
+    dragHandleSize: Size(48, 5),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(
+        top: Radius.circular(16),
+      ),
+    ),
+    showDragHandle: true,
+  ),
   colorScheme: ColorScheme.fromSeed(
     seedColor: CustomColors.primaryNormal,
     primary: CustomColors.primaryNormal,
