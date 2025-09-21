@@ -13,4 +13,7 @@ class ShipmentModel extends ShipmentEntity {
       courier: json['courier'],
       date: DateTime.parse(json['date']),
       receiptNumber: json['receipt_number']);
+
+  ShipmentEntity toEntity() => ShipmentEntity(
+      id: id, courier: courier, date: date, receiptNumber: receiptNumber);
 }

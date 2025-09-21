@@ -23,6 +23,6 @@ class CreateShipmentReportUseCaseParams {
     required this.endDate,
   });
 
-  final String startDate;
-  final String endDate;
+  final DateTime startDate;
+  final DateTime endDate;
 }

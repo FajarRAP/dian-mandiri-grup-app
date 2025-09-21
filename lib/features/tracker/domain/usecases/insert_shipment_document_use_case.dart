@@ -5,7 +5,7 @@ import '../../../../core/failure/failure.dart';
 import '../repositories/shipment_repositories.dart';
 
 class InsertShipmentDocumentUseCase
-    implements AsyncUseCaseParams<String, InsertShipmentDocumentUseCaseParams> {
+    implements UseCase<String, InsertShipmentDocumentUseCaseParams> {
   const InsertShipmentDocumentUseCase({required this.shipmentRepositories});
 
   final ShipmentRepositories shipmentRepositories;

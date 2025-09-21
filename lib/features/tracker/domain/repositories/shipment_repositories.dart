@@ -3,6 +3,7 @@ import 'package:dartz/dartz.dart';
 import '../../../../core/failure/failure.dart';
 import '../entities/shipment_detail_entity.dart';
 import '../entities/shipment_entity.dart';
+import '../entities/shipment_history_entity.dart';
 import '../entities/shipment_report_entity.dart';
 import '../usecases/create_shipment_report_use_case.dart';
 import '../usecases/download_shipment_report_use_case.dart';
@@ -19,7 +20,7 @@ abstract class ShipmentRepositories {
       {required DownloadShipmentReportUseCaseParams params});
   Future<Either<Failure, ShipmentDetailEntity>> fetchShipmentById(
       {required String shipmentId});
-  Future<Either<Failure, ShipmentDetailEntity>> fetchShipmentByReceiptNumber(
+  Future<Either<Failure, ShipmentHistoryEntity>> fetchShipmentByReceiptNumber(
       {required String receiptNumber});
   Future<Either<Failure, List<ShipmentReportEntity>>> fetchShipmentReports(
       {required FetchShipmentReportsUseCaseParams params});

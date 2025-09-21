@@ -6,8 +6,7 @@ import '../entities/shipment_entity.dart';
 import '../repositories/shipment_repositories.dart';
 
 class FetchShipmentsUseCase
-    implements
-        AsyncUseCaseParams<List<ShipmentEntity>, FetchShipmentsUseCaseParams> {
+    implements UseCase<List<ShipmentEntity>, FetchShipmentsUseCaseParams> {
   const FetchShipmentsUseCase({required this.shipmentRepositories});
 
   final ShipmentRepositories shipmentRepositories;
@@ -21,14 +20,14 @@ class FetchShipmentsUseCase
 
 class FetchShipmentsUseCaseParams {
   const FetchShipmentsUseCaseParams({
-    required this.date,
     required this.stage,
-    this.page = 1,
     this.keyword,
+    this.page = 1,
+    required this.date,
   });
 
-  final String date;
   final String stage;
-  final int page;
   final String? keyword;
+  final int page;
+  final DateTime date;
 }

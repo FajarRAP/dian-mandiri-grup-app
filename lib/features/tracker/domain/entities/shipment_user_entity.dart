@@ -1,5 +1,5 @@
-class UserEntity {
-  const UserEntity({
+class ShipmentUserEntity {
+  const ShipmentUserEntity({
     required this.id,
     required this.name,
   });

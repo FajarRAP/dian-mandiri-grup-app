@@ -95,7 +95,7 @@ void setup() {
 
   // Ship
   getIt
-    ..registerLazySingleton<ShipmentRemoteDataSources<Response>>(
+    ..registerLazySingleton<ShipmentRemoteDataSources>(
         () => ShipmentRemoteDataSourcesImpl(dio: getIt.get()))
     ..registerLazySingleton<ShipmentRepositories>(
         () => ShipmentRepositoriesImpl(shipmentRemoteDataSources: getIt.get()))

@@ -5,7 +5,7 @@ import '../../../../core/failure/failure.dart';
 import '../repositories/shipment_repositories.dart';
 
 class DownloadShipmentReportUseCase
-    implements AsyncUseCaseParams<String, DownloadShipmentReportUseCaseParams> {
+    implements UseCase<String, DownloadShipmentReportUseCaseParams> {
   const DownloadShipmentReportUseCase({required this.shipmentRepositories});
 
   final ShipmentRepositories shipmentRepositories;
@@ -19,11 +19,13 @@ class DownloadShipmentReportUseCase
 
 final class DownloadShipmentReportUseCaseParams {
   const DownloadShipmentReportUseCaseParams({
+    required this.externalPath,
     required this.fileUrl,
     required this.filename,
     required this.createdAt,
   });
 
+  final String externalPath;
   final String fileUrl;
   final String filename;
   final DateTime createdAt;

@@ -4,7 +4,7 @@ import '../../../../core/common/use_cases.dart';
 import '../../../../core/failure/failure.dart';
 import '../repositories/shipment_repositories.dart';
 
-class DeleteShipmentUseCase implements AsyncUseCaseParams<String, String> {
+class DeleteShipmentUseCase implements UseCase<String, String> {
   const DeleteShipmentUseCase({required this.shipmentRepositories});
 
   final ShipmentRepositories shipmentRepositories;

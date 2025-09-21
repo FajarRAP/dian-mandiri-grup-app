@@ -6,7 +6,7 @@ import '../entities/shipment_detail_entity.dart';
 import '../repositories/shipment_repositories.dart';
 
 class FetchShipmentByIdUseCase
-    implements AsyncUseCaseParams<ShipmentDetailEntity, String> {
+    implements UseCase<ShipmentDetailEntity, String> {
   const FetchShipmentByIdUseCase({required this.shipmentRepositories});
 
   final ShipmentRepositories shipmentRepositories;

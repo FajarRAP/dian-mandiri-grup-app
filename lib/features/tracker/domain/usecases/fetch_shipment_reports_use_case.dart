@@ -7,8 +7,7 @@ import '../repositories/shipment_repositories.dart';
 
 class FetchShipmentReportsUseCase
     implements
-        AsyncUseCaseParams<List<ShipmentReportEntity>,
-            FetchShipmentReportsUseCaseParams> {
+        UseCase<List<ShipmentReportEntity>, FetchShipmentReportsUseCaseParams> {
   const FetchShipmentReportsUseCase({required this.shipmentRepositories});
 
   final ShipmentRepositories shipmentRepositories;
@@ -22,14 +21,14 @@ class FetchShipmentReportsUseCase
 
 class FetchShipmentReportsUseCaseParams {
   const FetchShipmentReportsUseCaseParams({
-    required this.endDate,
     required this.page,
-    required this.startDate,
     required this.status,
+    required this.startDate,
+    required this.endDate,
   });
 
-  final String endDate;
   final int page;
-  final String startDate;
   final String status;
+  final DateTime startDate;
+  final DateTime endDate;
 }
