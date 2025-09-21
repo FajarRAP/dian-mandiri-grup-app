@@ -82,7 +82,7 @@ class HomePage extends StatelessWidget {
                                   ),
                                 ),
                                 Text(
-                                  idrCurrencyFormat.format(10000000),
+                                  10000000.toIDRCurrency,
                                   style: textTheme.bodyLarge?.copyWith(
                                     color: MaterialColors.onPrimary,
                                     fontWeight: FontWeight.w600,
@@ -105,7 +105,7 @@ class HomePage extends StatelessWidget {
                                   ),
                                 ),
                                 Text(
-                                  idrCurrencyFormat.format(10000000),
+                                  10000000.toIDRCurrency,
                                   style: textTheme.bodyLarge?.copyWith(
                                     color: MaterialColors.onPrimary,
                                     fontWeight: FontWeight.w600,
@@ -126,7 +126,7 @@ class HomePage extends StatelessWidget {
                           child: Column(
                             children: <Widget>[
                               Text(
-                                idrCurrencyFormat.format(100000000),
+                                100000000.toIDRCurrency,
                                 style: textTheme.titleLarge?.copyWith(
                                   color: MaterialColors.onSecondaryContainer,
                                   fontWeight: FontWeight.w600,
