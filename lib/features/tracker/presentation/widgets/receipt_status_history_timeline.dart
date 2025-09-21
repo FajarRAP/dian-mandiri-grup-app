@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../../../core/common/shadows.dart';
 import '../../../../core/helpers/helpers.dart';
 import '../../../../core/themes/colors.dart';
-import '../../data/models/stage_model.dart';
 import '../../domain/entities/stage_entity.dart';
 
 class ReceiptStatusHistoryTimeline extends StatelessWidget {
@@ -44,7 +43,7 @@ class ReceiptStatusHistoryTimeline extends StatelessWidget {
               ),
               height: 24,
               width: 24,
-              child: Icon(
+              child: const Icon(
                 Icons.circle,
                 color: Colors.white,
                 size: 12,
@@ -94,7 +93,7 @@ class ReceiptStatusHistoryTimeline extends StatelessWidget {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          (stage as StageModel).user.name,
+                          stage.user.name,
                           style: textTheme.bodyMedium?.copyWith(
                             color: Colors.grey.shade700,
                           ),
@@ -111,7 +110,7 @@ class ReceiptStatusHistoryTimeline extends StatelessWidget {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          dateTimeFormat.format(stage.date.toLocal()),
+                          stage.date.toLocal().toDMYHMS,
                           style: textTheme.bodySmall?.copyWith(
                             color: Colors.grey.shade600,
                           ),

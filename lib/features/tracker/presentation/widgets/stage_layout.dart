@@ -1,6 +1,7 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 
@@ -12,7 +13,10 @@ import '../../../../core/themes/colors.dart';
 import '../../../../core/widgets/confirmation_dialog.dart';
 import '../../../../core/widgets/expanded_fab/action_button.dart';
 import '../../../../core/widgets/expanded_fab/expandable_fab.dart';
+import '../../../../service_container.dart';
+import '../../domain/entities/shipment_entity.dart';
 import '../cubit/shipment_cubit.dart';
+import 'cancel_shipment_dialog.dart';
 import 'insert_shipment_from_scanner_dialog.dart';
 import 'shipment_list_item.dart';
 
@@ -35,15 +39,13 @@ class _StageLayoutState extends State<StageLayout> {
   late final Debouncer _debouncer;
   late final FocusNode _focusNode;
   late final ShipmentCubit _shipmentCubit;
-  late String _dMyDate;
-  late String _pickedDate;
+  late DateTime _pickedDate;
   String? _search;
 
   @override
   void initState() {
     super.initState();
-    _pickedDate = dateFormat.format(DateTime.now());
-    _dMyDate = dMyFormat.format(DateTime.now());
+    _pickedDate = DateTime.now();
     _audioPlayer = AudioPlayer();
     _debouncer = Debouncer(delay: const Duration(milliseconds: 500));
     _focusNode = FocusScope.of(context, createDependency: false);
@@ -60,13 +62,29 @@ class _StageLayoutState extends State<StageLayout> {
 
   @override
   Widget build(BuildContext context) {
+    getIt.get<FlutterSecureStorage>().read(key: accessTokenKey).then(print);
+
     return BlocListener<ShipmentCubit, ShipmentState>(
-      listener: (context, state) {
+      listener: (context, state) async {
         if (state is InsertShipmentLoaded || state is DeleteShipmentLoaded) {
-          _shipmentCubit.fetchShipments(
-            date: dateFormat.format(DateTime.now()),
-            stage: widget.stage,
-          );
+          await _shipmentCubit.fetchShipments(
+              date: _pickedDate, stage: widget.stage);
+        }
+
+        if (state is InsertShipmentLoaded) {
+          TopSnackbar.successSnackbar(message: state.message);
+          await _audioPlayer.play(AssetSource(successSound));
+        }
+
+        if (state is InsertShipmentError) {
+          TopSnackbar.dangerSnackbar(message: state.failure.message);
+
+          switch (state.failure.statusCode) {
+            case 422:
+              return await _audioPlayer.play(AssetSource(repeatSound));
+            case 423:
+              return await _audioPlayer.play(AssetSource(skipSound));
+          }
         }
       },
       child: Scaffold(
@@ -75,7 +93,7 @@ class _StageLayoutState extends State<StageLayout> {
               date: _pickedDate, stage: widget.stage),
           child: NotificationListener<ScrollNotification>(
             onNotification: (scrollState) {
-              if (scrollState.runtimeType == ScrollEndNotification &&
+              if (scrollState is ScrollEndNotification &&
                   _shipmentCubit.state is! ListPaginateLast) {
                 _shipmentCubit.fetchShipmentsPaginate(
                   date: _pickedDate,
@@ -104,14 +122,11 @@ class _StageLayoutState extends State<StageLayout> {
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 16),
                             child: TextFormField(
-                              onChanged: (value) {
-                                _search = value;
-                                _debouncer.run(() =>
-                                    _shipmentCubit.fetchShipments(
-                                        date: _pickedDate,
-                                        stage: widget.stage,
-                                        keyword: _search));
-                              },
+                              onChanged: (value) => _debouncer.run(() =>
+                                  _shipmentCubit.fetchShipments(
+                                      date: _pickedDate,
+                                      stage: widget.stage,
+                                      keyword: _search = value)),
                               onTapOutside: (event) => _focusNode.unfocus(),
                               decoration: const InputDecoration(
                                 hintText: 'Cari Resi',
@@ -131,10 +146,7 @@ class _StageLayoutState extends State<StageLayout> {
 
                               if (datePicked == null) return;
 
-                              setState(() {
-                                _dMyDate = dMyFormat.format(datePicked);
-                                _pickedDate = dateFormat.format(datePicked);
-                              });
+                              setState(() => _pickedDate = datePicked);
 
                               await _shipmentCubit.fetchShipments(
                                 date: _pickedDate,
@@ -144,7 +156,7 @@ class _StageLayoutState extends State<StageLayout> {
                             iconAlignment: IconAlignment.end,
                             icon: const Icon(Icons.calendar_month_outlined),
                             label: Text(
-                              _dMyDate,
+                              _pickedDate.toDMY,
                               style: const TextStyle(
                                 color: CustomColors.primaryNormal,
                                 fontWeight: FontWeight.w500,
@@ -196,85 +208,14 @@ class _StageLayoutState extends State<StageLayout> {
                             ),
                             child: ShipmentListItem(
                               onCancel: () => showDialog(
-                                builder: (context) =>
-                                    BlocConsumer<ShipmentCubit, ShipmentState>(
-                                  listenWhen: (previous, current) =>
-                                      current is InsertShipment,
-                                  listener: (context, state) {
-                                    if (state is InsertShipmentLoaded) {
-                                      TopSnackbar.successSnackbar(
-                                          message: state.message);
-                                      context.pop();
-                                    }
-
-                                    if (state is InsertShipmentError) {
-                                      TopSnackbar.dangerSnackbar(
-                                          message: state.failure.message);
-                                    }
-                                  },
-                                  builder: (context, cancelState) {
-                                    if (cancelState is InsertShipmentLoading) {
-                                      return ConfirmationDialog(
-                                        actionText: 'Cancel',
-                                        body: 'Yakin ingin cancel resi ini?',
-                                        title: 'Cancel Resi',
-                                      );
-                                    }
-
-                                    return ConfirmationDialog(
-                                      onAction: () async =>
-                                          await _shipmentCubit.insertShipment(
-                                        receiptNumber: state
-                                            .shipments[index].receiptNumber,
-                                        stage: cancelStage,
-                                      ),
-                                      actionText: 'Cancel',
-                                      body: 'Yakin ingin cancel resi ini?',
-                                      title: 'Cancel Resi',
-                                    );
-                                  },
-                                ),
+                                builder: (context) => CancelShipmentDialog(
+                                    receiptNumber:
+                                        state.shipments[index].receiptNumber),
                                 context: context,
                               ),
                               onDelete: () => showDialog(
-                                builder: (context) =>
-                                    BlocConsumer<ShipmentCubit, ShipmentState>(
-                                  buildWhen: (previous, current) =>
-                                      current is DeleteShipment,
-                                  listenWhen: (previous, current) =>
-                                      current is DeleteShipment,
-                                  listener: (context, state) {
-                                    if (state is DeleteShipmentLoaded) {
-                                      TopSnackbar.successSnackbar(
-                                          message: state.message);
-                                      context.pop();
-                                    }
-
-                                    if (state is DeleteShipmentError) {
-                                      TopSnackbar.dangerSnackbar(
-                                          message: state.message);
-                                    }
-                                  },
-                                  builder: (context, deleteState) {
-                                    if (deleteState is DeleteShipmentLoading) {
-                                      return ConfirmationDialog(
-                                        actionText: 'Hapus',
-                                        body: 'Yakin ingin menghapus resi ini?',
-                                        title: 'Hapus Resi',
-                                      );
-                                    }
-
-                                    return ConfirmationDialog(
-                                      onAction: () async =>
-                                          await _shipmentCubit.deleteShipment(
-                                        shipmentId: state.shipments[index].id,
-                                      ),
-                                      actionText: 'Hapus',
-                                      body: 'Yakin ingin menghapus resi ini?',
-                                      title: 'Hapus Resi',
-                                    );
-                                  },
-                                ),
+                                builder: (context) => _buildOnDeleteDialog(
+                                    state.shipments[index]),
                                 context: context,
                               ),
                               shipment: state.shipments[index],
@@ -293,9 +234,9 @@ class _StageLayoutState extends State<StageLayout> {
                   buildWhen: (previous, current) => current is ListPaginate,
                   builder: (context, state) {
                     if (state is ListPaginateLoading) {
-                      return SliverPadding(
-                        padding: const EdgeInsets.all(16),
-                        sliver: const SliverToBoxAdapter(
+                      return const SliverPadding(
+                        padding: EdgeInsets.all(16),
+                        sliver: SliverToBoxAdapter(
                           child: Center(
                             child: CircularProgressIndicator.adaptive(),
                           ),
@@ -310,65 +251,99 @@ class _StageLayoutState extends State<StageLayout> {
             ),
           ),
         ),
-        floatingActionButton: widget.stage == cancelStage
-            ? null
-            : ExpandableFAB(
-                distance: 90,
-                children: <Widget>[
-                  BlocListener<ShipmentCubit, ShipmentState>(
-                    listenWhen: (previous, current) =>
-                        current is InsertShipment,
-                    listener: (context, state) async {
-                      if (state is InsertShipmentLoaded) {
-                        TopSnackbar.successSnackbar(message: state.message);
-                        await _audioPlayer.play(AssetSource(successSound));
-                      }
+        floatingActionButton: ExpandableFAB(
+          distance: 90,
+          children: <Widget>[
+            ActionButton(
+              onPressed: () async {
+                final receiptCamera = await SimpleBarcodeScanner.scanBarcode(
+                  context,
+                  cameraFace: CameraFace.back,
+                  cancelButtonText: 'Batal',
+                  isShowFlashIcon: true,
+                );
 
-                      if (state is InsertShipmentError) {
-                        TopSnackbar.dangerSnackbar(
-                            message: state.failure.message);
+                if (receiptCamera == null) return;
 
-                        switch (state.failure.statusCode) {
-                          case 422:
-                            return await _audioPlayer
-                                .play(AssetSource(repeatSound));
-                          case 423:
-                            return await _audioPlayer
-                                .play(AssetSource(skipSound));
-                        }
-                      }
-                    },
-                    child: ActionButton(
-                      onPressed: () async {
-                        final receiptCamera =
-                            await SimpleBarcodeScanner.scanBarcode(
-                          context,
-                          cameraFace: CameraFace.back,
-                          cancelButtonText: 'Batal',
-                          isShowFlashIcon: true,
-                        );
-
-                        if (receiptCamera == null) return;
-
-                        await _shipmentCubit.insertShipment(
-                          receiptNumber: receiptCamera,
-                          stage: widget.stage,
-                        );
-                      },
-                      icon: Icons.document_scanner_rounded,
-                    ),
-                  ),
-                  ActionButton(
-                    onPressed: () => showDialog(
-                      builder: (context) =>
-                          InsertShipmentFromScannerDialog(stage: widget.stage),
-                      context: context,
-                    ),
-                    icon: Icons.barcode_reader,
-                  ),
-                ],
+                await _shipmentCubit.insertShipment(
+                  receiptNumber: receiptCamera,
+                  stage: widget.stage,
+                );
+              },
+              icon: Icons.document_scanner_rounded,
+            ),
+            ActionButton(
+              onPressed: () => showDialog(
+                builder: (context) =>
+                    InsertShipmentFromScannerDialog(stage: widget.stage),
+                context: context,
               ),
+              icon: Icons.barcode_reader,
+            ),
+          ],
+        ),
       ),
+    );
+  }
+
+  // Widget _buildOnCancelDialog(ShipmentEntity shipment) {
+  //   return BlocConsumer<ShipmentCubit, ShipmentState>(
+  //     listenWhen: (previous, current) => current is InsertShipment,
+  //     listener: (context, state) {
+  //       if (state is InsertShipmentLoaded) {
+  //         TopSnackbar.successSnackbar(message: state.message);
+  //         context.pop();
+  //       }
+
+  //       if (state is InsertShipmentError) {
+  //         TopSnackbar.dangerSnackbar(message: state.failure.message);
+  //       }
+  //     },
+  //     builder: (context, state) {
+  //       final onAction = switch (state) {
+  //         InsertShipmentLoading() => null,
+  //         _ => () async => await _shipmentCubit.insertShipment(
+  //             receiptNumber: shipment.receiptNumber, stage: cancelStage),
+  //       };
+
+  //       return ConfirmationDialog(
+  //         onAction: onAction,
+  //         actionText: 'Cancel',
+  //         body: 'Yakin ingin cancel resi ini?',
+  //         title: 'Cancel Resi',
+  //       );
+  //     },
+  //   );
+  // }
+
+  Widget _buildOnDeleteDialog(ShipmentEntity shipment) {
+    return BlocConsumer<ShipmentCubit, ShipmentState>(
+      buildWhen: (previous, current) => current is DeleteShipment,
+      listenWhen: (previous, current) => current is DeleteShipment,
+      listener: (context, state) {
+        if (state is DeleteShipmentLoaded) {
+          TopSnackbar.successSnackbar(message: state.message);
+          context.pop();
+        }
+
+        if (state is DeleteShipmentError) {
+          TopSnackbar.dangerSnackbar(message: state.message);
+        }
+      },
+      builder: (context, state) {
+        final onAction = switch (state) {
+          DeleteShipmentLoading() => null,
+          _ => () async =>
+              await _shipmentCubit.deleteShipment(shipmentId: shipment.id),
+        };
+
+        return ConfirmationDialog(
+          onAction: onAction,
+          actionText: 'Hapus',
+          body: 'Yakin ingin menghapus resi ini?',
+          title: 'Hapus Resi',
+        );
+      },
     );
   }
 }

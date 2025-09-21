@@ -48,8 +48,8 @@ class ShipmentRemoteDataSourcesImpl extends ShipmentRemoteDataSources {
       final response = await dio.post(
         '$shipmentEndpoint/report',
         data: {
-          'start_date': params.startDate,
-          'end_date': params.endDate,
+          'start_date': params.startDate.toYMD,
+          'end_date': params.endDate.toYMD,
         },
       );
 
@@ -80,12 +80,12 @@ class ShipmentRemoteDataSourcesImpl extends ShipmentRemoteDataSources {
     try {
       final formattedDate = params.createdAt.toLocal().toDMY;
 
-      final response = await dio.download(
+      await dio.download(
         params.fileUrl,
         '${params.externalPath}/${params.filename}_$formattedDate.xlsx',
       );
 
-      return response.data['message'] ?? 'Download completed';
+      return 'Download completed';
     } on DioException catch (de) {
       throw handleDioException(de);
     } catch (e) {
@@ -128,8 +128,8 @@ class ShipmentRemoteDataSourcesImpl extends ShipmentRemoteDataSources {
       final response = await dio.get(
         '$shipmentEndpoint/report',
         queryParameters: {
-          'start_date': params.startDate,
-          'end_date': params.endDate,
+          'start_date': params.startDate.toYMD,
+          'end_date': params.endDate.toYMD,
           'status': params.status,
           'page': params.page,
         },
@@ -154,7 +154,7 @@ class ShipmentRemoteDataSourcesImpl extends ShipmentRemoteDataSources {
       final response = await dio.get(
         shipmentEndpoint,
         queryParameters: {
-          'date': params.date,
+          'date': params.date.toYMD,
           'stage': params.stage,
           'search': params.keyword,
           'page': params.page

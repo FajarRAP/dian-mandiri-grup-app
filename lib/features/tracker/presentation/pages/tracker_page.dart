@@ -77,7 +77,7 @@ class TrackerPage extends StatelessWidget {
   }
 
   List<Widget> _buildAdminPage() {
-    return <Widget>[
+    return const <Widget>[
       TrackerMenuCard(
         title: 'Scan Resi',
         route: scanReceiptRoute,

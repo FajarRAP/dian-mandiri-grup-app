@@ -26,7 +26,7 @@ class ShipmentReportListItem extends StatelessWidget {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
     final shipmentCubit = context.read<ShipmentCubit>();
-    final formattedDate = dMyFormat.format(shipmentReport.date.toLocal());
+    final formattedDate = shipmentReport.date.toLocal().toDMY;
     final savedFilename = '${shipmentReport.name}_$formattedDate.xlsx';
 
     return BlocConsumer<ShipmentCubit, ShipmentState>(
@@ -96,7 +96,7 @@ class ShipmentReportListItem extends StatelessWidget {
                     ),
                     icon: state is DownloadShipmentReportLoading &&
                             state.shipmentReportId == shipmentReport.id
-                        ? CircularProgressIndicator.adaptive()
+                        ? const CircularProgressIndicator.adaptive()
                         : const Icon(Icons.download_for_offline_outlined),
                     color: CustomColors.primaryNormal,
                     tooltip: 'Unduh Laporan',
