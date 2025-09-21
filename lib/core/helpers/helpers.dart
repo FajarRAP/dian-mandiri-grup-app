@@ -9,8 +9,8 @@ import '../failure/failure.dart';
 
 extension DateTimeFormatter on DateTime {
   String get toYMD => DateFormat('y-MM-dd', 'id_ID').format(this);
-  String get toDMY => DateFormat('dd-MM-y HH:mm:ss', 'id_ID').format(this);
-  String get toDMYHMS => DateFormat('dd-MM-y', 'id_ID').format(this);
+  String get toDMY => DateFormat('dd-MM-y', 'id_ID').format(this);
+  String get toDMYHMS => DateFormat('dd-MM-y HH:mm:ss', 'id_ID').format(this);
   String get toHMS => DateFormat('HH:mm:ss', 'id_ID').format(this);
 }
 
