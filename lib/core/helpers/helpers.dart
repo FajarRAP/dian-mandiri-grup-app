@@ -106,6 +106,7 @@ ServerException handleDioException(DioException de) {
     default:
       return ServerException(
         message: isMap ? data['message'] : null,
+        errors: de.response?.data,
         statusCode: de.response?.statusCode,
       );
   }
