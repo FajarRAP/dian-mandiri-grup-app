@@ -1,4 +1,6 @@
-class Failure {
+import 'package:equatable/equatable.dart';
+
+class Failure extends Equatable {
   const Failure({
     this.message = 'Terjadi kesalahan',
     this.statusCode = 500,
@@ -6,6 +8,9 @@ class Failure {
 
   final String message;
   final int statusCode;
+
+  @override
+  List<Object?> get props => [message, statusCode];
 }
 
 class ServerFailure extends Failure {
@@ -31,10 +36,6 @@ class SpreadsheetFailure extends Failure {
     required this.rows,
   });
 
-  final List<String> headers;
-  final int hiddenColumnCount;
-  final List<List<Map<String, dynamic>?>> rows;
-
   factory SpreadsheetFailure.fromJson(Map<String, dynamic> json) {
     return SpreadsheetFailure(
       statusCode: json['statusCode'] ?? 500,
@@ -47,4 +48,11 @@ class SpreadsheetFailure extends Failure {
           .toList(),
     );
   }
+
+  final List<String> headers;
+  final int hiddenColumnCount;
+  final List<List<Map<String, dynamic>?>> rows;
+
+  @override
+  List<Object?> get props => [...super.props, headers, hiddenColumnCount, rows];
 }
