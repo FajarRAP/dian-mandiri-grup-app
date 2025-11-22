@@ -117,7 +117,7 @@ class SupplierRemoteDataSourcesImpl implements SupplierRemoteDataSources {
     final supplierDetail = SupplierDetailModel.fromEntity(params);
     final payload = supplierDetail.toJson();
     final isAvatarNull = supplierDetail.avatarUrl != null;
-    if (isAvatarNull && !supplierDetail.avatarUrl!.startsWith('https://')) {
+    if (isAvatarNull && !(supplierDetail.avatarUrl?.startsWith('https://') ?? false)) {
       payload['avatar'] =
           await MultipartFile.fromFile(supplierDetail.avatarUrl!);
     }
