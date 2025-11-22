@@ -5,6 +5,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 import 'core/common/constants.dart';
 import 'core/helpers/dio_interceptor.dart';
+import 'core/services/image_picker_service.dart';
 import 'features/auth/data/datasources/auth_local_data_sources.dart';
 import 'features/auth/data/datasources/auth_remote_data_sources.dart';
 import 'features/auth/data/repositories/auth_repositories_impl.dart';
@@ -66,6 +67,9 @@ void setup() {
       ),
     )..interceptors.add(DioInterceptor()),
   );
+
+  getIt.registerLazySingleton<ImagePickerService>(
+      () => ImagePickerServiceImpl());
 
   // Auth
   getIt
@@ -140,27 +144,36 @@ void setup() {
 
   // Warehouse
   getIt
-    ..registerLazySingleton<WarehouseRemoteDataSources<Response>>(
-        () => WarehouseRemoteDataSourcesImpl(dio: getIt.get()))
-    ..registerLazySingleton<WarehouseRepositories>(() =>
-        WarehouseRepositoriesImpl(warehouseRemoteDataSources: getIt.get()))
+    ..registerLazySingleton<WarehouseRemoteDataSources>(
+        () => WarehouseRemoteDataSourcesImpl(dio: getIt()))
+    ..registerLazySingleton<WarehouseRepositories>(
+        () => WarehouseRepositoriesImpl(warehouseRemoteDataSources: getIt()))
+    ..registerSingleton(
+        DeletePurchaseNoteUseCase(warehouseRepositories: getIt()))
+    ..registerSingleton(
+        FetchPurchaseNoteUseCase(warehouseRepositories: getIt()))
+    ..registerSingleton(
+        FetchPurchaseNotesUseCase(warehouseRepositories: getIt()))
+    ..registerSingleton(
+        FetchPurchaseNotesDropdownUseCase(warehouseRepositories: getIt()))
+    ..registerSingleton(
+        InsertPurchaseNoteManualUseCase(warehouseRepositories: getIt()))
+    ..registerSingleton(
+        InsertPurchaseNoteFileUseCase(warehouseRepositories: getIt()))
+    ..registerSingleton(InsertReturnCostUseCase(warehouseRepositories: getIt()))
+    ..registerSingleton(
+        InsertShippingFeeUseCase(warehouseRepositories: getIt()))
+    ..registerSingleton(
+        UpdatePurchaseNoteUseCase(warehouseRepositories: getIt()))
     ..registerLazySingleton<WarehouseCubit>(() => WarehouseCubit(
-        deletePurchaseNoteUseCase:
-            DeletePurchaseNoteUseCase(warehouseRepositories: getIt.get()),
-        fetchPurchaseNoteUseCase:
-            FetchPurchaseNoteUseCase(warehouseRepositories: getIt.get()),
-        fetchPurchaseNotesUseCase:
-            FetchPurchaseNotesUseCase(warehouseRepositories: getIt.get()),
-        fetchPurchaseNotesDropdownUseCase: FetchPurchaseNotesDropdownUseCase(
-            warehouseRepositories: getIt.get()),
-        insertPurchaseNoteManualUseCase:
-            InsertPurchaseNoteManualUseCase(warehouseRepositories: getIt.get()),
-        insertPurchaseNoteFileUseCase:
-            InsertPurchaseNoteFileUseCase(warehouseRepositories: getIt.get()),
-        insertReturnCostUseCase:
-            InsertReturnCostUseCase(warehouseRepositories: getIt.get()),
-        insertShippingFeeUseCase:
-            InsertShippingFeeUseCase(warehouseRepositories: getIt.get()),
-        updatePurchaseNoteUseCase:
-            UpdatePurchaseNoteUseCase(warehouseRepositories: getIt.get())));
+        deletePurchaseNoteUseCase: getIt(),
+        fetchPurchaseNoteUseCase: getIt(),
+        fetchPurchaseNotesUseCase: getIt(),
+        fetchPurchaseNotesDropdownUseCase: getIt(),
+        insertPurchaseNoteManualUseCase: getIt(),
+        insertPurchaseNoteFileUseCase: getIt(),
+        insertReturnCostUseCase: getIt(),
+        insertShippingFeeUseCase: getIt(),
+        updatePurchaseNoteUseCase: getIt(),
+        imagePickerService: getIt()));
 }
