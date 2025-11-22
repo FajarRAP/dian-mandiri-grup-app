@@ -16,4 +16,11 @@ class PurchaseNoteSummaryModel extends PurchaseNoteSummaryEntity {
         supplier: SupplierModel.fromJson(json['supplier']),
         totalItems: json['total'],
       );
+
+  PurchaseNoteSummaryEntity toEntity() => PurchaseNoteSummaryEntity(
+        id: id,
+        date: date,
+        supplier: supplier,
+        totalItems: totalItems,
+      );
 }

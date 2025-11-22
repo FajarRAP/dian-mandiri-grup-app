@@ -29,4 +29,16 @@ class PurchaseNoteDetailModel extends PurchaseNoteDetailEntity {
             .map(WarehouseItemModel.fromJson)
             .toList(),
       );
+
+  PurchaseNoteDetailEntity toEntity() => PurchaseNoteDetailEntity(
+        date: date,
+        receipt: receipt,
+        note: note,
+        id: id,
+        isEditable: isEditable,
+        returnCost: returnCost,
+        supplier: supplier,
+        totalPrice: totalPrice,
+        items: items,
+      );
 }
