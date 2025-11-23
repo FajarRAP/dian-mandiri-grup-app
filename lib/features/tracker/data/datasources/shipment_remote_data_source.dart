@@ -18,7 +18,7 @@ import '../models/shipment_history_model.dart';
 import '../models/shipment_model.dart';
 import '../models/shipment_report_model.dart';
 
-abstract class ShipmentRemoteDataSources {
+abstract class ShipmentRemoteDataSource {
   Future<String> createShipmentReport(
       {required CreateShipmentReportUseCaseParams params});
   Future<String> deleteShipment({required String shipmentId});
@@ -36,8 +36,8 @@ abstract class ShipmentRemoteDataSources {
       {required InsertShipmentDocumentUseCaseParams params});
 }
 
-class ShipmentRemoteDataSourcesImpl extends ShipmentRemoteDataSources {
-  ShipmentRemoteDataSourcesImpl({required this.dio});
+class ShipmentRemoteDataSourceImpl extends ShipmentRemoteDataSource {
+  ShipmentRemoteDataSourceImpl({required this.dio});
 
   final Dio dio;
 

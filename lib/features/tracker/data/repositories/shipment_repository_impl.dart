@@ -7,26 +7,26 @@ import '../../domain/entities/shipment_detail_entity.dart';
 import '../../domain/entities/shipment_entity.dart';
 import '../../domain/entities/shipment_history_entity.dart';
 import '../../domain/entities/shipment_report_entity.dart';
-import '../../domain/repositories/shipment_repositories.dart';
+import '../../domain/repositories/shipment_repository.dart';
 import '../../domain/usecases/create_shipment_report_use_case.dart';
 import '../../domain/usecases/download_shipment_report_use_case.dart';
 import '../../domain/usecases/fetch_shipment_reports_use_case.dart';
 import '../../domain/usecases/fetch_shipments_use_case.dart';
 import '../../domain/usecases/insert_shipment_document_use_case.dart';
 import '../../domain/usecases/insert_shipment_use_case.dart';
-import '../datasources/shipment_remote_data_sources.dart';
+import '../datasources/shipment_remote_data_source.dart';
 
-class ShipmentRepositoriesImpl extends ShipmentRepositories {
-  ShipmentRepositoriesImpl({required this.shipmentRemoteDataSources});
+class ShipmentRepositoryImpl extends ShipmentRepository {
+  ShipmentRepositoryImpl({required this.shipmentRemoteDataSource});
 
-  final ShipmentRemoteDataSources shipmentRemoteDataSources;
+  final ShipmentRemoteDataSource shipmentRemoteDataSource;
 
   @override
   Future<Either<Failure, String>> createShipmentReport(
       {required CreateShipmentReportUseCaseParams params}) async {
     try {
       final result =
-          await shipmentRemoteDataSources.createShipmentReport(params: params);
+          await shipmentRemoteDataSource.createShipmentReport(params: params);
 
       return Right(result);
     } on ServerException catch (se) {
@@ -46,8 +46,8 @@ class ShipmentRepositoriesImpl extends ShipmentRepositories {
   Future<Either<Failure, String>> deleteShipment(
       {required String shipmentId}) async {
     try {
-      final result = await shipmentRemoteDataSources.deleteShipment(
-          shipmentId: shipmentId);
+      final result =
+          await shipmentRemoteDataSource.deleteShipment(shipmentId: shipmentId);
 
       return Right(result);
     } on ServerException catch (se) {
@@ -64,8 +64,8 @@ class ShipmentRepositoriesImpl extends ShipmentRepositories {
   Future<Either<Failure, String>> downloadShipmentReport(
       {required DownloadShipmentReportUseCaseParams params}) async {
     try {
-      final result = await shipmentRemoteDataSources.downloadShipmentReport(
-          params: params);
+      final result =
+          await shipmentRemoteDataSource.downloadShipmentReport(params: params);
 
       return Right(result);
     } on ServerException catch (se) {
@@ -85,7 +85,7 @@ class ShipmentRepositoriesImpl extends ShipmentRepositories {
   Future<Either<Failure, ShipmentDetailEntity>> fetchShipmentById(
       {required String shipmentId}) async {
     try {
-      final result = await shipmentRemoteDataSources.fetchShipmentById(
+      final result = await shipmentRemoteDataSource.fetchShipmentById(
           shipmentId: shipmentId);
 
       return Right(result);
@@ -106,7 +106,7 @@ class ShipmentRepositoriesImpl extends ShipmentRepositories {
   Future<Either<Failure, ShipmentHistoryEntity>> fetchShipmentByReceiptNumber(
       {required String receiptNumber}) async {
     try {
-      final result = await shipmentRemoteDataSources
+      final result = await shipmentRemoteDataSource
           .fetchShipmentByReceiptNumber(receiptNumber: receiptNumber);
 
       return Right(result);
@@ -139,7 +139,7 @@ class ShipmentRepositoriesImpl extends ShipmentRepositories {
       {required FetchShipmentReportsUseCaseParams params}) async {
     try {
       final result =
-          await shipmentRemoteDataSources.fetchShipmentReports(params: params);
+          await shipmentRemoteDataSource.fetchShipmentReports(params: params);
 
       return Right(result);
     } on ServerException catch (se) {
@@ -160,7 +160,7 @@ class ShipmentRepositoriesImpl extends ShipmentRepositories {
       {required FetchShipmentsUseCaseParams params}) async {
     try {
       final result =
-          await shipmentRemoteDataSources.fetchShipments(params: params);
+          await shipmentRemoteDataSource.fetchShipments(params: params);
 
       return Right(result);
     } on ServerException catch (se) {
@@ -181,7 +181,7 @@ class ShipmentRepositoriesImpl extends ShipmentRepositories {
       {required InsertShipmentUseCaseParams params}) async {
     try {
       final result =
-          await shipmentRemoteDataSources.insertShipment(params: params);
+          await shipmentRemoteDataSource.insertShipment(params: params);
 
       return Right(result);
     } on ServerException catch (se) {
@@ -213,8 +213,8 @@ class ShipmentRepositoriesImpl extends ShipmentRepositories {
   Future<Either<Failure, String>> insertShipmentDocument(
       {required InsertShipmentDocumentUseCaseParams params}) async {
     try {
-      final result = await shipmentRemoteDataSources.insertShipmentDocument(
-          params: params);
+      final result =
+          await shipmentRemoteDataSource.insertShipmentDocument(params: params);
 
       return Right(result);
     } on ServerException catch (se) {

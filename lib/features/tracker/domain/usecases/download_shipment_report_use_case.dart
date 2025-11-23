@@ -2,18 +2,18 @@ import 'package:dartz/dartz.dart';
 
 import '../../../../core/common/use_cases.dart';
 import '../../../../core/failure/failure.dart';
-import '../repositories/shipment_repositories.dart';
+import '../repositories/shipment_repository.dart';
 
 class DownloadShipmentReportUseCase
     implements UseCase<String, DownloadShipmentReportUseCaseParams> {
-  const DownloadShipmentReportUseCase({required this.shipmentRepositories});
+  const DownloadShipmentReportUseCase({required this.shipmentRepository});
 
-  final ShipmentRepositories shipmentRepositories;
+  final ShipmentRepository shipmentRepository;
 
   @override
   Future<Either<Failure, String>> call(
       DownloadShipmentReportUseCaseParams params) async {
-    return await shipmentRepositories.downloadShipmentReport(params: params);
+    return await shipmentRepository.downloadShipmentReport(params: params);
   }
 }
 

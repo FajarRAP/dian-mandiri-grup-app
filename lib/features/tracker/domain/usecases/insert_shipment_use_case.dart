@@ -2,18 +2,18 @@ import 'package:dartz/dartz.dart';
 
 import '../../../../core/common/use_cases.dart';
 import '../../../../core/failure/failure.dart';
-import '../repositories/shipment_repositories.dart';
+import '../repositories/shipment_repository.dart';
 
 class InsertShipmentUseCase
     implements UseCase<String, InsertShipmentUseCaseParams> {
-  const InsertShipmentUseCase({required this.shipmentRepositories});
+  const InsertShipmentUseCase({required this.shipmentRepository});
 
-  final ShipmentRepositories shipmentRepositories;
+  final ShipmentRepository shipmentRepository;
 
   @override
   Future<Either<Failure, String>> call(
       InsertShipmentUseCaseParams params) async {
-    return await shipmentRepositories.insertShipment(params: params);
+    return await shipmentRepository.insertShipment(params: params);
   }
 }
 

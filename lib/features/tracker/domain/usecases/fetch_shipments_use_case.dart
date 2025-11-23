@@ -3,18 +3,18 @@ import 'package:dartz/dartz.dart';
 import '../../../../core/common/use_cases.dart';
 import '../../../../core/failure/failure.dart';
 import '../entities/shipment_entity.dart';
-import '../repositories/shipment_repositories.dart';
+import '../repositories/shipment_repository.dart';
 
 class FetchShipmentsUseCase
     implements UseCase<List<ShipmentEntity>, FetchShipmentsUseCaseParams> {
-  const FetchShipmentsUseCase({required this.shipmentRepositories});
+  const FetchShipmentsUseCase({required this.shipmentRepository});
 
-  final ShipmentRepositories shipmentRepositories;
+  final ShipmentRepository shipmentRepository;
 
   @override
   Future<Either<Failure, List<ShipmentEntity>>> call(
       FetchShipmentsUseCaseParams params) async {
-    return shipmentRepositories.fetchShipments(params: params);
+    return shipmentRepository.fetchShipments(params: params);
   }
 }
 

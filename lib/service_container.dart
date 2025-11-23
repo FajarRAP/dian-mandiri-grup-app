@@ -27,9 +27,9 @@ import 'features/supplier/domain/usecases/fetch_suppliers_use_case.dart';
 import 'features/supplier/domain/usecases/insert_supplier_use_case.dart';
 import 'features/supplier/domain/usecases/update_supplier_use_case.dart';
 import 'features/supplier/presentation/cubit/supplier_cubit.dart';
-import 'features/tracker/data/datasources/shipment_remote_data_sources.dart';
-import 'features/tracker/data/repositories/shipment_repositories_impl.dart';
-import 'features/tracker/domain/repositories/shipment_repositories.dart';
+import 'features/tracker/data/datasources/shipment_remote_data_source.dart';
+import 'features/tracker/data/repositories/shipment_repository_impl.dart';
+import 'features/tracker/domain/repositories/shipment_repository.dart';
 import 'features/tracker/domain/usecases/create_shipment_report_use_case.dart';
 import 'features/tracker/domain/usecases/delete_shipment_use_case.dart';
 import 'features/tracker/domain/usecases/download_shipment_report_use_case.dart';
@@ -105,30 +105,30 @@ void setup() {
 
   // Ship
   getIt
-    ..registerLazySingleton<ShipmentRemoteDataSources>(
-        () => ShipmentRemoteDataSourcesImpl(dio: getIt.get()))
-    ..registerLazySingleton<ShipmentRepositories>(
-        () => ShipmentRepositoriesImpl(shipmentRemoteDataSources: getIt.get()))
+    ..registerLazySingleton<ShipmentRemoteDataSource>(
+        () => ShipmentRemoteDataSourceImpl(dio: getIt.get()))
+    ..registerLazySingleton<ShipmentRepository>(
+        () => ShipmentRepositoryImpl(shipmentRemoteDataSource: getIt.get()))
     ..registerLazySingleton<ShipmentCubit>(() => ShipmentCubit(
         createShipmentReportUseCase:
-            CreateShipmentReportUseCase(shipmentRepositories: getIt.get()),
+            CreateShipmentReportUseCase(shipmentRepository: getIt.get()),
         deleteShipmentUseCase:
-            DeleteShipmentUseCase(shipmentRepositories: getIt.get()),
+            DeleteShipmentUseCase(shipmentRepository: getIt.get()),
         fetchShipmentByIdUseCase:
-            FetchShipmentByIdUseCase(shipmentRepositories: getIt.get()),
+            FetchShipmentByIdUseCase(shipmentRepository: getIt.get()),
         fetchShipmentByReceiptNumberUseCase:
             FetchShipmentByReceiptNumberUseCase(
-                shipmentRepositories: getIt.get()),
+                shipmentRepository: getIt.get()),
         fetchShipmentReportsUseCase:
-            FetchShipmentReportsUseCase(shipmentRepositories: getIt.get()),
+            FetchShipmentReportsUseCase(shipmentRepository: getIt.get()),
         fetchShipmentsUseCase:
-            FetchShipmentsUseCase(shipmentRepositories: getIt.get()),
+            FetchShipmentsUseCase(shipmentRepository: getIt.get()),
         insertShipmentDocumentUseCase:
-            InsertShipmentDocumentUseCase(shipmentRepositories: getIt.get()),
+            InsertShipmentDocumentUseCase(shipmentRepository: getIt.get()),
         insertShipmentUseCase:
-            InsertShipmentUseCase(shipmentRepositories: getIt.get()),
+            InsertShipmentUseCase(shipmentRepository: getIt.get()),
         downloadShipmentReportUseCase:
-            DownloadShipmentReportUseCase(shipmentRepositories: getIt.get())));
+            DownloadShipmentReportUseCase(shipmentRepository: getIt.get())));
 
   // Supplier
   getIt

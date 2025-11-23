@@ -12,7 +12,7 @@ import '../usecases/fetch_shipments_use_case.dart';
 import '../usecases/insert_shipment_document_use_case.dart';
 import '../usecases/insert_shipment_use_case.dart';
 
-abstract class ShipmentRepositories {
+abstract class ShipmentRepository {
   Future<Either<Failure, String>> createShipmentReport(
       {required CreateShipmentReportUseCaseParams params});
   Future<Either<Failure, String>> deleteShipment({required String shipmentId});

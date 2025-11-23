@@ -7,7 +7,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:ship_tracker/core/exceptions/internal_exception.dart';
 import 'package:ship_tracker/core/exceptions/server_exception.dart';
-import 'package:ship_tracker/features/tracker/data/datasources/shipment_remote_data_sources.dart';
+import 'package:ship_tracker/features/tracker/data/datasources/shipment_remote_data_source.dart';
 import 'package:ship_tracker/features/tracker/data/models/shipment_detail_model.dart';
 import 'package:ship_tracker/features/tracker/data/models/shipment_history_model.dart';
 import 'package:ship_tracker/features/tracker/data/models/shipment_model.dart';
@@ -29,12 +29,12 @@ class MockDio extends Mock implements Dio {}
 
 void main() {
   late MockDio mockDio;
-  late ShipmentRemoteDataSourcesImpl dataSource;
+  late ShipmentRemoteDataSourceImpl dataSource;
 
   setUp(() async {
     await initializeDateFormatting('id_ID', null);
     mockDio = MockDio();
-    dataSource = ShipmentRemoteDataSourcesImpl(dio: mockDio);
+    dataSource = ShipmentRemoteDataSourceImpl(dio: mockDio);
   });
 
   group('fetch shipments remote data sources test', () {
