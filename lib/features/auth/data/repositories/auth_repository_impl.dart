@@ -41,7 +41,10 @@ class AuthRepositoryImpl with RepositoryHandlerMixin implements AuthRepository {
       RefreshTokenUseCaseParams params) async {
     return await handleRepositoryRequest<String>(() async {
       final result = await authRemoteDataSource.refreshToken(params);
-      await authLocalDataSource.cacheTokens(token: result);
+      await authLocalDataSource.cacheTokens(
+        accessToken: result.accessToken,
+        refreshToken: result.refreshToken,
+      );
 
       return result.message;
     });
@@ -52,9 +55,10 @@ class AuthRepositoryImpl with RepositoryHandlerMixin implements AuthRepository {
     return await handleRepositoryRequest<String>(() async {
       final result = await authRemoteDataSource.signIn();
       await authLocalDataSource.cacheUser(user: result.user);
-      await authLocalDataSource.cacheTokens(token: result.token);
+      await authLocalDataSource.cacheTokens(
+          accessToken: result.accessToken, refreshToken: result.refreshToken);
 
-      return result.token.message;
+      return result.message;
     });
   }
 
