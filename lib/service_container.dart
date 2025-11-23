@@ -9,7 +9,7 @@ import 'core/services/google_sign_in_service.dart';
 import 'core/services/image_picker_service.dart';
 import 'features/auth/data/datasources/auth_local_data_source.dart';
 import 'features/auth/data/datasources/auth_remote_data_source.dart';
-import 'features/auth/data/repositories/auth_repositories_impl.dart';
+import 'features/auth/data/repositories/auth_repository_impl.dart';
 import 'features/auth/domain/repositories/auth_repository.dart';
 import 'features/auth/domain/usecases/fetch_user_from_storage_use_case.dart';
 import 'features/auth/domain/usecases/fetch_user_use_case.dart';
