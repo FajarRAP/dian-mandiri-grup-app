@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 
 import '../../../../core/network/dio_handler_mixin.dart';
 import '../../../../core/services/google_sign_in_service.dart';
+import '../../domain/entities/user_entity.dart';
 import '../../domain/usecases/refresh_token_use_case.dart';
 import '../../domain/usecases/update_profile_use_case.dart';
 import '../models/sign_in_response_model.dart';
@@ -9,7 +10,7 @@ import '../models/token_model.dart';
 import '../models/user_model.dart';
 
 abstract interface class AuthRemoteDataSource {
-  Future<UserModel> fetchUser();
+  Future<UserEntity> fetchUser();
   Future<TokenModel> refreshToken(RefreshTokenUseCaseParams params);
   Future<SignInResponseModel> signIn();
   Future<String> signOut();
@@ -28,11 +29,11 @@ class AuthRemoteDataSourceImpl
   final GoogleSignInService googleSignIn;
 
   @override
-  Future<UserModel> fetchUser() async {
-    return await handleDioRequest<UserModel>(() async {
+  Future<UserEntity> fetchUser() async {
+    return await handleDioRequest<UserEntity>(() async {
       final response = await dio.get('v1/auth/me');
 
-      return UserModel.fromJson(response.data['data']);
+      return UserModel.fromJson(response.data['data']).toEntity();
     });
   }
 

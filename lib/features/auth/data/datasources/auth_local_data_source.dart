@@ -4,16 +4,17 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../../../../core/common/constants.dart';
 import '../../../../core/utils/local_data_source_handler_mixin.dart';
-import '../models/token_model.dart';
+import '../../domain/entities/user_entity.dart';
 import '../models/user_model.dart';
 
 abstract interface class AuthLocalDataSource {
-  Future<void> cacheTokens({required TokenModel token});
+  Future<void> cacheTokens(
+      {required String accessToken, required String refreshToken});
   Future<void> cacheUser({required UserModel user});
   Future<void> clearCache();
   Future<String?> getAccessToken();
   Future<String?> getRefreshToken();
-  Future<UserModel?> getUser();
+  Future<UserEntity?> getUser();
 }
 
 class AuthLocalDataSourceImpl
@@ -24,10 +25,11 @@ class AuthLocalDataSourceImpl
   final FlutterSecureStorage storage;
 
   @override
-  Future<void> cacheTokens({required TokenModel token}) async {
+  Future<void> cacheTokens(
+      {required String accessToken, required String refreshToken}) async {
     return await handleLocalDataSourceRequest<void>(() async {
-      await storage.write(key: accessTokenKey, value: token.accessToken);
-      await storage.write(key: refreshTokenKey, value: token.refreshToken);
+      await storage.write(key: accessTokenKey, value: accessToken);
+      await storage.write(key: refreshTokenKey, value: refreshToken);
     });
   }
 
@@ -60,13 +62,13 @@ class AuthLocalDataSourceImpl
   }
 
   @override
-  Future<UserModel?> getUser() async {
-    return await handleLocalDataSourceRequest<UserModel?>(() async {
+  Future<UserEntity?> getUser() async {
+    return await handleLocalDataSourceRequest<UserEntity?>(() async {
       final user = await storage.read(key: userKey);
 
       if (user == null) return null;
 
-      return UserModel.fromJson(jsonDecode(user));
+      return UserModel.fromJson(jsonDecode(user)).toEntity();
     });
   }
 }
