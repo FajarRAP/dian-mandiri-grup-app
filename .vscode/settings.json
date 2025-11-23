@@ -1,0 +1,3 @@
+{
+  "dart.flutterTestAdditionalArgs": ["--dart-define-from-file", ".env.test"]
+}
