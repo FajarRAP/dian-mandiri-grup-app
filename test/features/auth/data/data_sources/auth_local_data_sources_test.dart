@@ -4,7 +4,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:ship_tracker/core/common/constants.dart';
-import 'package:ship_tracker/features/auth/data/datasources/auth_local_data_sources.dart';
+import 'package:ship_tracker/features/auth/data/datasources/auth_local_data_source.dart';
 import 'package:ship_tracker/features/auth/data/models/token_model.dart';
 import 'package:ship_tracker/features/auth/data/models/user_model.dart';
 
@@ -12,7 +12,7 @@ class MockStorage extends Mock implements FlutterSecureStorage {}
 
 void main() {
   late MockStorage mockStorage;
-  late AuthLocalDataSourcesImpl authLocalDataSources;
+  late AuthLocalDataSourceImpl authLocalDataSource;
 
   const token = TokenModel(
       accessToken: 'access_token',
@@ -28,7 +28,7 @@ void main() {
 
   setUp(() {
     mockStorage = MockStorage();
-    authLocalDataSources = AuthLocalDataSourcesImpl(storage: mockStorage);
+    authLocalDataSource = AuthLocalDataSourceImpl(storage: mockStorage);
   });
 
   group(
@@ -44,7 +44,7 @@ void main() {
             value: any(named: 'value'))).thenAnswer((_) async => {});
 
         // act
-        await authLocalDataSources.cacheTokens(token: token);
+        await authLocalDataSource.cacheTokens(token: token);
 
         // assert
         verify(() => mockStorage.write(
@@ -64,7 +64,7 @@ void main() {
             value: any(named: 'value'))).thenAnswer((_) async => {});
         // act
 
-        await authLocalDataSources.cacheUser(user: user);
+        await authLocalDataSource.cacheUser(user: user);
 
         // assert
 
@@ -81,7 +81,7 @@ void main() {
         when(() => mockStorage.deleteAll()).thenAnswer((_) async => {});
 
         // act
-        await authLocalDataSources.clearCache();
+        await authLocalDataSource.clearCache();
 
         // assert
         verify(() => mockStorage.deleteAll()).called(1);
@@ -97,7 +97,7 @@ void main() {
             .thenAnswer((_) async => token.accessToken);
 
         // act
-        final result = await authLocalDataSources.getAccessToken();
+        final result = await authLocalDataSource.getAccessToken();
 
         // assert
         expect(result, token.accessToken);
@@ -114,7 +114,7 @@ void main() {
             .thenAnswer((_) async => token.refreshToken);
 
         // act
-        final result = await authLocalDataSources.getRefreshToken();
+        final result = await authLocalDataSource.getRefreshToken();
 
         // assert
         expect(result, token.refreshToken);
@@ -132,7 +132,7 @@ void main() {
             .thenAnswer((_) async => userString);
 
         // act
-        final result = await authLocalDataSources.getUser();
+        final result = await authLocalDataSource.getUser();
 
         // assert
         expect(result, isA<UserModel?>());

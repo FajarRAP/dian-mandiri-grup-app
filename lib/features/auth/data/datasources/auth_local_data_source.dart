@@ -7,7 +7,7 @@ import '../../../../core/utils/local_data_source_handler_mixin.dart';
 import '../models/token_model.dart';
 import '../models/user_model.dart';
 
-abstract interface class AuthLocalDataSources {
+abstract interface class AuthLocalDataSource {
   Future<void> cacheTokens({required TokenModel token});
   Future<void> cacheUser({required UserModel user});
   Future<void> clearCache();
@@ -16,10 +16,10 @@ abstract interface class AuthLocalDataSources {
   Future<UserModel?> getUser();
 }
 
-class AuthLocalDataSourcesImpl
+class AuthLocalDataSourceImpl
     with LocalDataSourceHandlerMixin
-    implements AuthLocalDataSources {
-  const AuthLocalDataSourcesImpl({required this.storage});
+    implements AuthLocalDataSource {
+  const AuthLocalDataSourceImpl({required this.storage});
 
   final FlutterSecureStorage storage;
 
