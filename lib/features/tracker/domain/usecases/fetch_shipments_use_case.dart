@@ -1,8 +1,8 @@
 import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
 
-import '../../../../core/common/use_cases.dart';
 import '../../../../core/failure/failure.dart';
+import '../../../../core/usecase/use_case.dart';
 import '../entities/shipment_entity.dart';
 import '../repositories/shipment_repository.dart';
 
@@ -13,7 +13,7 @@ class FetchShipmentsUseCase
   final ShipmentRepository shipmentRepository;
 
   @override
-  Future<Either<Failure, List<ShipmentEntity>>> call(
+  Future<Either<Failure, List<ShipmentEntity>>> execute(
       FetchShipmentsUseCaseParams params) async {
     return shipmentRepository.fetchShipments(params);
   }
