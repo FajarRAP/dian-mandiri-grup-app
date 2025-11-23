@@ -1,14 +1,17 @@
 import 'package:dio/dio.dart';
 
 import '../../../../core/common/constants.dart';
-import '../../../../core/exceptions/internal_exception.dart';
 import '../../../../core/helpers/helpers.dart';
+import '../../../../core/network/dio_handler_mixin.dart';
 import '../../domain/entities/shipment_detail_entity.dart';
 import '../../domain/entities/shipment_entity.dart';
 import '../../domain/entities/shipment_history_entity.dart';
 import '../../domain/entities/shipment_report_entity.dart';
 import '../../domain/usecases/create_shipment_report_use_case.dart';
+import '../../domain/usecases/delete_shipment_use_case.dart';
 import '../../domain/usecases/download_shipment_report_use_case.dart';
+import '../../domain/usecases/fetch_shipment_by_id_use_case.dart';
+import '../../domain/usecases/fetch_shipment_by_receipt_number_use_case.dart';
 import '../../domain/usecases/fetch_shipment_reports_use_case.dart';
 import '../../domain/usecases/fetch_shipments_use_case.dart';
 import '../../domain/usecases/insert_shipment_document_use_case.dart';
@@ -18,33 +21,35 @@ import '../models/shipment_history_model.dart';
 import '../models/shipment_model.dart';
 import '../models/shipment_report_model.dart';
 
-abstract class ShipmentRemoteDataSource {
-  Future<String> createShipmentReport(
-      {required CreateShipmentReportUseCaseParams params});
-  Future<String> deleteShipment({required String shipmentId});
+abstract interface class ShipmentRemoteDataSource {
+  Future<String> createShipmentReport(CreateShipmentReportUseCaseParams params);
+  Future<String> deleteShipment(DeleteShipmentUseCaseParams params);
   Future<String> downloadShipmentReport(
-      {required DownloadShipmentReportUseCaseParams params});
-  Future<ShipmentDetailEntity> fetchShipmentById({required String shipmentId});
+      DownloadShipmentReportUseCaseParams params);
+  Future<ShipmentDetailEntity> fetchShipmentById(
+      FetchShipmentByIdUseCaseParams params);
   Future<ShipmentHistoryEntity> fetchShipmentByReceiptNumber(
-      {required String receiptNumber});
+      FetchShipmentByReceiptNumberUseCaseParams params);
   Future<List<ShipmentReportEntity>> fetchShipmentReports(
-      {required FetchShipmentReportsUseCaseParams params});
+      FetchShipmentReportsUseCaseParams params);
   Future<List<ShipmentEntity>> fetchShipments(
-      {required FetchShipmentsUseCaseParams params});
-  Future<String> insertShipment({required InsertShipmentUseCaseParams params});
+      FetchShipmentsUseCaseParams params);
+  Future<String> insertShipment(InsertShipmentUseCaseParams params);
   Future<String> insertShipmentDocument(
-      {required InsertShipmentDocumentUseCaseParams params});
+      InsertShipmentDocumentUseCaseParams params);
 }
 
-class ShipmentRemoteDataSourceImpl extends ShipmentRemoteDataSource {
-  ShipmentRemoteDataSourceImpl({required this.dio});
+class ShipmentRemoteDataSourceImpl
+    with DioHandlerMixin
+    implements ShipmentRemoteDataSource {
+  const ShipmentRemoteDataSourceImpl({required this.dio});
 
   final Dio dio;
 
   @override
   Future<String> createShipmentReport(
-      {required CreateShipmentReportUseCaseParams params}) async {
-    try {
+      CreateShipmentReportUseCaseParams params) async {
+    return await handleDioRequest<String>(() async {
       final response = await dio.post(
         '$shipmentEndpoint/report',
         data: {
@@ -54,30 +59,23 @@ class ShipmentRemoteDataSourceImpl extends ShipmentRemoteDataSource {
       );
 
       return response.data['message'];
-    } on DioException catch (de) {
-      throw handleDioException(de);
-    } catch (e) {
-      throw InternalException(message: '$e');
-    }
+    });
   }
 
   @override
-  Future<String> deleteShipment({required String shipmentId}) async {
-    try {
-      final response = await dio.delete('$shipmentEndpoint/$shipmentId');
+  Future<String> deleteShipment(DeleteShipmentUseCaseParams params) async {
+    return await handleDioRequest<String>(() async {
+      final response =
+          await dio.delete('$shipmentEndpoint/${params.shipmentId}');
 
       return response.data['message'];
-    } on DioException catch (de) {
-      throw handleDioException(de);
-    } catch (e) {
-      throw InternalException(message: '$e');
-    }
+    });
   }
 
   @override
   Future<String> downloadShipmentReport(
-      {required DownloadShipmentReportUseCaseParams params}) async {
-    try {
+      DownloadShipmentReportUseCaseParams params) async {
+    return await handleDioRequest<String>(() async {
       final formattedDate = params.createdAt.toLocal().toDMY;
 
       await dio.download(
@@ -86,45 +84,34 @@ class ShipmentRemoteDataSourceImpl extends ShipmentRemoteDataSource {
       );
 
       return 'Download completed';
-    } on DioException catch (de) {
-      throw handleDioException(de);
-    } catch (e) {
-      throw InternalException(message: '$e');
-    }
+    });
   }
 
   @override
   Future<ShipmentDetailEntity> fetchShipmentById(
-      {required String shipmentId}) async {
-    try {
-      final response = await dio.get('$shipmentEndpoint/$shipmentId');
+      FetchShipmentByIdUseCaseParams params) async {
+    return await handleDioRequest<ShipmentDetailEntity>(() async {
+      final response = await dio.get('$shipmentEndpoint/${params.shipmentId}');
 
       return ShipmentDetailModel.fromJson(response.data['data']).toEntity();
-    } on DioException catch (de) {
-      throw handleDioException(de);
-    } catch (e) {
-      throw InternalException(message: '$e');
-    }
+    });
   }
 
   @override
   Future<ShipmentHistoryEntity> fetchShipmentByReceiptNumber(
-      {required String receiptNumber}) async {
-    try {
-      final response = await dio.get('$shipmentEndpoint/status/$receiptNumber');
+      FetchShipmentByReceiptNumberUseCaseParams params) async {
+    return await handleDioRequest<ShipmentHistoryEntity>(() async {
+      final response =
+          await dio.get('$shipmentEndpoint/status/${params.receiptNumber}');
 
       return ShipmentHistoryModel.fromJson(response.data['data']).toEntity();
-    } on DioException catch (de) {
-      throw handleDioException(de);
-    } catch (e) {
-      throw InternalException(message: '$e');
-    }
+    });
   }
 
   @override
   Future<List<ShipmentReportEntity>> fetchShipmentReports(
-      {required FetchShipmentReportsUseCaseParams params}) async {
-    try {
+      FetchShipmentReportsUseCaseParams params) async {
+    return await handleDioRequest<List<ShipmentReportEntity>>(() async {
       final response = await dio.get(
         '$shipmentEndpoint/report',
         queryParameters: {
@@ -140,17 +127,13 @@ class ShipmentRemoteDataSourceImpl extends ShipmentRemoteDataSource {
       return contents
           .map((e) => ShipmentReportModel.fromJson(e).toEntity())
           .toList();
-    } on DioException catch (de) {
-      throw handleDioException(de);
-    } catch (e) {
-      throw InternalException(message: '$e');
-    }
+    });
   }
 
   @override
   Future<List<ShipmentEntity>> fetchShipments(
-      {required FetchShipmentsUseCaseParams params}) async {
-    try {
+      FetchShipmentsUseCaseParams params) async {
+    return await handleDioRequest<List<ShipmentEntity>>(() async {
       final response = await dio.get(
         shipmentEndpoint,
         queryParameters: {
@@ -164,34 +147,25 @@ class ShipmentRemoteDataSourceImpl extends ShipmentRemoteDataSource {
       final contents = List.from(response.data['data']['content']);
 
       return contents.map((e) => ShipmentModel.fromJson(e).toEntity()).toList();
-    } on DioException catch (de) {
-      throw handleDioException(de);
-    } catch (e) {
-      throw InternalException(message: '$e');
-    }
+    });
   }
 
   @override
-  Future<String> insertShipment(
-      {required InsertShipmentUseCaseParams params}) async {
-    try {
+  Future<String> insertShipment(InsertShipmentUseCaseParams params) async {
+    return await handleDioRequest<String>(() async {
       final response = await dio.post(
         shipmentEndpoint,
         data: {'receipt_number': params.receiptNumber, 'stage': params.stage},
       );
 
       return response.data['message'];
-    } on DioException catch (de) {
-      throw handleDioException(de);
-    } catch (e) {
-      throw InternalException(message: '$e');
-    }
+    });
   }
 
   @override
   Future<String> insertShipmentDocument(
-      {required InsertShipmentDocumentUseCaseParams params}) async {
-    try {
+      InsertShipmentDocumentUseCaseParams params) async {
+    return await handleDioRequest<String>(() async {
       final formData = FormData.fromMap({
         'document': await MultipartFile.fromFile(params.documentPath),
         'stage': params.stage,
@@ -203,10 +177,6 @@ class ShipmentRemoteDataSourceImpl extends ShipmentRemoteDataSource {
       );
 
       return response.data['message'];
-    } on DioException catch (de) {
-      throw handleDioException(de);
-    } catch (e) {
-      throw InternalException(message: '$e');
-    }
+    });
   }
 }
