@@ -1,8 +1,8 @@
 import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
 
-import '../../../../core/common/use_cases.dart';
 import '../../../../core/failure/failure.dart';
+import '../../../../core/usecase/use_case.dart';
 import '../repositories/auth_repository.dart';
 
 class UpdateProfileUseCase
@@ -12,7 +12,7 @@ class UpdateProfileUseCase
   final AuthRepository authRepository;
 
   @override
-  Future<Either<Failure, String>> call(
+  Future<Either<Failure, String>> execute(
       UpdateProfileUseCaseParams params) async {
     return await authRepository.updateProfile(params);
   }
