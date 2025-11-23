@@ -3,7 +3,7 @@ import 'package:dartz/dartz.dart';
 import '../../../../core/failure/failure.dart';
 import '../entities/user_entity.dart';
 
-abstract class AuthRepository {
+abstract interface class AuthRepository {
   Future<Either<Failure, String>> signIn();
   Future<Either<Failure, String>> signOut();
   Future<Either<Failure, UserEntity>> fetchUser();
