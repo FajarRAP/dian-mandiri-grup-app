@@ -8,6 +8,6 @@ abstract class AuthRepository {
   Future<Either<Failure, String>> signOut();
   Future<Either<Failure, UserEntity>> fetchUser();
   Future<Either<Failure, String>> refreshToken({required String refreshToken});
-  Future<Either<Failure, UserEntity>> fetchUserFromStorage();
+  Future<Either<Failure, UserEntity?>> fetchUserFromStorage();
   Future<Either<Failure, String>> updateProfile({required String name});
 }
