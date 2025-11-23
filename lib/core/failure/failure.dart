@@ -1,5 +1,7 @@
 import 'package:equatable/equatable.dart';
 
+import '../utils/typedefs.dart';
+
 class Failure extends Equatable {
   const Failure({
     this.message = 'Terjadi kesalahan',
@@ -11,6 +13,13 @@ class Failure extends Equatable {
 
   @override
   List<Object?> get props => [message, statusCode];
+}
+
+class NetworkFailure extends Failure {
+  const NetworkFailure({
+    super.message,
+    super.statusCode,
+  });
 }
 
 class ServerFailure extends Failure {
@@ -43,7 +52,7 @@ class SpreadsheetFailure extends Failure {
       headers: List<String>.from(json['data']['header'])..insert(0, 'Row'),
       hiddenColumnCount: json['data']['hide_column'],
       rows: List<dynamic>.from(json['data']['content'])
-          .map((e) => List<Map<String, dynamic>?>.from(e['column'])
+          .map((e) => ListJsonMap.from(e['column'])
             ..insert(0, {'value': '${e['row']}'}))
           .toList(),
     );
@@ -51,7 +60,7 @@ class SpreadsheetFailure extends Failure {
 
   final List<String> headers;
   final int hiddenColumnCount;
-  final List<List<Map<String, dynamic>?>> rows;
+  final List<ListJsonMap> rows;
 
   @override
   List<Object?> get props => [...super.props, headers, hiddenColumnCount, rows];
