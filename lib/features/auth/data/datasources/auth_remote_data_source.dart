@@ -2,16 +2,18 @@ import 'package:dio/dio.dart';
 
 import '../../../../core/network/dio_handler_mixin.dart';
 import '../../../../core/services/google_sign_in_service.dart';
+import '../../domain/usecases/refresh_token_use_case.dart';
+import '../../domain/usecases/update_profile_use_case.dart';
 import '../models/sign_in_response_model.dart';
 import '../models/token_model.dart';
 import '../models/user_model.dart';
 
 abstract interface class AuthRemoteDataSource {
   Future<UserModel> fetchUser();
-  Future<TokenModel> refreshToken({required String refreshToken});
+  Future<TokenModel> refreshToken(RefreshTokenUseCaseParams params);
   Future<SignInResponseModel> signIn();
   Future<String> signOut();
-  Future<String> updateProfile({required String name});
+  Future<String> updateProfile(UpdateProfileUseCaseParams params);
 }
 
 class AuthRemoteDataSourceImpl
@@ -35,11 +37,11 @@ class AuthRemoteDataSourceImpl
   }
 
   @override
-  Future<TokenModel> refreshToken({required String refreshToken}) async {
+  Future<TokenModel> refreshToken(RefreshTokenUseCaseParams params) async {
     return await handleDioRequest<TokenModel>(() async {
       final response = await dio.post(
         'v1/auth/refresh',
-        data: {'refresh_token': refreshToken},
+        data: {'refresh_token': params.refreshToken},
       );
 
       return TokenModel.fromJson(response.data);
@@ -70,11 +72,11 @@ class AuthRemoteDataSourceImpl
   }
 
   @override
-  Future<String> updateProfile({required String name}) async {
+  Future<String> updateProfile(UpdateProfileUseCaseParams params) async {
     return await handleDioRequest<String>(() async {
       final response = await dio.put(
         'v1/auth/profile',
-        data: {'name': name},
+        data: {'name': params.name},
       );
 
       return response.data['message'];

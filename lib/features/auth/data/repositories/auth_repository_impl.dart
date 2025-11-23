@@ -4,6 +4,8 @@ import '../../../../core/failure/failure.dart';
 import '../../../../core/utils/respository_handler_mixin.dart';
 import '../../domain/entities/user_entity.dart';
 import '../../domain/repositories/auth_repository.dart';
+import '../../domain/usecases/refresh_token_use_case.dart';
+import '../../domain/usecases/update_profile_use_case.dart';
 import '../datasources/auth_local_data_source.dart';
 import '../datasources/auth_remote_data_source.dart';
 
@@ -36,10 +38,9 @@ class AuthRepositoryImpl with RepositoryHandlerMixin implements AuthRepository {
 
   @override
   Future<Either<Failure, String>> refreshToken(
-      {required String refreshToken}) async {
+      RefreshTokenUseCaseParams params) async {
     return await handleRepositoryRequest<String>(() async {
-      final result =
-          await authRemoteDataSource.refreshToken(refreshToken: refreshToken);
+      final result = await authRemoteDataSource.refreshToken(params);
       await authLocalDataSource.cacheTokens(token: result);
 
       return result.message;
@@ -68,9 +69,10 @@ class AuthRepositoryImpl with RepositoryHandlerMixin implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, String>> updateProfile({required String name}) async {
+  Future<Either<Failure, String>> updateProfile(
+      UpdateProfileUseCaseParams params) async {
     return await handleRepositoryRequest<String>(() async {
-      final result = await authRemoteDataSource.updateProfile(name: name);
+      final result = await authRemoteDataSource.updateProfile(params);
 
       return result;
     });

@@ -63,7 +63,8 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> refreshToken({required String? refreshToken}) async {
     emit(RefreshTokenLoading());
 
-    final result = await _refreshTokenUseCase('$refreshToken');
+    final params = RefreshTokenUseCaseParams(refreshToken: '$refreshToken');
+    final result = await _refreshTokenUseCase(params);
 
     result.fold(
       (failure) => emit(RefreshTokenError(message: failure.message)),
@@ -96,7 +97,8 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> updateProfile({required String name}) async {
     emit(UpdateProfileLoading());
 
-    final result = await _updateProfileUseCase(name);
+    final params = UpdateProfileUseCaseParams(name: name);
+    final result = await _updateProfileUseCase(params);
 
     result.fold(
       (failure) => emit(UpdateProfileError(message: failure.message)),
