@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 
 import '../../../../core/network/dio_handler_mixin.dart';
+import '../../../../core/services/google_sign_in_service.dart';
 import '../models/sign_in_response_model.dart';
 import '../models/token_model.dart';
 import '../models/user_model.dart';
@@ -23,7 +23,7 @@ class AuthRemoteDataSourceImpl
   });
 
   final Dio dio;
-  final GoogleSignIn googleSignIn;
+  final GoogleSignInService googleSignIn;
 
   @override
   Future<UserModel> fetchUser() async {
@@ -49,11 +49,7 @@ class AuthRemoteDataSourceImpl
   @override
   Future<SignInResponseModel> signIn() async {
     return await handleDioRequest<SignInResponseModel>(() async {
-      final googleSignInAccount = await googleSignIn.signIn();
-      final googleSignInAuthentication =
-          await googleSignInAccount?.authentication;
-      final googleAccessToken = googleSignInAuthentication?.accessToken;
-
+      final googleAccessToken = await googleSignIn.authenticate();
       final response = await dio.post(
         'v1/auth/google',
         data: {'access_token': googleAccessToken},
