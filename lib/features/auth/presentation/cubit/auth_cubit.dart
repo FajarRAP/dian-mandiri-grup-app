@@ -54,7 +54,9 @@ class AuthCubit extends Cubit<AuthState> {
 
     userFromStorage.fold(
       (failure) => emit(FetchUserError(message: failure.message)),
-      (user) => emit(FetchUserLoaded(user: this.user = user)),
+      (user) => user == null
+          ? emit(FetchUserError(message: 'No user found in storage'))
+          : emit(FetchUserLoaded(user: this.user = user)),
     );
   }
 
