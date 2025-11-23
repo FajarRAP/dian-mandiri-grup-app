@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:equatable/equatable.dart';
 
 import '../../../../core/common/use_cases.dart';
 import '../../../../core/failure/failure.dart';
@@ -13,11 +14,11 @@ class InsertShipmentDocumentUseCase
   @override
   Future<Either<Failure, String>> call(
       InsertShipmentDocumentUseCaseParams params) async {
-    return await shipmentRepository.insertShipmentDocument(params: params);
+    return await shipmentRepository.insertShipmentDocument(params);
   }
 }
 
-class InsertShipmentDocumentUseCaseParams {
+class InsertShipmentDocumentUseCaseParams extends Equatable {
   const InsertShipmentDocumentUseCaseParams({
     required this.shipmentId,
     required this.documentPath,
@@ -27,4 +28,7 @@ class InsertShipmentDocumentUseCaseParams {
   final String shipmentId;
   final String documentPath;
   final String stage;
+
+  @override
+  List<Object?> get props => [shipmentId, documentPath, stage];
 }

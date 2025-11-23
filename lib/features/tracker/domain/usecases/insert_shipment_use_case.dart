@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:equatable/equatable.dart';
 
 import '../../../../core/common/use_cases.dart';
 import '../../../../core/failure/failure.dart';
@@ -13,11 +14,11 @@ class InsertShipmentUseCase
   @override
   Future<Either<Failure, String>> call(
       InsertShipmentUseCaseParams params) async {
-    return await shipmentRepository.insertShipment(params: params);
+    return await shipmentRepository.insertShipment(params);
   }
 }
 
-class InsertShipmentUseCaseParams {
+class InsertShipmentUseCaseParams extends Equatable {
   const InsertShipmentUseCaseParams({
     required this.receiptNumber,
     required this.stage,
@@ -25,4 +26,7 @@ class InsertShipmentUseCaseParams {
 
   final String receiptNumber;
   final String stage;
+
+  @override
+  List<Object?> get props => [receiptNumber, stage];
 }

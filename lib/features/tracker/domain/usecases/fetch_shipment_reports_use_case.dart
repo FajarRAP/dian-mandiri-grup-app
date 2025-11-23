@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:equatable/equatable.dart';
 
 import '../../../../core/common/use_cases.dart';
 import '../../../../core/failure/failure.dart';
@@ -15,11 +16,11 @@ class FetchShipmentReportsUseCase
   @override
   Future<Either<Failure, List<ShipmentReportEntity>>> call(
       FetchShipmentReportsUseCaseParams params) async {
-    return await shipmentRepository.fetchShipmentReports(params: params);
+    return await shipmentRepository.fetchShipmentReports(params);
   }
 }
 
-class FetchShipmentReportsUseCaseParams {
+class FetchShipmentReportsUseCaseParams extends Equatable {
   const FetchShipmentReportsUseCaseParams({
     required this.page,
     required this.status,
@@ -31,4 +32,7 @@ class FetchShipmentReportsUseCaseParams {
   final String status;
   final DateTime startDate;
   final DateTime endDate;
+
+  @override
+  List<Object?> get props => [page, status, startDate, endDate];
 }

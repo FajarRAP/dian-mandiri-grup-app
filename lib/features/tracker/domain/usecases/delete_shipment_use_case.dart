@@ -1,16 +1,30 @@
 import 'package:dartz/dartz.dart';
+import 'package:equatable/equatable.dart';
 
 import '../../../../core/common/use_cases.dart';
 import '../../../../core/failure/failure.dart';
 import '../repositories/shipment_repository.dart';
 
-class DeleteShipmentUseCase implements UseCase<String, String> {
+class DeleteShipmentUseCase
+    implements UseCase<String, DeleteShipmentUseCaseParams> {
   const DeleteShipmentUseCase({required this.shipmentRepository});
 
   final ShipmentRepository shipmentRepository;
 
   @override
-  Future<Either<Failure, String>> call(String params) async {
-    return await shipmentRepository.deleteShipment(shipmentId: params);
+  Future<Either<Failure, String>> call(
+      DeleteShipmentUseCaseParams params) async {
+    return await shipmentRepository.deleteShipment(params);
   }
+}
+
+class DeleteShipmentUseCaseParams extends Equatable {
+  const DeleteShipmentUseCaseParams({
+    required this.shipmentId,
+  });
+
+  final String shipmentId;
+
+  @override
+  List<Object?> get props => [shipmentId];
 }

@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:equatable/equatable.dart';
 
 import '../../../../core/common/use_cases.dart';
 import '../../../../core/failure/failure.dart';
@@ -13,11 +14,11 @@ class DownloadShipmentReportUseCase
   @override
   Future<Either<Failure, String>> call(
       DownloadShipmentReportUseCaseParams params) async {
-    return await shipmentRepository.downloadShipmentReport(params: params);
+    return await shipmentRepository.downloadShipmentReport(params);
   }
 }
 
-final class DownloadShipmentReportUseCaseParams {
+class DownloadShipmentReportUseCaseParams extends Equatable {
   const DownloadShipmentReportUseCaseParams({
     required this.externalPath,
     required this.fileUrl,
@@ -29,4 +30,7 @@ final class DownloadShipmentReportUseCaseParams {
   final String fileUrl;
   final String filename;
   final DateTime createdAt;
+
+  @override
+  List<Object?> get props => [externalPath, fileUrl, filename, createdAt];
 }
