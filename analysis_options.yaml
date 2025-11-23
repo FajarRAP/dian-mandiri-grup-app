@@ -1,16 +1,6 @@
 include: package:flutter_lints/flutter.yaml
 
 linter:
-  analyzer:
-    strong-mode:
-      implicit-casts: false
-      implicit-dynamic: false
-
-    errors:
-      missing_required_param: error
-      parameter_assignments: error
-      unnecessary_new: error
-      todo: ignore
   rules:
     prefer_single_quotes: true
     prefer_const_constructors: true
@@ -20,7 +10,7 @@ linter:
     # prefer_expression_function_bodies: true
     prefer_relative_imports: true
     # always_specify_types: true
-    curly_braces_in_flow_control_structures: always
+    curly_braces_in_flow_control_structures: true
     lines_longer_than_80_chars: false
 
     avoid_print: true
