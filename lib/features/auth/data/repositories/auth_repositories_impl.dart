@@ -7,21 +7,21 @@ import '../../../../core/failure/failure.dart';
 import '../../domain/entities/user_entity.dart';
 import '../../domain/repositories/auth_repositories.dart';
 import '../datasources/auth_local_data_source.dart';
-import '../datasources/auth_remote_data_sources.dart';
+import '../datasources/auth_remote_data_source.dart';
 
 class AuthRepositoriesImpl implements AuthRepositories {
   const AuthRepositoriesImpl({
     required this.authLocalDataSource,
-    required this.authRemoteDataSources,
+    required this.authRemoteDataSource,
   });
 
   final AuthLocalDataSource authLocalDataSource;
-  final AuthRemoteDataSources authRemoteDataSources;
+  final AuthRemoteDataSource authRemoteDataSource;
 
   @override
   Future<Either<Failure, UserEntity>> fetchUser() async {
     try {
-      final result = await authRemoteDataSources.fetchUser();
+      final result = await authRemoteDataSource.fetchUser();
 
       return Right(result);
     } on ServerException catch (se) {
@@ -78,7 +78,7 @@ class AuthRepositoriesImpl implements AuthRepositories {
       {required String refreshToken}) async {
     try {
       final result =
-          await authRemoteDataSources.refreshToken(refreshToken: refreshToken);
+          await authRemoteDataSource.refreshToken(refreshToken: refreshToken);
       await authLocalDataSource.cacheTokens(token: result);
 
       return Right(result.message);
@@ -103,7 +103,7 @@ class AuthRepositoriesImpl implements AuthRepositories {
   @override
   Future<Either<Failure, String>> signIn() async {
     try {
-      final result = await authRemoteDataSources.signIn();
+      final result = await authRemoteDataSource.signIn();
       await authLocalDataSource.cacheUser(user: result.user);
       await authLocalDataSource.cacheTokens(token: result.token);
 
@@ -129,7 +129,7 @@ class AuthRepositoriesImpl implements AuthRepositories {
   @override
   Future<Either<Failure, String>> signOut() async {
     try {
-      final result = await authRemoteDataSources.signOut();
+      final result = await authRemoteDataSource.signOut();
       await authLocalDataSource.clearCache();
 
       return Right(result);
@@ -154,7 +154,7 @@ class AuthRepositoriesImpl implements AuthRepositories {
   @override
   Future<Either<Failure, String>> updateProfile({required String name}) async {
     try {
-      final result = await authRemoteDataSources.updateProfile(name: name);
+      final result = await authRemoteDataSource.updateProfile(name: name);
 
       return Right(result);
     } on ServerException catch (se) {

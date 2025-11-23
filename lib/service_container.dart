@@ -7,7 +7,7 @@ import 'core/common/constants.dart';
 import 'core/helpers/dio_interceptor.dart';
 import 'core/services/image_picker_service.dart';
 import 'features/auth/data/datasources/auth_local_data_source.dart';
-import 'features/auth/data/datasources/auth_remote_data_sources.dart';
+import 'features/auth/data/datasources/auth_remote_data_source.dart';
 import 'features/auth/data/repositories/auth_repositories_impl.dart';
 import 'features/auth/domain/repositories/auth_repositories.dart';
 import 'features/auth/domain/usecases/fetch_user_from_storage_use_case.dart';
@@ -75,8 +75,8 @@ void setup() {
   getIt
     ..registerLazySingleton<AuthLocalDataSource>(
         () => AuthLocalDataSourceImpl(storage: getIt.get()))
-    ..registerLazySingleton<AuthRemoteDataSources>(
-      () => AuthRemoteDataSourcesImpl(
+    ..registerLazySingleton<AuthRemoteDataSource>(
+      () => AuthRemoteDataSourceImpl(
         dio: getIt.get(),
         googleSignIn: GoogleSignIn(),
       ),
@@ -84,7 +84,7 @@ void setup() {
     ..registerLazySingleton<AuthRepositories>(
       () => AuthRepositoriesImpl(
         authLocalDataSource: getIt.get(),
-        authRemoteDataSources: getIt.get(),
+        authRemoteDataSource: getIt.get(),
       ),
     )
     ..registerLazySingleton<AuthCubit>(() => AuthCubit(

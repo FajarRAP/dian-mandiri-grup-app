@@ -6,7 +6,7 @@ import '../models/sign_in_response_model.dart';
 import '../models/token_model.dart';
 import '../models/user_model.dart';
 
-abstract interface class AuthRemoteDataSources {
+abstract interface class AuthRemoteDataSource {
   Future<UserModel> fetchUser();
   Future<TokenModel> refreshToken({required String refreshToken});
   Future<SignInResponseModel> signIn();
@@ -14,10 +14,10 @@ abstract interface class AuthRemoteDataSources {
   Future<String> updateProfile({required String name});
 }
 
-class AuthRemoteDataSourcesImpl
+class AuthRemoteDataSourceImpl
     with DioHandlerMixin
-    implements AuthRemoteDataSources {
-  const AuthRemoteDataSourcesImpl({
+    implements AuthRemoteDataSource {
+  const AuthRemoteDataSourceImpl({
     required this.dio,
     required this.googleSignIn,
   });

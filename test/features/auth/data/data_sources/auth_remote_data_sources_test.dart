@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:ship_tracker/features/auth/data/datasources/auth_remote_data_sources.dart';
+import 'package:ship_tracker/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:ship_tracker/features/auth/data/models/sign_in_response_model.dart';
 import 'package:ship_tracker/features/auth/data/models/token_model.dart';
 import 'package:ship_tracker/features/auth/data/models/user_model.dart';
@@ -14,7 +14,7 @@ class MockGoogleSignIn extends Mock implements GoogleSignIn {}
 void main() {
   late MockDio mockDio;
   late MockGoogleSignIn mockGoogleSignIn;
-  late AuthRemoteDataSourcesImpl dataSources;
+  late AuthRemoteDataSourceImpl dataSources;
   late RequestOptions requestOptions;
 
   const tRefreshToken = 'refresh_token';
@@ -22,7 +22,7 @@ void main() {
   setUp(() {
     mockDio = MockDio();
     mockGoogleSignIn = MockGoogleSignIn();
-    dataSources = AuthRemoteDataSourcesImpl(
+    dataSources = AuthRemoteDataSourceImpl(
       dio: mockDio,
       googleSignIn: mockGoogleSignIn,
     );
