@@ -11,6 +11,7 @@ import 'package:path_provider/path_provider.dart';
 import 'core/common/constants.dart';
 import 'core/helpers/top_snackbar.dart';
 import 'core/routes/router.dart';
+import 'core/services/google_sign_in_service.dart';
 import 'core/themes/theme.dart';
 import 'features/auth/presentation/cubit/auth_cubit.dart';
 import 'features/supplier/presentation/cubit/supplier_cubit.dart';
@@ -35,6 +36,8 @@ Future<void> main() async {
   await initializeDateFormatting('id_ID', null);
 
   setup();
+
+  await getIt<GoogleSignInService>().initialize();
 
   final storage = getIt.get<FlutterSecureStorage>();
   final refreshToken = await storage.read(key: refreshTokenKey);
