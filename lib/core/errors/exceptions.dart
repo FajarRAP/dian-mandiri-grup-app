@@ -1,5 +1,7 @@
 import 'package:equatable/equatable.dart';
 
+import '../utils/typedefs.dart';
+
 abstract interface class BaseException extends Equatable implements Exception {
   const BaseException({
     required this.message,
@@ -31,7 +33,13 @@ class ServerException extends BaseException {
   const ServerException({
     super.message = 'Terjadi kesalahan server',
     super.code = 500,
+    this.errors,
   });
+
+  final JsonMap? errors;
+
+  @override
+  List<Object?> get props => [...super.props, errors];
 }
 
 class CacheException extends BaseException {
