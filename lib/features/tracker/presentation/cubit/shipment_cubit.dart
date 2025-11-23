@@ -78,7 +78,8 @@ class ShipmentCubit extends Cubit<ShipmentState> {
   Future<void> deleteShipment({required String shipmentId}) async {
     emit(DeleteShipmentLoading());
 
-    final result = await _deleteShipmentUseCase(shipmentId);
+    final params = DeleteShipmentUseCaseParams(shipmentId: shipmentId);
+    final result = await _deleteShipmentUseCase(params);
 
     result.fold(
       (failure) => emit(DeleteShipmentError(message: failure.message)),
@@ -108,7 +109,8 @@ class ShipmentCubit extends Cubit<ShipmentState> {
   Future<void> fetchShipmentById({required String shipmentId}) async {
     emit(FetchShipmentDetailLoading());
 
-    final result = await _fetchShipmentByIdUseCase(shipmentId);
+    final params = FetchShipmentByIdUseCaseParams(shipmentId: shipmentId);
+    final result = await _fetchShipmentByIdUseCase(params);
 
     result.fold(
       (failure) => emit(FetchShipmentDetailError(message: failure.message)),
@@ -121,7 +123,9 @@ class ShipmentCubit extends Cubit<ShipmentState> {
       {required String receiptNumber}) async {
     emit(FetchReceiptStatusLoading());
 
-    final result = await _fetchShipmentByReceiptNumberUseCase(receiptNumber);
+    final params =
+        FetchShipmentByReceiptNumberUseCaseParams(receiptNumber: receiptNumber);
+    final result = await _fetchShipmentByReceiptNumberUseCase(params);
 
     result.fold(
       (failure) => emit(FetchReceiptStatusError(failure: failure)),
