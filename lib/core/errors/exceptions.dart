@@ -17,21 +17,21 @@ abstract interface class BaseException extends Equatable implements Exception {
 
 class InternalException extends BaseException {
   const InternalException({
-    super.message = 'Terjadi kesalahan internal',
+    super.message = 'An internal error occurred',
     super.code = 500,
   });
 }
 
 class NetworkException extends BaseException {
   const NetworkException({
-    super.message = 'Tidak ada koneksi internet',
+    super.message = 'No internet connection',
     super.code = 503,
   });
 }
 
 class ServerException extends BaseException {
   const ServerException({
-    super.message = 'Terjadi kesalahan server',
+    super.message = 'A server error occurred',
     super.code = 500,
     this.errors,
   });
@@ -44,7 +44,7 @@ class ServerException extends BaseException {
 
 class CacheException extends BaseException {
   const CacheException({
-    super.message = 'Terjadi kesalahan cache',
+    super.message = 'A cache error occurred',
     super.code = 500,
   });
 }
