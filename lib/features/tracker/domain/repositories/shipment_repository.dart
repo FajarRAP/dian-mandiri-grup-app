@@ -6,7 +6,10 @@ import '../entities/shipment_entity.dart';
 import '../entities/shipment_history_entity.dart';
 import '../entities/shipment_report_entity.dart';
 import '../usecases/create_shipment_report_use_case.dart';
+import '../usecases/delete_shipment_use_case.dart';
 import '../usecases/download_shipment_report_use_case.dart';
+import '../usecases/fetch_shipment_by_id_use_case.dart';
+import '../usecases/fetch_shipment_by_receipt_number_use_case.dart';
 import '../usecases/fetch_shipment_reports_use_case.dart';
 import '../usecases/fetch_shipments_use_case.dart';
 import '../usecases/insert_shipment_document_use_case.dart';
@@ -14,20 +17,21 @@ import '../usecases/insert_shipment_use_case.dart';
 
 abstract class ShipmentRepository {
   Future<Either<Failure, String>> createShipmentReport(
-      {required CreateShipmentReportUseCaseParams params});
-  Future<Either<Failure, String>> deleteShipment({required String shipmentId});
+      CreateShipmentReportUseCaseParams params);
+  Future<Either<Failure, String>> deleteShipment(
+      DeleteShipmentUseCaseParams params);
   Future<Either<Failure, String>> downloadShipmentReport(
-      {required DownloadShipmentReportUseCaseParams params});
+      DownloadShipmentReportUseCaseParams params);
   Future<Either<Failure, ShipmentDetailEntity>> fetchShipmentById(
-      {required String shipmentId});
+      FetchShipmentByIdUseCaseParams params);
   Future<Either<Failure, ShipmentHistoryEntity>> fetchShipmentByReceiptNumber(
-      {required String receiptNumber});
+      FetchShipmentByReceiptNumberUseCaseParams params);
   Future<Either<Failure, List<ShipmentReportEntity>>> fetchShipmentReports(
-      {required FetchShipmentReportsUseCaseParams params});
+      FetchShipmentReportsUseCaseParams params);
   Future<Either<Failure, List<ShipmentEntity>>> fetchShipments(
-      {required FetchShipmentsUseCaseParams params});
+      FetchShipmentsUseCaseParams params);
   Future<Either<Failure, String>> insertShipment(
-      {required InsertShipmentUseCaseParams params});
+      InsertShipmentUseCaseParams params);
   Future<Either<Failure, String>> insertShipmentDocument(
-      {required InsertShipmentDocumentUseCaseParams params});
+      InsertShipmentDocumentUseCaseParams params);
 }
