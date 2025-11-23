@@ -1,13 +1,12 @@
 import 'package:dio/dio.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
-import '../../../../core/exceptions/internal_exception.dart';
-import '../../../../core/helpers/helpers.dart';
+import '../../../../core/network/dio_handler_mixin.dart';
 import '../models/sign_in_response_model.dart';
 import '../models/token_model.dart';
 import '../models/user_model.dart';
 
-abstract class AuthRemoteDataSources {
+abstract interface class AuthRemoteDataSources {
   Future<UserModel> fetchUser();
   Future<TokenModel> refreshToken({required String refreshToken});
   Future<SignInResponseModel> signIn();
@@ -15,7 +14,9 @@ abstract class AuthRemoteDataSources {
   Future<String> updateProfile({required String name});
 }
 
-class AuthRemoteDataSourcesImpl implements AuthRemoteDataSources {
+class AuthRemoteDataSourcesImpl
+    with DioHandlerMixin
+    implements AuthRemoteDataSources {
   const AuthRemoteDataSourcesImpl({
     required this.dio,
     required this.googleSignIn,
@@ -26,36 +27,28 @@ class AuthRemoteDataSourcesImpl implements AuthRemoteDataSources {
 
   @override
   Future<UserModel> fetchUser() async {
-    try {
+    return await handleDioRequest<UserModel>(() async {
       final response = await dio.get('v1/auth/me');
 
       return UserModel.fromJson(response.data['data']);
-    } on DioException catch (de) {
-      throw handleDioException(de);
-    } catch (e) {
-      throw InternalException(message: '$e');
-    }
+    });
   }
 
   @override
   Future<TokenModel> refreshToken({required String refreshToken}) async {
-    try {
+    return await handleDioRequest<TokenModel>(() async {
       final response = await dio.post(
         'v1/auth/refresh',
         data: {'refresh_token': refreshToken},
       );
 
       return TokenModel.fromJson(response.data);
-    } on DioException catch (de) {
-      throw handleDioException(de);
-    } catch (e) {
-      throw InternalException(message: '$e');
-    }
+    });
   }
 
   @override
   Future<SignInResponseModel> signIn() async {
-    try {
+    return await handleDioRequest<SignInResponseModel>(() async {
       final googleSignInAccount = await googleSignIn.signIn();
       final googleSignInAuthentication =
           await googleSignInAccount?.authentication;
@@ -67,40 +60,28 @@ class AuthRemoteDataSourcesImpl implements AuthRemoteDataSources {
       );
 
       return SignInResponseModel.fromJson(response.data);
-    } on DioException catch (de) {
-      throw handleDioException(de);
-    } catch (e) {
-      throw InternalException(message: '$e');
-    }
+    });
   }
 
   @override
   Future<String> signOut() async {
-    try {
+    return await handleDioRequest<String>(() async {
       final response = await dio.post('v1/auth/logout');
       await googleSignIn.signOut();
 
       return response.data['message'];
-    } on DioException catch (de) {
-      throw handleDioException(de);
-    } catch (e) {
-      throw InternalException(message: '$e');
-    }
+    });
   }
 
   @override
   Future<String> updateProfile({required String name}) async {
-    try {
+    return await handleDioRequest<String>(() async {
       final response = await dio.put(
-        'auth/profile',
+        'v1/auth/profile',
         data: {'name': name},
       );
 
       return response.data['message'];
-    } on DioException catch (de) {
-      throw handleDioException(de);
-    } catch (e) {
-      throw InternalException(message: '$e');
-    }
+    });
   }
 }
