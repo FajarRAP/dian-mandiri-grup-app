@@ -5,6 +5,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 import 'core/common/constants.dart';
 import 'core/helpers/dio_interceptor.dart';
+import 'core/services/google_sign_in_service.dart';
 import 'core/services/image_picker_service.dart';
 import 'features/auth/data/datasources/auth_local_data_source.dart';
 import 'features/auth/data/datasources/auth_remote_data_source.dart';
@@ -68,8 +69,13 @@ void setup() {
     )..interceptors.add(DioInterceptor()),
   );
 
-  getIt.registerLazySingleton<ImagePickerService>(
-      () => ImagePickerServiceImpl());
+  getIt
+    ..registerLazySingleton<ImagePickerService>(() => ImagePickerServiceImpl())
+    ..registerLazySingleton(
+      () => GoogleSignInService(
+          serverClientId: const String.fromEnvironment('SERVER_CLIENT_ID'),
+          googleSignIn: GoogleSignIn.instance),
+    );
 
   // Auth
   getIt
@@ -78,7 +84,7 @@ void setup() {
     ..registerLazySingleton<AuthRemoteDataSource>(
       () => AuthRemoteDataSourceImpl(
         dio: getIt.get(),
-        googleSignIn: GoogleSignIn(),
+        googleSignIn: getIt.get(),
       ),
     )
     ..registerLazySingleton<AuthRepository>(
