@@ -9,7 +9,7 @@ import 'core/services/image_picker_service.dart';
 import 'features/auth/data/datasources/auth_local_data_source.dart';
 import 'features/auth/data/datasources/auth_remote_data_source.dart';
 import 'features/auth/data/repositories/auth_repositories_impl.dart';
-import 'features/auth/domain/repositories/auth_repositories.dart';
+import 'features/auth/domain/repositories/auth_repository.dart';
 import 'features/auth/domain/usecases/fetch_user_from_storage_use_case.dart';
 import 'features/auth/domain/usecases/fetch_user_use_case.dart';
 import 'features/auth/domain/usecases/refresh_token_use_case.dart';
@@ -81,21 +81,21 @@ void setup() {
         googleSignIn: GoogleSignIn(),
       ),
     )
-    ..registerLazySingleton<AuthRepositories>(
-      () => AuthRepositoriesImpl(
+    ..registerLazySingleton<AuthRepository>(
+      () => AuthRepositoryImpl(
         authLocalDataSource: getIt.get(),
         authRemoteDataSource: getIt.get(),
       ),
     )
     ..registerLazySingleton<AuthCubit>(() => AuthCubit(
-        fetchUserUseCase: FetchUserUseCase(authRepositories: getIt.get()),
+        fetchUserUseCase: FetchUserUseCase(authRepository: getIt.get()),
         fetchUserFromStorageUseCase:
-            FetchUserFromStorageUseCase(authRepositories: getIt.get()),
-        refreshTokenUseCase: RefreshTokenUseCase(authRepositories: getIt.get()),
-        signInUseCase: SignInUseCase(authRepositories: getIt.get()),
-        signOutUseCase: SignOutUseCase(authRepositories: getIt.get()),
+            FetchUserFromStorageUseCase(authRepository: getIt.get()),
+        refreshTokenUseCase: RefreshTokenUseCase(authRepository: getIt.get()),
+        signInUseCase: SignInUseCase(authRepository: getIt.get()),
+        signOutUseCase: SignOutUseCase(authRepository: getIt.get()),
         updateProfileUseCase:
-            UpdateProfileUseCase(authRepositories: getIt.get())));
+            UpdateProfileUseCase(authRepository: getIt.get())));
 
   // Ship
   getIt

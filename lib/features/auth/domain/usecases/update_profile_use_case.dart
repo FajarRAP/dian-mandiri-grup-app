@@ -2,15 +2,15 @@ import 'package:dartz/dartz.dart';
 
 import '../../../../core/common/use_cases.dart';
 import '../../../../core/failure/failure.dart';
-import '../repositories/auth_repositories.dart';
+import '../repositories/auth_repository.dart';
 
 class UpdateProfileUseCase implements UseCase<String, String> {
-  const UpdateProfileUseCase({required this.authRepositories});
+  const UpdateProfileUseCase({required this.authRepository});
 
-  final AuthRepositories authRepositories;
+  final AuthRepository authRepository;
 
   @override
   Future<Either<Failure, String>> call(String params) async {
-    return await authRepositories.updateProfile(name: params);
+    return await authRepository.updateProfile(name: params);
   }
 }

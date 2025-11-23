@@ -5,12 +5,12 @@ import '../../../../core/exceptions/internal_exception.dart';
 import '../../../../core/exceptions/server_exception.dart';
 import '../../../../core/failure/failure.dart';
 import '../../domain/entities/user_entity.dart';
-import '../../domain/repositories/auth_repositories.dart';
+import '../../domain/repositories/auth_repository.dart';
 import '../datasources/auth_local_data_source.dart';
 import '../datasources/auth_remote_data_source.dart';
 
-class AuthRepositoriesImpl implements AuthRepositories {
-  const AuthRepositoriesImpl({
+class AuthRepositoryImpl implements AuthRepository {
+  const AuthRepositoryImpl({
     required this.authLocalDataSource,
     required this.authRemoteDataSource,
   });
