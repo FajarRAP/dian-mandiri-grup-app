@@ -22,7 +22,7 @@ class FetchShipmentReportsUseCase
 
 class FetchShipmentReportsUseCaseParams extends Equatable {
   const FetchShipmentReportsUseCaseParams({
-    required this.page,
+    this.page = 1,
     required this.status,
     required this.startDate,
     required this.endDate,
