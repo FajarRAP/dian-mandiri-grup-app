@@ -18,7 +18,7 @@ import '../models/purchase_note_detail_model.dart';
 import '../models/purchase_note_summary_model.dart';
 import '../models/warehouse_item_model.dart';
 
-abstract class WarehouseRemoteDataSources {
+abstract class WarehouseRemoteDataSource {
   Future<String> deletePurchaseNote({required String purchaseNoteId});
   Future<PurchaseNoteDetailEntity> fetchPurchaseNote(
       {required String purchaseNoteId});
@@ -38,9 +38,8 @@ abstract class WarehouseRemoteDataSources {
       {required UpdatePurchaseNoteUseCaseParams params});
 }
 
-class WarehouseRemoteDataSourcesImpl
-    extends WarehouseRemoteDataSources {
-  WarehouseRemoteDataSourcesImpl({required this.dio});
+class WarehouseRemoteDataSourceImpl extends WarehouseRemoteDataSource {
+  WarehouseRemoteDataSourceImpl({required this.dio});
 
   final Dio dio;
 

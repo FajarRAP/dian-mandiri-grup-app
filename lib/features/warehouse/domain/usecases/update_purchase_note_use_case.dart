@@ -3,18 +3,18 @@ import 'package:dartz/dartz.dart';
 import '../../../../core/common/use_cases.dart';
 import '../../../../core/failure/failure.dart';
 import '../entities/warehouse_item_entity.dart';
-import '../repositories/warehouse_repositories.dart';
+import '../repositories/warehouse_repository.dart';
 
 class UpdatePurchaseNoteUseCase
     implements UseCase<String, UpdatePurchaseNoteUseCaseParams> {
-  const UpdatePurchaseNoteUseCase({required this.warehouseRepositories});
+  const UpdatePurchaseNoteUseCase({required this.warehouseRepository});
 
-  final WarehouseRepositories warehouseRepositories;
+  final WarehouseRepository warehouseRepository;
 
   @override
   Future<Either<Failure, String>> call(
       UpdatePurchaseNoteUseCaseParams params) async {
-    return await warehouseRepositories.updatePurchaseNote(params: params);
+    return await warehouseRepository.updatePurchaseNote(params: params);
   }
 }
 

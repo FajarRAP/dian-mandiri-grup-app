@@ -40,9 +40,9 @@ import 'features/tracker/domain/usecases/fetch_shipments_use_case.dart';
 import 'features/tracker/domain/usecases/insert_shipment_document_use_case.dart';
 import 'features/tracker/domain/usecases/insert_shipment_use_case.dart';
 import 'features/tracker/presentation/cubit/shipment_cubit.dart';
-import 'features/warehouse/data/datasources/warehouse_remote_data_sources.dart';
-import 'features/warehouse/data/repositories/warehouse_repositories_impl.dart';
-import 'features/warehouse/domain/repositories/warehouse_repositories.dart';
+import 'features/warehouse/data/datasources/warehouse_remote_data_source.dart';
+import 'features/warehouse/data/repositories/warehouse_repository_impl.dart';
+import 'features/warehouse/domain/repositories/warehouse_repository.dart';
 import 'features/warehouse/domain/usecases/delete_purchase_note_use_case.dart';
 import 'features/warehouse/domain/usecases/fetch_purchase_note_use_case.dart';
 import 'features/warehouse/domain/usecases/fetch_purchase_notes_dropdown_use_case.dart';
@@ -150,27 +150,22 @@ void setup() {
 
   // Warehouse
   getIt
-    ..registerLazySingleton<WarehouseRemoteDataSources>(
-        () => WarehouseRemoteDataSourcesImpl(dio: getIt()))
-    ..registerLazySingleton<WarehouseRepositories>(
-        () => WarehouseRepositoriesImpl(warehouseRemoteDataSources: getIt()))
+    ..registerLazySingleton<WarehouseRemoteDataSource>(
+        () => WarehouseRemoteDataSourceImpl(dio: getIt()))
+    ..registerLazySingleton<WarehouseRepository>(
+        () => WarehouseRepositoryImpl(warehouseRemoteDataSource: getIt()))
+    ..registerSingleton(DeletePurchaseNoteUseCase(warehouseRepository: getIt()))
+    ..registerSingleton(FetchPurchaseNoteUseCase(warehouseRepository: getIt()))
+    ..registerSingleton(FetchPurchaseNotesUseCase(warehouseRepository: getIt()))
     ..registerSingleton(
-        DeletePurchaseNoteUseCase(warehouseRepositories: getIt()))
+        FetchPurchaseNotesDropdownUseCase(warehouseRepository: getIt()))
     ..registerSingleton(
-        FetchPurchaseNoteUseCase(warehouseRepositories: getIt()))
+        InsertPurchaseNoteManualUseCase(warehouseRepository: getIt()))
     ..registerSingleton(
-        FetchPurchaseNotesUseCase(warehouseRepositories: getIt()))
-    ..registerSingleton(
-        FetchPurchaseNotesDropdownUseCase(warehouseRepositories: getIt()))
-    ..registerSingleton(
-        InsertPurchaseNoteManualUseCase(warehouseRepositories: getIt()))
-    ..registerSingleton(
-        InsertPurchaseNoteFileUseCase(warehouseRepositories: getIt()))
-    ..registerSingleton(InsertReturnCostUseCase(warehouseRepositories: getIt()))
-    ..registerSingleton(
-        InsertShippingFeeUseCase(warehouseRepositories: getIt()))
-    ..registerSingleton(
-        UpdatePurchaseNoteUseCase(warehouseRepositories: getIt()))
+        InsertPurchaseNoteFileUseCase(warehouseRepository: getIt()))
+    ..registerSingleton(InsertReturnCostUseCase(warehouseRepository: getIt()))
+    ..registerSingleton(InsertShippingFeeUseCase(warehouseRepository: getIt()))
+    ..registerSingleton(UpdatePurchaseNoteUseCase(warehouseRepository: getIt()))
     ..registerLazySingleton<WarehouseCubit>(() => WarehouseCubit(
         deletePurchaseNoteUseCase: getIt(),
         fetchPurchaseNoteUseCase: getIt(),

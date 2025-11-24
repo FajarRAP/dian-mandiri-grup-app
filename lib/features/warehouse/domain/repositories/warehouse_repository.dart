@@ -12,7 +12,7 @@ import '../usecases/insert_return_cost_use_case.dart';
 import '../usecases/insert_shipping_fee_use_case.dart';
 import '../usecases/update_purchase_note_use_case.dart';
 
-abstract class WarehouseRepositories {
+abstract class WarehouseRepository {
   Future<Either<Failure, String>> deletePurchaseNote(
       {required String purchaseNoteId});
   Future<Either<Failure, PurchaseNoteDetailEntity>> fetchPurchaseNote(

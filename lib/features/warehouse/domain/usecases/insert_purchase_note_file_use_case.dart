@@ -2,17 +2,17 @@ import 'package:dartz/dartz.dart';
 
 import '../../../../core/common/use_cases.dart';
 import '../../../../core/failure/failure.dart';
-import '../repositories/warehouse_repositories.dart';
+import '../repositories/warehouse_repository.dart';
 
 class InsertPurchaseNoteFileUseCase
     implements AsyncUseCaseParams<String, InsertPurchaseNoteFileUseCaseParams> {
-  const InsertPurchaseNoteFileUseCase({required this.warehouseRepositories});
+  const InsertPurchaseNoteFileUseCase({required this.warehouseRepository});
 
-  final WarehouseRepositories warehouseRepositories;
+  final WarehouseRepository warehouseRepository;
   @override
   Future<Either<Failure, String>> call(
       InsertPurchaseNoteFileUseCaseParams params) async {
-    return await warehouseRepositories.insertPurchaseNoteFile(params: params);
+    return await warehouseRepository.insertPurchaseNoteFile(params: params);
   }
 }
 

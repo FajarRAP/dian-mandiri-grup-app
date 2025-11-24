@@ -2,18 +2,18 @@ import 'package:dartz/dartz.dart';
 
 import '../../../../core/common/use_cases.dart';
 import '../../../../core/failure/failure.dart';
-import '../repositories/warehouse_repositories.dart';
+import '../repositories/warehouse_repository.dart';
 
 class InsertReturnCostUseCase
     implements AsyncUseCaseParams<String, InsertReturnCostUseCaseParams> {
-  InsertReturnCostUseCase({required this.warehouseRepositories});
+  InsertReturnCostUseCase({required this.warehouseRepository});
 
-  final WarehouseRepositories warehouseRepositories;
+  final WarehouseRepository warehouseRepository;
 
   @override
   Future<Either<Failure, String>> call(
       InsertReturnCostUseCaseParams params) async {
-    return await warehouseRepositories.insertReturnCost(params: params);
+    return await warehouseRepository.insertReturnCost(params: params);
   }
 }
 
