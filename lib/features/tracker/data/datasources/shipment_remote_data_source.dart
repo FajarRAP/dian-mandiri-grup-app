@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 
-import '../../../../core/common/constants.dart';
 import '../../../../core/helpers/helpers.dart';
 import '../../../../core/network/dio_handler_mixin.dart';
 import '../../domain/entities/shipment_detail_entity.dart';
@@ -51,7 +50,7 @@ class ShipmentRemoteDataSourceImpl
       CreateShipmentReportUseCaseParams params) async {
     return await handleDioRequest<String>(() async {
       final response = await dio.post(
-        '$shipmentEndpoint/report',
+        '/v1/shipment/report',
         data: {
           'start_date': params.startDate.toYMD,
           'end_date': params.endDate.toYMD,
@@ -65,8 +64,7 @@ class ShipmentRemoteDataSourceImpl
   @override
   Future<String> deleteShipment(DeleteShipmentUseCaseParams params) async {
     return await handleDioRequest<String>(() async {
-      final response =
-          await dio.delete('$shipmentEndpoint/${params.shipmentId}');
+      final response = await dio.delete('/v1/shipment/${params.shipmentId}');
 
       return response.data['message'];
     });
@@ -91,7 +89,7 @@ class ShipmentRemoteDataSourceImpl
   Future<ShipmentDetailEntity> fetchShipmentById(
       FetchShipmentByIdUseCaseParams params) async {
     return await handleDioRequest<ShipmentDetailEntity>(() async {
-      final response = await dio.get('$shipmentEndpoint/${params.shipmentId}');
+      final response = await dio.get('/v1/shipment/${params.shipmentId}');
 
       return ShipmentDetailModel.fromJson(response.data['data']).toEntity();
     });
@@ -102,7 +100,7 @@ class ShipmentRemoteDataSourceImpl
       FetchShipmentByReceiptNumberUseCaseParams params) async {
     return await handleDioRequest<ShipmentHistoryEntity>(() async {
       final response =
-          await dio.get('$shipmentEndpoint/status/${params.receiptNumber}');
+          await dio.get('/v1/shipment/status/${params.receiptNumber}');
 
       return ShipmentHistoryModel.fromJson(response.data['data']).toEntity();
     });
@@ -113,7 +111,7 @@ class ShipmentRemoteDataSourceImpl
       FetchShipmentReportsUseCaseParams params) async {
     return await handleDioRequest<List<ShipmentReportEntity>>(() async {
       final response = await dio.get(
-        '$shipmentEndpoint/report',
+        '/v1/shipment/report',
         queryParameters: {
           'start_date': params.startDate.toYMD,
           'end_date': params.endDate.toYMD,
@@ -135,7 +133,7 @@ class ShipmentRemoteDataSourceImpl
       FetchShipmentsUseCaseParams params) async {
     return await handleDioRequest<List<ShipmentEntity>>(() async {
       final response = await dio.get(
-        shipmentEndpoint,
+        '/v1/shipment',
         queryParameters: {
           'date': params.date.toYMD,
           'stage': params.stage,
@@ -154,7 +152,7 @@ class ShipmentRemoteDataSourceImpl
   Future<String> insertShipment(InsertShipmentUseCaseParams params) async {
     return await handleDioRequest<String>(() async {
       final response = await dio.post(
-        shipmentEndpoint,
+        '/v1/shipment',
         data: {'receipt_number': params.receiptNumber, 'stage': params.stage},
       );
 
@@ -172,7 +170,7 @@ class ShipmentRemoteDataSourceImpl
       });
 
       final response = await dio.post(
-        '$shipmentEndpoint/${params.shipmentId}/document',
+        '/v1/shipment/${params.shipmentId}/document',
         data: formData,
       );
 

@@ -1,0 +1,15 @@
+{
+    "message": "Success get detail shipment!",
+    "data": {
+        "id": "05c0cef6-9c5d-4165-9145-b2c41f43a5e8",
+        "receipt_number": "SPXID04751919594A",
+        "user": {
+            "id": "05be1bd7-fdc9-488e-ac94-98eba66d1bd4",
+            "name": "mamy"
+        },
+        "courier": "Shopee Express",
+        "document": null,
+        "date": "2024-10-10T14:05:11.531361Z",
+        "stage": "scan"
+    }
+}

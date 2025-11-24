@@ -1,0 +1,19 @@
+{
+    "message": "Success get all shipment!",
+    "data": {
+        "content": [
+            {
+                "id": "05c0cef6-9c5d-4165-9145-b2c41f43a5e8",
+                "receipt_number": "SPXID04751919594A",
+                "courier": "Shopee Express",
+                "date": "2024-10-10T14:05:11.400718Z"
+            }
+        ],
+        "metadata": {
+            "total": 11,
+            "total_page": 2,
+            "page": 1,
+            "per_page": 10
+        }
+    }
+}
