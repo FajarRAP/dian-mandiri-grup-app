@@ -1,7 +1,8 @@
 import 'package:dartz/dartz.dart';
+import 'package:equatable/equatable.dart';
 
-import '../../../../core/common/use_cases.dart';
 import '../../../../core/failure/failure.dart';
+import '../../../../core/usecase/use_case.dart';
 import '../entities/supplier_entity.dart';
 import '../repositories/supplier_repositories.dart';
 
@@ -12,13 +13,13 @@ class FetchSuppliersUseCase
   final SupplierRepositories supplierRepositories;
 
   @override
-  Future<Either<Failure, List<SupplierEntity>>> call(
+  Future<Either<Failure, List<SupplierEntity>>> execute(
       FetchSuppliersUseCaseParams params) async {
-    return supplierRepositories.fetchSuppliers(params: params);
+    return await supplierRepositories.fetchSuppliers(params);
   }
 }
 
-final class FetchSuppliersUseCaseParams {
+class FetchSuppliersUseCaseParams extends Equatable {
   const FetchSuppliersUseCaseParams({
     this.column = 'name',
     this.sort = 'asc',
@@ -32,4 +33,7 @@ final class FetchSuppliersUseCaseParams {
   final String? search;
   final int limit;
   final int page;
+
+  @override
+  List<Object?> get props => [column, sort, search, limit, page];
 }
