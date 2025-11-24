@@ -1,9 +1,8 @@
 import 'package:dartz/dartz.dart';
 
 import '../../../../core/common/dropdown_entity.dart';
-import '../../../../core/exceptions/internal_exception.dart';
-import '../../../../core/exceptions/server_exception.dart';
 import '../../../../core/failure/failure.dart';
+import '../../../../core/utils/respository_handler_mixin.dart';
 import '../../domain/entities/supplier_detail_entity.dart';
 import '../../domain/entities/supplier_entity.dart';
 import '../../domain/repositories/supplier_repository.dart';
@@ -14,7 +13,9 @@ import '../../domain/usecases/insert_supplier_use_case.dart';
 import '../../domain/usecases/update_supplier_use_case.dart';
 import '../datasources/supplier_remote_data_source.dart';
 
-class SupplierRepositoryImpl implements SupplierRepository {
+class SupplierRepositoryImpl
+    with RepositoryHandlerMixin
+    implements SupplierRepository {
   const SupplierRepositoryImpl({required this.supplierRemoteDataSource});
 
   final SupplierRemoteDataSource supplierRemoteDataSource;
@@ -22,105 +23,51 @@ class SupplierRepositoryImpl implements SupplierRepository {
   @override
   Future<Either<Failure, SupplierDetailEntity>> fetchSupplier(
       FetchSupplierUseCaseParams params) async {
-    try {
-      final result = await supplierRemoteDataSource.fetchSupplier(
-          supplierId: params.supplierId);
+    return await handleRepositoryRequest<SupplierDetailEntity>(() async {
+      final result = await supplierRemoteDataSource.fetchSupplier(params);
 
-      return Right(result);
-    } on ServerException catch (se) {
-      return Left(ServerFailure(
-        message: se.message,
-        statusCode: se.statusCode,
-      ));
-    } on InternalException catch (ie) {
-      return Left(Failure(
-        message: ie.message,
-        statusCode: ie.statusCode,
-      ));
-    }
+      return result;
+    });
   }
 
   @override
   Future<Either<Failure, List<SupplierEntity>>> fetchSuppliers(
       FetchSuppliersUseCaseParams params) async {
-    try {
-      final result =
-          await supplierRemoteDataSource.fetchSuppliers(params: params);
+    return await handleRepositoryRequest<List<SupplierEntity>>(() async {
+      final result = await supplierRemoteDataSource.fetchSuppliers(params);
 
-      return Right(result);
-    } on ServerException catch (se) {
-      return Left(ServerFailure(
-        message: se.message,
-        statusCode: se.statusCode,
-      ));
-    } on InternalException catch (ie) {
-      return Left(Failure(
-        message: ie.message,
-        statusCode: ie.statusCode,
-      ));
-    }
+      return result;
+    });
   }
 
   @override
   Future<Either<Failure, List<DropdownEntity>>> fetchSuppliersDropdown(
       FetchSuppliersDropdownUseCaseParams params) async {
-    try {
+    return await handleRepositoryRequest<List<DropdownEntity>>(() async {
       final result =
-          await supplierRemoteDataSource.fetchSuppliersDropdown(params: params);
+          await supplierRemoteDataSource.fetchSuppliersDropdown(params);
 
-      return Right(result);
-    } on ServerException catch (se) {
-      return Left(ServerFailure(
-        message: se.message,
-        statusCode: se.statusCode,
-      ));
-    } on InternalException catch (ie) {
-      return Left(Failure(
-        message: ie.message,
-        statusCode: ie.statusCode,
-      ));
-    }
+      return result;
+    });
   }
 
   @override
   Future<Either<Failure, String>> insertSupplier(
       InsertSupplierUseCaseParams params) async {
-    try {
-      final result =
-          await supplierRemoteDataSource.insertSupplier(params: params);
+    return await handleRepositoryRequest<String>(() async {
+      final result = await supplierRemoteDataSource.insertSupplier(params);
 
-      return Right(result);
-    } on ServerException catch (se) {
-      return Left(ServerFailure(
-        message: se.message,
-        statusCode: se.statusCode,
-      ));
-    } on InternalException catch (ie) {
-      return Left(Failure(
-        message: ie.message,
-        statusCode: ie.statusCode,
-      ));
-    }
+      return result;
+    });
   }
 
   @override
   Future<Either<Failure, String>> updateSupplier(
       UpdateSupplierUseCaseParams params) async {
-    try {
-      final result = await supplierRemoteDataSource.updateSupplier(
-          params: params.supplierDetailEntity);
+    return await handleRepositoryRequest<String>(() async {
+      final result = await supplierRemoteDataSource.updateSupplier(params);
 
-      return Right(result);
-    } on ServerException catch (se) {
-      return Left(ServerFailure(
-        message: se.message,
-        statusCode: se.statusCode,
-      ));
-    } on InternalException catch (ie) {
-      return Left(Failure(
-        message: ie.message,
-        statusCode: ie.statusCode,
-      ));
-    }
+      return result;
+    });
   }
 }
