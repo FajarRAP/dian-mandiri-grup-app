@@ -1,3 +1,4 @@
+import '../../../../core/utils/typedefs.dart';
 import '../../domain/entities/shipment_history_entity.dart';
 import 'stage_model.dart';
 
@@ -10,20 +11,25 @@ class ShipmentHistoryModel extends ShipmentHistoryEntity {
     required super.stages,
   });
 
-  factory ShipmentHistoryModel.fromJson(Map<String, dynamic> json) =>
-      ShipmentHistoryModel(
-          id: json['id'],
-          receiptNumber: json['receipt_number'],
-          courier: json['courier'],
-          date: DateTime.parse(json['date']),
-          stages: List.from(json['stages'])
-              .map((e) => StageModel.fromJson(e).toEntity())
-              .toList());
+  factory ShipmentHistoryModel.fromJson(JsonMap json) {
+    final stages = List<JsonMap>.from(json['stages']);
 
-  ShipmentHistoryEntity toEntity() => ShipmentHistoryEntity(
+    return ShipmentHistoryModel(
+      id: json['id'],
+      receiptNumber: json['receipt_number'],
+      courier: json['courier'],
+      date: DateTime.parse(json['date']),
+      stages: stages.map(StageModel.fromJson).toList(),
+    );
+  }
+
+  ShipmentHistoryEntity toEntity() {
+    return ShipmentHistoryEntity(
       id: id,
       receiptNumber: receiptNumber,
       courier: courier,
       date: date,
-      stages: stages);
+      stages: stages.map((stage) => (stage as StageModel).toEntity()).toList(),
+    );
+  }
 }

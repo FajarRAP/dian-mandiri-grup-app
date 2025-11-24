@@ -1,4 +1,6 @@
-class ShipmentUserEntity {
+import 'package:equatable/equatable.dart';
+
+class ShipmentUserEntity extends Equatable {
   const ShipmentUserEntity({
     required this.id,
     required this.name,
@@ -6,4 +8,7 @@ class ShipmentUserEntity {
 
   final String id;
   final String name;
+
+  @override
+  List<Object?> get props => [id, name];
 }

@@ -1,3 +1,4 @@
+import '../../../../core/utils/typedefs.dart';
 import '../../domain/entities/shipment_user_entity.dart';
 
 class ShipmentUserModel extends ShipmentUserEntity {
@@ -6,8 +7,11 @@ class ShipmentUserModel extends ShipmentUserEntity {
     required super.name,
   });
 
-  factory ShipmentUserModel.fromJson(Map<String, dynamic> json) =>
-      ShipmentUserModel(id: json['id'], name: json['name']);
+  factory ShipmentUserModel.fromJson(JsonMap json) {
+    return ShipmentUserModel(id: json['id'], name: json['name']);
+  }
 
-  ShipmentUserEntity toEntity() => ShipmentUserEntity(id: id, name: name);
+  ShipmentUserEntity toEntity() {
+    return ShipmentUserEntity(id: id, name: name);
+  }
 }

@@ -1,3 +1,4 @@
+import '../../../../core/utils/typedefs.dart';
 import '../../domain/entities/shipment_detail_entity.dart';
 import 'shipment_user_model.dart';
 
@@ -12,23 +13,27 @@ class ShipmentDetailModel extends ShipmentDetailEntity {
     required super.user,
   });
 
-  factory ShipmentDetailModel.fromJson(Map<String, dynamic> json) =>
-      ShipmentDetailModel(
-        id: json['id'],
-        courier: json['courier'],
-        receiptNumber: json['receipt_number'],
-        stage: json['stage'],
-        document: json['document'],
-        date: DateTime.parse(json['date']),
-        user: ShipmentUserModel.fromJson(json['user']).toEntity(),
-      );
+  factory ShipmentDetailModel.fromJson(JsonMap json) {
+    return ShipmentDetailModel(
+      id: json['id'],
+      courier: json['courier'],
+      receiptNumber: json['receipt_number'],
+      stage: json['stage'],
+      document: json['document'],
+      date: DateTime.parse(json['date']),
+      user: ShipmentUserModel.fromJson(json['user']),
+    );
+  }
 
-  ShipmentDetailEntity toEntity() => ShipmentDetailEntity(
+  ShipmentDetailEntity toEntity() {
+    return ShipmentDetailEntity(
       id: id,
       courier: courier,
       receiptNumber: receiptNumber,
       stage: stage,
       document: document,
       date: date,
-      user: user);
+      user: (user as ShipmentUserModel).toEntity(),
+    );
+  }
 }

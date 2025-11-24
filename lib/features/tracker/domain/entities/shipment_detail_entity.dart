@@ -1,21 +1,21 @@
+import 'shipment_entity.dart';
 import 'shipment_user_entity.dart';
 
-class ShipmentDetailEntity {
+class ShipmentDetailEntity extends ShipmentEntity {
   const ShipmentDetailEntity({
-    required this.id,
-    required this.courier,
-    required this.receiptNumber,
+    required super.id,
+    required super.courier,
+    required super.receiptNumber,
+    required super.date,
     required this.stage,
     required this.document,
-    required this.date,
     required this.user,
   });
 
-  final String id;
-  final String courier;
-  final String receiptNumber;
   final String stage;
   final String? document;
-  final DateTime date;
   final ShipmentUserEntity user;
+
+  @override
+  List<Object?> get props => [...super.props, stage, document, user];
 }

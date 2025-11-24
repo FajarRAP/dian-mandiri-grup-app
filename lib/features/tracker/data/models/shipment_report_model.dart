@@ -1,3 +1,4 @@
+import '../../../../core/utils/typedefs.dart';
 import '../../domain/entities/shipment_report_entity.dart';
 
 class ShipmentReportModel extends ShipmentReportEntity {
@@ -9,14 +10,22 @@ class ShipmentReportModel extends ShipmentReportEntity {
     required super.date,
   });
 
-  factory ShipmentReportModel.fromJson(Map<String, dynamic> json) =>
-      ShipmentReportModel(
-          id: json['id'],
-          date: DateTime.parse(json['date']),
-          file: json['file'],
-          name: json['name'],
-          status: json['status']);
+  factory ShipmentReportModel.fromJson(JsonMap json) {
+    return ShipmentReportModel(
+        id: json['id'],
+        date: DateTime.parse(json['date']),
+        file: json['file'],
+        name: json['name'],
+        status: json['status']);
+  }
 
-  ShipmentReportEntity toEntity() => ShipmentReportEntity(
-      id: id, file: file, name: name, status: status, date: date);
+  ShipmentReportEntity toEntity() {
+    return ShipmentReportEntity(
+      id: id,
+      file: file,
+      name: name,
+      status: status,
+      date: date,
+    );
+  }
 }

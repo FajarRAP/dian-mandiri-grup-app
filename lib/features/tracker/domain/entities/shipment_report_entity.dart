@@ -1,4 +1,6 @@
-class ShipmentReportEntity {
+import 'package:equatable/equatable.dart';
+
+class ShipmentReportEntity extends Equatable {
   const ShipmentReportEntity({
     required this.id,
     required this.file,
@@ -12,4 +14,7 @@ class ShipmentReportEntity {
   final String name;
   final String status;
   final DateTime date;
+
+  @override
+  List<Object?> get props => [id, file, name, status, date];
 }

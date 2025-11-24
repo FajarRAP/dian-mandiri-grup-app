@@ -4,37 +4,36 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ship_tracker/features/tracker/data/models/shipment_report_model.dart';
 import 'package:ship_tracker/features/tracker/domain/entities/shipment_report_entity.dart';
 
-import '../../../../fixtures/fixture_reader.dart';
+import '../../../../core/utils/fixture_reader.dart';
+import '../../../../helpers/testdata/tracker_test_data.dart';
 
 void main() {
-  final tShipmentReportModel = ShipmentReportModel(
-      id: 'id',
-      file: 'file',
-      name: 'name',
-      status: 'status',
-      date: DateTime.now());
+  const fixtureReader = FixtureReader(domain: 'tracker');
+  final shipmentReportEntity = tShipmentReportEntity;
+  final shipmentReportModel = tShipmentReportModel;
 
   group('shipment report model test', () {
     test('should be a subclass of ShipmentReportEntity', () {
-      expect(tShipmentReportModel, isA<ShipmentReportEntity>());
-    });
-
-    test('should not bring implementation details', () {
-      expect(tShipmentReportModel.toEntity(), isA<ShipmentReportEntity>());
-      expect(
-          tShipmentReportModel.toEntity(), isNot(isA<ShipmentReportModel>()));
+      // assert
+      expect(shipmentReportModel, isA<ShipmentReportEntity>());
     });
 
     test('should return valid model from json', () {
       // arrange
-      final jsonString = fixtureReader('models/shipment_report.json');
+      final jsonString = fixtureReader.model('shipment_report.json');
       final json = jsonDecode(jsonString);
 
       // act
       final result = ShipmentReportModel.fromJson(json);
 
       // assert
-      expect(result.toEntity(), isA<ShipmentReportEntity>());
+      expect(result, shipmentReportModel);
+    });
+
+    test('should not bring implementation details', () {
+      // assert
+      expect(shipmentReportModel.toEntity(), isNot(isA<ShipmentReportModel>()));
+      expect(shipmentReportModel.toEntity(), shipmentReportEntity);
     });
   });
 }

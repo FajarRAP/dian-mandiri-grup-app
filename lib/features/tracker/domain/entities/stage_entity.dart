@@ -1,6 +1,8 @@
+import 'package:equatable/equatable.dart';
+
 import 'shipment_user_entity.dart';
 
-class StageEntity {
+class StageEntity extends Equatable {
   const StageEntity({
     required this.stage,
     required this.date,
@@ -12,4 +14,7 @@ class StageEntity {
   final String? document;
   final DateTime date;
   final ShipmentUserEntity user;
+
+  @override
+  List<Object?> get props => [stage, date, user, document];
 }
