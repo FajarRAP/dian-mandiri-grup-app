@@ -1,3 +1,4 @@
+import '../../../../core/utils/typedefs.dart';
 import '../../../supplier/data/models/supplier_model.dart';
 import '../../domain/entities/purchase_note_summary_entity.dart';
 
@@ -9,18 +10,21 @@ class PurchaseNoteSummaryModel extends PurchaseNoteSummaryEntity {
     required super.totalItems,
   });
 
-  factory PurchaseNoteSummaryModel.fromJson(Map<String, dynamic> json) =>
-      PurchaseNoteSummaryModel(
-        id: json['id'],
-        date: DateTime.parse(json['date']),
-        supplier: SupplierModel.fromJson(json['supplier']),
-        totalItems: json['total'],
-      );
+  factory PurchaseNoteSummaryModel.fromJson(JsonMap json) {
+    return PurchaseNoteSummaryModel(
+      id: json['id'],
+      date: DateTime.parse(json['date']),
+      supplier: SupplierModel.fromJson(json['supplier']),
+      totalItems: json['total'],
+    );
+  }
 
-  PurchaseNoteSummaryEntity toEntity() => PurchaseNoteSummaryEntity(
-        id: id,
-        date: date,
-        supplier: supplier,
-        totalItems: totalItems,
-      );
+  PurchaseNoteSummaryEntity toEntity() {
+    return PurchaseNoteSummaryEntity(
+      id: id,
+      date: date,
+      supplier: (supplier as SupplierModel).toEntity(),
+      totalItems: totalItems,
+    );
+  }
 }

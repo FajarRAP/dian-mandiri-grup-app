@@ -3,7 +3,7 @@ import 'purchase_note_entity.dart';
 import 'warehouse_item_entity.dart';
 
 class PurchaseNoteDetailEntity extends PurchaseNoteEntity {
-  PurchaseNoteDetailEntity({
+  const PurchaseNoteDetailEntity({
     required super.date,
     required super.receipt,
     required super.note,
@@ -45,4 +45,8 @@ class PurchaseNoteDetailEntity extends PurchaseNoteEntity {
   final SupplierEntity supplier;
   final int totalPrice;
   final List<WarehouseItemEntity> items;
+
+  @override
+  List<Object?> get props =>
+      [...super.props, id, isEditable, returnCost, supplier, totalPrice, items];
 }
