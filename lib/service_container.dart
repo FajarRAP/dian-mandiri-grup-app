@@ -18,9 +18,9 @@ import 'features/auth/domain/usecases/sign_in_use_case.dart';
 import 'features/auth/domain/usecases/sign_out_use_case.dart';
 import 'features/auth/domain/usecases/update_profile_use_case.dart';
 import 'features/auth/presentation/cubit/auth_cubit.dart';
-import 'features/supplier/data/datasources/supplier_remote_data_sources.dart';
-import 'features/supplier/data/repositories/supplier_repositories_impl.dart';
-import 'features/supplier/domain/repositories/supplier_repositories.dart';
+import 'features/supplier/data/datasources/supplier_remote_data_source.dart';
+import 'features/supplier/data/repositories/supplier_repository_impl.dart';
+import 'features/supplier/domain/repositories/supplier_repository.dart';
 import 'features/supplier/domain/usecases/fetch_supplier_use_case.dart';
 import 'features/supplier/domain/usecases/fetch_suppliers_dropdown_use_case.dart';
 import 'features/supplier/domain/usecases/fetch_suppliers_use_case.dart';
@@ -132,21 +132,21 @@ void setup() {
 
   // Supplier
   getIt
-    ..registerLazySingleton<SupplierRemoteDataSources>(
-        () => SupplierRemoteDataSourcesImpl(dio: getIt.get()))
-    ..registerLazySingleton<SupplierRepositories>(
-        () => SupplierRepositoriesImpl(supplierRemoteDataSources: getIt.get()))
+    ..registerLazySingleton<SupplierRemoteDataSource>(
+        () => SupplierRemoteDataSourceImpl(dio: getIt.get()))
+    ..registerLazySingleton<SupplierRepository>(
+        () => SupplierRepositoryImpl(supplierRemoteDataSource: getIt.get()))
     ..registerLazySingleton<SupplierCubit>(() => SupplierCubit(
         fetchSupplierUseCase:
-            FetchSupplierUseCase(supplierRepositories: getIt.get()),
+            FetchSupplierUseCase(supplierRepository: getIt.get()),
         fetchSuppliersUseCase:
-            FetchSuppliersUseCase(supplierRepositories: getIt.get()),
+            FetchSuppliersUseCase(supplierRepository: getIt.get()),
         fetchSuppliersDropdownUseCase:
-            FetchSuppliersDropdownUseCase(supplierRepositories: getIt.get()),
+            FetchSuppliersDropdownUseCase(supplierRepository: getIt.get()),
         insertSupplierUseCase:
-            InsertSupplierUseCase(supplierRepositories: getIt.get()),
+            InsertSupplierUseCase(supplierRepository: getIt.get()),
         updateSupplierUseCase:
-            UpdateSupplierUseCase(supplierRepositories: getIt.get())));
+            UpdateSupplierUseCase(supplierRepository: getIt.get())));
 
   // Warehouse
   getIt

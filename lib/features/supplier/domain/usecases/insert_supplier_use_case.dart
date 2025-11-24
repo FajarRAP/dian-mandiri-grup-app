@@ -3,18 +3,18 @@ import 'package:equatable/equatable.dart';
 
 import '../../../../core/failure/failure.dart';
 import '../../../../core/usecase/use_case.dart';
-import '../repositories/supplier_repositories.dart';
+import '../repositories/supplier_repository.dart';
 
 class InsertSupplierUseCase
     implements UseCase<String, InsertSupplierUseCaseParams> {
-  const InsertSupplierUseCase({required this.supplierRepositories});
+  const InsertSupplierUseCase({required this.supplierRepository});
 
-  final SupplierRepositories supplierRepositories;
+  final SupplierRepository supplierRepository;
 
   @override
   Future<Either<Failure, String>> execute(
       InsertSupplierUseCaseParams params) async {
-    return await supplierRepositories.insertSupplier(params);
+    return await supplierRepository.insertSupplier(params);
   }
 }
 

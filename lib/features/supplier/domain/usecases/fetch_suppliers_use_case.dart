@@ -4,18 +4,18 @@ import 'package:equatable/equatable.dart';
 import '../../../../core/failure/failure.dart';
 import '../../../../core/usecase/use_case.dart';
 import '../entities/supplier_entity.dart';
-import '../repositories/supplier_repositories.dart';
+import '../repositories/supplier_repository.dart';
 
 class FetchSuppliersUseCase
     implements UseCase<List<SupplierEntity>, FetchSuppliersUseCaseParams> {
-  const FetchSuppliersUseCase({required this.supplierRepositories});
+  const FetchSuppliersUseCase({required this.supplierRepository});
 
-  final SupplierRepositories supplierRepositories;
+  final SupplierRepository supplierRepository;
 
   @override
   Future<Either<Failure, List<SupplierEntity>>> execute(
       FetchSuppliersUseCaseParams params) async {
-    return await supplierRepositories.fetchSuppliers(params);
+    return await supplierRepository.fetchSuppliers(params);
   }
 }
 

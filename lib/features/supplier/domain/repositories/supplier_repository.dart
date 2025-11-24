@@ -10,7 +10,7 @@ import '../usecases/fetch_suppliers_use_case.dart';
 import '../usecases/insert_supplier_use_case.dart';
 import '../usecases/update_supplier_use_case.dart';
 
-abstract interface class SupplierRepositories {
+abstract interface class SupplierRepository {
   Future<Either<Failure, SupplierDetailEntity>> fetchSupplier(
       FetchSupplierUseCaseParams params);
   Future<Either<Failure, List<SupplierEntity>>> fetchSuppliers(

@@ -4,19 +4,19 @@ import 'package:equatable/equatable.dart';
 import '../../../../core/common/dropdown_entity.dart';
 import '../../../../core/failure/failure.dart';
 import '../../../../core/usecase/use_case.dart';
-import '../repositories/supplier_repositories.dart';
+import '../repositories/supplier_repository.dart';
 
 class FetchSuppliersDropdownUseCase
     implements
         UseCase<List<DropdownEntity>, FetchSuppliersDropdownUseCaseParams> {
-  const FetchSuppliersDropdownUseCase({required this.supplierRepositories});
+  const FetchSuppliersDropdownUseCase({required this.supplierRepository});
 
-  final SupplierRepositories supplierRepositories;
+  final SupplierRepository supplierRepository;
 
   @override
   Future<Either<Failure, List<DropdownEntity>>> execute(
       FetchSuppliersDropdownUseCaseParams params) async {
-    return await supplierRepositories.fetchSuppliersDropdown(params);
+    return await supplierRepository.fetchSuppliersDropdown(params);
   }
 }
 

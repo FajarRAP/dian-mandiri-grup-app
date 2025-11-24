@@ -6,24 +6,24 @@ import '../../../../core/exceptions/server_exception.dart';
 import '../../../../core/failure/failure.dart';
 import '../../domain/entities/supplier_detail_entity.dart';
 import '../../domain/entities/supplier_entity.dart';
-import '../../domain/repositories/supplier_repositories.dart';
+import '../../domain/repositories/supplier_repository.dart';
 import '../../domain/usecases/fetch_supplier_use_case.dart';
 import '../../domain/usecases/fetch_suppliers_dropdown_use_case.dart';
 import '../../domain/usecases/fetch_suppliers_use_case.dart';
 import '../../domain/usecases/insert_supplier_use_case.dart';
 import '../../domain/usecases/update_supplier_use_case.dart';
-import '../datasources/supplier_remote_data_sources.dart';
+import '../datasources/supplier_remote_data_source.dart';
 
-class SupplierRepositoriesImpl implements SupplierRepositories {
-  const SupplierRepositoriesImpl({required this.supplierRemoteDataSources});
+class SupplierRepositoryImpl implements SupplierRepository {
+  const SupplierRepositoryImpl({required this.supplierRemoteDataSource});
 
-  final SupplierRemoteDataSources supplierRemoteDataSources;
+  final SupplierRemoteDataSource supplierRemoteDataSource;
 
   @override
   Future<Either<Failure, SupplierDetailEntity>> fetchSupplier(
       FetchSupplierUseCaseParams params) async {
     try {
-      final result = await supplierRemoteDataSources.fetchSupplier(
+      final result = await supplierRemoteDataSource.fetchSupplier(
           supplierId: params.supplierId);
 
       return Right(result);
@@ -45,7 +45,7 @@ class SupplierRepositoriesImpl implements SupplierRepositories {
       FetchSuppliersUseCaseParams params) async {
     try {
       final result =
-          await supplierRemoteDataSources.fetchSuppliers(params: params);
+          await supplierRemoteDataSource.fetchSuppliers(params: params);
 
       return Right(result);
     } on ServerException catch (se) {
@@ -65,8 +65,8 @@ class SupplierRepositoriesImpl implements SupplierRepositories {
   Future<Either<Failure, List<DropdownEntity>>> fetchSuppliersDropdown(
       FetchSuppliersDropdownUseCaseParams params) async {
     try {
-      final result = await supplierRemoteDataSources.fetchSuppliersDropdown(
-          params: params);
+      final result =
+          await supplierRemoteDataSource.fetchSuppliersDropdown(params: params);
 
       return Right(result);
     } on ServerException catch (se) {
@@ -87,7 +87,7 @@ class SupplierRepositoriesImpl implements SupplierRepositories {
       InsertSupplierUseCaseParams params) async {
     try {
       final result =
-          await supplierRemoteDataSources.insertSupplier(params: params);
+          await supplierRemoteDataSource.insertSupplier(params: params);
 
       return Right(result);
     } on ServerException catch (se) {
@@ -107,7 +107,7 @@ class SupplierRepositoriesImpl implements SupplierRepositories {
   Future<Either<Failure, String>> updateSupplier(
       UpdateSupplierUseCaseParams params) async {
     try {
-      final result = await supplierRemoteDataSources.updateSupplier(
+      final result = await supplierRemoteDataSource.updateSupplier(
           params: params.supplierDetailEntity);
 
       return Right(result);

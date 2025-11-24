@@ -10,7 +10,7 @@ import '../../domain/usecases/insert_supplier_use_case.dart';
 import '../models/supplier_detail_model.dart';
 import '../models/supplier_model.dart';
 
-abstract class SupplierRemoteDataSources {
+abstract class SupplierRemoteDataSource {
   Future<SupplierDetailModel> fetchSupplier({required String supplierId});
   Future<List<SupplierModel>> fetchSuppliers(
       {required FetchSuppliersUseCaseParams params});
@@ -20,8 +20,8 @@ abstract class SupplierRemoteDataSources {
   Future<String> updateSupplier({required SupplierDetailEntity params});
 }
 
-class SupplierRemoteDataSourcesImpl implements SupplierRemoteDataSources {
-  SupplierRemoteDataSourcesImpl({required this.dio});
+class SupplierRemoteDataSourceImpl implements SupplierRemoteDataSource {
+  SupplierRemoteDataSourceImpl({required this.dio});
 
   final Dio dio;
 
@@ -117,7 +117,8 @@ class SupplierRemoteDataSourcesImpl implements SupplierRemoteDataSources {
     final supplierDetail = SupplierDetailModel.fromEntity(params);
     final payload = supplierDetail.toJson();
     final isAvatarNull = supplierDetail.avatarUrl != null;
-    if (isAvatarNull && !(supplierDetail.avatarUrl?.startsWith('https://') ?? false)) {
+    if (isAvatarNull &&
+        !(supplierDetail.avatarUrl?.startsWith('https://') ?? false)) {
       payload['avatar'] =
           await MultipartFile.fromFile(supplierDetail.avatarUrl!);
     }
