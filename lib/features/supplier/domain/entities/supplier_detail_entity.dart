@@ -12,4 +12,7 @@ class SupplierDetailEntity extends SupplierEntity {
 
   final String? address;
   final String? email;
+
+  @override
+  List<Object?> get props => [...super.props, address, email];
 }
