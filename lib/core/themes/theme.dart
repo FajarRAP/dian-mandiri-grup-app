@@ -7,15 +7,12 @@ import 'app_text_theme.dart';
 const fontFamily = 'Inter18pt';
 
 final theme = ThemeData(
-  appBarTheme: const AppBarTheme(
+  appBarTheme: AppBarTheme(
     centerTitle: true,
-    iconTheme: IconThemeData(color: CustomColors.primaryNormal),
-    scrolledUnderElevation: 0,
-    titleTextStyle: TextStyle(
-      color: CustomColors.primaryNormal,
-      fontFamily: fontFamily,
-      fontSize: 16,
-      fontWeight: FontWeight.w400,
+    iconTheme: IconThemeData(color: AppColorScheme.light.primary),
+    titleTextStyle: AppTextTheme.light.titleLarge?.copyWith(
+      color: AppColorScheme.light.primary,
+      fontWeight: FontWeight.w500,
     ),
   ),
   bottomSheetTheme: const BottomSheetThemeData(
