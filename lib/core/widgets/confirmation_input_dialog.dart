@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 
 import '../helpers/helpers.dart';
 import '../helpers/validators.dart';
+import '../utils/extensions.dart';
 import 'buttons/primary_button.dart';
 
 class ConfirmationInputDialog extends StatefulWidget {
@@ -47,33 +49,30 @@ class _ConfirmationInputDialogState extends State<ConfirmationInputDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final textTheme = theme.textTheme;
+    final textTheme = context.textTheme;
 
     return AlertDialog(
-      contentPadding: const EdgeInsets.all(24),
+      contentPadding: const .all(24),
       content: Form(
         key: _formKey,
         child: Column(
-          mainAxisSize: MainAxisSize.min,
+          mainAxisSize: .min,
           children: <Widget>[
             Text(
               widget.title,
-              style: textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w700,
-              ),
+              style: textTheme.titleLarge?.copyWith(fontWeight: .w700),
             ),
-            const SizedBox(height: 8),
+            const Gap(8),
             Text(
               widget.body,
               style: textTheme.bodyMedium?.copyWith(
-                color: Colors.grey.shade600,
+                color: context.colorScheme.onSurfaceVariant,
               ),
-              textAlign: TextAlign.center,
+              textAlign: .center,
             ),
-            const SizedBox(height: 24),
+            const Gap(24),
             TextFormField(
-              onFieldSubmitted: widget.textFormFieldConfig?.onFieldSubmitted,
+              onFieldSubmitted: (_) => _onSubmit(),
               onTapOutside: (_) => _focusNode.unfocus(),
               autofocus: widget.textFormFieldConfig?.autoFocus ?? false,
               controller: _controller,
@@ -82,22 +81,16 @@ class _ConfirmationInputDialogState extends State<ConfirmationInputDialog> {
               textInputAction: widget.textFormFieldConfig?.textInputAction,
               validator: inputValidator,
             ),
-            const SizedBox(height: 24),
+            const Gap(24),
             SizedBox(
-              width: double.infinity,
+              width: .infinity,
               child: PrimaryButton(
-                onPressed: widget.onAction == null
-                    ? null
-                    : () {
-                        if (!_formKey.currentState!.validate()) return;
-
-                        widget.onAction!(_controller.text);
-                      },
+                onPressed: widget.onAction == null ? null : _onSubmit,
                 child: Text(widget.actionText),
               ),
             ),
             SizedBox(
-              width: double.infinity,
+              width: .infinity,
               child: TextButton(
                 onPressed: context.pop,
                 child: const Text('Batal'),
@@ -107,5 +100,11 @@ class _ConfirmationInputDialogState extends State<ConfirmationInputDialog> {
         ),
       ),
     );
+  }
+
+  void _onSubmit() {
+    if (!_formKey.currentState!.validate()) return;
+
+    widget.onAction?.call(_controller.text);
   }
 }
