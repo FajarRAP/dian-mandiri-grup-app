@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 
 extension StringNullableExtension on String? {
   Future<MultipartFile?> toMultipartFile() async {
@@ -10,4 +11,9 @@ extension StringNullableExtension on String? {
 
     return await MultipartFile.fromFile(this!);
   }
+}
+
+extension BuildContextExtension on BuildContext {
+  ColorScheme get colorScheme => Theme.of(this).colorScheme;
+  bool get isDarkMode => Theme.of(this).brightness == Brightness.dark;
 }
