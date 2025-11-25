@@ -24,7 +24,7 @@ class UpdatePurchaseNoteUseCaseParams extends Equatable {
     required this.purchaseNoteId,
     required this.date,
     required this.receipt,
-    required this.note,
+    this.note,
     required this.supplierId,
     required this.items,
   });

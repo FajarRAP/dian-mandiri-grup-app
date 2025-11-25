@@ -23,7 +23,7 @@ class InsertPurchaseNoteManualUseCaseParams extends Equatable {
   const InsertPurchaseNoteManualUseCaseParams({
     required this.date,
     required this.receipt,
-    required this.note,
+    this.note,
     required this.supplierId,
     required this.items,
   });
