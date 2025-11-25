@@ -1,20 +1,31 @@
-import 'token_model.dart';
+import 'package:equatable/equatable.dart';
+
+import '../../../../core/utils/typedefs.dart';
 import 'user_model.dart';
 
-class SignInResponseModel {
+class SignInResponseModel extends Equatable {
   const SignInResponseModel({
-    required this.token,
+    required this.accessToken,
+    required this.refreshToken,
+    required this.message,
     required this.user,
   });
 
-  final TokenModel token;
+  factory SignInResponseModel.fromJson(JsonMap json) {
+    final data = JsonMap.from(json['data']);
+
+    return SignInResponseModel(
+        accessToken: data['access_token'],
+        refreshToken: data['refresh_token'],
+        message: json['message'],
+        user: UserModel.fromJson(data['user']));
+  }
+
+  final String accessToken;
+  final String refreshToken;
+  final String message;
   final UserModel user;
 
-  factory SignInResponseModel.fromJson(Map<String, dynamic> json) =>
-      SignInResponseModel(
-          token: TokenModel(
-              accessToken: json['data']['access_token'],
-              refreshToken: json['data']['refresh_token'],
-              message: json['message']),
-          user: UserModel.fromJson(json['data']['user']));
+  @override
+  List<Object?> get props => [accessToken, refreshToken, message, user];
 }

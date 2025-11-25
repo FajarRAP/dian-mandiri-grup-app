@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../helpers/debouncer.dart';
+import '../utils/debouncer.dart';
 
 class DropdownSearchModal extends StatefulWidget {
   const DropdownSearchModal({

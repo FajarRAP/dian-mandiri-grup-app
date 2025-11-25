@@ -1,16 +1,28 @@
 import 'package:dartz/dartz.dart';
+import 'package:equatable/equatable.dart';
 
-import '../../../../core/common/use_cases.dart';
-import '../../../../core/failure/failure.dart';
-import '../repositories/auth_repositories.dart';
+import '../../../../core/errors/failure.dart';
+import '../../../../core/usecase/use_case.dart';
+import '../repositories/auth_repository.dart';
 
-class UpdateProfileUseCase implements UseCase<String, String> {
-  const UpdateProfileUseCase({required this.authRepositories});
+class UpdateProfileUseCase
+    implements UseCase<String, UpdateProfileUseCaseParams> {
+  const UpdateProfileUseCase({required this.authRepository});
 
-  final AuthRepositories authRepositories;
+  final AuthRepository authRepository;
 
   @override
-  Future<Either<Failure, String>> call(String params) async {
-    return await authRepositories.updateProfile(name: params);
+  Future<Either<Failure, String>> execute(
+      UpdateProfileUseCaseParams params) async {
+    return await authRepository.updateProfile(params);
   }
+}
+
+class UpdateProfileUseCaseParams extends Equatable {
+  const UpdateProfileUseCaseParams({required this.name});
+
+  final String name;
+
+  @override
+  List<Object?> get props => [name];
 }

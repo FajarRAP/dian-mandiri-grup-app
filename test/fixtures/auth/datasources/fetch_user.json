@@ -1,0 +1,11 @@
+{
+    "message": "Get auth me successfully",
+    "data": {
+        "id": "db7d1edf-089d-4544-9ea3-ae15c44db7b5",
+        "name": "Fajar",
+        "email": "fajary363@gmail.com",
+        "permissions": [
+            "super_admin"
+        ]
+    }
+}

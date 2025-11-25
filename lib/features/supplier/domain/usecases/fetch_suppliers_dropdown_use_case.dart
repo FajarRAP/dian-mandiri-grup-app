@@ -1,25 +1,26 @@
 import 'package:dartz/dartz.dart';
+import 'package:equatable/equatable.dart';
 
 import '../../../../core/common/dropdown_entity.dart';
-import '../../../../core/common/use_cases.dart';
-import '../../../../core/failure/failure.dart';
-import '../repositories/supplier_repositories.dart';
+import '../../../../core/errors/failure.dart';
+import '../../../../core/usecase/use_case.dart';
+import '../repositories/supplier_repository.dart';
 
 class FetchSuppliersDropdownUseCase
     implements
         UseCase<List<DropdownEntity>, FetchSuppliersDropdownUseCaseParams> {
-  const FetchSuppliersDropdownUseCase({required this.supplierRepositories});
+  const FetchSuppliersDropdownUseCase({required this.supplierRepository});
 
-  final SupplierRepositories supplierRepositories;
+  final SupplierRepository supplierRepository;
 
   @override
-  Future<Either<Failure, List<DropdownEntity>>> call(
+  Future<Either<Failure, List<DropdownEntity>>> execute(
       FetchSuppliersDropdownUseCaseParams params) async {
-    return supplierRepositories.fetchSuppliersDropdown(params: params);
+    return await supplierRepository.fetchSuppliersDropdown(params);
   }
 }
 
-final class FetchSuppliersDropdownUseCaseParams {
+class FetchSuppliersDropdownUseCaseParams extends Equatable {
   const FetchSuppliersDropdownUseCaseParams({
     this.search,
     this.limit = 10,
@@ -29,4 +30,7 @@ final class FetchSuppliersDropdownUseCaseParams {
   final String? search;
   final int limit;
   final int page;
+
+  @override
+  List<Object?> get props => [search, limit, page];
 }

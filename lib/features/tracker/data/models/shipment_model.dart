@@ -1,3 +1,4 @@
+import '../../../../core/utils/typedefs.dart';
 import '../../domain/entities/shipment_entity.dart';
 
 class ShipmentModel extends ShipmentEntity {
@@ -8,9 +9,20 @@ class ShipmentModel extends ShipmentEntity {
     required super.receiptNumber,
   });
 
-  factory ShipmentModel.fromJson(Map<String, dynamic> json) => ShipmentModel(
-      id: json['id'],
-      courier: json['courier'],
-      date: DateTime.parse(json['date']),
-      receiptNumber: json['receipt_number']);
+  factory ShipmentModel.fromJson(JsonMap json) {
+    return ShipmentModel(
+        id: json['id'],
+        courier: json['courier'],
+        date: DateTime.parse(json['date']),
+        receiptNumber: json['receipt_number']);
+  }
+
+  ShipmentEntity toEntity() {
+    return ShipmentEntity(
+      id: id,
+      courier: courier,
+      date: date,
+      receiptNumber: receiptNumber,
+    );
+  }
 }

@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
 class ShipmentDetailInfoRow extends StatelessWidget {
-  final String label;
-  final String value;
-
   const ShipmentDetailInfoRow({
     super.key,
     required this.label,
     required this.value,
   });
+
+  final String label;
+  final String value;
 
   @override
   Widget build(BuildContext context) {

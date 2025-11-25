@@ -1,19 +1,30 @@
 import 'package:dartz/dartz.dart';
+import 'package:equatable/equatable.dart';
 
-import '../../../../core/common/use_cases.dart';
-import '../../../../core/failure/failure.dart';
+import '../../../../core/errors/failure.dart';
+import '../../../../core/usecase/use_case.dart';
 import '../entities/purchase_note_detail_entity.dart';
-import '../repositories/warehouse_repositories.dart';
+import '../repositories/warehouse_repository.dart';
 
 class FetchPurchaseNoteUseCase
-    implements AsyncUseCaseParams<PurchaseNoteDetailEntity, String> {
-  const FetchPurchaseNoteUseCase({required this.warehouseRepositories});
+    implements
+        UseCase<PurchaseNoteDetailEntity, FetchPurchaseNoteUseCaseParams> {
+  const FetchPurchaseNoteUseCase({required this.warehouseRepository});
 
-  final WarehouseRepositories warehouseRepositories;
+  final WarehouseRepository warehouseRepository;
 
   @override
-  Future<Either<Failure, PurchaseNoteDetailEntity>> call(String params) async {
-    return await warehouseRepositories.fetchPurchaseNote(
-        purchaseNoteId: params);
+  Future<Either<Failure, PurchaseNoteDetailEntity>> execute(
+      FetchPurchaseNoteUseCaseParams params) async {
+    return await warehouseRepository.fetchPurchaseNote(params);
   }
+}
+
+class FetchPurchaseNoteUseCaseParams extends Equatable {
+  const FetchPurchaseNoteUseCaseParams({required this.purchaseNoteId});
+
+  final String purchaseNoteId;
+
+  @override
+  List<Object?> get props => [purchaseNoteId];
 }

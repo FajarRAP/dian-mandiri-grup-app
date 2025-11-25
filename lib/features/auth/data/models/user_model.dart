@@ -1,3 +1,4 @@
+import '../../../../core/utils/typedefs.dart';
 import '../../domain/entities/user_entity.dart';
 
 class UserModel extends UserEntity {
@@ -8,16 +9,28 @@ class UserModel extends UserEntity {
     required super.permissions,
   });
 
-  factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
+  factory UserModel.fromJson(JsonMap json) {
+    return UserModel(
       id: json['id'],
       name: json['name'],
       email: json['email'],
-      permissions: (json['permissions'] as List).map((e) => '$e').toList());
+      permissions: List<String>.from(json['permissions']),
+    );
+  }
 
-  Map<String, dynamic> toJson() => {
+  JsonMap toJson() => {
         'id': id,
         'name': name,
         'email': email,
         'permissions': permissions,
       };
+
+  UserEntity toEntity() {
+    return UserEntity(
+      id: id,
+      name: name,
+      email: email,
+      permissions: permissions,
+    );
+  }
 }

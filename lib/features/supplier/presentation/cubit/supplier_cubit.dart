@@ -2,6 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
 
 import '../../../../core/common/dropdown_entity.dart';
+import '../../../../core/usecase/use_case.dart';
 import '../../domain/entities/supplier_detail_entity.dart';
 import '../../domain/entities/supplier_entity.dart';
 import '../../domain/usecases/fetch_supplier_use_case.dart';
@@ -39,7 +40,8 @@ class SupplierCubit extends Cubit<SupplierState> {
   Future<void> fetchSupplier({required String supplierId}) async {
     emit(FetchSupplierLoading());
 
-    final result = await _fetchSupplierUseCase(supplierId);
+    final params = FetchSupplierUseCaseParams(supplierId: supplierId);
+    final result = await _fetchSupplierUseCase(params);
 
     result.fold(
       (failure) => emit(FetchSupplierError(message: failure.message)),
@@ -162,7 +164,9 @@ class SupplierCubit extends Cubit<SupplierState> {
       {required SupplierDetailEntity supplierDetailEntity}) async {
     emit(UpdateSupplierLoading());
 
-    final result = await _updateSupplierUseCase(supplierDetailEntity);
+    final params =
+        UpdateSupplierUseCaseParams(supplierDetailEntity: supplierDetailEntity);
+    final result = await _updateSupplierUseCase(params);
 
     result.fold(
       (failure) => emit(UpdateSupplierError(message: failure.message)),

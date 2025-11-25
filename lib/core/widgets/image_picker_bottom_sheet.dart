@@ -7,34 +7,29 @@ import '../themes/colors.dart';
 class ImagePickerBottomSheet extends StatelessWidget {
   const ImagePickerBottomSheet({
     super.key,
-    required this.onPicked,
+    this.onCameraPick,
+    this.onGalleryPick,
+    this.onPicked,
   });
 
-  final void Function(XFile image) onPicked;
+  final void Function()? onCameraPick;
+  final void Function()? onGalleryPick;
+  final void Function(XFile image)? onPicked;
 
   @override
   Widget build(BuildContext context) {
-    final imagePicker = ImagePicker();
-
     return Wrap(
       children: <Widget>[
         ListTile(
-          onTap: () async {
-            final pickedImage = await imagePicker.pickImage(
-              imageQuality: 60,
-              source: ImageSource.camera,
-            );
-
-            if (pickedImage == null) return;
-            if (!context.mounted) return;
+          onTap: () {
             context.pop();
-            onPicked(pickedImage);
+            onCameraPick?.call();
           },
           leading: const Icon(
             Icons.camera_alt,
             color: CustomColors.primaryNormal,
           ),
-          shape: RoundedRectangleBorder(
+          shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.vertical(
               top: Radius.circular(16),
             ),
@@ -42,16 +37,9 @@ class ImagePickerBottomSheet extends StatelessWidget {
           title: const Text('Ambil dari Kamera'),
         ),
         ListTile(
-          onTap: () async {
-            final pickedImage = await imagePicker.pickImage(
-              imageQuality: 60,
-              source: ImageSource.gallery,
-            );
-
-            if (pickedImage == null) return;
-            if (!context.mounted) return;
+          onTap: () {
             context.pop();
-            onPicked(pickedImage);
+            onGalleryPick?.call();
           },
           leading: const Icon(
             Icons.photo_library,

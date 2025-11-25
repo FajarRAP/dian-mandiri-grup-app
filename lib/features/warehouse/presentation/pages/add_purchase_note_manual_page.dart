@@ -10,14 +10,14 @@ import '../../../../core/helpers/helpers.dart';
 import '../../../../core/helpers/top_snackbar.dart';
 import '../../../../core/helpers/validators.dart';
 import '../../../../core/themes/colors.dart';
+import '../../../../core/widgets/buttons/primary_button.dart';
+import '../../../../core/widgets/buttons/primary_outline_button.dart';
 import '../../../../core/widgets/dropdowns/supplier_dropdown.dart';
 import '../../../../core/widgets/fab_container.dart';
 import '../../../../core/widgets/image_picker_bottom_sheet.dart';
 import '../../../../core/widgets/preview_picked_image_dialog.dart';
-import '../../../../core/widgets/buttons/primary_button.dart';
-import '../../../../core/widgets/buttons/primary_outline_button.dart';
-import '../../domain/entities/insert_purchase_note_manual_entity.dart';
 import '../../domain/entities/warehouse_item_entity.dart';
+import '../../domain/usecases/insert_purchase_note_manual_use_case.dart';
 import '../cubit/warehouse_cubit.dart';
 import '../widgets/add_purchase_note_item_dialog.dart';
 import '../widgets/edit_purchase_note_item_dialog.dart';
@@ -127,9 +127,9 @@ class _AddPurchaseNoteManualPageState extends State<AddPurchaseNoteManualPage> {
               onTapOutside: (event) => _focusNode.unfocus(),
               autovalidateMode: AutovalidateMode.onUserInteraction,
               controller: _dateController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: 'Tanggal',
-                suffixIcon: const Icon(Icons.date_range),
+                suffixIcon: Icon(Icons.date_range),
               ),
               readOnly: true,
               validator: nullValidator,
@@ -302,7 +302,7 @@ class _AddPurchaseNoteManualPageState extends State<AddPurchaseNoteManualPage> {
                       }
 
                       _warehouseCubit.insertPurchaseNoteManual(
-                        purchaseNote: InsertPurchaseNoteManualEntity(
+                        purchaseNote: InsertPurchaseNoteManualUseCaseParams(
                           date: _pickedDate!,
                           receipt: _pickedImage!.path,
                           note: _noteController.text,

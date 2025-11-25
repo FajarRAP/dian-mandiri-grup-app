@@ -1,20 +1,32 @@
 import 'package:dartz/dartz.dart';
+import 'package:equatable/equatable.dart';
 
-import '../../../../core/common/use_cases.dart';
-import '../../../../core/failure/failure.dart';
-import '../entities/shipment_detail_entity.dart';
-import '../repositories/shipment_repositories.dart';
+import '../../../../core/errors/failure.dart';
+import '../../../../core/usecase/use_case.dart';
+import '../entities/shipment_history_entity.dart';
+import '../repositories/shipment_repository.dart';
 
 class FetchShipmentByReceiptNumberUseCase
-    implements AsyncUseCaseParams<ShipmentDetailEntity, String> {
-  const FetchShipmentByReceiptNumberUseCase(
-      {required this.shipmentRepositories});
+    implements
+        UseCase<ShipmentHistoryEntity,
+            FetchShipmentByReceiptNumberUseCaseParams> {
+  const FetchShipmentByReceiptNumberUseCase({required this.shipmentRepository});
 
-  final ShipmentRepositories shipmentRepositories;
+  final ShipmentRepository shipmentRepository;
 
   @override
-  Future<Either<Failure, ShipmentDetailEntity>> call(String params) async {
-    return await shipmentRepositories.fetchShipmentByReceiptNumber(
-        receiptNumber: params);
+  Future<Either<Failure, ShipmentHistoryEntity>> execute(
+      FetchShipmentByReceiptNumberUseCaseParams params) async {
+    return await shipmentRepository.fetchShipmentByReceiptNumber(params);
   }
+}
+
+class FetchShipmentByReceiptNumberUseCaseParams extends Equatable {
+  const FetchShipmentByReceiptNumberUseCaseParams(
+      {required this.receiptNumber});
+
+  final String receiptNumber;
+
+  @override
+  List<Object?> get props => [receiptNumber];
 }

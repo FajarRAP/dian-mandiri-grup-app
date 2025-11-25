@@ -22,12 +22,12 @@ class ShipmentListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final uriPath = GoRouterState.of(context).uri.path;
     final theme = Theme.of(context);
-    final textTheme = theme.textTheme;
     final authCubit = context.read<AuthCubit>();
+    final textTheme = theme.textTheme;
     final permissions = authCubit.user.permissions;
     final isSuperAdmin = permissions.contains(superAdminPermission);
-    final uriPath = GoRouterState.of(context).uri.path;
 
     return Card(
       color: MaterialColors.surfaceContainerLowest,
@@ -47,23 +47,32 @@ class ShipmentListItem extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 8),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  shipment.receiptNumber,
-                  style: textTheme.titleMedium,
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  timeFormat.format(shipment.date.toLocal()),
-                  style: textTheme.bodySmall?.copyWith(
-                    color: Colors.grey.shade600,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    shipment.receiptNumber,
+                    style: textTheme.titleMedium,
                   ),
-                ),
-              ],
+                  const SizedBox(height: 4),
+                  Text(
+                    shipment.date.toLocal().toHMS,
+                    style: textTheme.bodySmall?.copyWith(
+                      color: Colors.grey.shade600,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Kurir: ${shipment.courier}',
+                    style: textTheme.bodySmall?.copyWith(
+                      color: Colors.grey.shade700,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
             ),
-            const Spacer(),
             if (isSuperAdmin)
               PopupMenuButton(
                 padding: EdgeInsets.zero,

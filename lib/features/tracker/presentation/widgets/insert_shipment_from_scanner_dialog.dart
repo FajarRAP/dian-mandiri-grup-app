@@ -48,10 +48,11 @@ class _InsertDataFromScannerAlertDialogState
     final textTheme = theme.textTheme;
 
     return AlertDialog(
-      contentPadding: EdgeInsets.all(24),
+      contentPadding: const EdgeInsets.all(24),
       content: Form(
         key: _formKey,
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             Text(
@@ -59,10 +60,12 @@ class _InsertDataFromScannerAlertDialogState
               style: textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w700,
               ),
+              textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
-            Text.rich(
-              TextSpan(
+            RichText(
+              textAlign: TextAlign.center,
+              text: TextSpan(
                 text: 'Nama Pemindai: ',
                 style: textTheme.bodyMedium,
                 children: <InlineSpan>[
@@ -93,42 +96,35 @@ class _InsertDataFromScannerAlertDialogState
               textInputAction: TextInputAction.send,
             ),
             const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              child: BlocConsumer<ShipmentCubit, ShipmentState>(
-                bloc: _shipmentCubit,
-                buildWhen: (previous, current) => current is InsertShipment,
-                listener: (context, state) {
-                  if (state is InsertShipmentLoaded) {
-                    context.pop();
-                  }
-                },
-                builder: (context, state) {
-                  if (state is InsertShipmentLoading) {
-                    return const PrimaryButton(
-                      child: Text('Simpan'),
-                    );
-                  }
-
-                  return PrimaryButton(
-                    onPressed: () {
+            BlocConsumer<ShipmentCubit, ShipmentState>(
+              bloc: _shipmentCubit,
+              buildWhen: (previous, current) => current is InsertShipment,
+              listener: (context, state) {
+                if (state is InsertShipmentLoaded) {
+                  context.pop();
+                }
+              },
+              builder: (context, state) {
+                final onPressed = switch (state) {
+                  InsertShipmentLoading() => null,
+                  _ => () {
                       if (!_formKey.currentState!.validate()) return;
 
                       _shipmentCubit.insertShipment(
                           receiptNumber: _receiptController.text.trim(),
                           stage: widget.stage);
                     },
-                    child: Text('Simpan'),
-                  );
-                },
-              ),
+                };
+
+                return PrimaryButton(
+                  onPressed: onPressed,
+                  child: const Text('Simpan'),
+                );
+              },
             ),
-            SizedBox(
-              width: double.infinity,
-              child: TextButton(
-                onPressed: context.pop,
-                child: const Text('Batal'),
-              ),
+            TextButton(
+              onPressed: context.pop,
+              child: const Text('Batal'),
             ),
           ],
         ),

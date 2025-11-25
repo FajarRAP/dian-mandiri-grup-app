@@ -1,7 +1,89 @@
 part of 'warehouse_cubit.dart';
 
 @immutable
-sealed class WarehouseState {}
+sealed class WarehouseState extends Equatable {
+  const WarehouseState();
+
+  @override
+  List<Object?> get props => [];
+}
+// class WarehouseState extends Equatable {
+//   const WarehouseState({
+//     required this.deletePurchaseNote,
+//     required this.fetchPurchaseNote,
+//     required this.fetchPurchaseNotesDropdown,
+//     required this.fetchPurchaseNotes,
+//     required this.insertPurchaseNoteFile,
+//     required this.insertPurchaseNoteManual,
+//     required this.insertReturnCost,
+//     required this.insertShippingFee,
+//     required this.updatePurchaseNote,
+//   });
+
+//   factory WarehouseState.initial() {
+//     return WarehouseState(
+//       deletePurchaseNote: ActionInitial<String>(),
+//       fetchPurchaseNote: ActionInitial<PurchaseNoteDetailEntity>(),
+//       fetchPurchaseNotesDropdown: PaginateInitial<DropdownEntity>(),
+//       fetchPurchaseNotes: PaginateInitial<PurchaseNoteSummaryEntity>(),
+//       insertPurchaseNoteFile: ActionInitial<String>(),
+//       insertPurchaseNoteManual: ActionInitial<String>(),
+//       insertReturnCost: ActionInitial<String>(),
+//       insertShippingFee: ActionInitial<String>(),
+//       updatePurchaseNote: ActionInitial<String>(),
+//     );
+//   }
+
+//   WarehouseState copyWith({
+//     ActionState<String>? deletePurchaseNote,
+//     ActionState<PurchaseNoteDetailEntity>? fetchPurchaseNote,
+//     PaginateState<DropdownEntity>? fetchPurchaseNotesDropdown,
+//     PaginateState<PurchaseNoteSummaryEntity>? fetchPurchaseNotes,
+//     ActionState<String>? insertPurchaseNoteFile,
+//     ActionState<String>? insertPurchaseNoteManual,
+//     ActionState<String>? insertReturnCost,
+//     ActionState<String>? insertShippingFee,
+//     ActionState<String>? updatePurchaseNote,
+//   }) {
+//     return WarehouseState(
+//       deletePurchaseNote: deletePurchaseNote ?? this.deletePurchaseNote,
+//       fetchPurchaseNote: fetchPurchaseNote ?? this.fetchPurchaseNote,
+//       fetchPurchaseNotesDropdown:
+//           fetchPurchaseNotesDropdown ?? this.fetchPurchaseNotesDropdown,
+//       fetchPurchaseNotes: fetchPurchaseNotes ?? this.fetchPurchaseNotes,
+//       insertPurchaseNoteFile:
+//           insertPurchaseNoteFile ?? this.insertPurchaseNoteFile,
+//       insertPurchaseNoteManual:
+//           insertPurchaseNoteManual ?? this.insertPurchaseNoteManual,
+//       insertReturnCost: insertReturnCost ?? this.insertReturnCost,
+//       insertShippingFee: insertShippingFee ?? this.insertShippingFee,
+//       updatePurchaseNote: updatePurchaseNote ?? this.updatePurchaseNote,
+//     );
+//   }
+
+//   final ActionState<String> deletePurchaseNote;
+//   final ActionState<PurchaseNoteDetailEntity> fetchPurchaseNote;
+//   final PaginateState<DropdownEntity> fetchPurchaseNotesDropdown;
+//   final PaginateState<PurchaseNoteSummaryEntity> fetchPurchaseNotes;
+//   final ActionState<String> insertPurchaseNoteFile;
+//   final ActionState<String> insertPurchaseNoteManual;
+//   final ActionState<String> insertReturnCost;
+//   final ActionState<String> insertShippingFee;
+//   final ActionState<String> updatePurchaseNote;
+
+//   @override
+//   List<Object?> get props => [
+//         deletePurchaseNote,
+//         fetchPurchaseNote,
+//         fetchPurchaseNotesDropdown,
+//         fetchPurchaseNote,
+//         insertPurchaseNoteFile,
+//         insertPurchaseNoteManual,
+//         insertReturnCost,
+//         insertShippingFee,
+//         updatePurchaseNote,
+//       ];
+// }
 
 final class WarehouseInitial extends WarehouseState {}
 
@@ -11,7 +93,11 @@ class ListPaginateLoading extends ListPaginate {}
 
 class ListPaginateLoaded extends ListPaginate {}
 
-class ListPaginateLast extends ListPaginate {}
+class ListPaginateLast extends ListPaginate {
+  ListPaginateLast(this.page);
+
+  final int page;
+}
 
 class DeletePurchaseNote extends WarehouseState {}
 
@@ -29,20 +115,36 @@ class DeletePurchaseNoteError extends DeletePurchaseNote {
   DeletePurchaseNoteError({required this.message});
 }
 
-class FetchPurchaseNote extends WarehouseState {}
+class FetchPurchaseNote extends WarehouseState {
+  const FetchPurchaseNote();
+}
 
 class FetchPurchaseNoteLoading extends FetchPurchaseNote {}
 
 class FetchPurchaseNoteLoaded extends FetchPurchaseNote {
-  final PurchaseNoteDetailEntity purchaseNote;
+  const FetchPurchaseNoteLoaded({required this.purchaseNote, this.pickedImage});
 
-  FetchPurchaseNoteLoaded({required this.purchaseNote});
+  FetchPurchaseNoteLoaded copyWith({
+    PurchaseNoteDetailEntity? purchaseNote,
+    File? pickedImage,
+  }) {
+    return FetchPurchaseNoteLoaded(
+      purchaseNote: purchaseNote ?? this.purchaseNote,
+      pickedImage: pickedImage ?? this.pickedImage,
+    );
+  }
+
+  final PurchaseNoteDetailEntity purchaseNote;
+  final File? pickedImage;
+
+  @override
+  List<Object?> get props => [purchaseNote, pickedImage];
 }
 
 class FetchPurchaseNoteError extends FetchPurchaseNote {
-  final String message;
+  const FetchPurchaseNoteError({required this.message});
 
-  FetchPurchaseNoteError({required this.message});
+  final String message;
 }
 
 class FetchPurchaseNotes extends WarehouseState {}

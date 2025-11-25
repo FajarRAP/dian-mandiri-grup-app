@@ -1,11 +1,21 @@
-import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../common/constants.dart';
-import '../exceptions/server_exception.dart';
-import '../failure/failure.dart';
+import '../errors/failure.dart';
+
+extension DateTimeFormatter on DateTime {
+  String get toYMD => DateFormat('y-MM-dd', 'id_ID').format(this);
+  String get toDMY => DateFormat('dd-MM-y', 'id_ID').format(this);
+  String get toDMYHMS => DateFormat('dd-MM-y HH:mm:ss', 'id_ID').format(this);
+  String get toHMS => DateFormat('HH:mm:ss', 'id_ID').format(this);
+}
+
+extension NumberFormatter on num {
+  String get toIDRCurrency =>
+      NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0)
+          .format(this);
+}
 
 final dateFormat = DateFormat('y-MM-dd', 'id_ID');
 final dateTimeFormat = DateFormat('dd-MM-y HH:mm:ss', 'id_ID');
@@ -36,11 +46,6 @@ String evaluateStage(String stage) {
     default:
       return 'Tidak Diketahui';
   }
-}
-
-Future<bool> isInternetConnected() async {
-  final connectivity = await Connectivity().checkConnectivity();
-  return !connectivity.contains(ConnectivityResult.none);
 }
 
 List parseSpreadsheetFailure(SpreadsheetFailure spreadsheetFailure) {
@@ -83,17 +88,4 @@ class TextFormFieldConfig {
   final InputDecoration? decoration;
   final TextInputType? keyboardType;
   final TextInputAction? textInputAction;
-}
-
-ServerException handleDioException(DioException de) {
-  final data = de.response?.data;
-  final isMap = data is Map<String, dynamic>;
-
-  switch (de.response?.statusCode) {
-    default:
-      return ServerException(
-        message: isMap ? data['message'] : null,
-        statusCode: de.response?.statusCode,
-      );
-  }
 }

@@ -1,3 +1,4 @@
+import '../../../../core/utils/typedefs.dart';
 import '../../domain/entities/supplier_detail_entity.dart';
 
 class SupplierDetailModel extends SupplierDetailEntity {
@@ -10,31 +11,46 @@ class SupplierDetailModel extends SupplierDetailEntity {
     super.email,
   });
 
-  factory SupplierDetailModel.fromEntity(SupplierDetailEntity entity) =>
-      SupplierDetailModel(
-        id: entity.id,
-        avatarUrl: entity.avatarUrl,
-        name: entity.name,
-        phoneNumber: entity.phoneNumber,
-        address: entity.address,
-        email: entity.email,
-      );
+  factory SupplierDetailModel.fromEntity(SupplierDetailEntity entity) {
+    return SupplierDetailModel(
+      id: entity.id,
+      avatarUrl: entity.avatarUrl,
+      name: entity.name,
+      phoneNumber: entity.phoneNumber,
+      address: entity.address,
+      email: entity.email,
+    );
+  }
 
-  factory SupplierDetailModel.fromJson(Map<String, dynamic> json) =>
-      SupplierDetailModel(
-        id: json['id'],
-        avatarUrl: json['avatar'],
-        name: json['name'],
-        phoneNumber: json['phone'],
-        address: json['address'],
-        email: json['email'],
-      );
+  factory SupplierDetailModel.fromJson(JsonMap json) {
+    return SupplierDetailModel(
+      id: json['id'],
+      avatarUrl: json['avatar'],
+      name: json['name'],
+      phoneNumber: json['phone'],
+      address: json['address'],
+      email: json['email'],
+    );
+  }
 
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'name': name,
-        'phone_number': phoneNumber,
-        'address': address,
-        'email': email,
-      };
+  JsonMap toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'phone_number': phoneNumber,
+      'address': address,
+      'email': email,
+    };
+  }
+
+  SupplierDetailEntity toEntity() {
+    return SupplierDetailEntity(
+      id: id,
+      avatarUrl: avatarUrl,
+      name: name,
+      phoneNumber: phoneNumber,
+      address: address,
+      email: email,
+    );
+  }
 }
