@@ -1,0 +1,32 @@
+{
+    "message": "Success get detail purchase note!",
+    "data": {
+        "id": "83881607-18c5-4135-acb5-86f45892bd3c",
+        "supplier": {
+            "id": "71213ab2-eb64-4873-9732-a77681c9523f",
+            "name": "Ayubi",
+            "phone": "087885020053",
+            "avatar": "https://storage.dianmandirigrup.id/staging-app/supplier/avatar/f23d2884-66ac-4fe7-b1db-7f260014befa.jpg"
+        },
+        "date": "2025-09-27T17:00:00Z",
+        "receipt": "https://storage.dianmandirigrup.id/staging-app/receipt_note/4a7c9809-0431-44b3-b61e-e47e83d3ee47.jpg",
+        "note": "",
+        "is_editable": true,
+        "return_cost": 0,
+        "total_price": 60000,
+        "item_price": 40000,
+        "shipment_price": 20000,
+        "items": [
+            {
+                "id": "c5f50fa8-ec55-4f22-b2d9-b223da930ebd",
+                "name": "lorem",
+                "total": 2,
+                "total_reject": 0,
+                "price": 20000,
+                "shipment_price": 20000
+            }
+        ],
+        "created_at": "2025-09-27T19:43:06.893102Z",
+        "updated_at": "2025-09-27T19:59:11.921651Z"
+    }
+}

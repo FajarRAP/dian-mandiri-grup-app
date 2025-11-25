@@ -3,15 +3,15 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 
 import '../../../../core/common/dropdown_entity.dart';
-import '../../../../core/exceptions/internal_exception.dart';
-import '../../../../core/helpers/helpers.dart';
 import '../../../../core/network/dio_handler_mixin.dart';
+import '../../../../core/utils/extensions.dart';
+import '../../../../core/utils/typedefs.dart';
 import '../../domain/entities/purchase_note_detail_entity.dart';
 import '../../domain/entities/purchase_note_summary_entity.dart';
+import '../../domain/usecases/delete_purchase_note_use_case.dart';
+import '../../domain/usecases/fetch_purchase_note_use_case.dart';
 import '../../domain/usecases/fetch_purchase_notes_dropdown_use_case.dart';
 import '../../domain/usecases/fetch_purchase_notes_use_case.dart';
-import '../../domain/usecases/fetch_purchase_note_use_case.dart';
-import '../../domain/usecases/delete_purchase_note_use_case.dart';
 import '../../domain/usecases/insert_purchase_note_file_use_case.dart';
 import '../../domain/usecases/insert_purchase_note_manual_use_case.dart';
 import '../../domain/usecases/insert_return_cost_use_case.dart';
@@ -48,39 +48,31 @@ class WarehouseRemoteDataSourceImpl
   @override
   Future<String> deletePurchaseNote(
       DeletePurchaseNoteUseCaseParams params) async {
-    try {
+    return await handleDioRequest<String>(() async {
       final response =
-          await dio.delete('v1/purchase-note/${params.purchaseNoteId}');
+          await dio.delete('/v1/purchase-note/${params.purchaseNoteId}');
 
       return response.data['message'];
-    } on DioException catch (de) {
-      throw handleDioException(de);
-    } catch (e) {
-      throw InternalException(message: '$e');
-    }
+    });
   }
 
   @override
   Future<PurchaseNoteDetailEntity> fetchPurchaseNote(
       FetchPurchaseNoteUseCaseParams params) async {
-    try {
+    return await handleDioRequest<PurchaseNoteDetailEntity>(() async {
       final response =
-          await dio.get('v1/purchase-note/${params.purchaseNoteId}');
+          await dio.get('/v1/purchase-note/${params.purchaseNoteId}');
 
       return PurchaseNoteDetailModel.fromJson(response.data['data']).toEntity();
-    } on DioException catch (de) {
-      throw handleDioException(de);
-    } catch (e) {
-      throw InternalException(message: '$e');
-    }
+    });
   }
 
   @override
   Future<List<PurchaseNoteSummaryEntity>> fetchPurchaseNotes(
       FetchPurchaseNotesUseCaseParams params) async {
-    try {
+    return await handleDioRequest<List<PurchaseNoteSummaryEntity>>(() async {
       final response = await dio.get(
-        'v1/purchase-note',
+        '/v1/purchase-note',
         queryParameters: {
           'column': params.column,
           'sort': params.sort,
@@ -90,25 +82,20 @@ class WarehouseRemoteDataSourceImpl
         },
       );
 
-      final contents =
-          List<Map<String, dynamic>>.from(response.data['data']['content']);
+      final contents = List<JsonMap>.from(response.data['data']['content']);
 
       return contents
           .map((e) => PurchaseNoteSummaryModel.fromJson(e).toEntity())
           .toList();
-    } on DioException catch (de) {
-      throw handleDioException(de);
-    } catch (e) {
-      throw InternalException(message: '$e');
-    }
+    });
   }
 
   @override
   Future<List<DropdownEntity>> fetchPurchaseNotesDropdown(
       FetchPurchaseNotesDropdownUseCaseParams params) async {
-    try {
+    return await handleDioRequest<List<DropdownEntity>>(() async {
       final response = await dio.get(
-        'v1/purchase-note/dropdown',
+        '/v1/purchase-note/dropdown',
         queryParameters: {
           'search': params.search,
           'limit': params.limit,
@@ -116,23 +103,18 @@ class WarehouseRemoteDataSourceImpl
         },
       );
 
-      final contents =
-          List<Map<String, dynamic>>.from(response.data['data']['content']);
+      final contents = List<JsonMap>.from(response.data['data']['content']);
 
       return contents.map(DropdownEntity.fromJson).toList();
-    } on DioException catch (de) {
-      throw handleDioException(de);
-    } catch (e) {
-      throw InternalException(message: '$e');
-    }
+    });
   }
 
   @override
   Future<String> insertPurchaseNoteFile(
       InsertPurchaseNoteFileUseCaseParams params) async {
-    try {
+    return await handleDioRequest<String>(() async {
       final response = await dio.post(
-        'v1/purchase-note/spreadsheet',
+        '/v1/purchase-note/spreadsheet',
         data: FormData.fromMap({
           'supplier_id': params.supplierId,
           'date': params.date.toUtc().toIso8601String(),
@@ -143,23 +125,19 @@ class WarehouseRemoteDataSourceImpl
       );
 
       return response.data['message'];
-    } on DioException catch (de) {
-      throw handleDioException(de);
-    } catch (e) {
-      throw InternalException(message: '$e');
-    }
+    });
   }
 
   @override
   Future<String> insertPurchaseNoteManual(
       InsertPurchaseNoteManualUseCaseParams params) async {
-    try {
+    return await handleDioRequest<String>(() async {
       final items = params.items
           .map((item) => WarehouseItemModel.fromEntity(item).toJson())
           .toList();
 
       final response = await dio.post(
-        'v1/purchase-note',
+        '/v1/purchase-note',
         data: FormData.fromMap({
           'supplier_id': params.supplierId,
           'date': params.date.toUtc().toIso8601String(),
@@ -170,35 +148,27 @@ class WarehouseRemoteDataSourceImpl
       );
 
       return response.data['message'];
-    } on DioException catch (de) {
-      throw handleDioException(de);
-    } catch (e) {
-      throw InternalException(message: '$e');
-    }
+    });
   }
 
   @override
   Future<String> insertReturnCost(InsertReturnCostUseCaseParams params) async {
-    try {
+    return await handleDioRequest<String>(() async {
       final response = await dio.patch(
-        'v1/purchase-note/${params.purchaseNoteId}/return-cost',
+        '/v1/purchase-note/${params.purchaseNoteId}/return-cost',
         data: {'amount': params.amount},
       );
 
       return response.data['message'];
-    } on DioException catch (de) {
-      throw handleDioException(de);
-    } catch (e) {
-      throw InternalException(message: '$e');
-    }
+    });
   }
 
   @override
   Future<String> insertShippingFee(
       InsertShippingFeeUseCaseParams params) async {
-    try {
+    return await handleDioRequest<String>(() async {
       final response = await dio.post(
-        'v1/purchase-note/shipment-price',
+        '/v1/purchase-note/shipment-price',
         data: {
           'date': DateTime.now().toUtc().toIso8601String(),
           'price': params.price,
@@ -207,26 +177,20 @@ class WarehouseRemoteDataSourceImpl
       );
 
       return response.data['message'];
-    } on DioException catch (de) {
-      throw handleDioException(de);
-    } catch (e) {
-      throw InternalException(message: '$e');
-    }
+    });
   }
 
   @override
   Future<String> updatePurchaseNote(
       UpdatePurchaseNoteUseCaseParams params) async {
-    try {
+    return await handleDioRequest<String>(() async {
       final items = params.items
           .map((item) => WarehouseItemModel.fromEntity(item).toJson())
           .toList();
-      final receipt = params.receipt.startsWith('https://')
-          ? null
-          : await MultipartFile.fromFile(params.receipt);
+      final receipt = await params.receipt.toMultipartFile();
 
       final response = await dio.put(
-        'v1/purchase-note/${params.purchaseNoteId}',
+        '/v1/purchase-note/${params.purchaseNoteId}',
         data: FormData.fromMap({
           'supplier_id': params.supplierId,
           'date': params.date.toUtc().toIso8601String(),
@@ -237,10 +201,6 @@ class WarehouseRemoteDataSourceImpl
       );
 
       return response.data['message'];
-    } on DioException catch (de) {
-      throw handleDioException(de);
-    } catch (e) {
-      throw InternalException(message: '$e');
-    }
+    });
   }
 }
