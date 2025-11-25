@@ -10,9 +10,11 @@ import 'package:path_provider/path_provider.dart';
 
 import 'core/common/constants.dart';
 import 'core/helpers/top_snackbar.dart';
-import 'core/router/router.dart';
+import 'core/presentation/cubit/app_cubit.dart';
+import 'core/router/app_router.dart';
 import 'core/services/google_sign_in_service.dart';
 import 'core/themes/theme.dart';
+import 'core/utils/app_bloc_observer.dart';
 import 'features/auth/presentation/cubit/auth_cubit.dart';
 import 'features/supplier/presentation/cubit/supplier_cubit.dart';
 import 'features/tracker/presentation/cubit/shipment_cubit.dart';
@@ -26,9 +28,7 @@ late String externalPath;
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   final dir = await getExternalStorageDirectory();
   externalPath = '${dir?.path}';
@@ -43,6 +43,8 @@ Future<void> main() async {
   final refreshToken = await storage.read(key: refreshTokenKey);
   initialLocation = refreshToken != null ? homeRoute : loginRoute;
 
+  Bloc.observer = const AppBlocObserver();
+
   runApp(const MyApp());
 }
 
@@ -53,10 +55,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
+        BlocProvider(create: (context) => getIt.get<AppCubit>()),
         BlocProvider(create: (context) => getIt.get<AuthCubit>()),
         BlocProvider(create: (context) => getIt.get<ShipmentCubit>()),
         BlocProvider(create: (context) => getIt.get<SupplierCubit>()),
-        BlocProvider(create: (context) => getIt.get<WarehouseCubit>())
+        BlocProvider(create: (context) => getIt.get<WarehouseCubit>()),
       ],
       child: MaterialApp.router(
         builder: (context, child) => Overlay(
@@ -76,12 +79,9 @@ class MyApp extends StatelessWidget {
         ],
         title: 'Ship Tracker',
         theme: theme,
-        routerConfig: router,
+        routerConfig: AppRouter.router,
         scaffoldMessengerKey: scaffoldMessengerKey,
-        supportedLocales: const [
-          Locale('en', 'US'),
-          Locale('id'),
-        ],
+        supportedLocales: const [Locale('en', 'US'), Locale('id')],
       ),
     );
   }
