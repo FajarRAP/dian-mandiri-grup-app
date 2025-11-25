@@ -1,10 +1,7 @@
-import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../common/constants.dart';
-import '../exceptions/server_exception.dart';
 import '../failure/failure.dart';
 
 extension DateTimeFormatter on DateTime {
@@ -51,11 +48,6 @@ String evaluateStage(String stage) {
   }
 }
 
-Future<bool> isInternetConnected() async {
-  final connectivity = await Connectivity().checkConnectivity();
-  return !connectivity.contains(ConnectivityResult.none);
-}
-
 List parseSpreadsheetFailure(SpreadsheetFailure spreadsheetFailure) {
   DataCell mapCell(el) => DataCell(SizedBox(
       width: double.infinity,
@@ -96,18 +88,4 @@ class TextFormFieldConfig {
   final InputDecoration? decoration;
   final TextInputType? keyboardType;
   final TextInputAction? textInputAction;
-}
-
-ServerException handleDioException(DioException de) {
-  final data = de.response?.data;
-  final isMap = data is Map<String, dynamic>;
-
-  switch (de.response?.statusCode) {
-    default:
-      return ServerException(
-        message: isMap ? data['message'] : null,
-        errors: de.response?.data,
-        statusCode: de.response?.statusCode,
-      );
-  }
 }
