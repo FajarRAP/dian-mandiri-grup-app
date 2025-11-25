@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 
-import '../../themes/colors.dart';
+import '../../utils/extensions.dart';
 
 class LightButton extends StatelessWidget {
   const LightButton({
     super.key,
     this.onPressed,
     this.height,
-    required this.icon,
+    this.icon,
     required this.label,
   });
 
   final void Function()? onPressed;
   final double? height;
-  final Widget icon;
+  final Widget? icon;
   final Widget label;
 
   @override
@@ -23,9 +23,9 @@ class LightButton extends StatelessWidget {
       icon: icon,
       label: label,
       style: ElevatedButton.styleFrom(
-        backgroundColor: MaterialColors.surfaceContainerLowest,
-        foregroundColor: MaterialColors.onSurface,
-        fixedSize: height == null ? null : Size.fromHeight(height!),
+        backgroundColor: context.colorScheme.surfaceContainerLowest,
+        foregroundColor: context.colorScheme.onSurface,
+        fixedSize: height == null ? null : .fromHeight(height!),
       ),
     );
   }
