@@ -62,7 +62,10 @@ class AuthRepositoryImpl with RepositoryHandlerMixin implements AuthRepository {
         refreshToken: result.refreshToken,
       );
 
-      return SignInEntity(message: result.message, user: result.user);
+      return SignInEntity(
+        message: result.message,
+        user: result.user.toEntity(),
+      );
     });
   }
 

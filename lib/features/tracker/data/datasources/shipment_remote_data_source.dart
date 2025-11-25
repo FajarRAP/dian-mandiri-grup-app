@@ -24,18 +24,24 @@ abstract interface class ShipmentRemoteDataSource {
   Future<String> createShipmentReport(CreateShipmentReportUseCaseParams params);
   Future<String> deleteShipment(DeleteShipmentUseCaseParams params);
   Future<String> downloadShipmentReport(
-      DownloadShipmentReportUseCaseParams params);
+    DownloadShipmentReportUseCaseParams params,
+  );
   Future<ShipmentDetailEntity> fetchShipmentById(
-      FetchShipmentByIdUseCaseParams params);
+    FetchShipmentByIdUseCaseParams params,
+  );
   Future<ShipmentHistoryEntity> fetchShipmentByReceiptNumber(
-      FetchShipmentByReceiptNumberUseCaseParams params);
+    FetchShipmentByReceiptNumberUseCaseParams params,
+  );
   Future<List<ShipmentReportEntity>> fetchShipmentReports(
-      FetchShipmentReportsUseCaseParams params);
+    FetchShipmentReportsUseCaseParams params,
+  );
   Future<List<ShipmentEntity>> fetchShipments(
-      FetchShipmentsUseCaseParams params);
+    FetchShipmentsUseCaseParams params,
+  );
   Future<String> insertShipment(InsertShipmentUseCaseParams params);
   Future<String> insertShipmentDocument(
-      InsertShipmentDocumentUseCaseParams params);
+    InsertShipmentDocumentUseCaseParams params,
+  );
 }
 
 class ShipmentRemoteDataSourceImpl
@@ -47,10 +53,11 @@ class ShipmentRemoteDataSourceImpl
 
   @override
   Future<String> createShipmentReport(
-      CreateShipmentReportUseCaseParams params) async {
+    CreateShipmentReportUseCaseParams params,
+  ) async {
     return await handleDioRequest<String>(() async {
       final response = await dio.post(
-        '/v1/shipment/report',
+        '/shipment/report',
         data: {
           'start_date': params.startDate.toYMD,
           'end_date': params.endDate.toYMD,
@@ -64,7 +71,7 @@ class ShipmentRemoteDataSourceImpl
   @override
   Future<String> deleteShipment(DeleteShipmentUseCaseParams params) async {
     return await handleDioRequest<String>(() async {
-      final response = await dio.delete('/v1/shipment/${params.shipmentId}');
+      final response = await dio.delete('/shipment/${params.shipmentId}');
 
       return response.data['message'];
     });
@@ -72,7 +79,8 @@ class ShipmentRemoteDataSourceImpl
 
   @override
   Future<String> downloadShipmentReport(
-      DownloadShipmentReportUseCaseParams params) async {
+    DownloadShipmentReportUseCaseParams params,
+  ) async {
     return await handleDioRequest<String>(() async {
       final formattedDate = params.createdAt.toLocal().toDMY;
 
@@ -87,9 +95,10 @@ class ShipmentRemoteDataSourceImpl
 
   @override
   Future<ShipmentDetailEntity> fetchShipmentById(
-      FetchShipmentByIdUseCaseParams params) async {
+    FetchShipmentByIdUseCaseParams params,
+  ) async {
     return await handleDioRequest<ShipmentDetailEntity>(() async {
-      final response = await dio.get('/v1/shipment/${params.shipmentId}');
+      final response = await dio.get('/shipment/${params.shipmentId}');
 
       return ShipmentDetailModel.fromJson(response.data['data']).toEntity();
     });
@@ -97,10 +106,12 @@ class ShipmentRemoteDataSourceImpl
 
   @override
   Future<ShipmentHistoryEntity> fetchShipmentByReceiptNumber(
-      FetchShipmentByReceiptNumberUseCaseParams params) async {
+    FetchShipmentByReceiptNumberUseCaseParams params,
+  ) async {
     return await handleDioRequest<ShipmentHistoryEntity>(() async {
-      final response =
-          await dio.get('/v1/shipment/status/${params.receiptNumber}');
+      final response = await dio.get(
+        '/shipment/status/${params.receiptNumber}',
+      );
 
       return ShipmentHistoryModel.fromJson(response.data['data']).toEntity();
     });
@@ -108,10 +119,11 @@ class ShipmentRemoteDataSourceImpl
 
   @override
   Future<List<ShipmentReportEntity>> fetchShipmentReports(
-      FetchShipmentReportsUseCaseParams params) async {
+    FetchShipmentReportsUseCaseParams params,
+  ) async {
     return await handleDioRequest<List<ShipmentReportEntity>>(() async {
       final response = await dio.get(
-        '/v1/shipment/report',
+        '/shipment/report',
         queryParameters: {
           'start_date': params.startDate.toYMD,
           'end_date': params.endDate.toYMD,
@@ -130,15 +142,16 @@ class ShipmentRemoteDataSourceImpl
 
   @override
   Future<List<ShipmentEntity>> fetchShipments(
-      FetchShipmentsUseCaseParams params) async {
+    FetchShipmentsUseCaseParams params,
+  ) async {
     return await handleDioRequest<List<ShipmentEntity>>(() async {
       final response = await dio.get(
-        '/v1/shipment',
+        '/shipment',
         queryParameters: {
           'date': params.date.toYMD,
           'stage': params.stage,
           'search': params.keyword,
-          'page': params.page
+          'page': params.page,
         },
       );
 
@@ -152,7 +165,7 @@ class ShipmentRemoteDataSourceImpl
   Future<String> insertShipment(InsertShipmentUseCaseParams params) async {
     return await handleDioRequest<String>(() async {
       final response = await dio.post(
-        '/v1/shipment',
+        '/shipment',
         data: {'receipt_number': params.receiptNumber, 'stage': params.stage},
       );
 
@@ -162,7 +175,8 @@ class ShipmentRemoteDataSourceImpl
 
   @override
   Future<String> insertShipmentDocument(
-      InsertShipmentDocumentUseCaseParams params) async {
+    InsertShipmentDocumentUseCaseParams params,
+  ) async {
     return await handleDioRequest<String>(() async {
       final formData = FormData.fromMap({
         'document': await MultipartFile.fromFile(params.documentPath),
@@ -170,7 +184,7 @@ class ShipmentRemoteDataSourceImpl
       });
 
       final response = await dio.post(
-        '/v1/shipment/${params.shipmentId}/document',
+        '/shipment/${params.shipmentId}/document',
         data: formData,
       );
 

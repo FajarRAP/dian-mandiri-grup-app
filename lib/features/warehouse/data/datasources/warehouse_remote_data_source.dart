@@ -24,15 +24,20 @@ import '../models/warehouse_item_model.dart';
 abstract interface class WarehouseRemoteDataSource {
   Future<String> deletePurchaseNote(DeletePurchaseNoteUseCaseParams params);
   Future<PurchaseNoteDetailEntity> fetchPurchaseNote(
-      FetchPurchaseNoteUseCaseParams params);
+    FetchPurchaseNoteUseCaseParams params,
+  );
   Future<List<PurchaseNoteSummaryEntity>> fetchPurchaseNotes(
-      FetchPurchaseNotesUseCaseParams params);
+    FetchPurchaseNotesUseCaseParams params,
+  );
   Future<List<DropdownEntity>> fetchPurchaseNotesDropdown(
-      FetchPurchaseNotesDropdownUseCaseParams params);
+    FetchPurchaseNotesDropdownUseCaseParams params,
+  );
   Future<String> insertPurchaseNoteManual(
-      InsertPurchaseNoteManualUseCaseParams params);
+    InsertPurchaseNoteManualUseCaseParams params,
+  );
   Future<String> insertPurchaseNoteFile(
-      InsertPurchaseNoteFileUseCaseParams params);
+    InsertPurchaseNoteFileUseCaseParams params,
+  );
   Future<String> insertReturnCost(InsertReturnCostUseCaseParams params);
   Future<String> insertShippingFee(InsertShippingFeeUseCaseParams params);
   Future<String> updatePurchaseNote(UpdatePurchaseNoteUseCaseParams params);
@@ -47,10 +52,12 @@ class WarehouseRemoteDataSourceImpl
 
   @override
   Future<String> deletePurchaseNote(
-      DeletePurchaseNoteUseCaseParams params) async {
+    DeletePurchaseNoteUseCaseParams params,
+  ) async {
     return await handleDioRequest<String>(() async {
-      final response =
-          await dio.delete('/v1/purchase-note/${params.purchaseNoteId}');
+      final response = await dio.delete(
+        '/purchase-note/${params.purchaseNoteId}',
+      );
 
       return response.data['message'];
     });
@@ -58,10 +65,10 @@ class WarehouseRemoteDataSourceImpl
 
   @override
   Future<PurchaseNoteDetailEntity> fetchPurchaseNote(
-      FetchPurchaseNoteUseCaseParams params) async {
+    FetchPurchaseNoteUseCaseParams params,
+  ) async {
     return await handleDioRequest<PurchaseNoteDetailEntity>(() async {
-      final response =
-          await dio.get('/v1/purchase-note/${params.purchaseNoteId}');
+      final response = await dio.get('/purchase-note/${params.purchaseNoteId}');
 
       return PurchaseNoteDetailModel.fromJson(response.data['data']).toEntity();
     });
@@ -69,10 +76,11 @@ class WarehouseRemoteDataSourceImpl
 
   @override
   Future<List<PurchaseNoteSummaryEntity>> fetchPurchaseNotes(
-      FetchPurchaseNotesUseCaseParams params) async {
+    FetchPurchaseNotesUseCaseParams params,
+  ) async {
     return await handleDioRequest<List<PurchaseNoteSummaryEntity>>(() async {
       final response = await dio.get(
-        '/v1/purchase-note',
+        '/purchase-note',
         queryParameters: {
           'column': params.column,
           'sort': params.sort,
@@ -92,10 +100,11 @@ class WarehouseRemoteDataSourceImpl
 
   @override
   Future<List<DropdownEntity>> fetchPurchaseNotesDropdown(
-      FetchPurchaseNotesDropdownUseCaseParams params) async {
+    FetchPurchaseNotesDropdownUseCaseParams params,
+  ) async {
     return await handleDioRequest<List<DropdownEntity>>(() async {
       final response = await dio.get(
-        '/v1/purchase-note/dropdown',
+        '/purchase-note/dropdown',
         queryParameters: {
           'search': params.search,
           'limit': params.limit,
@@ -111,10 +120,11 @@ class WarehouseRemoteDataSourceImpl
 
   @override
   Future<String> insertPurchaseNoteFile(
-      InsertPurchaseNoteFileUseCaseParams params) async {
+    InsertPurchaseNoteFileUseCaseParams params,
+  ) async {
     return await handleDioRequest<String>(() async {
       final response = await dio.post(
-        '/v1/purchase-note/spreadsheet',
+        '/purchase-note/spreadsheet',
         data: FormData.fromMap({
           'supplier_id': params.supplierId,
           'date': params.date.toUtc().toIso8601String(),
@@ -130,14 +140,15 @@ class WarehouseRemoteDataSourceImpl
 
   @override
   Future<String> insertPurchaseNoteManual(
-      InsertPurchaseNoteManualUseCaseParams params) async {
+    InsertPurchaseNoteManualUseCaseParams params,
+  ) async {
     return await handleDioRequest<String>(() async {
       final items = params.items
           .map((item) => WarehouseItemModel.fromEntity(item).toJson())
           .toList();
 
       final response = await dio.post(
-        '/v1/purchase-note',
+        '/purchase-note',
         data: FormData.fromMap({
           'supplier_id': params.supplierId,
           'date': params.date.toUtc().toIso8601String(),
@@ -155,7 +166,7 @@ class WarehouseRemoteDataSourceImpl
   Future<String> insertReturnCost(InsertReturnCostUseCaseParams params) async {
     return await handleDioRequest<String>(() async {
       final response = await dio.patch(
-        '/v1/purchase-note/${params.purchaseNoteId}/return-cost',
+        '/purchase-note/${params.purchaseNoteId}/return-cost',
         data: {'amount': params.amount},
       );
 
@@ -165,10 +176,11 @@ class WarehouseRemoteDataSourceImpl
 
   @override
   Future<String> insertShippingFee(
-      InsertShippingFeeUseCaseParams params) async {
+    InsertShippingFeeUseCaseParams params,
+  ) async {
     return await handleDioRequest<String>(() async {
       final response = await dio.post(
-        '/v1/purchase-note/shipment-price',
+        '/purchase-note/shipment-price',
         data: {
           'date': DateTime.now().toUtc().toIso8601String(),
           'price': params.price,
@@ -182,7 +194,8 @@ class WarehouseRemoteDataSourceImpl
 
   @override
   Future<String> updatePurchaseNote(
-      UpdatePurchaseNoteUseCaseParams params) async {
+    UpdatePurchaseNoteUseCaseParams params,
+  ) async {
     return await handleDioRequest<String>(() async {
       final items = params.items
           .map((item) => WarehouseItemModel.fromEntity(item).toJson())
@@ -190,7 +203,7 @@ class WarehouseRemoteDataSourceImpl
       final receipt = await params.receipt.toMultipartFile();
 
       final response = await dio.put(
-        '/v1/purchase-note/${params.purchaseNoteId}',
+        '/purchase-note/${params.purchaseNoteId}',
         data: FormData.fromMap({
           'supplier_id': params.supplierId,
           'date': params.date.toUtc().toIso8601String(),

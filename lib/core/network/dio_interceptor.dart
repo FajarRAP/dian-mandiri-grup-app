@@ -38,7 +38,9 @@ class DioInterceptor implements Interceptor {
 
   @override
   void onRequest(
-      RequestOptions options, RequestInterceptorHandler handler) async {
+    RequestOptions options,
+    RequestInterceptorHandler handler,
+  ) async {
     final accessToken = await _storage.read(key: accessTokenKey);
     final isLogin = options.path.endsWith('/google');
     final isRefresh = options.path.endsWith('/refresh');
@@ -53,7 +55,7 @@ class DioInterceptor implements Interceptor {
 
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) async {
-    if (response.requestOptions.path == '/v1/auth/refresh' &&
+    if (response.requestOptions.path == '/auth/refresh' &&
         response.statusCode == 401) {
       await _storage.deleteAll();
     }

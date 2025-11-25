@@ -17,9 +17,11 @@ import '../models/supplier_model.dart';
 abstract interface class SupplierRemoteDataSource {
   Future<SupplierDetailEntity> fetchSupplier(FetchSupplierUseCaseParams params);
   Future<List<SupplierEntity>> fetchSuppliers(
-      FetchSuppliersUseCaseParams params);
+    FetchSuppliersUseCaseParams params,
+  );
   Future<List<DropdownEntity>> fetchSuppliersDropdown(
-      FetchSuppliersDropdownUseCaseParams params);
+    FetchSuppliersDropdownUseCaseParams params,
+  );
   Future<String> insertSupplier(InsertSupplierUseCaseParams params);
   Future<String> updateSupplier(UpdateSupplierUseCaseParams params);
 }
@@ -33,9 +35,10 @@ class SupplierRemoteDataSourceImpl
 
   @override
   Future<SupplierDetailEntity> fetchSupplier(
-      FetchSupplierUseCaseParams params) async {
+    FetchSupplierUseCaseParams params,
+  ) async {
     return handleDioRequest<SupplierDetailEntity>(() async {
-      final response = await dio.get('v1/supplier/${params.supplierId}');
+      final response = await dio.get('/supplier/${params.supplierId}');
 
       return SupplierDetailModel.fromJson(response.data['data']).toEntity();
     });
@@ -43,10 +46,11 @@ class SupplierRemoteDataSourceImpl
 
   @override
   Future<List<SupplierEntity>> fetchSuppliers(
-      FetchSuppliersUseCaseParams params) async {
+    FetchSuppliersUseCaseParams params,
+  ) async {
     return handleDioRequest<List<SupplierEntity>>(() async {
       final response = await dio.get(
-        'v1/supplier',
+        '/supplier',
         queryParameters: {
           'column': params.column,
           'order': params.sort,
@@ -63,10 +67,11 @@ class SupplierRemoteDataSourceImpl
 
   @override
   Future<List<DropdownEntity>> fetchSuppliersDropdown(
-      FetchSuppliersDropdownUseCaseParams params) async {
+    FetchSuppliersDropdownUseCaseParams params,
+  ) async {
     return handleDioRequest<List<DropdownEntity>>(() async {
       final response = await dio.get(
-        'v1/supplier/dropdown',
+        '/supplier/dropdown',
         queryParameters: {
           'search': params.search,
           'limit': params.limit,
@@ -83,7 +88,7 @@ class SupplierRemoteDataSourceImpl
   Future<String> insertSupplier(InsertSupplierUseCaseParams params) async {
     return handleDioRequest<String>(() async {
       final response = await dio.post(
-        'v1/supplier',
+        '/supplier',
         data: FormData.fromMap({
           'address': params.address,
           'avatar': await params.avatar.toMultipartFile(),
@@ -100,8 +105,9 @@ class SupplierRemoteDataSourceImpl
   @override
   Future<String> updateSupplier(UpdateSupplierUseCaseParams params) async {
     return handleDioRequest<String>(() async {
-      final supplierDetail =
-          SupplierDetailModel.fromEntity(params.supplierDetailEntity);
+      final supplierDetail = SupplierDetailModel.fromEntity(
+        params.supplierDetailEntity,
+      );
       final payload = supplierDetail.toJson();
       final newAvatar = await supplierDetail.avatarUrl.toMultipartFile();
 
@@ -110,7 +116,7 @@ class SupplierRemoteDataSourceImpl
       }
 
       final response = await dio.put(
-        'v1/supplier/${params.supplierDetailEntity.id}',
+        '/supplier/${params.supplierDetailEntity.id}',
         data: FormData.fromMap(payload),
       );
 
