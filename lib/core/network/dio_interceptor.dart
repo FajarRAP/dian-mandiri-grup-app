@@ -53,7 +53,7 @@ class DioInterceptor implements Interceptor {
 
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) async {
-    if (response.requestOptions.path == '$authEndpoint/refresh' &&
+    if (response.requestOptions.path == '/v1/auth/refresh' &&
         response.statusCode == 401) {
       await _storage.deleteAll();
     }

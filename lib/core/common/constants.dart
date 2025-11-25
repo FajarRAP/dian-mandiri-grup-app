@@ -1,57 +1,57 @@
 import 'package:flutter/material.dart';
 
-const homeRoute = "/";
+const homeRoute = '/';
 
-const loginRoute = "/login";
-const displayPictureRoute = "/picture";
+const loginRoute = '/login';
+const displayPictureRoute = '/picture';
 
-const supplierRoute = "${homeRoute}supplier";
-const addSupplierRoute = "$supplierRoute/add";
-const editSupplierRoute = "$supplierRoute/edit";
-const supplierDetailRoute = "$supplierRoute/detail";
+const supplierRoute = '${homeRoute}supplier';
+const addSupplierRoute = '$supplierRoute/add';
+const editSupplierRoute = '$supplierRoute/edit';
+const supplierDetailRoute = '$supplierRoute/detail';
 
-const warehouseRoute = "${homeRoute}warehouse";
-const addShippingFeeRoute = "$warehouseRoute/add-shipping-fee";
-const addPurchaseNoteManualRoute = "$warehouseRoute/add-purchase-note-manual";
-const addPurchaseNoteFileRoute = "$warehouseRoute/add-purchase-note-file";
-const purchaseNoteDetailRoute = "$warehouseRoute/detail";
+const warehouseRoute = '${homeRoute}warehouse';
+const addShippingFeeRoute = '$warehouseRoute/add-shipping-fee';
+const addPurchaseNoteManualRoute = '$warehouseRoute/add-purchase-note-manual';
+const addPurchaseNoteFileRoute = '$warehouseRoute/add-purchase-note-file';
+const purchaseNoteDetailRoute = '$warehouseRoute/detail';
 
-const trackerRoute = "${homeRoute}tracker";
-const scanReceiptRoute = "$trackerRoute/scan";
-const pickUpReceiptRoute = "$trackerRoute/pick-up";
-const checkReceiptRoute = "$trackerRoute/check";
-const packReceiptRoute = "$trackerRoute/pack";
-const sendReceiptRoute = "$trackerRoute/send";
-const returnReceiptRoute = "$trackerRoute/return";
-const cancelReceiptRoute = "$trackerRoute/cancel";
-const reportRoute = "$trackerRoute/report";
-const receiptStatusRoute = "$trackerRoute/status";
-const detailReceiptRoute = "$trackerRoute/detail";
-const cameraRoute = "$trackerRoute/camera";
+const trackerRoute = '${homeRoute}tracker';
+const scanReceiptRoute = '$trackerRoute/scan';
+const pickUpReceiptRoute = '$trackerRoute/pick-up';
+const checkReceiptRoute = '$trackerRoute/check';
+const packReceiptRoute = '$trackerRoute/pack';
+const sendReceiptRoute = '$trackerRoute/send';
+const returnReceiptRoute = '$trackerRoute/return';
+const cancelReceiptRoute = '$trackerRoute/cancel';
+const reportRoute = '$trackerRoute/report';
+const receiptStatusRoute = '$trackerRoute/status';
+const detailReceiptRoute = '$trackerRoute/detail';
+const cameraRoute = '$trackerRoute/camera';
 
-const staffManagementRoute = "${homeRoute}staff-management";
+const staffManagementRoute = '${homeRoute}staff-management';
 
-const profileRoute = "${homeRoute}profile";
+const profileRoute = '${homeRoute}profile';
 
-const iconsPath = "assets/icons";
-const spreadsheetIcon = "$iconsPath/excel.png";
-const scanReceiptIcon = "$iconsPath/scan.png";
-const pickUpReceiptIcon = "$iconsPath/pick-up.png";
-const checkReceiptIcon = "$iconsPath/check.png";
-const packReceiptIcon = "$iconsPath/pack.png";
-const sendReceiptIcon = "$iconsPath/send.png";
-const returnReceiptIcon = "$iconsPath/return.png";
-const cancelReceiptIcon = "$iconsPath/cancel.png";
-const reportReceiptIcon = "$iconsPath/report.png";
-const checkReceiptStatusIcon = "$iconsPath/check.png";
-const googleIcon = "$iconsPath/google.png";
-const personIcon = "$iconsPath/person.png";
-const appIcon = "$iconsPath/app-icon.png";
+const iconsPath = 'assets/icons';
+const spreadsheetIcon = '$iconsPath/excel.png';
+const scanReceiptIcon = '$iconsPath/scan.png';
+const pickUpReceiptIcon = '$iconsPath/pick-up.png';
+const checkReceiptIcon = '$iconsPath/check.png';
+const packReceiptIcon = '$iconsPath/pack.png';
+const sendReceiptIcon = '$iconsPath/send.png';
+const returnReceiptIcon = '$iconsPath/return.png';
+const cancelReceiptIcon = '$iconsPath/cancel.png';
+const reportReceiptIcon = '$iconsPath/report.png';
+const checkReceiptStatusIcon = '$iconsPath/check.png';
+const googleIcon = '$iconsPath/google.png';
+const personIcon = '$iconsPath/person.png';
+const appIcon = '$iconsPath/app-icon.png';
 
-const soundsPath = "sounds";
-const successSound = "$soundsPath/success.mp3";
-const skipSound = "$soundsPath/skip.mp3";
-const repeatSound = "$soundsPath/repeat.mp3";
+const soundsPath = 'sounds';
+const successSound = '$soundsPath/success.mp3';
+const skipSound = '$soundsPath/skip.mp3';
+const repeatSound = '$soundsPath/repeat.mp3';
 
 const svgPath = 'assets/svgs';
 const boxPenSvg = '$svgPath/box-pen.svg';
@@ -92,8 +92,6 @@ const completedReport = 'completed';
 const failedReport = 'failed';
 
 const apiUrl = String.fromEnvironment('API_URL');
-const shipmentEndpoint = String.fromEnvironment('SHIPMENT_ENDPOINT');
-const authEndpoint = String.fromEnvironment('AUTH_ENDPOINT');
 const accessTokenKey = String.fromEnvironment('ACCESS_TOKEN_KEY');
 const refreshTokenKey = String.fromEnvironment('REFRESH_TOKEN_KEY');
 const userKey = String.fromEnvironment('USER_KEY');
