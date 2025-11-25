@@ -5,6 +5,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 import 'core/common/constants.dart';
 import 'core/network/dio_interceptor.dart';
+import 'core/presentation/cubit/app_cubit.dart';
 import 'core/services/google_sign_in_service.dart';
 import 'core/services/image_picker_service.dart';
 import 'features/auth/data/datasources/auth_local_data_source.dart';
@@ -13,6 +14,7 @@ import 'features/auth/data/repositories/auth_repository_impl.dart';
 import 'features/auth/domain/repositories/auth_repository.dart';
 import 'features/auth/domain/usecases/fetch_user_from_storage_use_case.dart';
 import 'features/auth/domain/usecases/fetch_user_use_case.dart';
+import 'features/auth/domain/usecases/get_refresh_token_use_case.dart';
 import 'features/auth/domain/usecases/refresh_token_use_case.dart';
 import 'features/auth/domain/usecases/sign_in_use_case.dart';
 import 'features/auth/domain/usecases/sign_out_use_case.dart';
@@ -93,6 +95,7 @@ void setup() {
         authRemoteDataSource: getIt.get(),
       ),
     )
+    ..registerSingleton(GetRefreshTokenUseCase(authRepository: getIt()))
     ..registerLazySingleton<AuthCubit>(() => AuthCubit(
         fetchUserUseCase: FetchUserUseCase(authRepository: getIt.get()),
         fetchUserFromStorageUseCase:
@@ -177,4 +180,6 @@ void setup() {
         insertShippingFeeUseCase: getIt(),
         updatePurchaseNoteUseCase: getIt(),
         imagePickerService: getIt()));
+
+  getIt.registerLazySingleton(() => AppCubit(getRefreshTokenUseCase: getIt()));
 }

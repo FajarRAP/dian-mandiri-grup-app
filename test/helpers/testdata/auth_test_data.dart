@@ -60,3 +60,6 @@ const tRefreshTokenSuccess = TokenModel(
     accessToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
     refreshToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
     message: 'Auth refresh Successfully');
+
+const tRefreshTokenNull = null;
+const tRefreshTokenString = 'eyJhbGciOi';

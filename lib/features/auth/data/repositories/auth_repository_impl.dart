@@ -81,4 +81,13 @@ class AuthRepositoryImpl with RepositoryHandlerMixin implements AuthRepository {
       return result;
     });
   }
+
+  @override
+  Future<Either<Failure, String?>> getRefreshToken() async {
+    return await handleRepositoryRequest<String?>(() async {
+      final result = await authLocalDataSource.getRefreshToken();
+
+      return result;
+    });
+  }
 }

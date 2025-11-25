@@ -14,4 +14,5 @@ abstract interface class AuthRepository {
   Future<Either<Failure, UserEntity?>> fetchUserFromStorage();
   Future<Either<Failure, String>> updateProfile(
       UpdateProfileUseCaseParams params);
+  Future<Either<Failure, String?>> getRefreshToken();
 }

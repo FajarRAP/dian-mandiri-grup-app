@@ -267,4 +267,39 @@ void main() {
       verifyZeroInteractions(mockAuthLocalDataSource);
     });
   });
+
+  group('get refresh token repository test', () {
+    test('should return Right(String?) when local call is successful',
+        () async {
+      // arrange
+      when(() => mockAuthLocalDataSource.getRefreshToken())
+          .thenAnswer((_) async => tRefreshTokenString);
+
+      // act
+      final result = await authRepository.getRefreshToken();
+
+      // assert
+      expect(result, const Right(tRefreshTokenString));
+      verify(() => mockAuthLocalDataSource.getRefreshToken()).called(1);
+      verifyNoMoreInteractions(mockAuthLocalDataSource);
+      verifyZeroInteractions(mockAuthRemoteDataSource);
+    });
+
+    test(
+        'should return Left(CacheFailure) when local data source throws CacheException',
+        () async {
+      // arrange
+      when(() => mockAuthLocalDataSource.getRefreshToken())
+          .thenThrow(tCacheException);
+
+      // act
+      final result = await authRepository.getRefreshToken();
+
+      // assert
+      expect(result, const Left(tCacheFailure));
+      verify(() => mockAuthLocalDataSource.getRefreshToken()).called(1);
+      verifyNoMoreInteractions(mockAuthLocalDataSource);
+      verifyZeroInteractions(mockAuthRemoteDataSource);
+    });
+  });
 }
