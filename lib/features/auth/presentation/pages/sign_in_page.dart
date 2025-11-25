@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/common/constants.dart';
 import '../../../../core/helpers/top_snackbar.dart';
+import '../../../../core/presentation/cubit/user_cubit.dart';
 import '../../../../core/widgets/buttons/light_button.dart';
 import '../cubit/auth_cubit.dart';
 
@@ -15,19 +16,19 @@ class SignInPage extends StatelessWidget {
     final authCubit = context.read<AuthCubit>();
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Sign In'),
-      ),
+      appBar: AppBar(title: const Text('Sign In')),
       body: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const .all(16),
         child: Center(
           child: SizedBox(
-            width: double.infinity,
+            width: .infinity,
             child: BlocConsumer<AuthCubit, AuthState>(
               listener: (context, state) {
                 if (state is SignInLoaded) {
                   TopSnackbar.successSnackbar(message: state.message);
-                  context.go(homeRoute);
+                  context
+                    ..read<UserCubit>().setUser = state.user
+                    ..go(homeRoute);
                 }
 
                 if (state is SignInError) {
@@ -35,15 +36,13 @@ class SignInPage extends StatelessWidget {
                 }
               },
               builder: (context, state) {
-                if (state is SignInLoading) {
-                  return LightButton(
-                    icon: Image.asset(googleIcon, height: 40),
-                    label: const Text('Masuk dengan Akun Google'),
-                  );
-                }
+                final onPressed = switch (state) {
+                  SignInLoading() => null,
+                  _ => authCubit.signIn,
+                };
 
                 return LightButton(
-                  onPressed: authCubit.signIn,
+                  onPressed: onPressed,
                   icon: Image.asset(googleIcon, height: 40),
                   label: const Text('Masuk dengan Akun Google'),
                 );
