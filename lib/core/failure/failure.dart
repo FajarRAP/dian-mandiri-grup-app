@@ -52,7 +52,7 @@ class SpreadsheetFailure extends Failure {
       headers: List<String>.from(json['data']['header'])..insert(0, 'Row'),
       hiddenColumnCount: json['data']['hide_column'],
       rows: List<dynamic>.from(json['data']['content'])
-          .map((e) => ListJsonMap.from(e['column'])
+          .map((e) => ListJsonMapNullable.from(e['column'])
             ..insert(0, {'value': '${e['row']}'}))
           .toList(),
     );
@@ -60,7 +60,7 @@ class SpreadsheetFailure extends Failure {
 
   final List<String> headers;
   final int hiddenColumnCount;
-  final List<ListJsonMap> rows;
+  final List<ListJsonMapNullable> rows;
 
   @override
   List<Object?> get props => [...super.props, headers, hiddenColumnCount, rows];
