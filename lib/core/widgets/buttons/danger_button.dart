@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../themes/colors.dart';
+import '../../utils/extensions.dart';
 
 class DangerButton extends StatelessWidget {
   const DangerButton({
@@ -23,9 +23,9 @@ class DangerButton extends StatelessWidget {
       icon: icon,
       label: child,
       style: ElevatedButton.styleFrom(
-        backgroundColor: MaterialColors.error,
-        foregroundColor: MaterialColors.onError,
-        fixedSize: height == null ? null : Size.fromHeight(height!),
+        backgroundColor: context.colorScheme.error,
+        foregroundColor: context.colorScheme.onError,
+        fixedSize: height == null ? null : .fromHeight(height!),
       ),
     );
   }
