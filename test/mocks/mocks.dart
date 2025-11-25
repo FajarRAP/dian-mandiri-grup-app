@@ -7,6 +7,7 @@ import 'package:ship_tracker/features/auth/data/datasources/auth_local_data_sour
 import 'package:ship_tracker/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:ship_tracker/features/supplier/data/datasources/supplier_remote_data_source.dart';
 import 'package:ship_tracker/features/tracker/data/datasources/shipment_remote_data_source.dart';
+import 'package:ship_tracker/features/warehouse/data/datasources/warehouse_remote_data_source.dart';
 
 class MockDio extends Mock implements Dio {}
 
@@ -25,3 +26,6 @@ class MockShipmentRemoteDataSource extends Mock
 
 class MockSupplierRemoteDataSource extends Mock
     implements SupplierRemoteDataSource {}
+
+class MockWarehouseRemoteDataSource extends Mock
+    implements WarehouseRemoteDataSource {}
