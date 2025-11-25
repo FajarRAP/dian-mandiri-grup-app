@@ -1,4 +1,6 @@
-class WarehouseItemEntity {
+import 'package:equatable/equatable.dart';
+
+class WarehouseItemEntity extends Equatable {
   const WarehouseItemEntity({
     this.id,
     this.shipmentFee,
@@ -14,4 +16,8 @@ class WarehouseItemEntity {
   final int quantity;
   final int rejectQuantity;
   final num price;
+
+  @override
+  List<Object?> get props =>
+      [id, shipmentFee, name, quantity, rejectQuantity, price];
 }

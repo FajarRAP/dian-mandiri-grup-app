@@ -29,8 +29,8 @@ class _ReportPageState extends State<ReportPage> {
     super.initState();
     _shipmentCubit = context.read<ShipmentCubit>()
       ..fetchShipmentReports(
-        endDate: dateFormat.format(_dateTimeRange.end),
-        startDate: dateFormat.format(_dateTimeRange.start),
+        endDate: _dateTimeRange.end,
+        startDate: _dateTimeRange.start,
         status: _status,
       );
   }
@@ -40,196 +40,201 @@ class _ReportPageState extends State<ReportPage> {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
 
-    return Scaffold(
-      body: BlocListener<ShipmentCubit, ShipmentState>(
-        listener: (context, state) {
-          if (state is CreateShipmentReportLoaded) {
-            _shipmentCubit.fetchShipmentReports(
-              endDate: dateFormat.format(DateTime.now()),
-              startDate: dateFormat.format(DateTime.now()),
-              status: _status,
-            );
-          }
-        },
-        child: NotificationListener<ScrollNotification>(
-          onNotification: (scrollState) {
-            if (scrollState.runtimeType == ScrollEndNotification &&
-                _shipmentCubit.state is! ListPaginateLast) {
-              _shipmentCubit.fetchShipmentReportsPaginate(
-                endDate: dateFormat.format(_dateTimeRange.end),
-                startDate: dateFormat.format(_dateTimeRange.start),
+    return RefreshIndicator(
+      onRefresh: () async => await _shipmentCubit.fetchShipmentReports(
+          endDate: _dateTimeRange.end,
+          startDate: _dateTimeRange.start,
+          status: _status),
+      child: Scaffold(
+        body: BlocListener<ShipmentCubit, ShipmentState>(
+          listener: (context, state) {
+            if (state is CreateShipmentReportLoaded) {
+              _shipmentCubit.fetchShipmentReports(
+                endDate: _dateTimeRange.end,
+                startDate: _dateTimeRange.start,
                 status: _status,
               );
             }
-
-            return false;
           },
-          child: CustomScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            slivers: <Widget>[
-              SliverAppBar(
-                actions: <Widget>[
-                  PopupMenuButton(
-                    itemBuilder: (context) => <PopupMenuItem>[
-                      PopupMenuItem(
-                        onTap: () => showDialog(
-                          context: context,
-                          builder: (context) =>
-                              CreateReportDateRangeDialog(status: _status),
-                        ),
-                        child: const Text('Buat Laporan'),
-                      ),
-                    ],
-                  ),
-                ],
-                backgroundColor: MaterialColors.surfaceContainerLowest,
-                expandedHeight: kToolbarHeight + kSpaceBarHeight,
-                flexibleSpace: FlexibleSpaceBar(
-                  background: Align(
-                    alignment: Alignment.bottomCenter,
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          TextButton.icon(
-                            onPressed: () async {
-                              final dateTimeRangePicked =
-                                  await showDateRangePicker(
-                                      context: context,
-                                      firstDate: DateTime(2000),
-                                      lastDate: DateTime.now(),
-                                      locale: const Locale('id'));
+          child: NotificationListener<ScrollNotification>(
+            onNotification: (scrollState) {
+              if (scrollState is ScrollEndNotification &&
+                  _shipmentCubit.state is! ListPaginateLast) {
+                _shipmentCubit.fetchShipmentReportsPaginate(
+                  endDate: _dateTimeRange.end,
+                  startDate: _dateTimeRange.start,
+                  status: _status,
+                );
+              }
 
-                              if (dateTimeRangePicked == null) return;
-
-                              _dateTimeRange = dateTimeRangePicked;
-                              final startDate =
-                                  dMyFormat.format(dateTimeRangePicked.start);
-                              final endDate =
-                                  dMyFormat.format(dateTimeRangePicked.end);
-                              setState(() => _dateTimeRangePicked =
-                                  '$startDate s.d.\n$endDate');
-
-                              _shipmentCubit.fetchShipmentReports(
-                                endDate: endDate,
-                                startDate: startDate,
-                                status: _status,
-                              );
-                            },
-                            icon: const Icon(Icons.calendar_month_rounded),
-                            label: Text(_dateTimeRangePicked),
+              return false;
+            },
+            child: CustomScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              slivers: <Widget>[
+                // App Bar
+                SliverAppBar(
+                  actions: <Widget>[
+                    PopupMenuButton(
+                      itemBuilder: (context) => <PopupMenuItem>[
+                        PopupMenuItem(
+                          onTap: () => showDialog(
+                            context: context,
+                            builder: (context) =>
+                                CreateReportDateRangeDialog(status: _status),
                           ),
-                          SizedBox(
-                            width: 150,
-                            child: DropdownButtonFormField<String>(
-                              onChanged: (value) {
-                                if (value == null) return;
+                          child: const Text('Buat Laporan'),
+                        ),
+                      ],
+                    ),
+                  ],
+                  backgroundColor: MaterialColors.surfaceContainerLowest,
+                  expandedHeight: kToolbarHeight + kSpaceBarHeight,
+                  flexibleSpace: FlexibleSpaceBar(
+                    background: Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            TextButton.icon(
+                              onPressed: () async {
+                                final dateTimeRangePicked =
+                                    await showDateRangePicker(
+                                        context: context,
+                                        firstDate: DateTime(2000),
+                                        lastDate: DateTime.now(),
+                                        locale: const Locale('id'));
 
-                                _status = value;
-                                _shipmentCubit.fetchShipmentReports(
-                                  endDate: dMyFormat.format(_dateTimeRange.end),
-                                  startDate:
-                                      dMyFormat.format(_dateTimeRange.start),
+                                if (dateTimeRangePicked == null) return;
+
+                                _dateTimeRange = dateTimeRangePicked;
+                                final startDate = dateTimeRangePicked.start;
+                                final endDate = dateTimeRangePicked.end;
+                                setState(() => _dateTimeRangePicked =
+                                    '${startDate.toDMY} s.d.\n${endDate.toDMY}');
+
+                                await _shipmentCubit.fetchShipmentReports(
+                                  endDate: endDate,
+                                  startDate: startDate,
                                   status: _status,
                                 );
                               },
-                              style: textTheme.bodyMedium?.copyWith(
-                                fontWeight: FontWeight.w500,
-                              ),
-                              items: <DropdownMenuItem<String>>[
-                                DropdownMenuItem(
-                                  value: pendingReport,
-                                  child: const Text('Pending'),
-                                ),
-                                DropdownMenuItem(
-                                  value: processingReport,
-                                  child: const Text('Processing'),
-                                ),
-                                DropdownMenuItem(
-                                  value: completedReport,
-                                  child: const Text('Compeleted'),
-                                ),
-                                DropdownMenuItem(
-                                  value: failedReport,
-                                  child: const Text('Failed'),
-                                ),
-                              ],
-                              value: _status,
+                              icon: const Icon(Icons.calendar_month_rounded),
+                              label: Text(_dateTimeRangePicked),
                             ),
-                          ),
-                        ],
+                            SizedBox(
+                              width: 150,
+                              child: DropdownButtonFormField<String>(
+                                onChanged: (value) {
+                                  if (value == null) return;
+
+                                  _status = value;
+                                  _shipmentCubit.fetchShipmentReports(
+                                    endDate: _dateTimeRange.end,
+                                    startDate: _dateTimeRange.start,
+                                    status: _status,
+                                  );
+                                },
+                                style: textTheme.bodyMedium?.copyWith(
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                items: const <DropdownMenuItem<String>>[
+                                  DropdownMenuItem(
+                                    value: pendingReport,
+                                    child: Text('Pending'),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: processingReport,
+                                    child: Text('Processing'),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: completedReport,
+                                    child: Text('Compeleted'),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: failedReport,
+                                    child: Text('Failed'),
+                                  ),
+                                ],
+                                initialValue: _status,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-                floating: true,
-                pinned: true,
-                shape: const RoundedRectangleBorder(
-                  side: BorderSide(
-                    color: MaterialColors.outlineVariant,
-                    width: 1,
+                  floating: true,
+                  pinned: true,
+                  shape: const RoundedRectangleBorder(
+                    side: BorderSide(
+                      color: MaterialColors.outlineVariant,
+                      width: 1,
+                    ),
                   ),
+                  snap: true,
+                  title: const Text('Laporan'),
                 ),
-                snap: true,
-                title: const Text('Laporan'),
-              ),
-              // List
-              BlocBuilder<ShipmentCubit, ShipmentState>(
-                bloc: _shipmentCubit,
-                buildWhen: (previous, current) =>
-                    current is FetchShipmentReports,
-                builder: (context, state) {
-                  if (state is FetchShipmentReportsLoading) {
-                    return const SliverFillRemaining(
-                      child: Center(
-                        child: CircularProgressIndicator.adaptive(),
-                      ),
-                    );
-                  }
-
-                  if (state is FetchShipmentReportsLoaded) {
-                    if (state.shipmentReports.isEmpty) {
+                // List
+                BlocBuilder<ShipmentCubit, ShipmentState>(
+                  bloc: _shipmentCubit,
+                  buildWhen: (previous, current) =>
+                      current is FetchShipmentReports,
+                  builder: (context, state) {
+                    if (state is FetchShipmentReportsLoading) {
                       return const SliverFillRemaining(
-                        child: Center(
-                          child: Text('Belum ada laporan'),
-                        ),
-                      );
-                    }
-                    
-                    return SliverPadding(
-                      padding: const EdgeInsets.all(16),
-                      sliver: SliverList.builder(
-                        itemBuilder: (context, index) => ShipmentReportListItem(
-                          shipmentReport: state.shipmentReports[index],
-                        ),
-                        itemCount: state.shipmentReports.length,
-                      ),
-                    );
-                  }
-
-                  return const SizedBox();
-                },
-              ),
-              // Widget when Pagination
-              BlocBuilder<ShipmentCubit, ShipmentState>(
-                buildWhen: (previous, current) => current is ListPaginate,
-                builder: (context, state) {
-                  if (state is ListPaginateLoading) {
-                    return SliverPadding(
-                      padding: const EdgeInsets.all(16),
-                      sliver: const SliverToBoxAdapter(
                         child: Center(
                           child: CircularProgressIndicator.adaptive(),
                         ),
-                      ),
-                    );
-                  }
+                      );
+                    }
 
-                  return const SliverToBoxAdapter();
-                },
-              ),
-            ],
+                    if (state is FetchShipmentReportsLoaded) {
+                      if (state.shipmentReports.isEmpty) {
+                        return const SliverFillRemaining(
+                          child: Center(
+                            child: Text('Belum ada laporan'),
+                          ),
+                        );
+                      }
+
+                      return SliverPadding(
+                        padding: const EdgeInsets.all(16),
+                        sliver: SliverList.builder(
+                          itemBuilder: (context, index) =>
+                              ShipmentReportListItem(
+                            shipmentReport: state.shipmentReports[index],
+                          ),
+                          itemCount: state.shipmentReports.length,
+                        ),
+                      );
+                    }
+
+                    return const SizedBox();
+                  },
+                ),
+                // Widget when Pagination
+                BlocBuilder<ShipmentCubit, ShipmentState>(
+                  buildWhen: (previous, current) => current is ListPaginate,
+                  builder: (context, state) {
+                    if (state is ListPaginateLoading) {
+                      return const SliverPadding(
+                        padding: EdgeInsets.all(16),
+                        sliver: SliverToBoxAdapter(
+                          child: Center(
+                            child: CircularProgressIndicator.adaptive(),
+                          ),
+                        ),
+                      );
+                    }
+
+                    return const SliverToBoxAdapter();
+                  },
+                ),
+              ],
+            ),
           ),
         ),
       ),

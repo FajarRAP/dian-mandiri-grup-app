@@ -1,19 +1,37 @@
 import 'package:dartz/dartz.dart';
+import 'package:equatable/equatable.dart';
 
-import '../../../../core/common/use_cases.dart';
-import '../../../../core/failure/failure.dart';
-import '../entities/insert_purchase_note_file_entity.dart';
-import '../repositories/warehouse_repositories.dart';
+import '../../../../core/errors/failure.dart';
+import '../../../../core/usecase/use_case.dart';
+import '../repositories/warehouse_repository.dart';
 
 class InsertPurchaseNoteFileUseCase
-    implements AsyncUseCaseParams<String, InsertPurchaseNoteFileEntity> {
-  const InsertPurchaseNoteFileUseCase({required this.warehouseRepositories});
+    implements UseCase<String, InsertPurchaseNoteFileUseCaseParams> {
+  const InsertPurchaseNoteFileUseCase({required this.warehouseRepository});
 
-  final WarehouseRepositories warehouseRepositories;
+  final WarehouseRepository warehouseRepository;
   @override
-  Future<Either<Failure, String>> call(
-      InsertPurchaseNoteFileEntity params) async {
-    return await warehouseRepositories.insertPurchaseNoteFile(
-        purchaseNote: params);
+  Future<Either<Failure, String>> execute(
+      InsertPurchaseNoteFileUseCaseParams params) async {
+    return await warehouseRepository.insertPurchaseNoteFile(params);
   }
+}
+
+class InsertPurchaseNoteFileUseCaseParams extends Equatable {
+  const InsertPurchaseNoteFileUseCaseParams({
+    required this.date,
+    required this.receipt,
+    this.note,
+    required this.supplierId,
+    required this.file,
+  });
+
+  final DateTime date;
+  final String receipt;
+  final String? note;
+  final String supplierId;
+  final String file;
+
+  @override
+  List<Object?> get props => [date, receipt, note, supplierId, file];
 }

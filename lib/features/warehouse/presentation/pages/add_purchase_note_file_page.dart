@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/common/dropdown_entity.dart';
-import '../../../../core/failure/failure.dart';
+import '../../../../core/errors/failure.dart';
 import '../../../../core/helpers/helpers.dart';
 import '../../../../core/helpers/top_snackbar.dart';
 import '../../../../core/helpers/validators.dart';
@@ -15,7 +15,7 @@ import '../../../../core/widgets/image_picker_bottom_sheet.dart';
 import '../../../../core/widgets/preview_picked_image_dialog.dart';
 import '../../../../core/widgets/buttons/primary_button.dart';
 import '../../../../core/widgets/buttons/primary_outline_button.dart';
-import '../../domain/entities/insert_purchase_note_file_entity.dart';
+import '../../domain/usecases/insert_purchase_note_file_use_case.dart';
 import '../cubit/warehouse_cubit.dart';
 
 class AddPurchaseNoteFilePage extends StatefulWidget {
@@ -334,7 +334,7 @@ class _AddPurchaseNoteFilePageState extends State<AddPurchaseNoteFilePage> {
                     return TopSnackbar.dangerSnackbar(message: message);
                   }
 
-                  final purchaseNote = InsertPurchaseNoteFileEntity(
+                  final purchaseNote = InsertPurchaseNoteFileUseCaseParams(
                     date: _pickedDate!,
                     note: _noteController.text,
                     receipt: _pickedImage!.path,

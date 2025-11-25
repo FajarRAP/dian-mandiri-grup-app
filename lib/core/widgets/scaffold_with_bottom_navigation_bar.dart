@@ -3,20 +3,20 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 
 import '../../features/auth/presentation/cubit/auth_cubit.dart';
 import '../../service_container.dart';
-import '../themes/colors.dart';
 import '../common/constants.dart';
+import '../services/google_sign_in_service.dart';
+import '../themes/colors.dart';
 
 class ScaffoldWithBottomNavigationBar extends StatelessWidget {
-  final StatefulNavigationShell child;
-
   const ScaffoldWithBottomNavigationBar({
     super.key,
     required this.child,
   });
+
+  final StatefulNavigationShell child;
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +27,7 @@ class ScaffoldWithBottomNavigationBar extends StatelessWidget {
           final storage = getIt.get<FlutterSecureStorage>();
           final refresh = await storage.read(key: refreshTokenKey);
 
-          if (refresh == null) await GoogleSignIn().signOut();
+          if (refresh == null) await getIt<GoogleSignInService>().signOut();
           if (!context.mounted) return;
           if (refresh == null) context.go(loginRoute);
         }

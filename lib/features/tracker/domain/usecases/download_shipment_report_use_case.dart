@@ -1,30 +1,36 @@
 import 'package:dartz/dartz.dart';
+import 'package:equatable/equatable.dart';
 
-import '../../../../core/common/use_cases.dart';
-import '../../../../core/failure/failure.dart';
-import '../repositories/shipment_repositories.dart';
+import '../../../../core/errors/failure.dart';
+import '../../../../core/usecase/use_case.dart';
+import '../repositories/shipment_repository.dart';
 
 class DownloadShipmentReportUseCase
-    implements AsyncUseCaseParams<String, DownloadShipmentReportUseCaseParams> {
-  const DownloadShipmentReportUseCase({required this.shipmentRepositories});
+    implements UseCase<String, DownloadShipmentReportUseCaseParams> {
+  const DownloadShipmentReportUseCase({required this.shipmentRepository});
 
-  final ShipmentRepositories shipmentRepositories;
+  final ShipmentRepository shipmentRepository;
 
   @override
-  Future<Either<Failure, String>> call(
+  Future<Either<Failure, String>> execute(
       DownloadShipmentReportUseCaseParams params) async {
-    return await shipmentRepositories.downloadShipmentReport(params: params);
+    return await shipmentRepository.downloadShipmentReport(params);
   }
 }
 
-final class DownloadShipmentReportUseCaseParams {
+class DownloadShipmentReportUseCaseParams extends Equatable {
   const DownloadShipmentReportUseCaseParams({
+    required this.externalPath,
     required this.fileUrl,
     required this.filename,
     required this.createdAt,
   });
 
+  final String externalPath;
   final String fileUrl;
   final String filename;
   final DateTime createdAt;
+
+  @override
+  List<Object?> get props => [externalPath, fileUrl, filename, createdAt];
 }

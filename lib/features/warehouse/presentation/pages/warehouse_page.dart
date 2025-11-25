@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/common/constants.dart';
-import '../../../../core/helpers/debouncer.dart';
+import '../../../../core/utils/debouncer.dart';
 import '../../../../core/helpers/top_snackbar.dart';
 import '../../../../core/themes/colors.dart';
 import '../../../../core/widgets/confirmation_dialog.dart';
@@ -39,7 +39,7 @@ class WarehousePage extends StatelessWidget {
           onRefresh: warehouseCubit.fetchPurchaseNotes,
           child: NotificationListener<ScrollNotification>(
             onNotification: (scrollState) {
-              if (scrollState.runtimeType == ScrollEndNotification &&
+              if (scrollState is ScrollEndNotification &&
                   warehouseCubit.state is! ListPaginateLast) {
                 warehouseCubit.fetchPurchaseNotesPaginate(
                     column: column, sort: sort, search: search);
@@ -55,9 +55,7 @@ class WarehousePage extends StatelessWidget {
                   actions: <Widget>[
                     PopupMenuButton(
                       onSelected: (value) {
-                        final params = value.split(',');
-                        column = params.first;
-                        sort = params.last;
+                        [column, sort] = value.split(',');
                         warehouseCubit.fetchPurchaseNotes(
                           column: column,
                           sort: sort,
@@ -95,14 +93,11 @@ class WarehousePage extends StatelessWidget {
                       child: Padding(
                         padding: const EdgeInsets.all(16),
                         child: TextFormField(
-                          onChanged: (value) {
-                            search = value;
-                            debouncer.run(() =>
-                                warehouseCubit.fetchPurchaseNotes(
-                                    column: column,
-                                    sort: sort,
-                                    search: search));
-                          },
+                          onChanged: (value) => debouncer.run(() =>
+                              warehouseCubit.fetchPurchaseNotes(
+                                  column: column,
+                                  sort: sort,
+                                  search: search = value)),
                           onTapOutside: (event) => focusNode.unfocus(),
                           decoration: const InputDecoration(
                             hintText: 'Cari Nota',
@@ -149,10 +144,6 @@ class WarehousePage extends StatelessWidget {
                         padding: const EdgeInsets.all(16),
                         sliver: SliverList.separated(
                           itemBuilder: (context, index) => PurchaseNoteItem(
-                            onTap: () => context.push(
-                              purchaseNoteDetailRoute,
-                              extra: state.purchaseNotes[index].id,
-                            ),
                             onDelete: () => showDialog(
                               context: context,
                               builder: (context) =>
@@ -162,7 +153,6 @@ class WarehousePage extends StatelessWidget {
                                     TopSnackbar.successSnackbar(
                                         message: state.message);
                                     context.pop();
-                                    warehouseCubit.fetchPurchaseNotes();
                                   }
 
                                   if (state is DeletePurchaseNoteError) {
@@ -172,22 +162,16 @@ class WarehousePage extends StatelessWidget {
                                   }
                                 },
                                 builder: (context, deleteState) {
-                                  if (deleteState
-                                      is DeletePurchaseNoteLoading) {
-                                    return ConfirmationDialog(
-                                      actionText: 'Hapus',
-                                      body:
-                                          'Apakah Anda yakin ingin menghapus nota ini?',
-                                      title: 'Hapus Nota',
-                                    );
-                                  }
+                                  final onAction = switch (deleteState) {
+                                    DeletePurchaseNoteLoading() => null,
+                                    _ => () =>
+                                        warehouseCubit.deletePurchaseNote(
+                                            purchaseNoteId:
+                                                state.purchaseNotes[index].id),
+                                  };
 
                                   return ConfirmationDialog(
-                                    onAction: () =>
-                                        warehouseCubit.deletePurchaseNote(
-                                      purchaseNoteId:
-                                          state.purchaseNotes[index].id,
-                                    ),
+                                    onAction: onAction,
                                     actionText: 'Hapus',
                                     body:
                                         'Apakah Anda yakin ingin menghapus nota ini?',
@@ -195,6 +179,10 @@ class WarehousePage extends StatelessWidget {
                                   );
                                 },
                               ),
+                            ),
+                            onTap: () => context.push(
+                              purchaseNoteDetailRoute,
+                              extra: state.purchaseNotes[index].id,
                             ),
                             purchaseNoteSummary: state.purchaseNotes[index],
                           ),
@@ -213,9 +201,9 @@ class WarehousePage extends StatelessWidget {
                   buildWhen: (previous, current) => current is ListPaginate,
                   builder: (context, state) {
                     if (state is ListPaginateLoading) {
-                      return SliverPadding(
-                        padding: const EdgeInsets.all(16),
-                        sliver: const SliverToBoxAdapter(
+                      return const SliverPadding(
+                        padding: EdgeInsets.all(16),
+                        sliver: SliverToBoxAdapter(
                           child: Center(
                             child: CircularProgressIndicator.adaptive(),
                           ),

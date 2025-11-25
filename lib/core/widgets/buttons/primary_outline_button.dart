@@ -25,7 +25,7 @@ class PrimaryOutlineButton extends StatelessWidget {
         elevation: 0,
         foregroundColor: CustomColors.primaryNormal,
         fixedSize: height == null ? null : Size.fromHeight(height!),
-        side: BorderSide(
+        side: const BorderSide(
           color: CustomColors.primaryNormal,
           width: 1.5,
         ),

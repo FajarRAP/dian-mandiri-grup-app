@@ -32,10 +32,11 @@ class _DateRangeDialogState extends State<CreateReportDateRangeDialog> {
   @override
   void initState() {
     super.initState();
-    final startDate = dMyFormat.format(_dateTimeRange.start);
-    final endDate = dMyFormat.format(_dateTimeRange.end);
+    final startDate = _dateTimeRange.start;
+    final endDate = _dateTimeRange.end;
     _shipmentCubit = context.read<ShipmentCubit>();
-    _dateController = TextEditingController(text: '$startDate s.d. $endDate');
+    _dateController =
+        TextEditingController(text: '${startDate.toDMY} s.d. ${endDate.toDMY}');
     _formKey = GlobalKey<FormState>();
   }
 
@@ -55,6 +56,7 @@ class _DateRangeDialogState extends State<CreateReportDateRangeDialog> {
       content: Form(
         key: _formKey,
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             Text(
@@ -62,6 +64,7 @@ class _DateRangeDialogState extends State<CreateReportDateRangeDialog> {
               style: textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w700,
               ),
+              textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
             Text(
@@ -83,10 +86,10 @@ class _DateRangeDialogState extends State<CreateReportDateRangeDialog> {
                 if (dateTimeRangePicked == null) return;
 
                 _dateTimeRange = dateTimeRangePicked;
-                final startDate = dMyFormat.format(dateTimeRangePicked.start);
-                final endDate = dMyFormat.format(dateTimeRangePicked.end);
-                setState(
-                    () => _dateController.text = '$startDate s.d. $endDate');
+                final startDate = dateTimeRangePicked.start;
+                final endDate = dateTimeRangePicked.end;
+                _dateController.text =
+                    '${startDate.toDMY} s.d. ${endDate.toDMY}';
               },
               controller: _dateController,
               decoration: const InputDecoration(
@@ -97,50 +100,43 @@ class _DateRangeDialogState extends State<CreateReportDateRangeDialog> {
               validator: inputValidator,
             ),
             const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              child: BlocConsumer<ShipmentCubit, ShipmentState>(
-                buildWhen: (previous, current) =>
-                    current is CreateShipmentReport,
-                listenWhen: (previous, current) =>
-                    current is CreateShipmentReport,
-                listener: (context, state) {
-                  if (state is CreateShipmentReportLoaded) {
-                    TopSnackbar.successSnackbar(message: state.message);
-                    context.pop();
-                  }
+            BlocConsumer<ShipmentCubit, ShipmentState>(
+              buildWhen: (previous, current) => current is CreateShipmentReport,
+              listenWhen: (previous, current) =>
+                  current is CreateShipmentReport,
+              listener: (context, state) {
+                if (state is CreateShipmentReportLoaded) {
+                  TopSnackbar.successSnackbar(message: state.message);
+                  context.pop();
+                }
 
-                  if (state is CreateShipmentReportError) {
-                    TopSnackbar.dangerSnackbar(message: state.message);
-                  }
-                },
-                builder: (context, state) {
-                  if (state is CreateShipmentReportLoading) {
-                    return const PrimaryButton(
-                      child: Text('Buat Laporan'),
-                    );
-                  }
-
-                  return PrimaryButton(
-                    onPressed: () {
-                      if (!_formKey.currentState!.validate()) return;
-
-                      _shipmentCubit.createShipmentReport(
-                        startDate: dateFormat.format(_dateTimeRange.start),
-                        endDate: dateFormat.format(_dateTimeRange.end),
-                      );
-                    },
-                    child: const Text('Buat Laporan'),
+                if (state is CreateShipmentReportError) {
+                  TopSnackbar.dangerSnackbar(message: state.message);
+                }
+              },
+              builder: (context, state) {
+                if (state is CreateShipmentReportLoading) {
+                  return const PrimaryButton(
+                    child: Text('Buat Laporan'),
                   );
-                },
-              ),
+                }
+
+                return PrimaryButton(
+                  onPressed: () {
+                    if (!_formKey.currentState!.validate()) return;
+
+                    _shipmentCubit.createShipmentReport(
+                      startDate: _dateTimeRange.start,
+                      endDate: _dateTimeRange.end,
+                    );
+                  },
+                  child: const Text('Buat Laporan'),
+                );
+              },
             ),
-            SizedBox(
-              width: double.infinity,
-              child: TextButton(
-                onPressed: context.pop,
-                child: const Text('Batal'),
-              ),
+            TextButton(
+              onPressed: context.pop,
+              child: const Text('Batal'),
             ),
           ],
         ),

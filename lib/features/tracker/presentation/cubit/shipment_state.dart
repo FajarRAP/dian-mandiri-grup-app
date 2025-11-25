@@ -34,105 +34,105 @@ class FetchReceiptStatus extends ShipmentState {}
 class FetchShipmentsLoading extends FetchShipments {}
 
 class FetchShipmentsLoaded extends FetchShipments {
-  final List<ShipmentEntity> shipments;
-
   FetchShipmentsLoaded({required this.shipments});
+
+  final List<ShipmentEntity> shipments;
 }
 
 class FetchShipmentsError extends FetchShipments {
-  final String message;
-
   FetchShipmentsError({required this.message});
+
+  final String message;
 }
 
 class SearchShipmentsLoaded extends FetchShipments {
-  final List<ShipmentEntity> shipments;
-
   SearchShipmentsLoaded({required this.shipments});
+
+  final List<ShipmentEntity> shipments;
 }
 
 class InsertShipmentLoading extends InsertShipment {}
 
 class InsertShipmentLoaded extends InsertShipment {
-  final String message;
-
   InsertShipmentLoaded({required this.message});
+
+  final String message;
 }
 
 class InsertShipmentError extends InsertShipment {
-  final Failure failure;
-
   InsertShipmentError({required this.failure});
+
+  final Failure failure;
 }
 
 class FetchShipmentDetailLoading extends FetchShipmentDetail {}
 
 class FetchShipmentDetailLoaded extends FetchShipmentDetail {
-  final ShipmentDetailEntity shipmentDetail;
-
   FetchShipmentDetailLoaded({required this.shipmentDetail});
+
+  final ShipmentDetailEntity shipmentDetail;
 }
 
 class FetchShipmentDetailError extends FetchShipmentDetail {
-  final String message;
-
   FetchShipmentDetailError({required this.message});
+
+  final String message;
 }
 
 class InsertShipmentDocumentLoading extends InsertShipmentDocument {}
 
 class InsertShipmentDocumentLoaded extends InsertShipmentDocument {
-  final String message;
-
   InsertShipmentDocumentLoaded({required this.message});
+
+  final String message;
 }
 
 class InsertShipmentDocumentError extends InsertShipmentDocument {
-  final String message;
-
   InsertShipmentDocumentError({required this.message});
+
+  final String message;
 }
 
 class DeleteShipmentLoading extends DeleteShipment {}
 
 class DeleteShipmentLoaded extends DeleteShipment {
-  final String message;
-
   DeleteShipmentLoaded({required this.message});
+
+  final String message;
 }
 
 class DeleteShipmentError extends DeleteShipment {
-  final String message;
-
   DeleteShipmentError({required this.message});
+
+  final String message;
 }
 
 class FetchShipmentReportsLoading extends FetchShipmentReports {}
 
 class FetchShipmentReportsLoaded extends FetchShipmentReports {
-  final List<ShipmentReportEntity> shipmentReports;
-
   FetchShipmentReportsLoaded({required this.shipmentReports});
+
+  final List<ShipmentReportEntity> shipmentReports;
 }
 
 class FetchShipmentReportsError extends FetchShipmentReports {
-  final String message;
-
   FetchShipmentReportsError({required this.message});
+
+  final String message;
 }
 
 class CreateShipmentReportLoading extends CreateShipmentReport {}
 
 class CreateShipmentReportLoaded extends CreateShipmentReport {
-  final String message;
-
   CreateShipmentReportLoaded({required this.message});
+
+  final String message;
 }
 
 class CreateShipmentReportError extends CreateShipmentReport {
-  final String message;
-
   CreateShipmentReportError({required this.message});
+
+  final String message;
 }
 
 class DownloadShipmentReportLoading extends DownloadShipmentReport {
@@ -142,27 +142,27 @@ class DownloadShipmentReportLoading extends DownloadShipmentReport {
 }
 
 class DownloadShipmentReportLoaded extends DownloadShipmentReport {
-  final String message;
-
   DownloadShipmentReportLoaded({required this.message});
+
+  final String message;
 }
 
 class DownloadShipmentReportError extends DownloadShipmentReport {
-  final String message;
-
   DownloadShipmentReportError({required this.message});
+
+  final String message;
 }
 
 class FetchReceiptStatusLoading extends FetchReceiptStatus {}
 
 class FetchReceiptStatusLoaded extends FetchReceiptStatus {
-  final ShipmentDetailEntity shipmentDetail;
+  FetchReceiptStatusLoaded({required this.shipmentHistory});
 
-  FetchReceiptStatusLoaded({required this.shipmentDetail});
+  final ShipmentHistoryEntity shipmentHistory;
 }
 
 class FetchReceiptStatusError extends FetchReceiptStatus {
-  final Failure failure;
-
   FetchReceiptStatusError({required this.failure});
+
+  final Failure failure;
 }

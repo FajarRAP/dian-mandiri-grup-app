@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'color_scheme.dart';
 import 'colors.dart';
 
 const fontFamily = 'Inter18pt';
@@ -16,10 +17,20 @@ final theme = ThemeData(
       fontWeight: FontWeight.w400,
     ),
   ),
-  colorScheme: ColorScheme.fromSeed(
-    seedColor: CustomColors.primaryNormal,
-    primary: CustomColors.primaryNormal,
+  bottomSheetTheme: const BottomSheetThemeData(
+    constraints: BoxConstraints(
+      maxHeight: 550,
+    ),
+    dragHandleColor: Color(0xFFE0E0E0),
+    dragHandleSize: Size(48, 5),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(
+        top: Radius.circular(16),
+      ),
+    ),
+    showDragHandle: true,
   ),
+  colorScheme: colorScheme,
   fontFamily: fontFamily,
   floatingActionButtonTheme: const FloatingActionButtonThemeData(
     backgroundColor: CustomColors.primaryNormal,
@@ -69,7 +80,7 @@ final theme = ThemeData(
     ),
     filled: true,
     fillColor: Colors.grey.shade50,
-    hintStyle: TextStyle(
+    hintStyle: const TextStyle(
       color: MaterialColors.onSurfaceVariant,
       fontSize: 16,
     ),

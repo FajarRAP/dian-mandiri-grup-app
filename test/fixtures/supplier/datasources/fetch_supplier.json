@@ -1,0 +1,13 @@
+{
+    "message": "Success get detail supplier!",
+    "data": {
+        "id": "71213ab2-eb64-4873-9732-a77681c9523f",
+        "name": "ayyubi",
+        "email": "tk.ajib@gmail.com",
+        "phone": "087885020053",
+        "address": "pergudangan gracia tunggak jati jl. proklamasi",
+        "avatar": "https://storage.dianmandirigrup.id/staging-app/supplier/avatar/f23d2884-66ac-4fe7-b1db-7f260014befa.jpg",
+        "created_at": "2025-08-31T08:04:37.870153Z",
+        "updated_at": null
+    }
+}

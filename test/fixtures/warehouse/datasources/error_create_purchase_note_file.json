@@ -1,0 +1,53 @@
+{
+    "message": "Failed to validate spreadsheet, please check detail rows and columns",
+    "data": {
+        "header": [
+            "Name",
+            "Total",
+            "Total Reject",
+            "Price"
+        ],
+        "content": [
+            {
+                "row": 2,
+                "column": [
+                    null,
+                    {
+                        "value": "p",
+                        "error": "Total value is invalid"
+                    },
+                    null,
+                    null
+                ]
+            },
+            {
+                "row": 3,
+                "column": [
+                    null,
+                    null,
+                    null,
+                    {
+                        "value": "lorem",
+                        "error": "Price value is invalid"
+                    }
+                ]
+            },
+            {
+                "row": 4,
+                "column": [
+                    null,
+                    {
+                        "value": "q",
+                        "error": "Total value is invalid"
+                    },
+                    {
+                        "value": "/",
+                        "error": "Total reject value is invalid"
+                    },
+                    null
+                ]
+            }
+        ],
+        "hide_column": 0
+    }
+}

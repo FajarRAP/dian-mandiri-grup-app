@@ -8,7 +8,6 @@ import '../../../../core/helpers/top_snackbar.dart';
 import '../../../../core/widgets/buttons/primary_button.dart';
 import '../../../../core/widgets/image_picker_bottom_sheet.dart';
 import '../../../auth/presentation/cubit/auth_cubit.dart';
-import '../../data/models/shipment_detail_model.dart';
 import '../cubit/shipment_cubit.dart';
 import '../widgets/image_not_found.dart';
 import '../widgets/shipment_detail_info_row.dart';
@@ -52,12 +51,11 @@ class ShipmentDetailPage extends StatelessWidget {
             }
 
             if (state is FetchShipmentDetailLoaded) {
-              final shipmentDetail =
-                  state.shipmentDetail as ShipmentDetailModel;
+              final shipmentDetail = state.shipmentDetail;
               // final isSuperAdmin =
               //     authCubit.user.permissions.contains(superAdminPermission);
               final isHasUploadPermission =
-                  authCubit.user.id == shipmentDetail.stage.user.id;
+                  authCubit.user.id == shipmentDetail.user.id;
 
               return RefreshIndicator(
                 onRefresh: () async => await shipmentCubit.fetchShipmentById(
@@ -88,16 +86,11 @@ class ShipmentDetailPage extends StatelessWidget {
                                 extra: {
                                   'image_path': image.path,
                                   'shipment_id': shipmentId,
-                                  'stage': shipmentDetail.stage.stage,
+                                  'stage': shipmentDetail.stage,
                                 },
                               ),
                             ),
                             context: context,
-                            shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.vertical(
-                                top: Radius.circular(16),
-                              ),
-                            ),
                           ),
                           icon: const Icon(Icons.camera_alt),
                           child: const Text('Upload Resi'),
@@ -116,7 +109,7 @@ class ShipmentDetailPage extends StatelessWidget {
                     const SizedBox(height: 12),
                     ShipmentDetailInfoRow(
                       label: 'Di Scan Oleh',
-                      value: shipmentDetail.stage.user.name,
+                      value: shipmentDetail.user.name,
                     ),
                     const SizedBox(height: 8),
                     ShipmentDetailInfoRow(
@@ -131,13 +124,12 @@ class ShipmentDetailPage extends StatelessWidget {
                     const SizedBox(height: 8),
                     ShipmentDetailInfoRow(
                       label: 'Stage',
-                      value: shipmentDetail.stage.stage,
+                      value: shipmentDetail.stage,
                     ),
                     const SizedBox(height: 8),
                     ShipmentDetailInfoRow(
                       label: 'Tanggal Scan',
-                      value: dateTimeFormat
-                          .format(shipmentDetail.stage.date.toLocal()),
+                      value: shipmentDetail.date.toLocal().toDMYHMS,
                     ),
                   ],
                 ),

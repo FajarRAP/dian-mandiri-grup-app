@@ -1,22 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 
 import '../../../../core/common/constants.dart';
 import '../../../../core/common/shadows.dart';
-import '../../../../core/helpers/helpers.dart';
 import '../../../../core/helpers/top_snackbar.dart';
 import '../../../../core/themes/colors.dart';
 import '../../../../core/widgets/buttons/danger_button.dart';
-import '../../../../core/widgets/confirmation_dialog.dart';
-import '../../../../core/widgets/confirmation_input_dialog.dart';
 import '../../../../core/widgets/expanded_fab/action_button.dart';
 import '../../../../core/widgets/expanded_fab/expandable_fab.dart';
 import '../../../auth/presentation/cubit/auth_cubit.dart';
-import '../../data/models/shipment_detail_status_model.dart';
 import '../cubit/shipment_cubit.dart';
+import '../widgets/cancel_shipment_dialog.dart';
+import '../widgets/check_receipt_status_from_scanner_dialog.dart';
 import '../widgets/receipt_status_history_timeline.dart';
 import '../widgets/receipt_status_info_row.dart';
 
@@ -26,9 +23,9 @@ class ReceiptStatusPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final textTheme = theme.textTheme;
     final authCubit = context.read<AuthCubit>();
     final shipmentCubit = context.read<ShipmentCubit>();
+    final textTheme = theme.textTheme;
     final permissions = authCubit.user.permissions;
     final isSuperAdmin = permissions.contains(superAdminPermission);
 
@@ -55,10 +52,9 @@ class ReceiptStatusPage extends StatelessWidget {
             }
 
             if (state is FetchReceiptStatusLoaded) {
-              final shipmentDetail =
-                  state.shipmentDetail as ShipmentDetailStatusModel;
-              final stages = shipmentDetail.stages;
-              final isCanceled = shipmentDetail.stages
+              final shipmentHistory = state.shipmentHistory;
+              final stages = shipmentHistory.stages;
+              final isCanceled = shipmentHistory.stages
                   .any((stage) => stage.stage == cancelStage);
 
               return SingleChildScrollView(
@@ -73,7 +69,7 @@ class ReceiptStatusPage extends StatelessWidget {
                     children: <Widget>[
                       // Header
                       Container(
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           borderRadius: const BorderRadius.vertical(
                             top: Radius.circular(16),
                           ),
@@ -128,9 +124,8 @@ class ReceiptStatusPage extends StatelessWidget {
                                   trailing: IconButton(
                                     onPressed: () {
                                       Clipboard.setData(ClipboardData(
-                                          text: state
-                                              .shipmentDetail.receiptNumber));
-                                      final message =
+                                          text: shipmentHistory.receiptNumber));
+                                      const message =
                                           'Nomor Resi disalin ke clipboard';
                                       TopSnackbar.successSnackbar(
                                           message: message);
@@ -141,13 +136,13 @@ class ReceiptStatusPage extends StatelessWidget {
                                       color: CustomColors.primaryNormal,
                                     ),
                                   ),
-                                  value: state.shipmentDetail.receiptNumber,
+                                  value: shipmentHistory.receiptNumber,
                                 ),
                                 const SizedBox(height: 12),
                                 ReceiptStatusInfoRow(
                                   icon: Icons.local_shipping,
                                   label: 'Nama Ekspedisi',
-                                  value: state.shipmentDetail.courier,
+                                  value: shipmentHistory.courier,
                                 ),
                               ],
                             ),
@@ -160,93 +155,21 @@ class ReceiptStatusPage extends StatelessWidget {
                               onPressed: () => showDialog(
                                 context: context,
                                 builder: (context) =>
-                                    BlocConsumer<ShipmentCubit, ShipmentState>(
-                                  buildWhen: (previous, current) =>
-                                      current is InsertShipment,
-                                  listenWhen: (previous, current) =>
-                                      current is InsertShipment,
+                                    BlocListener<ShipmentCubit, ShipmentState>(
                                   listener: (context, state) {
                                     if (state is InsertShipmentLoaded) {
-                                      TopSnackbar.successSnackbar(
-                                          message: state.message);
-                                      context.pop();
                                       shipmentCubit
                                           .fetchShipmentByReceiptNumber(
                                         receiptNumber:
-                                            shipmentDetail.receiptNumber,
+                                            shipmentHistory.receiptNumber,
                                       );
                                     }
-
-                                    if (state is InsertShipmentError) {
-                                      TopSnackbar.dangerSnackbar(
-                                          message: state.failure.message);
-                                    }
                                   },
-                                  builder: (context, state) {
-                                    return ConfirmationDialog(
-                                      onAction: () async =>
-                                          await shipmentCubit.insertShipment(
-                                        receiptNumber:
-                                            shipmentDetail.receiptNumber,
-                                        stage: cancelStage,
-                                      ),
-                                      actionText: 'Cancel',
-                                      body: 'Yakin ingin cancel resi ini?',
-                                      title: 'Cancel Resi',
-                                    );
-                                  },
+                                  child: CancelShipmentDialog(
+                                    receiptNumber:
+                                        shipmentHistory.receiptNumber,
+                                  ),
                                 ),
-                                // AlertDialog(
-                                //   title: const Text('Konfirmasi'),
-                                //   content: const Text(
-                                //     'Apakah Anda yakin ingin membatalkan resi ini?',
-                                //   ),
-                                //   actions: <Widget>[
-                                //     TextButton(
-                                //       onPressed: context.pop,
-                                //       child: const Text('Tidak'),
-                                //     ),
-                                //     BlocConsumer<ShipmentCubit, ShipmentState>(
-                                //       listener: (context, cancelState) {
-                                //         if (cancelState
-                                //             is InsertShipmentLoaded) {
-                                //           context.pop();
-                                //           shipmentCubit
-                                //               .fetchShipmentByReceiptNumber(
-                                //             receiptNumber: state
-                                //                 .shipmentDetail.receiptNumber,
-                                //           );
-                                //         }
-                                //         if (cancelState
-                                //             is InsertShipmentError) {
-                                //           context.pop();
-                                //           scaffoldMessengerKey.currentState
-                                //               ?.showSnackBar(
-                                //             dangerSnackbar(
-                                //                 cancelState.failure.message),
-                                //           );
-                                //         }
-                                //       },
-                                //       builder: (context, cancelState) {
-                                //         if (cancelState
-                                //             is InsertShipmentLoading) {
-                                //           return const CircularProgressIndicator
-                                //               .adaptive();
-                                //         }
-
-                                //         return TextButton(
-                                //           onPressed: () =>
-                                //               shipmentCubit.insertShipment(
-                                //             receiptNumber: state
-                                //                 .shipmentDetail.receiptNumber,
-                                //             stage: cancelStage,
-                                //           ),
-                                //           child: const Text('Ya'),
-                                //         );
-                                //       },
-                                //     ),
-                                //   ],
-                                // ),
                               ),
                               child: const Text('Cancel Resi'),
                             ),
@@ -256,7 +179,7 @@ class ReceiptStatusPage extends StatelessWidget {
                           // Shipment Histories
                           Row(
                             children: <Widget>[
-                              Icon(
+                              const Icon(
                                 Icons.history,
                                 color: CustomColors.primaryNormal,
                               ),
@@ -330,54 +253,13 @@ class ReceiptStatusPage extends StatelessWidget {
           ),
           ActionButton(
             onPressed: () => showDialog(
-              builder: (context) => BlocConsumer<ShipmentCubit, ShipmentState>(
-                buildWhen: (previous, current) => current is FetchReceiptStatus,
-                listenWhen: (previous, current) =>
-                    current is FetchReceiptStatus,
-                listener: (context, state) {
-                  if (state is FetchReceiptStatusLoaded) {
-                    context.pop();
-                  }
-                },
-                builder: (context, state) {
-                  if (state is FetchReceiptStatusLoading) {
-                    return _buildConfirmationInputDialog(
-                        shipmentCubit: shipmentCubit);
-                  }
-
-                  return _buildConfirmationInputDialog(
-                      onAction: (value) async => await shipmentCubit
-                          .fetchShipmentByReceiptNumber(receiptNumber: value),
-                      shipmentCubit: shipmentCubit);
-                },
-              ),
+              builder: (context) => const CheckReceiptStatusFromScannerDialog(),
               context: context,
             ),
             icon: Icons.barcode_reader,
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildConfirmationInputDialog({
-    void Function(String value)? onAction,
-    required ShipmentCubit shipmentCubit,
-  }) {
-    return ConfirmationInputDialog(
-      onAction: onAction,
-      actionText: 'Cari',
-      body: 'Silakan scan nomor resi menggunakan scanner',
-      textFormFieldConfig: TextFormFieldConfig(
-        onFieldSubmitted: (value) =>
-            shipmentCubit.fetchShipmentByReceiptNumber(receiptNumber: value),
-        autoFocus: true,
-        decoration: const InputDecoration(
-          labelText: 'Hasil Scan',
-        ),
-        textInputAction: TextInputAction.send,
-      ),
-      title: 'Cari Resi',
     );
   }
 }

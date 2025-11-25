@@ -1,7 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
 
-import '../../../../core/common/use_cases.dart';
+import '../../../../core/usecase/use_case.dart';
 import '../../domain/entities/user_entity.dart';
 import '../../domain/usecases/fetch_user_from_storage_use_case.dart';
 import '../../domain/usecases/fetch_user_use_case.dart';
@@ -39,7 +39,7 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> fetchUser() async {
     emit(FetchUserLoading());
 
-    final result = await _fetchUserUseCase(NoParams());
+    final result = await _fetchUserUseCase();
 
     result.fold(
       (failure) => emit(FetchUserError(message: failure.message)),
@@ -50,18 +50,21 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> fetchUserFromStorage() async {
     emit(FetchUserLoading());
 
-    final userFromStorage = await _fetchUserFromStorageUseCase(NoParams());
+    final userFromStorage = await _fetchUserFromStorageUseCase();
 
     userFromStorage.fold(
       (failure) => emit(FetchUserError(message: failure.message)),
-      (user) => emit(FetchUserLoaded(user: this.user = user)),
+      (user) => user == null
+          ? emit(FetchUserError(message: 'No user found in storage'))
+          : emit(FetchUserLoaded(user: this.user = user)),
     );
   }
 
   Future<void> refreshToken({required String? refreshToken}) async {
     emit(RefreshTokenLoading());
 
-    final result = await _refreshTokenUseCase('$refreshToken');
+    final params = RefreshTokenUseCaseParams(refreshToken: '$refreshToken');
+    final result = await _refreshTokenUseCase(params);
 
     result.fold(
       (failure) => emit(RefreshTokenError(message: failure.message)),
@@ -72,7 +75,7 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> signIn() async {
     emit(SignInLoading());
 
-    final result = await _signInUseCase(NoParams());
+    final result = await _signInUseCase();
 
     result.fold(
       (failure) => emit(SignInError(message: failure.message)),
@@ -83,7 +86,7 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> signOut() async {
     emit(SignOutLoading());
 
-    final result = await _signOutUseCase(NoParams());
+    final result = await _signOutUseCase();
 
     result.fold(
       (failure) => emit(SignOutError(message: failure.message)),
@@ -94,7 +97,8 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> updateProfile({required String name}) async {
     emit(UpdateProfileLoading());
 
-    final result = await _updateProfileUseCase(name);
+    final params = UpdateProfileUseCaseParams(name: name);
+    final result = await _updateProfileUseCase(params);
 
     result.fold(
       (failure) => emit(UpdateProfileError(message: failure.message)),
