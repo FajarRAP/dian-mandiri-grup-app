@@ -219,7 +219,12 @@ void setup() {
     );
 
   getIt
-    ..registerLazySingleton(() => AppCubit(getRefreshTokenUseCase: getIt()))
+    ..registerLazySingleton(
+      () => AppCubit(
+        getRefreshTokenUseCase: getIt(),
+        fetchUserFromStorageUseCase: getIt(),
+      ),
+    )
     ..registerLazySingleton(
       () => UserCubit(
         fetchUserUseCase: getIt(),
