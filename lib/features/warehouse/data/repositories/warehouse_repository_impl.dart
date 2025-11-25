@@ -7,6 +7,8 @@ import '../../../../core/failure/failure.dart';
 import '../../domain/entities/purchase_note_detail_entity.dart';
 import '../../domain/entities/purchase_note_summary_entity.dart';
 import '../../domain/repositories/warehouse_repository.dart';
+import '../../domain/usecases/delete_purchase_note_use_case.dart';
+import '../../domain/usecases/fetch_purchase_note_use_case.dart';
 import '../../domain/usecases/fetch_purchase_notes_dropdown_use_case.dart';
 import '../../domain/usecases/fetch_purchase_notes_use_case.dart';
 import '../../domain/usecases/insert_purchase_note_file_use_case.dart';
@@ -14,7 +16,7 @@ import '../../domain/usecases/insert_purchase_note_manual_use_case.dart';
 import '../../domain/usecases/insert_return_cost_use_case.dart';
 import '../../domain/usecases/insert_shipping_fee_use_case.dart';
 import '../../domain/usecases/update_purchase_note_use_case.dart';
-import '../datasources/warehouse_remote_data_sources.dart';
+import '../datasources/warehouse_remote_data_source.dart';
 
 class WarehouseRepositoryImpl extends WarehouseRepository {
   WarehouseRepositoryImpl({required this.warehouseRemoteDataSource});
@@ -23,10 +25,9 @@ class WarehouseRepositoryImpl extends WarehouseRepository {
 
   @override
   Future<Either<Failure, String>> deletePurchaseNote(
-      {required String purchaseNoteId}) async {
+      DeletePurchaseNoteUseCaseParams params) async {
     try {
-      final result = await warehouseRemoteDataSource.deletePurchaseNote(
-          purchaseNoteId: purchaseNoteId);
+      final result = await warehouseRemoteDataSource.deletePurchaseNote(params);
 
       return Right(result);
     } on ServerException catch (se) {
@@ -44,10 +45,9 @@ class WarehouseRepositoryImpl extends WarehouseRepository {
 
   @override
   Future<Either<Failure, PurchaseNoteDetailEntity>> fetchPurchaseNote(
-      {required String purchaseNoteId}) async {
+      FetchPurchaseNoteUseCaseParams params) async {
     try {
-      final result = await warehouseRemoteDataSource.fetchPurchaseNote(
-          purchaseNoteId: purchaseNoteId);
+      final result = await warehouseRemoteDataSource.fetchPurchaseNote(params);
 
       return Right(result);
     } on ServerException catch (se) {
@@ -65,10 +65,9 @@ class WarehouseRepositoryImpl extends WarehouseRepository {
 
   @override
   Future<Either<Failure, List<PurchaseNoteSummaryEntity>>> fetchPurchaseNotes(
-      {required FetchPurchaseNotesUseCaseParams params}) async {
+      FetchPurchaseNotesUseCaseParams params) async {
     try {
-      final result =
-          await warehouseRemoteDataSource.fetchPurchaseNotes(params: params);
+      final result = await warehouseRemoteDataSource.fetchPurchaseNotes(params);
 
       return Right(result);
     } on ServerException catch (se) {
@@ -86,10 +85,10 @@ class WarehouseRepositoryImpl extends WarehouseRepository {
 
   @override
   Future<Either<Failure, List<DropdownEntity>>> fetchPurchaseNotesDropdown(
-      {required FetchPurchaseNotesDropdownUseCaseParams params}) async {
+      FetchPurchaseNotesDropdownUseCaseParams params) async {
     try {
-      final result = await warehouseRemoteDataSource.fetchPurchaseNotesDropdown(
-          params: params);
+      final result =
+          await warehouseRemoteDataSource.fetchPurchaseNotesDropdown(params);
 
       return Right(result);
     } on ServerException catch (se) {
@@ -107,10 +106,10 @@ class WarehouseRepositoryImpl extends WarehouseRepository {
 
   @override
   Future<Either<Failure, String>> insertPurchaseNoteFile(
-      {required InsertPurchaseNoteFileUseCaseParams params}) async {
+      InsertPurchaseNoteFileUseCaseParams params) async {
     try {
-      final result = await warehouseRemoteDataSource.insertPurchaseNoteFile(
-          params: params);
+      final result =
+          await warehouseRemoteDataSource.insertPurchaseNoteFile(params);
 
       return Right(result);
     } on ServerException catch (se) {
@@ -140,10 +139,10 @@ class WarehouseRepositoryImpl extends WarehouseRepository {
 
   @override
   Future<Either<Failure, String>> insertPurchaseNoteManual(
-      {required InsertPurchaseNoteManualUseCaseParams params}) async {
+      InsertPurchaseNoteManualUseCaseParams params) async {
     try {
-      final result = await warehouseRemoteDataSource.insertPurchaseNoteManual(
-          params: params);
+      final result =
+          await warehouseRemoteDataSource.insertPurchaseNoteManual(params);
 
       return Right(result);
     } on ServerException catch (se) {
@@ -161,10 +160,9 @@ class WarehouseRepositoryImpl extends WarehouseRepository {
 
   @override
   Future<Either<Failure, String>> insertReturnCost(
-      {required InsertReturnCostUseCaseParams params}) async {
+      InsertReturnCostUseCaseParams params) async {
     try {
-      final result =
-          await warehouseRemoteDataSource.insertReturnCost(params: params);
+      final result = await warehouseRemoteDataSource.insertReturnCost(params);
 
       return Right(result);
     } on ServerException catch (se) {
@@ -182,10 +180,9 @@ class WarehouseRepositoryImpl extends WarehouseRepository {
 
   @override
   Future<Either<Failure, String>> insertShippingFee(
-      {required InsertShippingFeeUseCaseParams params}) async {
+      InsertShippingFeeUseCaseParams params) async {
     try {
-      final result =
-          await warehouseRemoteDataSource.insertShippingFee(params: params);
+      final result = await warehouseRemoteDataSource.insertShippingFee(params);
 
       return Right(result);
     } on ServerException catch (se) {
@@ -203,10 +200,9 @@ class WarehouseRepositoryImpl extends WarehouseRepository {
 
   @override
   Future<Either<Failure, String>> updatePurchaseNote(
-      {required UpdatePurchaseNoteUseCaseParams params}) async {
+      UpdatePurchaseNoteUseCaseParams params) async {
     try {
-      final result =
-          await warehouseRemoteDataSource.updatePurchaseNote(params: params);
+      final result = await warehouseRemoteDataSource.updatePurchaseNote(params);
 
       return Right(result);
     } on ServerException catch (se) {

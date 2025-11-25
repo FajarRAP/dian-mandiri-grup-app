@@ -4,6 +4,8 @@ import '../../../../core/common/dropdown_entity.dart';
 import '../../../../core/failure/failure.dart';
 import '../entities/purchase_note_detail_entity.dart';
 import '../entities/purchase_note_summary_entity.dart';
+import '../usecases/delete_purchase_note_use_case.dart';
+import '../usecases/fetch_purchase_note_use_case.dart';
 import '../usecases/fetch_purchase_notes_dropdown_use_case.dart';
 import '../usecases/fetch_purchase_notes_use_case.dart';
 import '../usecases/insert_purchase_note_file_use_case.dart';
@@ -14,21 +16,21 @@ import '../usecases/update_purchase_note_use_case.dart';
 
 abstract class WarehouseRepository {
   Future<Either<Failure, String>> deletePurchaseNote(
-      {required String purchaseNoteId});
+      DeletePurchaseNoteUseCaseParams params);
   Future<Either<Failure, PurchaseNoteDetailEntity>> fetchPurchaseNote(
-      {required String purchaseNoteId});
+      FetchPurchaseNoteUseCaseParams params);
   Future<Either<Failure, List<PurchaseNoteSummaryEntity>>> fetchPurchaseNotes(
-      {required FetchPurchaseNotesUseCaseParams params});
+      FetchPurchaseNotesUseCaseParams params);
   Future<Either<Failure, List<DropdownEntity>>> fetchPurchaseNotesDropdown(
-      {required FetchPurchaseNotesDropdownUseCaseParams params});
+      FetchPurchaseNotesDropdownUseCaseParams params);
   Future<Either<Failure, String>> insertPurchaseNoteManual(
-      {required InsertPurchaseNoteManualUseCaseParams params});
+      InsertPurchaseNoteManualUseCaseParams params);
   Future<Either<Failure, String>> insertPurchaseNoteFile(
-      {required InsertPurchaseNoteFileUseCaseParams params});
+      InsertPurchaseNoteFileUseCaseParams params);
   Future<Either<Failure, String>> insertReturnCost(
-      {required InsertReturnCostUseCaseParams params});
+      InsertReturnCostUseCaseParams params);
   Future<Either<Failure, String>> insertShippingFee(
-      {required InsertShippingFeeUseCaseParams params});
+      InsertShippingFeeUseCaseParams params);
   Future<Either<Failure, String>> updatePurchaseNote(
-      {required UpdatePurchaseNoteUseCaseParams params});
+      UpdatePurchaseNoteUseCaseParams params);
 }

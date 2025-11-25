@@ -1,23 +1,24 @@
 import 'package:dartz/dartz.dart';
+import 'package:equatable/equatable.dart';
 
-import '../../../../core/common/use_cases.dart';
 import '../../../../core/failure/failure.dart';
+import '../../../../core/usecase/use_case.dart';
 import '../repositories/warehouse_repository.dart';
 
 class InsertShippingFeeUseCase
-    implements AsyncUseCaseParams<String, InsertShippingFeeUseCaseParams> {
+    implements UseCase<String, InsertShippingFeeUseCaseParams> {
   const InsertShippingFeeUseCase({required this.warehouseRepository});
 
   final WarehouseRepository warehouseRepository;
 
   @override
-  Future<Either<Failure, String>> call(
+  Future<Either<Failure, String>> execute(
       InsertShippingFeeUseCaseParams params) async {
-    return await warehouseRepository.insertShippingFee(params: params);
+    return await warehouseRepository.insertShippingFee(params);
   }
 }
 
-final class InsertShippingFeeUseCaseParams {
+class InsertShippingFeeUseCaseParams extends Equatable {
   const InsertShippingFeeUseCaseParams({
     required this.price,
     required this.purchaseNoteIds,
@@ -25,4 +26,7 @@ final class InsertShippingFeeUseCaseParams {
 
   final int price;
   final List<String> purchaseNoteIds;
+
+  @override
+  List<Object?> get props => [price, purchaseNoteIds];
 }

@@ -7,6 +7,7 @@ import 'package:meta/meta.dart';
 import '../../../../core/common/dropdown_entity.dart';
 import '../../../../core/failure/failure.dart';
 import '../../../../core/services/image_picker_service.dart';
+import '../../../../core/usecase/use_case.dart';
 import '../../domain/entities/purchase_note_detail_entity.dart';
 import '../../domain/entities/purchase_note_summary_entity.dart';
 import '../../domain/entities/warehouse_item_entity.dart';
@@ -65,7 +66,9 @@ class WarehouseCubit extends Cubit<WarehouseState> {
   Future<void> deletePurchaseNote({required String purchaseNoteId}) async {
     emit(DeletePurchaseNoteLoading());
 
-    final result = await _deletePurchaseNoteUseCase(purchaseNoteId);
+    final params =
+        DeletePurchaseNoteUseCaseParams(purchaseNoteId: purchaseNoteId);
+    final result = await _deletePurchaseNoteUseCase(params);
 
     result.fold(
       (failure) => emit(DeletePurchaseNoteError(message: failure.message)),
@@ -76,7 +79,9 @@ class WarehouseCubit extends Cubit<WarehouseState> {
   Future<void> fetchPurchaseNote({required String purchaseNoteId}) async {
     emit(FetchPurchaseNoteLoading());
 
-    final result = await _fetchPurchaseNoteUseCase(purchaseNoteId);
+    final params =
+        FetchPurchaseNoteUseCaseParams(purchaseNoteId: purchaseNoteId);
+    final result = await _fetchPurchaseNoteUseCase(params);
 
     result.fold(
       (failure) => emit(FetchPurchaseNoteError(message: failure.message)),
@@ -309,7 +314,7 @@ class WarehouseCubit extends Cubit<WarehouseState> {
     final currentState = state as FetchPurchaseNoteLoaded;
 
     emit(InsertReturnCostLoading());
-    
+
     final params = InsertReturnCostUseCaseParams(
       purchaseNoteId: currentState.purchaseNote.id,
       amount: returnCost,

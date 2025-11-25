@@ -1,7 +1,8 @@
 import 'package:dartz/dartz.dart';
+import 'package:equatable/equatable.dart';
 
-import '../../../../core/common/use_cases.dart';
 import '../../../../core/failure/failure.dart';
+import '../../../../core/usecase/use_case.dart';
 import '../entities/warehouse_item_entity.dart';
 import '../repositories/warehouse_repository.dart';
 
@@ -12,13 +13,13 @@ class UpdatePurchaseNoteUseCase
   final WarehouseRepository warehouseRepository;
 
   @override
-  Future<Either<Failure, String>> call(
+  Future<Either<Failure, String>> execute(
       UpdatePurchaseNoteUseCaseParams params) async {
-    return await warehouseRepository.updatePurchaseNote(params: params);
+    return await warehouseRepository.updatePurchaseNote(params);
   }
 }
 
-final class UpdatePurchaseNoteUseCaseParams {
+class UpdatePurchaseNoteUseCaseParams extends Equatable {
   const UpdatePurchaseNoteUseCaseParams({
     required this.purchaseNoteId,
     required this.date,
@@ -34,4 +35,8 @@ final class UpdatePurchaseNoteUseCaseParams {
   final String? note;
   final String supplierId;
   final List<WarehouseItemEntity> items;
+
+  @override
+  List<Object?> get props =>
+      [purchaseNoteId, date, receipt, note, supplierId, items];
 }
