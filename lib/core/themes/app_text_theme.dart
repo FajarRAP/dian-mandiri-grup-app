@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'color_scheme.dart';
+import 'app_color_scheme.dart';
 
 class AppTextTheme {
   const AppTextTheme._();
