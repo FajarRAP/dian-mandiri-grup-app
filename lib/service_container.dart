@@ -6,6 +6,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'core/common/constants.dart';
 import 'core/network/dio_interceptor.dart';
 import 'core/presentation/cubit/app_cubit.dart';
+import 'core/presentation/cubit/user_cubit.dart';
 import 'core/services/google_sign_in_service.dart';
 import 'core/services/image_picker_service.dart';
 import 'features/auth/data/datasources/auth_local_data_source.dart';
@@ -20,6 +21,7 @@ import 'features/auth/domain/usecases/sign_in_use_case.dart';
 import 'features/auth/domain/usecases/sign_out_use_case.dart';
 import 'features/auth/domain/usecases/update_profile_use_case.dart';
 import 'features/auth/presentation/cubit/auth_cubit.dart';
+import 'features/auth/presentation/cubit/update_profile_cubit.dart';
 import 'features/supplier/data/datasources/supplier_remote_data_source.dart';
 import 'features/supplier/data/repositories/supplier_repository_impl.dart';
 import 'features/supplier/domain/repositories/supplier_repository.dart';
@@ -60,116 +62,149 @@ final getIt = GetIt.instance;
 
 void setup() {
   getIt.registerLazySingleton<FlutterSecureStorage>(
-      () => const FlutterSecureStorage());
-
-  getIt.registerLazySingleton<Dio>(
-    () => Dio(
-      BaseOptions(
-        baseUrl: apiUrl,
-        connectTimeout: const Duration(seconds: 5),
-      ),
-    )..interceptors.add(DioInterceptor()),
+    () => const FlutterSecureStorage(),
   );
 
+  // Services
   getIt
+    ..registerLazySingleton<Dio>(
+      () => Dio(
+        BaseOptions(
+          baseUrl: apiUrl,
+          connectTimeout: const Duration(seconds: 5),
+        ),
+      )..interceptors.add(DioInterceptor()),
+    )
     ..registerLazySingleton<ImagePickerService>(() => ImagePickerServiceImpl())
     ..registerLazySingleton(
       () => GoogleSignInService(
-          serverClientId: const String.fromEnvironment('SERVER_CLIENT_ID'),
-          googleSignIn: GoogleSignIn.instance),
+        serverClientId: const String.fromEnvironment('SERVER_CLIENT_ID'),
+        googleSignIn: GoogleSignIn.instance,
+      ),
     );
 
   // Auth
   getIt
     ..registerLazySingleton<AuthLocalDataSource>(
-        () => AuthLocalDataSourceImpl(storage: getIt.get()))
+      () => AuthLocalDataSourceImpl(storage: getIt()),
+    )
     ..registerLazySingleton<AuthRemoteDataSource>(
-      () => AuthRemoteDataSourceImpl(
-        dio: getIt.get(),
-        googleSignIn: getIt.get(),
-      ),
+      () => AuthRemoteDataSourceImpl(dio: getIt(), googleSignIn: getIt()),
     )
     ..registerLazySingleton<AuthRepository>(
       () => AuthRepositoryImpl(
-        authLocalDataSource: getIt.get(),
-        authRemoteDataSource: getIt.get(),
+        authLocalDataSource: getIt(),
+        authRemoteDataSource: getIt(),
       ),
     )
     ..registerSingleton(GetRefreshTokenUseCase(authRepository: getIt()))
-    ..registerLazySingleton<AuthCubit>(() => AuthCubit(
-        fetchUserUseCase: FetchUserUseCase(authRepository: getIt.get()),
-        fetchUserFromStorageUseCase:
-            FetchUserFromStorageUseCase(authRepository: getIt.get()),
-        refreshTokenUseCase: RefreshTokenUseCase(authRepository: getIt.get()),
-        signInUseCase: SignInUseCase(authRepository: getIt.get()),
-        signOutUseCase: SignOutUseCase(authRepository: getIt.get()),
-        updateProfileUseCase:
-            UpdateProfileUseCase(authRepository: getIt.get())));
+    ..registerSingleton(FetchUserUseCase(authRepository: getIt()))
+    ..registerSingleton(FetchUserFromStorageUseCase(authRepository: getIt()))
+    ..registerSingleton(RefreshTokenUseCase(authRepository: getIt()))
+    ..registerSingleton(SignInUseCase(authRepository: getIt()))
+    ..registerSingleton(SignOutUseCase(authRepository: getIt()))
+    ..registerSingleton(UpdateProfileUseCase(authRepository: getIt()))
+    ..registerLazySingleton<AuthCubit>(
+      () => AuthCubit(
+        fetchUserUseCase: getIt(),
+        fetchUserFromStorageUseCase: getIt(),
+        refreshTokenUseCase: getIt(),
+        signInUseCase: getIt(),
+        signOutUseCase: getIt(),
+      ),
+    );
 
   // Ship
   getIt
     ..registerLazySingleton<ShipmentRemoteDataSource>(
-        () => ShipmentRemoteDataSourceImpl(dio: getIt.get()))
+      () => ShipmentRemoteDataSourceImpl(dio: getIt()),
+    )
     ..registerLazySingleton<ShipmentRepository>(
-        () => ShipmentRepositoryImpl(shipmentRemoteDataSource: getIt.get()))
-    ..registerLazySingleton<ShipmentCubit>(() => ShipmentCubit(
-        createShipmentReportUseCase:
-            CreateShipmentReportUseCase(shipmentRepository: getIt.get()),
-        deleteShipmentUseCase:
-            DeleteShipmentUseCase(shipmentRepository: getIt.get()),
-        fetchShipmentByIdUseCase:
-            FetchShipmentByIdUseCase(shipmentRepository: getIt.get()),
-        fetchShipmentByReceiptNumberUseCase:
-            FetchShipmentByReceiptNumberUseCase(
-                shipmentRepository: getIt.get()),
-        fetchShipmentReportsUseCase:
-            FetchShipmentReportsUseCase(shipmentRepository: getIt.get()),
-        fetchShipmentsUseCase:
-            FetchShipmentsUseCase(shipmentRepository: getIt.get()),
-        insertShipmentDocumentUseCase:
-            InsertShipmentDocumentUseCase(shipmentRepository: getIt.get()),
-        insertShipmentUseCase:
-            InsertShipmentUseCase(shipmentRepository: getIt.get()),
-        downloadShipmentReportUseCase:
-            DownloadShipmentReportUseCase(shipmentRepository: getIt.get())));
+      () => ShipmentRepositoryImpl(shipmentRemoteDataSource: getIt()),
+    )
+    ..registerSingleton(
+      CreateShipmentReportUseCase(shipmentRepository: getIt()),
+    )
+    ..registerSingleton(DeleteShipmentUseCase(shipmentRepository: getIt()))
+    ..registerSingleton(FetchShipmentByIdUseCase(shipmentRepository: getIt()))
+    ..registerSingleton(
+      FetchShipmentByReceiptNumberUseCase(shipmentRepository: getIt()),
+    )
+    ..registerSingleton(
+      FetchShipmentReportsUseCase(shipmentRepository: getIt()),
+    )
+    ..registerSingleton(FetchShipmentsUseCase(shipmentRepository: getIt()))
+    ..registerSingleton(
+      InsertShipmentDocumentUseCase(shipmentRepository: getIt()),
+    )
+    ..registerSingleton(InsertShipmentUseCase(shipmentRepository: getIt()))
+    ..registerSingleton(
+      DownloadShipmentReportUseCase(shipmentRepository: getIt()),
+    )
+    ..registerLazySingleton<ShipmentCubit>(
+      () => ShipmentCubit(
+        createShipmentReportUseCase: getIt(),
+        deleteShipmentUseCase: getIt(),
+        fetchShipmentByIdUseCase: getIt(),
+        fetchShipmentByReceiptNumberUseCase: getIt(),
+        fetchShipmentReportsUseCase: getIt(),
+        fetchShipmentsUseCase: getIt(),
+        insertShipmentDocumentUseCase: getIt(),
+        insertShipmentUseCase: getIt(),
+        downloadShipmentReportUseCase: getIt(),
+      ),
+    );
 
   // Supplier
   getIt
     ..registerLazySingleton<SupplierRemoteDataSource>(
-        () => SupplierRemoteDataSourceImpl(dio: getIt.get()))
+      () => SupplierRemoteDataSourceImpl(dio: getIt()),
+    )
     ..registerLazySingleton<SupplierRepository>(
-        () => SupplierRepositoryImpl(supplierRemoteDataSource: getIt.get()))
-    ..registerLazySingleton<SupplierCubit>(() => SupplierCubit(
-        fetchSupplierUseCase:
-            FetchSupplierUseCase(supplierRepository: getIt.get()),
-        fetchSuppliersUseCase:
-            FetchSuppliersUseCase(supplierRepository: getIt.get()),
-        fetchSuppliersDropdownUseCase:
-            FetchSuppliersDropdownUseCase(supplierRepository: getIt.get()),
-        insertSupplierUseCase:
-            InsertSupplierUseCase(supplierRepository: getIt.get()),
-        updateSupplierUseCase:
-            UpdateSupplierUseCase(supplierRepository: getIt.get())));
+      () => SupplierRepositoryImpl(supplierRemoteDataSource: getIt()),
+    )
+    ..registerSingleton(FetchSupplierUseCase(supplierRepository: getIt()))
+    ..registerSingleton(FetchSuppliersUseCase(supplierRepository: getIt()))
+    ..registerSingleton(
+      FetchSuppliersDropdownUseCase(supplierRepository: getIt()),
+    )
+    ..registerSingleton(InsertSupplierUseCase(supplierRepository: getIt()))
+    ..registerSingleton(UpdateSupplierUseCase(supplierRepository: getIt()))
+    ..registerLazySingleton<SupplierCubit>(
+      () => SupplierCubit(
+        fetchSupplierUseCase: getIt(),
+        fetchSuppliersUseCase: getIt(),
+        fetchSuppliersDropdownUseCase: getIt(),
+        insertSupplierUseCase: getIt(),
+        updateSupplierUseCase: getIt(),
+      ),
+    );
 
   // Warehouse
   getIt
     ..registerLazySingleton<WarehouseRemoteDataSource>(
-        () => WarehouseRemoteDataSourceImpl(dio: getIt()))
+      () => WarehouseRemoteDataSourceImpl(dio: getIt()),
+    )
     ..registerLazySingleton<WarehouseRepository>(
-        () => WarehouseRepositoryImpl(warehouseRemoteDataSource: getIt()))
+      () => WarehouseRepositoryImpl(warehouseRemoteDataSource: getIt()),
+    )
     ..registerSingleton(DeletePurchaseNoteUseCase(warehouseRepository: getIt()))
     ..registerSingleton(FetchPurchaseNoteUseCase(warehouseRepository: getIt()))
     ..registerSingleton(FetchPurchaseNotesUseCase(warehouseRepository: getIt()))
     ..registerSingleton(
-        FetchPurchaseNotesDropdownUseCase(warehouseRepository: getIt()))
+      FetchPurchaseNotesDropdownUseCase(warehouseRepository: getIt()),
+    )
     ..registerSingleton(
-        InsertPurchaseNoteManualUseCase(warehouseRepository: getIt()))
+      InsertPurchaseNoteManualUseCase(warehouseRepository: getIt()),
+    )
     ..registerSingleton(
-        InsertPurchaseNoteFileUseCase(warehouseRepository: getIt()))
+      InsertPurchaseNoteFileUseCase(warehouseRepository: getIt()),
+    )
     ..registerSingleton(InsertReturnCostUseCase(warehouseRepository: getIt()))
     ..registerSingleton(InsertShippingFeeUseCase(warehouseRepository: getIt()))
     ..registerSingleton(UpdatePurchaseNoteUseCase(warehouseRepository: getIt()))
-    ..registerLazySingleton<WarehouseCubit>(() => WarehouseCubit(
+    ..registerLazySingleton<WarehouseCubit>(
+      () => WarehouseCubit(
         deletePurchaseNoteUseCase: getIt(),
         fetchPurchaseNoteUseCase: getIt(),
         fetchPurchaseNotesUseCase: getIt(),
@@ -179,7 +214,17 @@ void setup() {
         insertReturnCostUseCase: getIt(),
         insertShippingFeeUseCase: getIt(),
         updatePurchaseNoteUseCase: getIt(),
-        imagePickerService: getIt()));
+        imagePickerService: getIt(),
+      ),
+    );
 
-  getIt.registerLazySingleton(() => AppCubit(getRefreshTokenUseCase: getIt()));
+  getIt
+    ..registerLazySingleton(() => AppCubit(getRefreshTokenUseCase: getIt()))
+    ..registerLazySingleton(
+      () => UserCubit(
+        fetchUserUseCase: getIt(),
+        fetchUserFromStorageUseCase: getIt(),
+      ),
+    )
+    ..registerFactory(() => UpdateProfileCubit(updateProfileUseCase: getIt()));
 }
