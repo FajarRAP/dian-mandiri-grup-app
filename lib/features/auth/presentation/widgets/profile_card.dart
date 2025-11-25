@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 
 import '../../../../core/common/shadows.dart';
-import '../../../../core/themes/colors.dart';
+import '../../../../core/utils/extensions.dart';
 
 class ProfileCard extends StatelessWidget {
   const ProfileCard({
@@ -19,37 +20,28 @@ class ProfileCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final textTheme = theme.textTheme;
+    final textTheme = context.textTheme;
 
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: .circular(4),
         boxShadow: cardBoxShadow,
-        color: MaterialColors.surfaceContainerLowest,
+        color: context.colorScheme.surfaceContainerLowest,
       ),
-      padding: const EdgeInsets.all(10),
-      width: double.infinity,
+      padding: const .all(10),
+      width: .infinity,
       child: Row(
         children: <Widget>[
-          Icon(
-            icon,
-            color: CustomColors.primaryNormal,
-          ),
-          const SizedBox(width: 18),
+          Icon(icon, color: context.colorScheme.primary),
+          const Gap(18),
           Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: .start,
             children: <Widget>[
               Text(
                 title,
-                style: textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w500,
-                ),
+                style: textTheme.titleMedium?.copyWith(fontWeight: .w500),
               ),
-              Text(
-                body,
-                style: textTheme.bodyMedium,
-              ),
+              Text(body, style: textTheme.bodyMedium),
             ],
           ),
           const Spacer(),
