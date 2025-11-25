@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'color_scheme.dart';
 import 'colors.dart';
 
 const fontFamily = 'Inter18pt';
@@ -29,10 +30,7 @@ final theme = ThemeData(
     ),
     showDragHandle: true,
   ),
-  colorScheme: ColorScheme.fromSeed(
-    seedColor: CustomColors.primaryNormal,
-    primary: CustomColors.primaryNormal,
-  ),
+  colorScheme: colorScheme,
   fontFamily: fontFamily,
   floatingActionButtonTheme: const FloatingActionButtonThemeData(
     backgroundColor: CustomColors.primaryNormal,
