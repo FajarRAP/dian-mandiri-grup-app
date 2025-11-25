@@ -1,7 +1,12 @@
 part of 'auth_cubit.dart';
 
 @immutable
-sealed class AuthState {}
+sealed class AuthState extends Equatable {
+  const AuthState();
+
+  @override
+  List<Object?> get props => [];
+}
 
 final class AuthInitial extends AuthState {}
 
@@ -13,7 +18,9 @@ class UpdateProfile extends AuthState {}
 
 class FetchUserLoading extends FetchUser {}
 
-class SignIn extends AuthState {}
+class SignIn extends AuthState {
+  const SignIn();
+}
 
 class SignOut extends AuthState {}
 
@@ -39,16 +46,22 @@ class RefreshTokenError extends RefreshToken {
   final String message;
 }
 
-class SignInLoading extends SignIn {}
+class SignInLoading extends SignIn {
+  const SignInLoading();
+}
 
 class SignInLoaded extends SignIn {
-  SignInLoaded({required this.message});
+  const SignInLoaded({required this.message, required this.user});
 
   final String message;
+  final UserEntity user;
+
+  @override
+  List<Object?> get props => [message, user];
 }
 
 class SignInError extends SignIn {
-  SignInError({required this.message});
+  const SignInError({required this.message});
 
   final String message;
 }
