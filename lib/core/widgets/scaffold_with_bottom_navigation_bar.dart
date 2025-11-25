@@ -4,17 +4,15 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../common/constants/app_svgs.dart';
 import '../../features/auth/presentation/cubit/auth_cubit.dart';
 import '../../service_container.dart';
 import '../common/constants.dart';
 import '../services/google_sign_in_service.dart';
-import '../themes/colors.dart';
+import '../utils/extensions.dart';
 
 class ScaffoldWithBottomNavigationBar extends StatelessWidget {
-  const ScaffoldWithBottomNavigationBar({
-    super.key,
-    required this.child,
-  });
+  const ScaffoldWithBottomNavigationBar({super.key, required this.child});
 
   final StatefulNavigationShell child;
 
@@ -36,29 +34,28 @@ class ScaffoldWithBottomNavigationBar extends StatelessWidget {
         body: child,
         bottomNavigationBar: NavigationBar(
           onDestinationSelected: child.goBranch,
-          backgroundColor: CustomColors.primaryLightHover,
-          indicatorColor: CustomColors.primaryNormalHover,
+          backgroundColor: context.colorScheme.surfaceContainerHigh,
+          indicatorColor: context.colorScheme.primary,
           labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
           selectedIndex: child.currentIndex,
           height: 70,
           destinations: <NavigationDestination>[
             NavigationDestination(
-              icon: _boxIcon(MaterialColors.onSurface),
+              icon: _Icon.inactive(AppSvgs.box),
               label: 'Home',
-              selectedIcon: _boxIcon(MaterialColors.surfaceContainerLowest),
+              selectedIcon: _Icon.active(AppSvgs.box),
               tooltip: 'Beranda',
             ),
             NavigationDestination(
-              icon: _personMenuIcon(MaterialColors.onSurface),
+              icon: _Icon.inactive(AppSvgs.personMenu),
               label: 'Staff',
-              selectedIcon:
-                  _personMenuIcon(MaterialColors.surfaceContainerLowest),
+              selectedIcon: _Icon.active(AppSvgs.personMenu),
               tooltip: 'Kelola Staf',
             ),
             NavigationDestination(
-              icon: _personIcon(MaterialColors.onSurface),
+              icon: _Icon.inactive(AppSvgs.person),
               label: 'Profile',
-              selectedIcon: _personIcon(MaterialColors.surfaceContainerLowest),
+              selectedIcon: _Icon.active(AppSvgs.person),
               tooltip: 'Profil',
             ),
           ],
@@ -66,33 +63,26 @@ class ScaffoldWithBottomNavigationBar extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget _boxIcon(Color color) {
-    return SvgPicture.asset(
-      boxSvg,
-      colorFilter: ColorFilter.mode(
-        color,
-        BlendMode.srcIn,
-      ),
-    );
-  }
+class _Icon extends StatelessWidget {
+  const _Icon({required this.path, required this.isActive});
 
-  Widget _personMenuIcon(Color color) {
-    return SvgPicture.asset(
-      personMenuSvg,
-      colorFilter: ColorFilter.mode(
-        color,
-        BlendMode.srcIn,
-      ),
-    );
-  }
+  factory _Icon.active(String path) => _Icon(path: path, isActive: true);
+  factory _Icon.inactive(String path) => _Icon(path: path, isActive: false);
 
-  Widget _personIcon(Color color) {
+  final String path;
+  final bool isActive;
+
+  @override
+  Widget build(BuildContext context) {
     return SvgPicture.asset(
-      personSvg,
-      colorFilter: ColorFilter.mode(
-        color,
-        BlendMode.srcIn,
+      path,
+      colorFilter: .mode(
+        isActive
+            ? context.colorScheme.surfaceContainerLowest
+            : context.colorScheme.onSurface,
+        .srcIn,
       ),
     );
   }
