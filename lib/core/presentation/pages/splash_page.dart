@@ -31,7 +31,7 @@ class SplashPage extends StatelessWidget {
             alignment: .center,
             decoration: const BoxDecoration(
               image: DecorationImage(
-                image: AssetImage(AppImages.appIcon),
+                image: AssetImage(AppImages.app),
                 fit: .contain,
               ),
               shape: .circle,
