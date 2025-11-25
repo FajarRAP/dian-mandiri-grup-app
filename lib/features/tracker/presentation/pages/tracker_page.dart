@@ -1,8 +1,13 @@
+import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../core/common/constants.dart';
-import '../../../auth/presentation/cubit/auth_cubit.dart';
+import '../../../../common/constants/app_images.dart';
+import '../../../../common/constants/app_permissions.dart';
+import '../../../../core/presentation/cubit/user_cubit.dart';
+import '../../../../core/presentation/widgets/error_state_widget.dart';
+import '../../../../core/router/route_names.dart';
+import '../../../auth/domain/entities/user_entity.dart';
 import '../widgets/tracker_menu_card.dart';
 
 class TrackerPage extends StatelessWidget {
@@ -10,133 +15,61 @@ class TrackerPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final authCubit = context.read<AuthCubit>();
-
     return Scaffold(
       appBar: AppBar(title: const Text('Ship Tracker')),
-      body: Center(
-        child: BlocBuilder<AuthCubit, AuthState>(
-          bloc: authCubit..fetchUserFromStorage(),
-          buildWhen: (previous, current) => current is FetchUser,
-          builder: (context, state) {
-            if (state is FetchUserLoading) {
-              return const CircularProgressIndicator.adaptive();
-            }
-
-            final permissions = authCubit.user.permissions;
-            final isSinglePermission = permissions.length == 1;
-            final isSuperAdmin = permissions.contains(superAdminPermission);
-
-            if (isSinglePermission && !isSuperAdmin) {
-              final singleMenu =
-                  menus.firstWhere((e) => e.permission == permissions.first);
-              return TrackerMenuCard(
-                size: 150,
-                title: singleMenu.title,
-                route: singleMenu.route,
-                color: singleMenu.color,
-                assetName: singleMenu.assetName,
-              );
-            }
-
-            return GridView.count(
-              childAspectRatio: isSinglePermission && !isSuperAdmin ? 2 : 1,
-              crossAxisCount: isSinglePermission && !isSuperAdmin ? 1 : 2,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 16,
-              padding: const EdgeInsets.all(16),
-              children: _buildMenuCard(permissions, menus),
-            );
-          },
-        ),
-      ),
+      body: const Center(child: _MenuContent()),
     );
-  }
-
-  List<Widget> _buildMenuCard(List<String> permissions, List<_Menu> menus) {
-    if (permissions.contains(superAdminPermission)) return _buildAdminPage();
-    if (permissions.isEmpty || menus.isEmpty) return <Widget>[];
-
-    final config = menus.first;
-    final currentPermission = config.permission;
-
-    if (permissions.contains(currentPermission)) {
-      permissions.remove(currentPermission);
-      return <Widget>[
-        TrackerMenuCard(
-          title: config.title,
-          route: config.route,
-          color: config.color,
-          assetName: config.assetName,
-        ),
-        ..._buildMenuCard(permissions, menus.sublist(1)),
-      ];
-    }
-
-    return _buildMenuCard(permissions, menus.sublist(1));
-  }
-
-  List<Widget> _buildAdminPage() {
-    return const <Widget>[
-      TrackerMenuCard(
-        title: 'Scan Resi',
-        route: scanReceiptRoute,
-        color: Colors.blue,
-        assetName: scanReceiptIcon,
-      ),
-      TrackerMenuCard(
-        title: 'Scan Ambil Barang',
-        route: pickUpReceiptRoute,
-        color: Colors.brown,
-        assetName: pickUpReceiptIcon,
-      ),
-      TrackerMenuCard(
-        title: 'Scan Checker',
-        route: checkReceiptRoute,
-        color: Colors.red,
-        assetName: checkReceiptIcon,
-      ),
-      TrackerMenuCard(
-        title: 'Scan Packing',
-        route: packReceiptRoute,
-        color: Colors.green,
-        assetName: packReceiptIcon,
-      ),
-      TrackerMenuCard(
-        title: 'Scan Kirim',
-        route: sendReceiptRoute,
-        color: Colors.orange,
-        assetName: sendReceiptIcon,
-      ),
-      TrackerMenuCard(
-        title: 'Scan Retur',
-        route: returnReceiptRoute,
-        color: Colors.purple,
-        assetName: returnReceiptIcon,
-      ),
-      TrackerMenuCard(
-        title: 'Barang Cancel',
-        route: cancelReceiptRoute,
-        color: Colors.deepOrange,
-        assetName: cancelReceiptIcon,
-      ),
-      TrackerMenuCard(
-        title: 'Laporan',
-        route: reportRoute,
-        color: Colors.teal,
-        assetName: reportReceiptIcon,
-      ),
-      TrackerMenuCard(
-        title: 'Status Resi',
-        route: receiptStatusRoute,
-        color: Colors.indigo,
-        assetName: checkReceiptStatusIcon,
-      ),
-    ];
   }
 }
 
-class _Menu {
+class _MenuContent extends StatelessWidget {
+  const _MenuContent();
+
+  @override
+  Widget build(BuildContext context) {
+    final visibleMenus = _getVisibleMenus(context.read<UserCubit>().user);
+
+    if (visibleMenus.isEmpty) {
+      return const ErrorStateWidget(message: 'Tidak Memiliki Hak Akses');
+    }
+
+    if (visibleMenus.length == 1) {
+      final menu = visibleMenus.first;
+      return TrackerMenuCard(
+        size: 150,
+        title: menu.title,
+        route: menu.route,
+        color: menu.color,
+        assetName: menu.assetName,
+      );
+    }
+
+    return GridView.count(
+      crossAxisCount: 2,
+      crossAxisSpacing: 10,
+      mainAxisSpacing: 16,
+      padding: const .all(16),
+      children: visibleMenus
+          .map(
+            (menu) => TrackerMenuCard(
+              title: menu.title,
+              route: menu.route,
+              color: menu.color,
+              assetName: menu.assetName,
+            ),
+          )
+          .toList(),
+    );
+  }
+
+  List<_Menu> _getVisibleMenus(UserEntity user) {
+    if (user.can(AppPermissions.superAdmin)) return menus;
+
+    return menus.where((menu) => user.can(menu.permission)).toList();
+  }
+}
+
+class _Menu extends Equatable {
   const _Menu({
     required this.title,
     required this.route,
@@ -150,56 +83,59 @@ class _Menu {
   final String assetName;
   final String permission;
   final MaterialColor color;
+
+  @override
+  List<Object?> get props => [title, route, assetName, permission, color];
 }
 
 const menus = <_Menu>[
   _Menu(
     title: 'Scan Resi',
-    route: scanReceiptRoute,
+    route: Routes.trackerScan,
     color: Colors.blue,
-    assetName: scanReceiptIcon,
-    permission: scanPermission,
+    assetName: AppImages.scanReceipt,
+    permission: AppPermissions.scanShipment,
   ),
   _Menu(
     title: 'Scan Ambil Resi',
-    route: pickUpReceiptRoute,
+    route: Routes.trackerPickUp,
     color: Colors.brown,
-    assetName: pickUpReceiptIcon,
-    permission: pickUpPermission,
+    assetName: AppImages.pickUpReceipt,
+    permission: AppPermissions.pickUpShipment,
   ),
   _Menu(
     title: 'Scan Checker',
-    route: checkReceiptRoute,
+    route: Routes.trackerCheck,
     color: Colors.red,
-    assetName: checkReceiptIcon,
-    permission: checkPermission,
+    assetName: AppImages.checkReceipt,
+    permission: AppPermissions.checkShipment,
   ),
   _Menu(
     title: 'Scan Packing',
-    route: packReceiptRoute,
+    route: Routes.trackerPack,
     color: Colors.green,
-    assetName: packReceiptIcon,
-    permission: packPermission,
+    assetName: AppImages.packReceipt,
+    permission: AppPermissions.packShipment,
   ),
   _Menu(
     title: 'Scan Kirim',
-    route: sendReceiptRoute,
+    route: Routes.trackerSend,
     color: Colors.orange,
-    assetName: sendReceiptIcon,
-    permission: sendPermission,
+    assetName: AppImages.sendReceipt,
+    permission: AppPermissions.sendShipment,
   ),
   _Menu(
     title: 'Scan Retur',
-    route: returnReceiptRoute,
+    route: Routes.trackerReturn,
     color: Colors.purple,
-    assetName: returnReceiptIcon,
-    permission: returnPermission,
+    assetName: AppImages.returnReceipt,
+    permission: AppPermissions.returnShipment,
   ),
   _Menu(
     title: 'Barang Cancel',
-    route: cancelReceiptRoute,
+    route: Routes.trackerCancel,
     color: Colors.indigo,
-    assetName: cancelReceiptIcon,
-    permission: superAdminPermission,
-  )
+    assetName: AppImages.cancelReceipt,
+    permission: AppPermissions.superAdmin,
+  ),
 ];
