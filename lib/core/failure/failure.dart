@@ -45,7 +45,7 @@ class SpreadsheetFailure extends Failure {
     required this.rows,
   });
 
-  factory SpreadsheetFailure.fromJson(Map<String, dynamic> json) {
+  factory SpreadsheetFailure.fromJson(JsonMap json) {
     return SpreadsheetFailure(
       statusCode: json['statusCode'] ?? 500,
       message: json['message'] ?? 'Terjadi kesalahan',
