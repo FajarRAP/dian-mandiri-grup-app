@@ -10,7 +10,7 @@ import 'package:path_provider/path_provider.dart';
 
 import 'core/common/constants.dart';
 import 'core/helpers/top_snackbar.dart';
-import 'core/routes/router.dart';
+import 'core/router/router.dart';
 import 'core/services/google_sign_in_service.dart';
 import 'core/themes/theme.dart';
 import 'features/auth/presentation/cubit/auth_cubit.dart';
