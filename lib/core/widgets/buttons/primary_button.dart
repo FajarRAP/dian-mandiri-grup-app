@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../themes/colors.dart';
+import '../../utils/extensions.dart';
 
 class PrimaryButton extends StatelessWidget {
   const PrimaryButton({
@@ -23,9 +23,9 @@ class PrimaryButton extends StatelessWidget {
       icon: icon,
       label: child,
       style: ElevatedButton.styleFrom(
-        backgroundColor: CustomColors.primaryNormal,
-        foregroundColor: MaterialColors.onPrimary,
-        fixedSize: height == null ? null : Size.fromHeight(height!),
+        backgroundColor: context.colorScheme.primary,
+        foregroundColor: context.colorScheme.onPrimary,
+        fixedSize: height == null ? null : .fromHeight(height!),
       ),
     );
   }
