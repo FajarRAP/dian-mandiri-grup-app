@@ -1,0 +1,240 @@
+import 'package:flutter/widgets.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../features/auth/presentation/pages/profile_page.dart';
+import '../../features/auth/presentation/pages/sign_in_page.dart';
+import '../../features/home_page.dart';
+import '../../features/staff_management_page.dart';
+import '../../features/supplier/presentation/pages/add_supplier_page.dart';
+import '../../features/supplier/presentation/pages/edit_supplier_page.dart';
+import '../../features/supplier/presentation/pages/supplier_detail_page.dart';
+import '../../features/supplier/presentation/pages/supplier_page.dart';
+import '../../features/tracker/presentation/pages/cancel_page.dart';
+import '../../features/tracker/presentation/pages/check_page.dart';
+import '../../features/tracker/presentation/pages/pack_page.dart';
+import '../../features/tracker/presentation/pages/pick_up_page.dart';
+import '../../features/tracker/presentation/pages/receipt_status_page.dart';
+import '../../features/tracker/presentation/pages/report_page.dart';
+import '../../features/tracker/presentation/pages/return_page.dart';
+import '../../features/tracker/presentation/pages/scan_page.dart';
+import '../../features/tracker/presentation/pages/send_page.dart';
+import '../../features/tracker/presentation/pages/shipment_detail_page.dart';
+import '../../features/tracker/presentation/pages/tracker_page.dart';
+import '../../features/tracker/presentation/pages/upload_page.dart';
+import '../../features/warehouse/presentation/pages/add_purchase_note_file_page.dart';
+import '../../features/warehouse/presentation/pages/add_purchase_note_manual_page.dart';
+import '../../features/warehouse/presentation/pages/add_shipping_fee_page.dart';
+import '../../features/warehouse/presentation/pages/purchase_note_detail_page.dart';
+import '../../features/warehouse/presentation/pages/warehouse_page.dart';
+import '../common/constants.dart';
+import '../presentation/pages/splash_page.dart';
+import '../widgets/scaffold_with_bottom_navigation_bar.dart';
+import 'route_names.dart';
+
+FadeTransition transition(Animation<double> animation, Widget child) =>
+    FadeTransition(
+      opacity: CurveTween(curve: Curves.easeInOut).animate(animation),
+      child: child,
+    );
+
+Widget transitionsBuilder(
+  BuildContext context,
+  Animation<double> animation,
+  Animation<double> secondaryAnimation,
+  Widget child,
+) => transition(animation, child);
+
+final _rootNavigatorkey = GlobalKey<NavigatorState>();
+final _homeNavigatorKey = GlobalKey<NavigatorState>();
+final _staffManagementNavigatorKey = GlobalKey<NavigatorState>();
+final _profileNavigatorKey = GlobalKey<NavigatorState>();
+
+class AppRouter {
+  const AppRouter._();
+
+  static final router = GoRouter(
+    navigatorKey: _rootNavigatorkey,
+    initialLocation: '/splash',
+    routes: [
+      GoRoute(path: '/splash', builder: (context, state) => const SplashPage()),
+      GoRoute(
+        path: loginRoute,
+        name: Routes.login,
+        pageBuilder: (context, state) => CustomTransitionPage(
+          key: state.pageKey,
+          child: const SignInPage(),
+          transitionsBuilder: transitionsBuilder,
+        ),
+      ),
+      GoRoute(
+        path: displayPictureRoute,
+        pageBuilder: (context, state) {
+          final params = state.extra as Map<String, dynamic>;
+
+          return CustomTransitionPage(
+            key: state.pageKey,
+            child: UploadPage(
+              imagePath: '${params['image_path']}',
+              shipmentId: '${params['shipment_id']}',
+              stage: '${params['stage']}',
+            ),
+            transitionsBuilder: transitionsBuilder,
+          );
+        },
+      ),
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) =>
+            ScaffoldWithBottomNavigationBar(child: navigationShell),
+        branches: <StatefulShellBranch>[
+          StatefulShellBranch(
+            navigatorKey: _homeNavigatorKey,
+            routes: <RouteBase>[
+              GoRoute(
+                path: homeRoute,
+                name: Routes.home,
+                builder: (context, state) => const HomePage(),
+                routes: <RouteBase>[
+                  GoRoute(
+                    path: 'tracker',
+                    name: Routes.tracker,
+                    builder: (context, state) => const TrackerPage(),
+                    routes: <RouteBase>[
+                      GoRoute(
+                        path: 'scan',
+                        name: Routes.trackerScan,
+                        builder: (context, state) => const ScanPage(),
+                      ),
+                      GoRoute(
+                        path: 'pick-up',
+                        name: Routes.trackerPickUp,
+                        builder: (context, state) => const PickUpPage(),
+                      ),
+                      GoRoute(
+                        path: 'check',
+                        name: Routes.trackerCheck,
+                        builder: (context, state) => const CheckPage(),
+                      ),
+                      GoRoute(
+                        path: 'pack',
+                        name: Routes.trackerPack,
+                        builder: (context, state) => const PackPage(),
+                      ),
+                      GoRoute(
+                        path: 'send',
+                        name: Routes.trackerSend,
+                        builder: (context, state) => const SendPage(),
+                      ),
+                      GoRoute(
+                        path: 'return',
+                        name: Routes.trackerReturn,
+                        builder: (context, state) => const ReturnPage(),
+                      ),
+                      GoRoute(
+                        path: 'cancel',
+                        name: Routes.trackerCancel,
+                        builder: (context, state) => const CancelPage(),
+                      ),
+                      GoRoute(
+                        path: 'report',
+                        name: Routes.trackerReport,
+                        builder: (context, state) => const ReportPage(),
+                      ),
+                      GoRoute(
+                        path: 'status',
+                        name: Routes.trackerStatus,
+                        builder: (context, state) => const ReceiptStatusPage(),
+                      ),
+                      GoRoute(
+                        path: 'detail',
+                        name: Routes.trackerDetail,
+                        builder: (context, state) => ShipmentDetailPage(
+                          shipmentId: state.extra as String,
+                        ),
+                      ),
+                    ],
+                  ),
+                  GoRoute(
+                    path: 'supplier',
+                    name: Routes.supplier,
+                    builder: (context, state) => const SupplierPage(),
+                    routes: <RouteBase>[
+                      GoRoute(
+                        path: 'detail',
+                        name: Routes.supplierDetail,
+                        builder: (context, state) => SupplierDetailPage(
+                          supplierId: state.extra as String,
+                        ),
+                      ),
+                      GoRoute(
+                        path: 'add',
+                        name: Routes.supplierAdd,
+                        builder: (context, state) => const AddSupplierPage(),
+                      ),
+                      GoRoute(
+                        path: 'edit',
+                        name: Routes.supplierEdit,
+                        builder: (context, state) =>
+                            EditSupplierPage(supplierId: state.extra as String),
+                      ),
+                    ],
+                  ),
+                  GoRoute(
+                    path: 'warehouse',
+                    name: Routes.warehouse,
+                    builder: (context, state) => const WarehousePage(),
+                    routes: <RouteBase>[
+                      GoRoute(
+                        path: 'detail',
+                        name: Routes.warehouseDetail,
+                        builder: (context, state) => PurchaseNoteDetailPage(
+                          purchaseNoteId: state.extra as String,
+                        ),
+                      ),
+                      GoRoute(
+                        path: 'add-purchase-note-manual',
+                        name: Routes.warehouseAddPurchaseNoteManual,
+                        builder: (context, state) =>
+                            const AddPurchaseNoteManualPage(),
+                      ),
+                      GoRoute(
+                        path: 'add-purchase-note-file',
+                        name: Routes.warehouseAddPurchaseNoteFile,
+                        builder: (context, state) =>
+                            const AddPurchaseNoteFilePage(),
+                      ),
+                      GoRoute(
+                        path: 'add-shipping-fee',
+                        name: Routes.warehouseAddShippingFee,
+                        builder: (context, state) => const AddShippingFeePage(),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            navigatorKey: _staffManagementNavigatorKey,
+            routes: <RouteBase>[
+              GoRoute(
+                path: staffManagementRoute,
+                name: Routes.staffManagement,
+                builder: (context, state) => const StaffManagementPage(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            navigatorKey: _profileNavigatorKey,
+            routes: <RouteBase>[
+              GoRoute(
+                path: profileRoute,
+                name: Routes.profile,
+                builder: (context, state) => const ProfilePage(),
+              ),
+            ],
+          ),
+        ],
+      ),
+    ],
+  );
+}
