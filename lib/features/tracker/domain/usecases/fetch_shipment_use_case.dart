@@ -6,21 +6,22 @@ import '../../../../core/usecase/use_case.dart';
 import '../entities/shipment_detail_entity.dart';
 import '../repositories/shipment_repository.dart';
 
-class FetchShipmentByIdUseCase
-    implements UseCase<ShipmentDetailEntity, FetchShipmentByIdUseCaseParams> {
-  const FetchShipmentByIdUseCase({required this.shipmentRepository});
+class FetchShipmentUseCase
+    implements UseCase<ShipmentDetailEntity, FetchShipmentUseCaseParams> {
+  const FetchShipmentUseCase({required this.shipmentRepository});
 
   final ShipmentRepository shipmentRepository;
 
   @override
   Future<Either<Failure, ShipmentDetailEntity>> execute(
-      FetchShipmentByIdUseCaseParams params) async {
-    return await shipmentRepository.fetchShipmentById(params);
+    FetchShipmentUseCaseParams params,
+  ) async {
+    return await shipmentRepository.fetchShipment(params);
   }
 }
 
-class FetchShipmentByIdUseCaseParams extends Equatable {
-  const FetchShipmentByIdUseCaseParams({required this.shipmentId});
+class FetchShipmentUseCaseParams extends Equatable {
+  const FetchShipmentUseCaseParams({required this.shipmentId});
 
   final String shipmentId;
 

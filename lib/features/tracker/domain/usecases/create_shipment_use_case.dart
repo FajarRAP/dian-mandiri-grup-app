@@ -5,21 +5,22 @@ import '../../../../core/errors/failure.dart';
 import '../../../../core/usecase/use_case.dart';
 import '../repositories/shipment_repository.dart';
 
-class InsertShipmentUseCase
-    implements UseCase<String, InsertShipmentUseCaseParams> {
-  const InsertShipmentUseCase({required this.shipmentRepository});
+class CreateShipmentUseCase
+    implements UseCase<String, CreateShipmentUseCaseParams> {
+  const CreateShipmentUseCase({required this.shipmentRepository});
 
   final ShipmentRepository shipmentRepository;
 
   @override
   Future<Either<Failure, String>> execute(
-      InsertShipmentUseCaseParams params) async {
+    CreateShipmentUseCaseParams params,
+  ) async {
     return await shipmentRepository.insertShipment(params);
   }
 }
 
-class InsertShipmentUseCaseParams extends Equatable {
-  const InsertShipmentUseCaseParams({
+class CreateShipmentUseCaseParams extends Equatable {
+  const CreateShipmentUseCaseParams({
     required this.receiptNumber,
     required this.stage,
   });

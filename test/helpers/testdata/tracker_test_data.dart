@@ -13,12 +13,12 @@ import 'package:ship_tracker/features/tracker/domain/entities/stage_entity.dart'
 import 'package:ship_tracker/features/tracker/domain/usecases/create_shipment_report_use_case.dart';
 import 'package:ship_tracker/features/tracker/domain/usecases/delete_shipment_use_case.dart';
 import 'package:ship_tracker/features/tracker/domain/usecases/download_shipment_report_use_case.dart';
-import 'package:ship_tracker/features/tracker/domain/usecases/fetch_shipment_by_id_use_case.dart';
-import 'package:ship_tracker/features/tracker/domain/usecases/fetch_shipment_by_receipt_number_use_case.dart';
+import 'package:ship_tracker/features/tracker/domain/usecases/fetch_shipment_use_case.dart';
+import 'package:ship_tracker/features/tracker/domain/usecases/fetch_shipment_status_use_case.dart';
 import 'package:ship_tracker/features/tracker/domain/usecases/fetch_shipment_reports_use_case.dart';
 import 'package:ship_tracker/features/tracker/domain/usecases/fetch_shipments_use_case.dart';
-import 'package:ship_tracker/features/tracker/domain/usecases/insert_shipment_document_use_case.dart';
-import 'package:ship_tracker/features/tracker/domain/usecases/insert_shipment_use_case.dart';
+import 'package:ship_tracker/features/tracker/domain/usecases/update_shipment_document_use_case.dart';
+import 'package:ship_tracker/features/tracker/domain/usecases/create_shipment_use_case.dart';
 
 final tShipmentEntity = ShipmentEntity(
   id: '05c0cef6-9c5d-4165-9145-b2c41f43a5e8',
@@ -100,7 +100,7 @@ final tShipmentHistoryEntity = ShipmentHistoryEntity(
         name: 'mamy',
       ),
       document: null,
-    )
+    ),
   ],
 );
 final tShipmentHistoryModel = ShipmentHistoryModel(
@@ -117,7 +117,7 @@ final tShipmentHistoryModel = ShipmentHistoryModel(
         name: 'mamy',
       ),
       document: null,
-    )
+    ),
   ],
 );
 
@@ -138,19 +138,22 @@ final tShipmentReportModel = ShipmentReportModel(
   date: DateTime.parse('2025-09-21T16:30:12.164136Z'),
 );
 
-final tFetchShipmentsParams =
-    FetchShipmentsUseCaseParams(stage: 'stage', date: DateTime.now());
+final tFetchShipmentsParams = FetchShipmentsUseCaseParams(
+  stage: 'stage',
+  date: DateTime.now(),
+);
 final tFetchShipmentsSuccess = [
   ShipmentEntity(
     id: '05c0cef6-9c5d-4165-9145-b2c41f43a5e8',
     courier: 'Shopee Express',
     date: DateTime.parse('2024-10-10T14:05:11.400718Z'),
     receiptNumber: 'SPXID04751919594A',
-  )
+  ),
 ];
 
-const tFetchShipmentParams =
-    FetchShipmentByIdUseCaseParams(shipmentId: 'shipmentId');
+const tFetchShipmentParams = FetchShipmentUseCaseParams(
+  shipmentId: 'shipmentId',
+);
 final tFetchShipmentSuccess = ShipmentDetailEntity(
   id: '05c0cef6-9c5d-4165-9145-b2c41f43a5e8',
   courier: 'Shopee Express',
@@ -164,8 +167,9 @@ final tFetchShipmentSuccess = ShipmentDetailEntity(
   ),
 );
 
-const tFetchShipmentHistoryParams =
-    FetchShipmentByReceiptNumberUseCaseParams(receiptNumber: 'receiptNumber');
+const tFetchShipmentHistoryParams = FetchShipmentStatusUseCaseParams(
+  receiptNumber: 'receiptNumber',
+);
 final tFetchShipmentHistorySuccess = ShipmentHistoryEntity(
   id: '05c0cef6-9c5d-4165-9145-b2c41f43a5e8',
   receiptNumber: 'SPXID04751919594A',
@@ -180,7 +184,7 @@ final tFetchShipmentHistorySuccess = ShipmentHistoryEntity(
         name: 'mamy',
       ),
       document: null,
-    )
+    ),
   ],
 );
 
@@ -197,28 +201,37 @@ final tFetchShipmentReportsSuccess = [
     file:
         'https://storage.dianmandirigrup.id/staging-app/shipment/report/ab1b64ef-a540-46ce-b17e-fbf0877da515.xlsx',
     date: DateTime.parse('2025-09-21T16:30:12.164136Z'),
-  )
+  ),
 ];
 
 final tCreateShipmentReportParams = CreateShipmentReportUseCaseParams(
-    startDate: DateTime.now(), endDate: DateTime.now());
+  startDate: DateTime.now(),
+  endDate: DateTime.now(),
+);
 const tCreateShipmentReportSuccess = 'Success create report shipment!';
 
-const tUpdateShipmentDocumentParams = InsertShipmentDocumentUseCaseParams(
-    shipmentId: 'shipmentId', documentPath: 'documentPath', stage: 'stage');
+const tUpdateShipmentDocumentParams = UpdateShipmentDocumentUseCaseParams(
+  shipmentId: 'shipmentId',
+  documentPath: 'documentPath',
+  stage: 'stage',
+);
 const tUpdateShipmentDocumentSuccess = 'Success update document shipment!';
 
-const tDeleteShipmentParams =
-    DeleteShipmentUseCaseParams(shipmentId: 'shipmentId');
+const tDeleteShipmentParams = DeleteShipmentUseCaseParams(
+  shipmentId: 'shipmentId',
+);
 const tDeleteShipmentSuccess = 'Success delete shipment!';
 
 final tDownloadShipmentReportParams = DownloadShipmentReportUseCaseParams(
-    externalPath: 'externalPath',
-    fileUrl: 'fileUrl',
-    filename: 'filename',
-    createdAt: DateTime.now());
+  externalPath: 'externalPath',
+  fileUrl: 'fileUrl',
+  filename: 'filename',
+  createdAt: DateTime.now(),
+);
 const tDownloadShipmentReportSuccess = 'Download completed';
 
-const tCreateShipmentParams =
-    InsertShipmentUseCaseParams(receiptNumber: 'receiptNumber', stage: 'stage');
+const tCreateShipmentParams = CreateShipmentUseCaseParams(
+  receiptNumber: 'receiptNumber',
+  stage: 'stage',
+);
 const tCreateShipmentSuccess = 'Success create or edit shipment!';

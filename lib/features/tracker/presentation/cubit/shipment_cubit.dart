@@ -12,12 +12,12 @@ import '../../domain/entities/shipment_report_entity.dart';
 import '../../domain/usecases/create_shipment_report_use_case.dart';
 import '../../domain/usecases/delete_shipment_use_case.dart';
 import '../../domain/usecases/download_shipment_report_use_case.dart';
-import '../../domain/usecases/fetch_shipment_by_id_use_case.dart';
-import '../../domain/usecases/fetch_shipment_by_receipt_number_use_case.dart';
+import '../../domain/usecases/fetch_shipment_use_case.dart';
+import '../../domain/usecases/fetch_shipment_status_use_case.dart';
 import '../../domain/usecases/fetch_shipment_reports_use_case.dart';
 import '../../domain/usecases/fetch_shipments_use_case.dart';
-import '../../domain/usecases/insert_shipment_document_use_case.dart';
-import '../../domain/usecases/insert_shipment_use_case.dart';
+import '../../domain/usecases/update_shipment_document_use_case.dart';
+import '../../domain/usecases/create_shipment_use_case.dart';
 
 part 'shipment_state.dart';
 
@@ -26,42 +26,41 @@ class ShipmentCubit extends Cubit<ShipmentState> {
     required CreateShipmentReportUseCase createShipmentReportUseCase,
     required DeleteShipmentUseCase deleteShipmentUseCase,
     required DownloadShipmentReportUseCase downloadShipmentReportUseCase,
-    required FetchShipmentByIdUseCase fetchShipmentByIdUseCase,
-    required FetchShipmentByReceiptNumberUseCase
-        fetchShipmentByReceiptNumberUseCase,
+    required FetchShipmentUseCase fetchShipmentUseCase,
+    required FetchShipmentStatusUseCase fetchShipmentStatusUseCase,
     required FetchShipmentReportsUseCase fetchShipmentReportsUseCase,
     required FetchShipmentsUseCase fetchShipmentsUseCase,
-    required InsertShipmentDocumentUseCase insertShipmentDocumentUseCase,
-    required InsertShipmentUseCase insertShipmentUseCase,
-  })  : _createShipmentReportUseCase = createShipmentReportUseCase,
-        _deleteShipmentUseCase = deleteShipmentUseCase,
-        _downloadShipmentReportUseCase = downloadShipmentReportUseCase,
-        _fetchShipmentByIdUseCase = fetchShipmentByIdUseCase,
-        _fetchShipmentByReceiptNumberUseCase =
-            fetchShipmentByReceiptNumberUseCase,
-        _fetchShipmentReportsUseCase = fetchShipmentReportsUseCase,
-        _fetchShipmentsUseCase = fetchShipmentsUseCase,
-        _insertShipmentUseCase = insertShipmentUseCase,
-        _insertShipmentDocumentUseCase = insertShipmentDocumentUseCase,
-        super(ShipInitial());
+    required UpdateShipmentDocumentUseCase insertShipmentDocumentUseCase,
+    required CreateShipmentUseCase insertShipmentUseCase,
+  }) : _createShipmentReportUseCase = createShipmentReportUseCase,
+       _deleteShipmentUseCase = deleteShipmentUseCase,
+       _downloadShipmentReportUseCase = downloadShipmentReportUseCase,
+       _fetchShipmentUseCase = fetchShipmentUseCase,
+       _fetchShipmentStatusUseCase = fetchShipmentStatusUseCase,
+       _fetchShipmentReportsUseCase = fetchShipmentReportsUseCase,
+       _fetchShipmentsUseCase = fetchShipmentsUseCase,
+       _insertShipmentUseCase = insertShipmentUseCase,
+       _insertShipmentDocumentUseCase = insertShipmentDocumentUseCase,
+       super(ShipInitial());
 
   final CreateShipmentReportUseCase _createShipmentReportUseCase;
   final DeleteShipmentUseCase _deleteShipmentUseCase;
   final DownloadShipmentReportUseCase _downloadShipmentReportUseCase;
-  final FetchShipmentByIdUseCase _fetchShipmentByIdUseCase;
-  final FetchShipmentByReceiptNumberUseCase
-      _fetchShipmentByReceiptNumberUseCase;
+  final FetchShipmentUseCase _fetchShipmentUseCase;
+  final FetchShipmentStatusUseCase _fetchShipmentStatusUseCase;
   final FetchShipmentReportsUseCase _fetchShipmentReportsUseCase;
   final FetchShipmentsUseCase _fetchShipmentsUseCase;
-  final InsertShipmentUseCase _insertShipmentUseCase;
-  final InsertShipmentDocumentUseCase _insertShipmentDocumentUseCase;
+  final CreateShipmentUseCase _insertShipmentUseCase;
+  final UpdateShipmentDocumentUseCase _insertShipmentDocumentUseCase;
 
   var _currentPage = 1;
   final _shipments = <ShipmentEntity>[];
   final _shipmentReports = <ShipmentReportEntity>[];
 
-  Future<void> createShipmentReport(
-      {required DateTime startDate, required DateTime endDate}) async {
+  Future<void> createShipmentReport({
+    required DateTime startDate,
+    required DateTime endDate,
+  }) async {
     emit(CreateShipmentReportLoading());
 
     final params = CreateShipmentReportUseCaseParams(
@@ -88,10 +87,12 @@ class ShipmentCubit extends Cubit<ShipmentState> {
     );
   }
 
-  Future<void> downloadShipmentReport(
-      {required ShipmentReportEntity shipmentReportEntity}) async {
-    emit(DownloadShipmentReportLoading(
-        shipmentReportId: shipmentReportEntity.id));
+  Future<void> downloadShipmentReport({
+    required ShipmentReportEntity shipmentReportEntity,
+  }) async {
+    emit(
+      DownloadShipmentReportLoading(shipmentReportId: shipmentReportEntity.id),
+    );
 
     final params = DownloadShipmentReportUseCaseParams(
       externalPath: externalPath,
@@ -107,11 +108,11 @@ class ShipmentCubit extends Cubit<ShipmentState> {
     );
   }
 
-  Future<void> fetchShipmentById({required String shipmentId}) async {
+  Future<void> fetchShipment({required String shipmentId}) async {
     emit(FetchShipmentDetailLoading());
 
-    final params = FetchShipmentByIdUseCaseParams(shipmentId: shipmentId);
-    final result = await _fetchShipmentByIdUseCase(params);
+    final params = FetchShipmentUseCaseParams(shipmentId: shipmentId);
+    final result = await _fetchShipmentUseCase(params);
 
     result.fold(
       (failure) => emit(FetchShipmentDetailError(message: failure.message)),
@@ -120,13 +121,13 @@ class ShipmentCubit extends Cubit<ShipmentState> {
     );
   }
 
-  Future<void> fetchShipmentByReceiptNumber(
-      {required String receiptNumber}) async {
+  Future<void> fetchShipmentStatus({required String receiptNumber}) async {
     emit(FetchReceiptStatusLoading());
 
-    final params =
-        FetchShipmentByReceiptNumberUseCaseParams(receiptNumber: receiptNumber);
-    final result = await _fetchShipmentByReceiptNumberUseCase(params);
+    final params = FetchShipmentStatusUseCaseParams(
+      receiptNumber: receiptNumber,
+    );
+    final result = await _fetchShipmentStatusUseCase(params);
 
     result.fold(
       (failure) => emit(FetchReceiptStatusError(failure: failure)),
@@ -135,10 +136,11 @@ class ShipmentCubit extends Cubit<ShipmentState> {
     );
   }
 
-  Future<void> fetchShipmentReports(
-      {required DateTime startDate,
-      required DateTime endDate,
-      required String status}) async {
+  Future<void> fetchShipmentReports({
+    required DateTime startDate,
+    required DateTime endDate,
+    required String status,
+  }) async {
     emit(FetchShipmentReportsLoading());
 
     final params = FetchShipmentReportsUseCaseParams(
@@ -151,17 +153,21 @@ class ShipmentCubit extends Cubit<ShipmentState> {
 
     result.fold(
       (failure) => emit(FetchShipmentReportsError(message: failure.message)),
-      (shipmentReports) => emit(FetchShipmentReportsLoaded(
+      (shipmentReports) => emit(
+        FetchShipmentReportsLoaded(
           shipmentReports: _shipmentReports
             ..clear()
-            ..addAll(shipmentReports))),
+            ..addAll(shipmentReports),
+        ),
+      ),
     );
   }
 
-  Future<void> fetchShipmentReportsPaginate(
-      {required DateTime startDate,
-      required DateTime endDate,
-      required String status}) async {
+  Future<void> fetchShipmentReportsPaginate({
+    required DateTime startDate,
+    required DateTime endDate,
+    required String status,
+  }) async {
     emit(ListPaginateLoading());
 
     final params = FetchShipmentReportsUseCaseParams(
@@ -180,15 +186,21 @@ class ShipmentCubit extends Cubit<ShipmentState> {
           emit(ListPaginateLast());
         } else {
           emit(ListPaginateLoaded());
-          emit(FetchShipmentReportsLoaded(
-              shipmentReports: _shipmentReports..addAll(shipmentReports)));
+          emit(
+            FetchShipmentReportsLoaded(
+              shipmentReports: _shipmentReports..addAll(shipmentReports),
+            ),
+          );
         }
       },
     );
   }
 
-  Future<void> fetchShipments(
-      {required DateTime date, required String stage, String? keyword}) async {
+  Future<void> fetchShipments({
+    required DateTime date,
+    required String stage,
+    String? keyword,
+  }) async {
     emit(FetchShipmentsLoading());
 
     final params = FetchShipmentsUseCaseParams(
@@ -201,19 +213,29 @@ class ShipmentCubit extends Cubit<ShipmentState> {
 
     result.fold(
       (failure) => emit(FetchShipmentsError(message: failure.message)),
-      (shipments) => emit(FetchShipmentsLoaded(
+      (shipments) => emit(
+        FetchShipmentsLoaded(
           shipments: _shipments
             ..clear()
-            ..addAll(shipments))),
+            ..addAll(shipments),
+        ),
+      ),
     );
   }
 
-  Future<void> fetchShipmentsPaginate(
-      {required DateTime date, required String stage, String? keyword}) async {
+  Future<void> fetchShipmentsPaginate({
+    required DateTime date,
+    required String stage,
+    String? keyword,
+  }) async {
     emit(ListPaginateLoading());
 
     final params = FetchShipmentsUseCaseParams(
-        date: date, stage: stage, keyword: keyword, page: ++_currentPage);
+      date: date,
+      stage: stage,
+      keyword: keyword,
+      page: ++_currentPage,
+    );
     final result = await _fetchShipmentsUseCase(params);
 
     result.fold(
@@ -230,12 +252,16 @@ class ShipmentCubit extends Cubit<ShipmentState> {
     );
   }
 
-  Future<void> insertShipment(
-      {required String receiptNumber, required String stage}) async {
+  Future<void> insertShipment({
+    required String receiptNumber,
+    required String stage,
+  }) async {
     emit(InsertShipmentLoading());
 
-    final params =
-        InsertShipmentUseCaseParams(receiptNumber: receiptNumber, stage: stage);
+    final params = CreateShipmentUseCaseParams(
+      receiptNumber: receiptNumber,
+      stage: stage,
+    );
 
     final result = await _insertShipmentUseCase(params);
 
@@ -245,14 +271,18 @@ class ShipmentCubit extends Cubit<ShipmentState> {
     );
   }
 
-  Future<void> insertShipmentDocument(
-      {required String shipmentId,
-      required String documentPath,
-      required String stage}) async {
+  Future<void> insertShipmentDocument({
+    required String shipmentId,
+    required String documentPath,
+    required String stage,
+  }) async {
     emit(InsertShipmentDocumentLoading());
 
-    final params = InsertShipmentDocumentUseCaseParams(
-        shipmentId: shipmentId, documentPath: documentPath, stage: stage);
+    final params = UpdateShipmentDocumentUseCaseParams(
+      shipmentId: shipmentId,
+      documentPath: documentPath,
+      stage: stage,
+    );
 
     final result = await _insertShipmentDocumentUseCase(params);
 

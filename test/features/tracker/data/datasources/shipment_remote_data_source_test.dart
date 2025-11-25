@@ -99,7 +99,7 @@ void main() {
     });
   });
 
-  group('fetch shipment by id remote data sources test', () {
+  group('fetch shipment remote data sources test', () {
     const params = tFetchShipmentParams;
     final resultMatcher = tFetchShipmentSuccess;
 
@@ -118,7 +118,7 @@ void main() {
         );
 
         // act
-        final result = await shipmentRemoteDataSource.fetchShipmentById(params);
+        final result = await shipmentRemoteDataSource.fetchShipment(params);
 
         // assert
         expect(result, resultMatcher);
@@ -137,7 +137,7 @@ void main() {
       );
 
       // act
-      final future = shipmentRemoteDataSource.fetchShipmentById(params);
+      final future = shipmentRemoteDataSource.fetchShipment(params);
 
       // assert
       await expectLater(future, throwsA(isA<ServerException>()));
@@ -145,7 +145,7 @@ void main() {
     });
   });
 
-  group('fetch shipment by receipt number remote data sources test', () {
+  group('fetch shipment status remote data sources test', () {
     const params = tFetchShipmentHistoryParams;
     final resultMatcher = tFetchShipmentHistorySuccess;
 
@@ -166,8 +166,9 @@ void main() {
         );
 
         // act
-        final result = await shipmentRemoteDataSource
-            .fetchShipmentByReceiptNumber(params);
+        final result = await shipmentRemoteDataSource.fetchShipmentStatus(
+          params,
+        );
 
         // assert
         expect(result, resultMatcher);
@@ -188,9 +189,7 @@ void main() {
       );
 
       // act
-      final future = shipmentRemoteDataSource.fetchShipmentByReceiptNumber(
-        params,
-      );
+      final future = shipmentRemoteDataSource.fetchShipmentStatus(params);
 
       // assert
       await expectLater(future, throwsA(isA<ServerException>()));
@@ -435,7 +434,7 @@ void main() {
     });
   });
 
-  group('insert shipment remote data sources test', () {
+  group('create shipment remote data sources test', () {
     const params = tCreateShipmentParams;
     const resultMatcher = tCreateShipmentSuccess;
 
@@ -452,7 +451,7 @@ void main() {
       );
 
       // act
-      final result = await shipmentRemoteDataSource.insertShipment(params);
+      final result = await shipmentRemoteDataSource.createShipment(params);
 
       // assert
       expect(result, resultMatcher);
@@ -475,7 +474,7 @@ void main() {
       );
 
       // act
-      final future = shipmentRemoteDataSource.insertShipment(params);
+      final future = shipmentRemoteDataSource.createShipment(params);
 
       // assert
       await expectLater(future, throwsA(isA<ServerException>()));
@@ -488,7 +487,7 @@ void main() {
     });
   });
 
-  group('insert shipment document remote data sources test', () {
+  group('update shipment document remote data sources test', () {
     const params = tUpdateShipmentDocumentParams;
     const resultMatcher = tUpdateShipmentDocumentSuccess;
     final file = File(params.documentPath);
@@ -518,7 +517,7 @@ void main() {
       );
 
       // act
-      final result = await shipmentRemoteDataSource.insertShipmentDocument(
+      final result = await shipmentRemoteDataSource.updateShipmentDocument(
         params,
       );
 
@@ -543,7 +542,7 @@ void main() {
       );
 
       // act
-      final result = shipmentRemoteDataSource.insertShipmentDocument(params);
+      final result = shipmentRemoteDataSource.updateShipmentDocument(params);
 
       // assert
       await expectLater(result, throwsA(isA<ServerException>()));

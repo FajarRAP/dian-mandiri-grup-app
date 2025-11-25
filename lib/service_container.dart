@@ -37,12 +37,12 @@ import 'features/tracker/domain/repositories/shipment_repository.dart';
 import 'features/tracker/domain/usecases/create_shipment_report_use_case.dart';
 import 'features/tracker/domain/usecases/delete_shipment_use_case.dart';
 import 'features/tracker/domain/usecases/download_shipment_report_use_case.dart';
-import 'features/tracker/domain/usecases/fetch_shipment_by_id_use_case.dart';
-import 'features/tracker/domain/usecases/fetch_shipment_by_receipt_number_use_case.dart';
+import 'features/tracker/domain/usecases/fetch_shipment_use_case.dart';
+import 'features/tracker/domain/usecases/fetch_shipment_status_use_case.dart';
 import 'features/tracker/domain/usecases/fetch_shipment_reports_use_case.dart';
 import 'features/tracker/domain/usecases/fetch_shipments_use_case.dart';
-import 'features/tracker/domain/usecases/insert_shipment_document_use_case.dart';
-import 'features/tracker/domain/usecases/insert_shipment_use_case.dart';
+import 'features/tracker/domain/usecases/update_shipment_document_use_case.dart';
+import 'features/tracker/domain/usecases/create_shipment_use_case.dart';
 import 'features/tracker/presentation/cubit/shipment_cubit.dart';
 import 'features/warehouse/data/datasources/warehouse_remote_data_source.dart';
 import 'features/warehouse/data/repositories/warehouse_repository_impl.dart';
@@ -126,18 +126,16 @@ void setup() {
       CreateShipmentReportUseCase(shipmentRepository: getIt()),
     )
     ..registerSingleton(DeleteShipmentUseCase(shipmentRepository: getIt()))
-    ..registerSingleton(FetchShipmentByIdUseCase(shipmentRepository: getIt()))
-    ..registerSingleton(
-      FetchShipmentByReceiptNumberUseCase(shipmentRepository: getIt()),
-    )
+    ..registerSingleton(FetchShipmentUseCase(shipmentRepository: getIt()))
+    ..registerSingleton(FetchShipmentStatusUseCase(shipmentRepository: getIt()))
     ..registerSingleton(
       FetchShipmentReportsUseCase(shipmentRepository: getIt()),
     )
     ..registerSingleton(FetchShipmentsUseCase(shipmentRepository: getIt()))
     ..registerSingleton(
-      InsertShipmentDocumentUseCase(shipmentRepository: getIt()),
+      UpdateShipmentDocumentUseCase(shipmentRepository: getIt()),
     )
-    ..registerSingleton(InsertShipmentUseCase(shipmentRepository: getIt()))
+    ..registerSingleton(CreateShipmentUseCase(shipmentRepository: getIt()))
     ..registerSingleton(
       DownloadShipmentReportUseCase(shipmentRepository: getIt()),
     )
@@ -145,8 +143,8 @@ void setup() {
       () => ShipmentCubit(
         createShipmentReportUseCase: getIt(),
         deleteShipmentUseCase: getIt(),
-        fetchShipmentByIdUseCase: getIt(),
-        fetchShipmentByReceiptNumberUseCase: getIt(),
+        fetchShipmentUseCase: getIt(),
+        fetchShipmentStatusUseCase: getIt(),
         fetchShipmentReportsUseCase: getIt(),
         fetchShipmentsUseCase: getIt(),
         insertShipmentDocumentUseCase: getIt(),
