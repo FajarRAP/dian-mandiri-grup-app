@@ -11,12 +11,12 @@ import '../services/google_sign_in_service.dart';
 import '../themes/colors.dart';
 
 class ScaffoldWithBottomNavigationBar extends StatelessWidget {
-  final StatefulNavigationShell child;
-
   const ScaffoldWithBottomNavigationBar({
     super.key,
     required this.child,
   });
+
+  final StatefulNavigationShell child;
 
   @override
   Widget build(BuildContext context) {

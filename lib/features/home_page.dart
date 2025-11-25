@@ -147,7 +147,7 @@ class HomePage extends StatelessWidget {
                   const SizedBox(height: 28),
                   Expanded(
                     child: Container(
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                         borderRadius: BorderRadius.vertical(
                           top: Radius.circular(30),
                         ),
@@ -168,11 +168,11 @@ class HomePage extends StatelessWidget {
                                 icon: Icons.factory_outlined,
                                 title: 'Barang Mentah',
                               ),
-                              GridMenuItem(
+                              const GridMenuItem(
                                 icon: Icons.category_outlined,
                                 title: 'Kategori Barang',
                               ),
-                              GridMenuItem(
+                              const GridMenuItem(
                                 icon: Icons.inventory_2_outlined,
                                 title: 'Manajemen Stok',
                               ),
@@ -181,7 +181,7 @@ class HomePage extends StatelessWidget {
                                 icon: Icons.person_outline,
                                 title: 'Supplier',
                               ),
-                              GridMenuItem(
+                              const GridMenuItem(
                                 icon: Icons.receipt_long_outlined,
                                 title: 'Pembelian Barang',
                               ),
@@ -250,7 +250,8 @@ class GridMenuItem extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(10),
-        overlayColor: WidgetStatePropertyAll(MaterialColors.primaryContainer),
+        overlayColor:
+            const WidgetStatePropertyAll(MaterialColors.primaryContainer),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[

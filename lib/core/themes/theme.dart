@@ -82,7 +82,7 @@ final theme = ThemeData(
     ),
     filled: true,
     fillColor: Colors.grey.shade50,
-    hintStyle: TextStyle(
+    hintStyle: const TextStyle(
       color: MaterialColors.onSurfaceVariant,
       fontSize: 16,
     ),

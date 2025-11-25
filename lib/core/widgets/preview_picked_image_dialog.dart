@@ -16,7 +16,7 @@ class PreviewPickedImageDialog extends StatelessWidget {
 
     return AlertDialog(
       alignment: Alignment.center,
-      contentPadding: EdgeInsets.all(2),
+      contentPadding: const EdgeInsets.all(2),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(6),
       ),

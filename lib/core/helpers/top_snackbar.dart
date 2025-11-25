@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:ship_tracker/core/themes/colors.dart';
+
+import '../themes/colors.dart';
 
 class TopSnackbar {
   static late BuildContext _context;
@@ -46,7 +47,7 @@ class TopSnackbar {
       color: Colors.transparent,
       child: Container(
         alignment: Alignment.center,
-        constraints: BoxConstraints(minHeight: 48),
+        constraints: const BoxConstraints(minHeight: 48),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
           color: color,
