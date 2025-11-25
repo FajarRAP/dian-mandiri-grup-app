@@ -12,9 +12,11 @@ extension DateTimeFormatter on DateTime {
 }
 
 extension NumberFormatter on num {
-  String get toIDRCurrency =>
-      NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0)
-          .format(this);
+  String get toIDRCurrency => NumberFormat.currency(
+    locale: 'id_ID',
+    symbol: 'Rp ',
+    decimalDigits: 0,
+  ).format(this);
 }
 
 final dateFormat = DateFormat('y-MM-dd', 'id_ID');
@@ -49,27 +51,29 @@ String evaluateStage(String stage) {
 }
 
 List parseSpreadsheetFailure(SpreadsheetFailure spreadsheetFailure) {
-  DataCell mapCell(el) => DataCell(SizedBox(
+  DataCell mapCell(el) => DataCell(
+    SizedBox(
       width: double.infinity,
       child: Tooltip(
-          triggerMode: TooltipTriggerMode.tap,
-          message: el?['error'] ?? '',
-          child: Text(el?['value'] ?? ''))));
+        triggerMode: TooltipTriggerMode.tap,
+        message: el?['error'] ?? '',
+        child: Text(el?['value'] ?? ''),
+      ),
+    ),
+  );
 
   final headers = spreadsheetFailure.headers
       .map((e) => DataColumn(label: Text(e)))
       .toList();
-  final rows = List.generate(
-    spreadsheetFailure.rows.length,
-    (index) {
-      final row = spreadsheetFailure.rows[index];
-      final color = index % 2 == 0 ? Colors.white : Colors.grey.shade50;
+  final rows = List.generate(spreadsheetFailure.rows.length, (index) {
+    final row = spreadsheetFailure.rows[index];
+    final color = index % 2 == 0 ? Colors.white : Colors.grey.shade50;
 
-      return DataRow(
-          color: WidgetStateProperty.all(color),
-          cells: row.map(mapCell).toList());
-    },
-  );
+    return DataRow(
+      color: WidgetStateProperty.all(color),
+      cells: row.map(mapCell).toList(),
+    );
+  });
 
   return [headers, rows];
 }
@@ -77,15 +81,31 @@ List parseSpreadsheetFailure(SpreadsheetFailure spreadsheetFailure) {
 class TextFormFieldConfig {
   const TextFormFieldConfig({
     this.onFieldSubmitted,
-    this.autoFocus,
+    this.autoFocus = false,
     this.decoration,
-    this.keyboardType,
-    this.textInputAction,
+    this.keyboardType = .text,
+    this.textInputAction = .send,
   });
 
+  TextFormFieldConfig copyWith({
+    final void Function(String value)? onFieldSubmitted,
+    final bool? autoFocus,
+    final InputDecoration? decoration,
+    final TextInputType? keyboardType,
+    final TextInputAction? textInputAction,
+  }) {
+    return TextFormFieldConfig(
+      onFieldSubmitted: onFieldSubmitted ?? this.onFieldSubmitted,
+      autoFocus: autoFocus ?? this.autoFocus,
+      decoration: decoration ?? this.decoration,
+      keyboardType: keyboardType ?? this.keyboardType,
+      textInputAction: textInputAction ?? this.textInputAction,
+    );
+  }
+
   final void Function(String value)? onFieldSubmitted;
-  final bool? autoFocus;
+  final bool autoFocus;
   final InputDecoration? decoration;
-  final TextInputType? keyboardType;
-  final TextInputAction? textInputAction;
+  final TextInputType keyboardType;
+  final TextInputAction textInputAction;
 }
