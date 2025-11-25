@@ -11,6 +11,7 @@ import 'package:path_provider/path_provider.dart';
 import 'core/common/constants.dart';
 import 'core/helpers/top_snackbar.dart';
 import 'core/presentation/cubit/app_cubit.dart';
+import 'core/presentation/cubit/user_cubit.dart';
 import 'core/router/app_router.dart';
 import 'core/services/google_sign_in_service.dart';
 import 'core/themes/theme.dart';
@@ -55,11 +56,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => getIt.get<AppCubit>()),
-        BlocProvider(create: (context) => getIt.get<AuthCubit>()),
-        BlocProvider(create: (context) => getIt.get<ShipmentCubit>()),
-        BlocProvider(create: (context) => getIt.get<SupplierCubit>()),
-        BlocProvider(create: (context) => getIt.get<WarehouseCubit>()),
+        BlocProvider(create: (context) => getIt<UserCubit>()),
+        BlocProvider(create: (context) => getIt<AppCubit>()),
+        BlocProvider(create: (context) => getIt<AuthCubit>()),
+        BlocProvider(create: (context) => getIt<ShipmentCubit>()),
+        BlocProvider(create: (context) => getIt<SupplierCubit>()),
+        BlocProvider(create: (context) => getIt<WarehouseCubit>()),
       ],
       child: MaterialApp.router(
         builder: (context, child) => Overlay(
