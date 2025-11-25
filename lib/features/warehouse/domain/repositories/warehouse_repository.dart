@@ -1,7 +1,7 @@
 import 'package:dartz/dartz.dart';
 
 import '../../../../core/common/dropdown_entity.dart';
-import '../../../../core/failure/failure.dart';
+import '../../../../core/errors/failure.dart';
 import '../entities/purchase_note_detail_entity.dart';
 import '../entities/purchase_note_summary_entity.dart';
 import '../usecases/delete_purchase_note_use_case.dart';

@@ -1,7 +1,7 @@
 import 'package:dartz/dartz.dart';
 
 import '../errors/exceptions.dart';
-import '../failure/failure.dart';
+import '../errors/failure.dart';
 
 mixin RepositoryHandlerMixin {
   Future<Either<Failure, T>> handleRepositoryRequest<T>(

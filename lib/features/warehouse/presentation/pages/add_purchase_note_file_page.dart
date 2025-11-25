@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/common/dropdown_entity.dart';
-import '../../../../core/failure/failure.dart';
+import '../../../../core/errors/failure.dart';
 import '../../../../core/helpers/helpers.dart';
 import '../../../../core/helpers/top_snackbar.dart';
 import '../../../../core/helpers/validators.dart';

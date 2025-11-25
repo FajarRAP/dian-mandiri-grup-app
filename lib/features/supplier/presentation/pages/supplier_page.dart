@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/common/constants.dart';
-import '../../../../core/helpers/debouncer.dart';
+import '../../../../core/utils/debouncer.dart';
 import '../../../../core/themes/colors.dart';
 import '../cubit/supplier_cubit.dart';
 import '../widgets/supplier_item.dart';

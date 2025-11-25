@@ -1,5 +1,5 @@
 import 'package:ship_tracker/core/errors/exceptions.dart';
-import 'package:ship_tracker/core/failure/failure.dart';
+import 'package:ship_tracker/core/errors/failure.dart';
 
 const tServerFailure = ServerFailure(
   message: 'Server Error Occured',

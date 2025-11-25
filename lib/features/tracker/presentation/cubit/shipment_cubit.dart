@@ -2,7 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
-import '../../../../core/failure/failure.dart';
+import '../../../../core/errors/failure.dart';
 import '../../../../core/usecase/use_case.dart';
 import '../../../../main.dart';
 import '../../domain/entities/shipment_detail_entity.dart';

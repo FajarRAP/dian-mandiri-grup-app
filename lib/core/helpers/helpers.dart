@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../common/constants.dart';
-import '../failure/failure.dart';
+import '../errors/failure.dart';
 
 extension DateTimeFormatter on DateTime {
   String get toYMD => DateFormat('y-MM-dd', 'id_ID').format(this);

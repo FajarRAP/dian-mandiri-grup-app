@@ -1,6 +1,6 @@
 import 'package:dartz/dartz.dart';
 
-import '../../../../core/failure/failure.dart';
+import '../../../../core/errors/failure.dart';
 import '../../../../core/utils/respository_handler_mixin.dart';
 import '../../domain/entities/user_entity.dart';
 import '../../domain/repositories/auth_repository.dart';

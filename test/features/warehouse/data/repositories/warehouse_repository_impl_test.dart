@@ -4,7 +4,7 @@ import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:ship_tracker/core/errors/exceptions.dart';
-import 'package:ship_tracker/core/failure/failure.dart';
+import 'package:ship_tracker/core/errors/failure.dart';
 import 'package:ship_tracker/features/warehouse/data/repositories/warehouse_repository_impl.dart';
 
 import '../../../../core/utils/fixture_reader.dart';

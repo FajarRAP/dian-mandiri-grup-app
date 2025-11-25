@@ -1,6 +1,6 @@
 import 'package:dartz/dartz.dart';
 
-import '../../../../core/failure/failure.dart';
+import '../../../../core/errors/failure.dart';
 import '../entities/user_entity.dart';
 import '../usecases/refresh_token_use_case.dart';
 import '../usecases/update_profile_use_case.dart';

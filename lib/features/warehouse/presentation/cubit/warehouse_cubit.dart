@@ -5,7 +5,7 @@ import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 
 import '../../../../core/common/dropdown_entity.dart';
-import '../../../../core/failure/failure.dart';
+import '../../../../core/errors/failure.dart';
 import '../../../../core/services/image_picker_service.dart';
 import '../../../../core/usecase/use_case.dart';
 import '../../domain/entities/purchase_note_detail_entity.dart';

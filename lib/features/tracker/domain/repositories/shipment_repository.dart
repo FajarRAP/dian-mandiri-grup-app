@@ -1,6 +1,6 @@
 import 'package:dartz/dartz.dart';
 
-import '../../../../core/failure/failure.dart';
+import '../../../../core/errors/failure.dart';
 import '../entities/shipment_detail_entity.dart';
 import '../entities/shipment_entity.dart';
 import '../entities/shipment_history_entity.dart';

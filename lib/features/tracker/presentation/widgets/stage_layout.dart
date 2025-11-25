@@ -6,7 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 
 import '../../../../core/common/constants.dart';
-import '../../../../core/helpers/debouncer.dart';
+import '../../../../core/utils/debouncer.dart';
 import '../../../../core/helpers/helpers.dart';
 import '../../../../core/helpers/top_snackbar.dart';
 import '../../../../core/themes/colors.dart';
