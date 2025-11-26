@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
+import 'package:gap/gap.dart';
 
-import '../../../../core/common/constants.dart';
+import '../../../../common/constants/app_permissions.dart';
 import '../../../../core/helpers/helpers.dart';
-import '../../../../core/themes/colors.dart';
-import '../../../auth/presentation/cubit/auth_cubit.dart';
+import '../../../../core/presentation/cubit/user_cubit.dart';
+import '../../../../core/utils/extensions.dart';
 import '../../domain/entities/shipment_entity.dart';
 
 class ShipmentListItem extends StatelessWidget {
@@ -22,52 +22,44 @@ class ShipmentListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final uriPath = GoRouterState.of(context).uri.path;
-    final theme = Theme.of(context);
-    final authCubit = context.read<AuthCubit>();
-    final textTheme = theme.textTheme;
-    final permissions = authCubit.user.permissions;
-    final isSuperAdmin = permissions.contains(superAdminPermission);
+    final textTheme = context.textTheme;
+    final isSuperAdmin = context.read<UserCubit>().can(
+      AppPermissions.superAdmin,
+    );
 
     return Card(
-      color: MaterialColors.surfaceContainerLowest,
+      color: context.colorScheme.surfaceContainerLowest,
       elevation: 2,
       child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 12,
-          vertical: 16,
-        ),
+        padding: const .symmetric(horizontal: 12, vertical: 16),
         child: Row(
           children: <Widget>[
-            const CircleAvatar(
-              backgroundColor: MaterialColors.primaryContainer,
+            CircleAvatar(
+              backgroundColor: context.colorScheme.primaryFixed,
               child: Icon(
                 Icons.local_shipping,
-                color: CustomColors.primaryNormal,
+                color: context.colorScheme.primary,
               ),
             ),
             const SizedBox(width: 8),
             Expanded(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: .start,
                 children: <Widget>[
-                  Text(
-                    shipment.receiptNumber,
-                    style: textTheme.titleMedium,
-                  ),
-                  const SizedBox(height: 4),
+                  Text(shipment.receiptNumber, style: textTheme.titleMedium),
+                  const Gap(4),
                   Text(
                     shipment.date.toLocal().toHMS,
                     style: textTheme.bodySmall?.copyWith(
                       color: Colors.grey.shade600,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const Gap(4),
                   Text(
                     'Kurir: ${shipment.courier}',
                     style: textTheme.bodySmall?.copyWith(
                       color: Colors.grey.shade700,
-                      fontWeight: FontWeight.w500,
+                      fontWeight: .w500,
                     ),
                   ),
                 ],
@@ -77,15 +69,9 @@ class ShipmentListItem extends StatelessWidget {
               PopupMenuButton(
                 padding: EdgeInsets.zero,
                 itemBuilder: (context) => <PopupMenuEntry>[
-                  if (uriPath != cancelReceiptRoute)
-                    PopupMenuItem(
-                      onTap: onCancel,
-                      child: const Text('Cancel'),
-                    ),
-                  PopupMenuItem(
-                    onTap: onDelete,
-                    child: const Text('Hapus'),
-                  ),
+                  // if (uriPath != cancelReceiptRoute)
+                  PopupMenuItem(onTap: onCancel, child: const Text('Cancel')),
+                  PopupMenuItem(onTap: onDelete, child: const Text('Hapus')),
                 ],
               ),
           ],
