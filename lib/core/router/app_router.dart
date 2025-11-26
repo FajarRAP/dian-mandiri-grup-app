@@ -10,6 +10,7 @@ import '../../features/supplier/presentation/pages/add_supplier_page.dart';
 import '../../features/supplier/presentation/pages/edit_supplier_page.dart';
 import '../../features/supplier/presentation/pages/supplier_detail_page.dart';
 import '../../features/supplier/presentation/pages/supplier_page.dart';
+import '../../features/tracker/presentation/cubit/shipment_detail/shipment_detail_cubit.dart';
 import '../../features/tracker/presentation/cubit/shipment_list/shipment_list_cubit.dart';
 import '../../features/tracker/presentation/pages/cancel_page.dart';
 import '../../features/tracker/presentation/pages/check_page.dart';
@@ -22,7 +23,7 @@ import '../../features/tracker/presentation/pages/scan_page.dart';
 import '../../features/tracker/presentation/pages/send_page.dart';
 import '../../features/tracker/presentation/pages/shipment_detail_page.dart';
 import '../../features/tracker/presentation/pages/tracker_page.dart';
-import '../../features/tracker/presentation/pages/upload_page.dart';
+import '../../features/tracker/presentation/pages/update_shipment_document_page.dart';
 import '../../features/warehouse/presentation/pages/add_purchase_note_file_page.dart';
 import '../../features/warehouse/presentation/pages/add_purchase_note_manual_page.dart';
 import '../../features/warehouse/presentation/pages/add_shipping_fee_page.dart';
@@ -69,22 +70,7 @@ class AppRouter {
           transitionsBuilder: transitionsBuilder,
         ),
       ),
-      GoRoute(
-        path: displayPictureRoute,
-        pageBuilder: (context, state) {
-          final params = state.extra as Map<String, dynamic>;
 
-          return CustomTransitionPage(
-            key: state.pageKey,
-            child: UploadPage(
-              imagePath: '${params['image_path']}',
-              shipmentId: '${params['shipment_id']}',
-              stage: '${params['stage']}',
-            ),
-            transitionsBuilder: transitionsBuilder,
-          );
-        },
-      ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) =>
             ScaffoldWithBottomNavigationBar(child: navigationShell),
@@ -105,37 +91,37 @@ class AppRouter {
                       _buildRouteWithCubit<ShipmentListCubit>(
                         path: 'scan',
                         name: Routes.trackerScan,
-                        child: const ScanPage(),
+                        child: (state) => const ScanPage(),
                       ),
                       _buildRouteWithCubit<ShipmentListCubit>(
                         path: 'pick-up',
                         name: Routes.trackerPickUp,
-                        child: const PickUpPage(),
+                        child: (state) => const PickUpPage(),
                       ),
                       _buildRouteWithCubit<ShipmentListCubit>(
                         path: 'check',
                         name: Routes.trackerCheck,
-                        child: const CheckPage(),
+                        child: (state) => const CheckPage(),
                       ),
                       _buildRouteWithCubit<ShipmentListCubit>(
                         path: 'pack',
                         name: Routes.trackerPack,
-                        child: const PackPage(),
+                        child: (state) => const PackPage(),
                       ),
                       _buildRouteWithCubit<ShipmentListCubit>(
                         path: 'send',
                         name: Routes.trackerSend,
-                        child: const SendPage(),
+                        child: (state) => const SendPage(),
                       ),
                       _buildRouteWithCubit<ShipmentListCubit>(
                         path: 'return',
                         name: Routes.trackerReturn,
-                        child: const ReturnPage(),
+                        child: (state) => const ReturnPage(),
                       ),
                       _buildRouteWithCubit<ShipmentListCubit>(
                         path: 'cancel',
                         name: Routes.trackerCancel,
-                        child: const CancelPage(),
+                        child: (state) => const CancelPage(),
                       ),
                       GoRoute(
                         path: 'report',
@@ -147,12 +133,32 @@ class AppRouter {
                         name: Routes.trackerStatus,
                         builder: (context, state) => const ReceiptStatusPage(),
                       ),
-                      GoRoute(
+                      _buildRouteWithCubit<ShipmentDetailCubit>(
                         path: 'detail',
                         name: Routes.trackerDetail,
-                        builder: (context, state) => ShipmentDetailPage(
+                        child: (state) => ShipmentDetailPage(
                           shipmentId: state.extra as String,
                         ),
+                      ),
+                      GoRoute(
+                        path: displayPictureRoute,
+                        name: Routes.trackerPickedDocument,
+                        builder: (context, state) {
+                          final extras = state.extra as Map<String, dynamic>;
+                          final imagePath = extras['image_path'] as String;
+                          final shipmentId = extras['shipment_id'] as String;
+                          final stage = extras['stage'] as String;
+                          final cubit = extras['cubit'] as ShipmentDetailCubit;
+
+                          return BlocProvider.value(
+                            value: cubit,
+                            child: UpdateShipmentDocumentPage(
+                              imagePath: imagePath,
+                              shipmentId: shipmentId,
+                              stage: stage,
+                            ),
+                          );
+                        },
                       ),
                     ],
                   ),
@@ -241,14 +247,17 @@ class AppRouter {
     ],
   );
 
-  static GoRoute _buildRouteWithCubit<
-    T extends StateStreamableSource<Object?>
-  >({required String path, required String name, required Widget child}) {
+  static GoRoute
+  _buildRouteWithCubit<T extends StateStreamableSource<Object?>>({
+    required String path,
+    required String name,
+    required Widget Function(GoRouterState state) child,
+  }) {
     return GoRoute(
       path: path,
       name: name,
       builder: (context, state) =>
-          BlocProvider<T>(create: (context) => getIt<T>(), child: child),
+          BlocProvider<T>(create: (context) => getIt<T>(), child: child(state)),
     );
   }
 }

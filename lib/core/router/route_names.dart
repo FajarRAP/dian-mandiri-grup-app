@@ -16,6 +16,7 @@ class Routes {
   static const trackerReport = 'tracker.report';
   static const trackerStatus = 'tracker.status';
   static const trackerDetail = 'tracker.detail';
+  static const trackerPickedDocument = '$trackerDetail.picked_document';
 
   // Supplier
   static const supplier = 'supplier';
