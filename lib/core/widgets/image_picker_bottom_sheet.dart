@@ -1,10 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:image_picker/image_picker.dart';
 
-import '../themes/colors.dart';
+import '../presentation/mixins/image_picker_mixin.dart';
+import '../utils/extensions.dart';
 
-class ImagePickerBottomSheet extends StatelessWidget {
+class ImagePickerBottomSheet extends StatelessWidget with ImagePickerMixin {
   const ImagePickerBottomSheet({
     super.key,
     this.onCameraPick,
@@ -12,38 +14,34 @@ class ImagePickerBottomSheet extends StatelessWidget {
     this.onPicked,
   });
 
-  final void Function()? onCameraPick;
-  final void Function()? onGalleryPick;
-  final void Function(XFile image)? onPicked;
+  final void Function(File image)? onCameraPick;
+  final void Function(File image)? onGalleryPick;
+  final void Function(File image)? onPicked;
 
   @override
   Widget build(BuildContext context) {
     return Wrap(
       children: <Widget>[
         ListTile(
-          onTap: () {
+          onTap: () async {
             context.pop();
-            onCameraPick?.call();
+            onCameraPick != null
+                ? await pickFromCamera(onPicked: onCameraPick)
+                : await pickFromCamera(onPicked: onPicked);
           },
-          leading: const Icon(
-            Icons.camera_alt,
-            color: CustomColors.primaryNormal,
-          ),
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(
-              top: Radius.circular(16),
-            ),
-          ),
+          leading: Icon(Icons.camera_alt, color: context.colorScheme.primary),
           title: const Text('Ambil dari Kamera'),
         ),
         ListTile(
-          onTap: () {
+          onTap: () async {
             context.pop();
-            onGalleryPick?.call();
+            onGalleryPick != null
+                ? await pickFromGallery(onPicked: onGalleryPick)
+                : await pickFromGallery(onPicked: onPicked);
           },
-          leading: const Icon(
+          leading: Icon(
             Icons.photo_library,
-            color: CustomColors.primaryNormal,
+            color: context.colorScheme.primary,
           ),
           title: const Text('Pilih dari Galeri'),
         ),
