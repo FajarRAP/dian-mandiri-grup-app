@@ -254,14 +254,19 @@ class _SuccessWidget extends StatelessWidget {
           ),
           child: ShipmentListItem(
             onCancel: () => showDialog(
-              builder: (context) => CancelShipmentDialog(
-                receiptNumber: shipments[index].receiptNumber,
+              builder: (_) => BlocProvider.value(
+                value: context.read<ShipmentListCubit>(),
+                child: CancelShipmentDialog(
+                  receiptNumber: shipments[index].receiptNumber,
+                ),
               ),
               context: context,
             ),
             onDelete: () => showDialog(
-              builder: (context) =>
-                  DeleteShipmentDialog(shipmentId: shipments[index].id),
+              builder: (_) => BlocProvider.value(
+                value: context.read<ShipmentListCubit>(),
+                child: DeleteShipmentDialog(shipmentId: shipments[index].id),
+              ),
               context: context,
             ),
             shipment: shipments[index],
@@ -305,7 +310,10 @@ class _FAB extends StatelessWidget {
         ),
         ActionButton(
           onPressed: () => showDialog(
-            builder: (context) => CreateShipmentFromScannerDialog(stage: stage),
+            builder: (_) => BlocProvider.value(
+              value: context.read<ShipmentListCubit>(),
+              child: CreateShipmentFromScannerDialog(stage: stage),
+            ),
             context: context,
           ),
           icon: Icons.barcode_reader,
