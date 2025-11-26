@@ -15,7 +15,7 @@ class CreateShipmentUseCase
   Future<Either<Failure, String>> execute(
     CreateShipmentUseCaseParams params,
   ) async {
-    return await shipmentRepository.insertShipment(params);
+    return await shipmentRepository.createShipment(params);
   }
 }
 
