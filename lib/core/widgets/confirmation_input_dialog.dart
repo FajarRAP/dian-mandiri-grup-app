@@ -13,14 +13,14 @@ class ConfirmationInputDialog extends StatefulWidget {
     this.onAction,
     required this.actionText,
     required this.body,
-    this.textFormFieldConfig,
+    this.textFormFieldConfig = const TextFormFieldConfig(),
     required this.title,
   });
 
   final void Function(String value)? onAction;
   final String actionText;
   final String body;
-  final TextFormFieldConfig? textFormFieldConfig;
+  final TextFormFieldConfig textFormFieldConfig;
   final String title;
 
   @override
@@ -74,11 +74,11 @@ class _ConfirmationInputDialogState extends State<ConfirmationInputDialog> {
             TextFormField(
               onFieldSubmitted: (_) => _onSubmit(),
               onTapOutside: (_) => _focusNode.unfocus(),
-              autofocus: widget.textFormFieldConfig?.autoFocus ?? false,
+              autofocus: widget.textFormFieldConfig.autoFocus,
               controller: _controller,
-              decoration: widget.textFormFieldConfig?.decoration,
-              keyboardType: widget.textFormFieldConfig?.keyboardType,
-              textInputAction: widget.textFormFieldConfig?.textInputAction,
+              decoration: widget.textFormFieldConfig.decoration,
+              keyboardType: widget.textFormFieldConfig.keyboardType,
+              textInputAction: widget.textFormFieldConfig.textInputAction,
               validator: inputValidator,
             ),
             const Gap(24),
