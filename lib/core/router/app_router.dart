@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/auth/presentation/pages/profile_page.dart';
@@ -9,6 +10,7 @@ import '../../features/supplier/presentation/pages/add_supplier_page.dart';
 import '../../features/supplier/presentation/pages/edit_supplier_page.dart';
 import '../../features/supplier/presentation/pages/supplier_detail_page.dart';
 import '../../features/supplier/presentation/pages/supplier_page.dart';
+import '../../features/tracker/presentation/cubit/shipment_list/shipment_list_cubit.dart';
 import '../../features/tracker/presentation/pages/cancel_page.dart';
 import '../../features/tracker/presentation/pages/check_page.dart';
 import '../../features/tracker/presentation/pages/pack_page.dart';
@@ -26,6 +28,7 @@ import '../../features/warehouse/presentation/pages/add_purchase_note_manual_pag
 import '../../features/warehouse/presentation/pages/add_shipping_fee_page.dart';
 import '../../features/warehouse/presentation/pages/purchase_note_detail_page.dart';
 import '../../features/warehouse/presentation/pages/warehouse_page.dart';
+import '../../service_container.dart';
 import '../common/constants.dart';
 import '../presentation/pages/splash_page.dart';
 import '../widgets/scaffold_with_bottom_navigation_bar.dart';
@@ -99,40 +102,40 @@ class AppRouter {
                     name: Routes.tracker,
                     builder: (context, state) => const TrackerPage(),
                     routes: <RouteBase>[
-                      GoRoute(
+                      _buildRouteWithCubit<ShipmentListCubit>(
                         path: 'scan',
                         name: Routes.trackerScan,
-                        builder: (context, state) => const ScanPage(),
+                        child: const ScanPage(),
                       ),
-                      GoRoute(
+                      _buildRouteWithCubit<ShipmentListCubit>(
                         path: 'pick-up',
                         name: Routes.trackerPickUp,
-                        builder: (context, state) => const PickUpPage(),
+                        child: const PickUpPage(),
                       ),
-                      GoRoute(
+                      _buildRouteWithCubit<ShipmentListCubit>(
                         path: 'check',
                         name: Routes.trackerCheck,
-                        builder: (context, state) => const CheckPage(),
+                        child: const CheckPage(),
                       ),
-                      GoRoute(
+                      _buildRouteWithCubit<ShipmentListCubit>(
                         path: 'pack',
                         name: Routes.trackerPack,
-                        builder: (context, state) => const PackPage(),
+                        child: const PackPage(),
                       ),
-                      GoRoute(
+                      _buildRouteWithCubit<ShipmentListCubit>(
                         path: 'send',
                         name: Routes.trackerSend,
-                        builder: (context, state) => const SendPage(),
+                        child: const SendPage(),
                       ),
-                      GoRoute(
+                      _buildRouteWithCubit<ShipmentListCubit>(
                         path: 'return',
                         name: Routes.trackerReturn,
-                        builder: (context, state) => const ReturnPage(),
+                        child: const ReturnPage(),
                       ),
-                      GoRoute(
+                      _buildRouteWithCubit<ShipmentListCubit>(
                         path: 'cancel',
                         name: Routes.trackerCancel,
-                        builder: (context, state) => const CancelPage(),
+                        child: const CancelPage(),
                       ),
                       GoRoute(
                         path: 'report',
@@ -237,4 +240,15 @@ class AppRouter {
       ),
     ],
   );
+
+  static GoRoute _buildRouteWithCubit<
+    T extends StateStreamableSource<Object?>
+  >({required String path, required String name, required Widget child}) {
+    return GoRoute(
+      path: path,
+      name: name,
+      builder: (context, state) =>
+          BlocProvider<T>(create: (context) => getIt<T>(), child: child),
+    );
+  }
 }
