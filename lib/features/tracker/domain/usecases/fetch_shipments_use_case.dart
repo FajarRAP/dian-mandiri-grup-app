@@ -14,7 +14,8 @@ class FetchShipmentsUseCase
 
   @override
   Future<Either<Failure, List<ShipmentEntity>>> execute(
-      FetchShipmentsUseCaseParams params) async {
+    FetchShipmentsUseCaseParams params,
+  ) async {
     return shipmentRepository.fetchShipments(params);
   }
 }
@@ -22,16 +23,16 @@ class FetchShipmentsUseCase
 class FetchShipmentsUseCaseParams extends Equatable {
   const FetchShipmentsUseCaseParams({
     required this.stage,
-    this.keyword,
-    this.page = 1,
     required this.date,
+    this.paginate = const PaginateParams(),
+    this.search = const SearchParams(),
   });
 
   final String stage;
-  final String? keyword;
-  final int page;
   final DateTime date;
+  final PaginateParams paginate;
+  final SearchParams search;
 
   @override
-  List<Object?> get props => [stage, keyword, page, date];
+  List<Object?> get props => [stage, date, paginate, search];
 }

@@ -147,7 +147,7 @@ class ShipmentCubit extends Cubit<ShipmentState> {
       startDate: startDate,
       endDate: endDate,
       status: status,
-      page: _currentPage = 1,
+      paginate: PaginateParams(page: _currentPage = 1),
     );
     final result = await _fetchShipmentReportsUseCase(params);
 
@@ -174,7 +174,7 @@ class ShipmentCubit extends Cubit<ShipmentState> {
       startDate: startDate,
       endDate: endDate,
       status: status,
-      page: ++_currentPage,
+      paginate: PaginateParams(page: ++_currentPage),
     );
     final result = await _fetchShipmentReportsUseCase(params);
 
@@ -206,8 +206,8 @@ class ShipmentCubit extends Cubit<ShipmentState> {
     final params = FetchShipmentsUseCaseParams(
       date: date,
       stage: stage,
-      keyword: keyword,
-      page: _currentPage = 1,
+      search: SearchParams(query: keyword ?? ''),
+      paginate: PaginateParams(page: _currentPage = 1),
     );
     final result = await _fetchShipmentsUseCase(params);
 
@@ -233,8 +233,8 @@ class ShipmentCubit extends Cubit<ShipmentState> {
     final params = FetchShipmentsUseCaseParams(
       date: date,
       stage: stage,
-      keyword: keyword,
-      page: ++_currentPage,
+      search: SearchParams(query: keyword ?? ''),
+      paginate: PaginateParams(page: ++_currentPage),
     );
     final result = await _fetchShipmentsUseCase(params);
 

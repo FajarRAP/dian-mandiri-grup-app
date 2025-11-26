@@ -59,8 +59,9 @@ class ShipmentRemoteDataSourceImpl
         queryParameters: {
           'date': params.date.toYMD,
           'stage': params.stage,
-          'search': params.keyword,
-          'page': params.page,
+          'search': params.search.query,
+          'page': params.paginate.page,
+          'limit': params.paginate.limit,
         },
       );
 
@@ -178,7 +179,8 @@ class ShipmentRemoteDataSourceImpl
           'start_date': params.startDate.toYMD,
           'end_date': params.endDate.toYMD,
           'status': params.status,
-          'page': params.page,
+          'page': params.paginate.page,
+          'limit': params.paginate.limit,
         },
       );
 
