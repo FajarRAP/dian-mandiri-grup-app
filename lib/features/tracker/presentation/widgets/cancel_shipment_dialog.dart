@@ -3,40 +3,30 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/common/constants.dart';
-import '../../../../core/helpers/top_snackbar.dart';
 import '../../../../core/widgets/confirmation_dialog.dart';
-import '../cubit/shipment_cubit.dart';
+import '../cubit/shipment_list/shipment_list_cubit.dart';
 
 class CancelShipmentDialog extends StatelessWidget {
-  const CancelShipmentDialog({
-    super.key,
-    required this.receiptNumber,
-  });
+  const CancelShipmentDialog({super.key, required this.receiptNumber});
 
   final String receiptNumber;
 
   @override
   Widget build(BuildContext context) {
-    final shipmentCubit = context.read<ShipmentCubit>();
-    return BlocConsumer<ShipmentCubit, ShipmentState>(
-      bloc: shipmentCubit,
-      buildWhen: (previous, current) => current is InsertShipment,
-      listenWhen: (previous, current) => current is InsertShipment,
+    return BlocConsumer<ShipmentListCubit, ShipmentListState>(
       listener: (context, state) {
-        if (state is InsertShipmentLoaded) {
-          TopSnackbar.successSnackbar(message: state.message);
+        if (state.status == ShipmentListStatus.actionSuccess) {
           context.pop();
-        }
-
-        if (state is InsertShipmentError) {
-          TopSnackbar.dangerSnackbar(message: state.failure.message);
         }
       },
       builder: (context, state) {
-        final onAction = switch (state) {
-          InsertShipmentLoading() => null,
-          _ => () async => await shipmentCubit.insertShipment(
-              receiptNumber: receiptNumber, stage: cancelStage),
+        final onAction = switch (state.status) {
+          ShipmentListStatus.actionInProgress => null,
+          _ =>
+            () async => await context.read<ShipmentListCubit>().createShipment(
+              receiptNumber: receiptNumber,
+              stage: cancelStage,
+            ),
         };
 
         return ConfirmationDialog(
