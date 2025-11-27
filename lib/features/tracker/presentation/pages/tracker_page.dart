@@ -139,6 +139,13 @@ const menus = <_Menu>[
     permission: AppPermissions.superAdmin,
   ),
   _Menu(
+    title: 'Laporan',
+    route: Routes.trackerReport,
+    color: Colors.teal,
+    assetName: AppImages.reportReceipt,
+    permission: AppPermissions.superAdmin,
+  ),
+  _Menu(
     title: 'Status Resi',
     route: Routes.trackerStatus,
     color: Colors.deepPurple,
