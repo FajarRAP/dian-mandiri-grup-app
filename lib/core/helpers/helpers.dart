@@ -55,35 +55,3 @@ List parseSpreadsheetFailure(SpreadsheetFailure spreadsheetFailure) {
 
   return [headers, rows];
 }
-
-class TextFormFieldConfig {
-  const TextFormFieldConfig({
-    this.onFieldSubmitted,
-    this.autoFocus = false,
-    this.decoration,
-    this.keyboardType = .text,
-    this.textInputAction = .send,
-  });
-
-  TextFormFieldConfig copyWith({
-    final void Function(String value)? onFieldSubmitted,
-    final bool? autoFocus,
-    final InputDecoration? decoration,
-    final TextInputType? keyboardType,
-    final TextInputAction? textInputAction,
-  }) {
-    return TextFormFieldConfig(
-      onFieldSubmitted: onFieldSubmitted ?? this.onFieldSubmitted,
-      autoFocus: autoFocus ?? this.autoFocus,
-      decoration: decoration ?? this.decoration,
-      keyboardType: keyboardType ?? this.keyboardType,
-      textInputAction: textInputAction ?? this.textInputAction,
-    );
-  }
-
-  final void Function(String value)? onFieldSubmitted;
-  final bool autoFocus;
-  final InputDecoration? decoration;
-  final TextInputType keyboardType;
-  final TextInputAction textInputAction;
-}
