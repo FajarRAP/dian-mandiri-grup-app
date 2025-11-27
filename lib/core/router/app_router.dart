@@ -128,10 +128,10 @@ class AppRouter {
                         name: Routes.trackerReport,
                         builder: (context, state) => const ReportPage(),
                       ),
-                      GoRoute(
+                      _buildRouteWithCubit<ShipmentDetailCubit>(
                         path: 'status',
                         name: Routes.trackerStatus,
-                        builder: (context, state) => const ReceiptStatusPage(),
+                        child: (state) => const ReceiptStatusPage(),
                       ),
                       _buildRouteWithCubit<ShipmentDetailCubit>(
                         path: 'detail',
