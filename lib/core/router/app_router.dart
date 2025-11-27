@@ -12,6 +12,7 @@ import '../../features/supplier/presentation/pages/supplier_detail_page.dart';
 import '../../features/supplier/presentation/pages/supplier_page.dart';
 import '../../features/tracker/presentation/cubit/shipment_detail/shipment_detail_cubit.dart';
 import '../../features/tracker/presentation/cubit/shipment_list/shipment_list_cubit.dart';
+import '../../features/tracker/presentation/cubit/shipment_report/shipment_report_cubit.dart';
 import '../../features/tracker/presentation/pages/stages/cancel_page.dart';
 import '../../features/tracker/presentation/pages/stages/check_page.dart';
 import '../../features/tracker/presentation/pages/stages/pack_page.dart';
@@ -123,10 +124,10 @@ class AppRouter {
                         name: Routes.trackerCancel,
                         child: (state) => const CancelPage(),
                       ),
-                      GoRoute(
+                      _buildRouteWithCubit<ShipmentReportCubit>(
                         path: 'report',
                         name: Routes.trackerReport,
-                        builder: (context, state) => const ReportPage(),
+                        child: (state) => const ReportPage(),
                       ),
                       _buildRouteWithCubit<ShipmentDetailCubit>(
                         path: 'status',
