@@ -43,7 +43,7 @@ import 'features/tracker/domain/usecases/fetch_shipment_reports_use_case.dart';
 import 'features/tracker/domain/usecases/fetch_shipments_use_case.dart';
 import 'features/tracker/domain/usecases/update_shipment_document_use_case.dart';
 import 'features/tracker/domain/usecases/create_shipment_use_case.dart';
-import 'features/tracker/presentation/cubit/shipment_cubit.dart';
+import 'features/tracker/presentation/cubit/shipment_report/shipment_report_cubit.dart';
 import 'features/tracker/presentation/cubit/shipment_detail/shipment_detail_cubit.dart';
 import 'features/tracker/presentation/cubit/shipment_list/shipment_list_cubit.dart';
 import 'features/warehouse/data/datasources/warehouse_remote_data_source.dart';
@@ -155,8 +155,8 @@ void setup() {
         updateShipmentDocumentUseCase: getIt(),
       ),
     )
-    ..registerLazySingleton<ShipmentCubit>(
-      () => ShipmentCubit(
+    ..registerFactory(
+      () => ShipmentReportCubit(
         createShipmentReportUseCase: getIt(),
         fetchShipmentReportsUseCase: getIt(),
         downloadShipmentReportUseCase: getIt(),

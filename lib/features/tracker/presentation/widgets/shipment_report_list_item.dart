@@ -11,7 +11,7 @@ import '../../../../core/helpers/top_snackbar.dart';
 import '../../../../core/themes/colors.dart';
 import '../../../../main.dart';
 import '../../domain/entities/shipment_report_entity.dart';
-import '../cubit/shipment_cubit.dart';
+import '../cubit/shipment_report/shipment_report_cubit.dart';
 
 class ShipmentReportListItem extends StatelessWidget {
   const ShipmentReportListItem({
@@ -25,11 +25,11 @@ class ShipmentReportListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
-    final shipmentCubit = context.read<ShipmentCubit>();
+    final shipmentCubit = context.read<ShipmentReportCubit>();
     final formattedDate = shipmentReport.date.toLocal().toDMY;
     final savedFilename = '${shipmentReport.name}_$formattedDate.xlsx';
 
-    return BlocConsumer<ShipmentCubit, ShipmentState>(
+    return BlocConsumer<ShipmentReportCubit, ShipmentReportState>(
       bloc: shipmentCubit,
       listener: (context, state) {
         if (state is DownloadShipmentReportLoaded) {

@@ -1,20 +1,20 @@
-part of 'shipment_cubit.dart';
+part of 'shipment_report_cubit.dart';
 
 @immutable
-sealed class ShipmentState extends Equatable {
-  const ShipmentState();
+sealed class ShipmentReportState extends Equatable {
+  const ShipmentReportState();
 
   @override
   List<Object?> get props => [];
 }
 
-class ShipmentInitial extends ShipmentState {}
+class ShipmentInitial extends ShipmentReportState {}
 
-class FetchShipmentReports extends ShipmentState {}
+class FetchShipmentReports extends ShipmentReportState {}
 
-class CreateShipmentReport extends ShipmentState {}
+class CreateShipmentReport extends ShipmentReportState {}
 
-class DownloadShipmentReport extends ShipmentState {}
+class DownloadShipmentReport extends ShipmentReportState {}
 
 class FetchShipmentReportsLoading extends FetchShipmentReports {}
 

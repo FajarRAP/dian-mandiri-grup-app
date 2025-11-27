@@ -10,10 +10,10 @@ import '../../../domain/usecases/create_shipment_report_use_case.dart';
 import '../../../domain/usecases/download_shipment_report_use_case.dart';
 import '../../../domain/usecases/fetch_shipment_reports_use_case.dart';
 
-part 'shipment_state.dart';
+part 'shipment_report_state.dart';
 
-class ShipmentCubit extends Cubit<ShipmentState> {
-  ShipmentCubit({
+class ShipmentReportCubit extends Cubit<ShipmentReportState> {
+  ShipmentReportCubit({
     required CreateShipmentReportUseCase createShipmentReportUseCase,
     required DownloadShipmentReportUseCase downloadShipmentReportUseCase,
     required FetchShipmentReportsUseCase fetchShipmentReportsUseCase,

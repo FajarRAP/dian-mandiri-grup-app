@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/common/constants.dart';
 import '../../../../core/helpers/helpers.dart';
 import '../../../../core/themes/colors.dart';
-import '../cubit/shipment_cubit.dart';
+import '../cubit/shipment_report/shipment_report_cubit.dart';
 import '../widgets/create_report_date_range_dialog.dart';
 import '../widgets/shipment_report_list_item.dart';
 
@@ -16,7 +16,7 @@ class ReportPage extends StatefulWidget {
 }
 
 class _ReportPageState extends State<ReportPage> {
-  late final ShipmentCubit _shipmentCubit;
+  late final ShipmentReportCubit _shipmentCubit;
   var _dateTimeRange = DateTimeRange(
     start: DateTime.now(),
     end: DateTime.now(),
@@ -27,7 +27,7 @@ class _ReportPageState extends State<ReportPage> {
   @override
   void initState() {
     super.initState();
-    _shipmentCubit = context.read<ShipmentCubit>()
+    _shipmentCubit = context.read<ShipmentReportCubit>()
       ..fetchShipmentReports(
         endDate: _dateTimeRange.end,
         startDate: _dateTimeRange.start,
@@ -42,11 +42,12 @@ class _ReportPageState extends State<ReportPage> {
 
     return RefreshIndicator(
       onRefresh: () async => await _shipmentCubit.fetchShipmentReports(
-          endDate: _dateTimeRange.end,
-          startDate: _dateTimeRange.start,
-          status: _status),
+        endDate: _dateTimeRange.end,
+        startDate: _dateTimeRange.start,
+        status: _status,
+      ),
       child: Scaffold(
-        body: BlocListener<ShipmentCubit, ShipmentState>(
+        body: BlocListener<ShipmentReportCubit, ShipmentReportState>(
           listener: (context, state) {
             if (state is CreateShipmentReportLoaded) {
               _shipmentCubit.fetchShipmentReports(
@@ -58,14 +59,13 @@ class _ReportPageState extends State<ReportPage> {
           },
           child: NotificationListener<ScrollNotification>(
             onNotification: (scrollState) {
-              if (scrollState is ScrollEndNotification &&
-                  _shipmentCubit.state is! ListPaginateLast) {
-                _shipmentCubit.fetchShipmentReportsPaginate(
-                  endDate: _dateTimeRange.end,
-                  startDate: _dateTimeRange.start,
-                  status: _status,
-                );
-              }
+              // if (scrollState is ScrollEndNotification ) {
+              //   _shipmentCubit.fetchShipmentReportsPaginate(
+              //     endDate: _dateTimeRange.end,
+              //     startDate: _dateTimeRange.start,
+              //     status: _status,
+              //   );
+              // }
 
               return false;
             },
@@ -102,18 +102,21 @@ class _ReportPageState extends State<ReportPage> {
                               onPressed: () async {
                                 final dateTimeRangePicked =
                                     await showDateRangePicker(
-                                        context: context,
-                                        firstDate: DateTime(2000),
-                                        lastDate: DateTime.now(),
-                                        locale: const Locale('id'));
+                                      context: context,
+                                      firstDate: DateTime(2000),
+                                      lastDate: DateTime.now(),
+                                      locale: const Locale('id'),
+                                    );
 
                                 if (dateTimeRangePicked == null) return;
 
                                 _dateTimeRange = dateTimeRangePicked;
                                 final startDate = dateTimeRangePicked.start;
                                 final endDate = dateTimeRangePicked.end;
-                                setState(() => _dateTimeRangePicked =
-                                    '${startDate.toDMY} s.d.\n${endDate.toDMY}');
+                                setState(
+                                  () => _dateTimeRangePicked =
+                                      '${startDate.toDMY} s.d.\n${endDate.toDMY}',
+                                );
 
                                 await _shipmentCubit.fetchShipmentReports(
                                   endDate: endDate,
@@ -178,7 +181,7 @@ class _ReportPageState extends State<ReportPage> {
                   title: const Text('Laporan'),
                 ),
                 // List
-                BlocBuilder<ShipmentCubit, ShipmentState>(
+                BlocBuilder<ShipmentReportCubit, ShipmentReportState>(
                   bloc: _shipmentCubit,
                   buildWhen: (previous, current) =>
                       current is FetchShipmentReports,
@@ -194,9 +197,7 @@ class _ReportPageState extends State<ReportPage> {
                     if (state is FetchShipmentReportsLoaded) {
                       if (state.shipmentReports.isEmpty) {
                         return const SliverFillRemaining(
-                          child: Center(
-                            child: Text('Belum ada laporan'),
-                          ),
+                          child: Center(child: Text('Belum ada laporan')),
                         );
                       }
 
@@ -205,32 +206,14 @@ class _ReportPageState extends State<ReportPage> {
                         sliver: SliverList.builder(
                           itemBuilder: (context, index) =>
                               ShipmentReportListItem(
-                            shipmentReport: state.shipmentReports[index],
-                          ),
+                                shipmentReport: state.shipmentReports[index],
+                              ),
                           itemCount: state.shipmentReports.length,
                         ),
                       );
                     }
 
                     return const SizedBox();
-                  },
-                ),
-                // Widget when Pagination
-                BlocBuilder<ShipmentCubit, ShipmentState>(
-                  buildWhen: (previous, current) => current is ListPaginate,
-                  builder: (context, state) {
-                    if (state is ListPaginateLoading) {
-                      return const SliverPadding(
-                        padding: EdgeInsets.all(16),
-                        sliver: SliverToBoxAdapter(
-                          child: Center(
-                            child: CircularProgressIndicator.adaptive(),
-                          ),
-                        ),
-                      );
-                    }
-
-                    return const SliverToBoxAdapter();
                   },
                 ),
               ],

@@ -6,7 +6,7 @@ import '../../../../core/helpers/helpers.dart';
 import '../../../../core/helpers/top_snackbar.dart';
 import '../../../../core/helpers/validators.dart';
 import '../../../../core/widgets/buttons/primary_button.dart';
-import '../cubit/shipment_cubit.dart';
+import '../cubit/shipment_report/shipment_report_cubit.dart';
 
 class CreateReportDateRangeDialog extends StatefulWidget {
   const CreateReportDateRangeDialog({
@@ -21,7 +21,7 @@ class CreateReportDateRangeDialog extends StatefulWidget {
 }
 
 class _DateRangeDialogState extends State<CreateReportDateRangeDialog> {
-  late final ShipmentCubit _shipmentCubit;
+  late final ShipmentReportCubit _shipmentCubit;
   late final TextEditingController _dateController;
   late final GlobalKey<FormState> _formKey;
   var _dateTimeRange = DateTimeRange(
@@ -34,7 +34,7 @@ class _DateRangeDialogState extends State<CreateReportDateRangeDialog> {
     super.initState();
     final startDate = _dateTimeRange.start;
     final endDate = _dateTimeRange.end;
-    _shipmentCubit = context.read<ShipmentCubit>();
+    _shipmentCubit = context.read<ShipmentReportCubit>();
     _dateController =
         TextEditingController(text: '${startDate.toDMY} s.d. ${endDate.toDMY}');
     _formKey = GlobalKey<FormState>();
@@ -100,7 +100,7 @@ class _DateRangeDialogState extends State<CreateReportDateRangeDialog> {
               validator: inputValidator,
             ),
             const SizedBox(height: 24),
-            BlocConsumer<ShipmentCubit, ShipmentState>(
+            BlocConsumer<ShipmentReportCubit, ShipmentReportState>(
               buildWhen: (previous, current) => current is CreateShipmentReport,
               listenWhen: (previous, current) =>
                   current is CreateShipmentReport,
