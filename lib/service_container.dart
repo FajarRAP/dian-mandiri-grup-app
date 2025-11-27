@@ -158,10 +158,7 @@ void setup() {
     ..registerLazySingleton<ShipmentCubit>(
       () => ShipmentCubit(
         createShipmentReportUseCase: getIt(),
-        fetchShipmentUseCase: getIt(),
-        fetchShipmentStatusUseCase: getIt(),
         fetchShipmentReportsUseCase: getIt(),
-        insertShipmentDocumentUseCase: getIt(),
         downloadShipmentReportUseCase: getIt(),
       ),
     );
