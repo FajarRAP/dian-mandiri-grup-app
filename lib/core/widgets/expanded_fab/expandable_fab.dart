@@ -2,6 +2,8 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import '../../utils/extensions.dart';
+
 class ExpandableFAB extends StatefulWidget {
   const ExpandableFAB({
     super.key,
@@ -73,17 +75,14 @@ class _ExpandableFABState extends State<ExpandableFAB>
       height: 56,
       child: Center(
         child: Material(
-          clipBehavior: Clip.antiAlias,
+          clipBehavior: .antiAlias,
           elevation: 4,
           shape: const CircleBorder(),
           child: InkWell(
             onTap: _toggle,
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Icon(
-                Icons.close,
-                color: Theme.of(context).primaryColor,
-              ),
+              padding: const .all(8.0),
+              child: Icon(Icons.close, color: context.colorScheme.primary),
             ),
           ),
         ),
@@ -96,9 +95,11 @@ class _ExpandableFABState extends State<ExpandableFAB>
     final length = widget.children.length;
     final step = 90.0 / (length - 1);
 
-    for (var i = 0, angleInDegrees = 0.0;
-        i < length;
-        i++, angleInDegrees += step) {
+    for (
+      var i = 0, angleInDegrees = 0.0;
+      i < length;
+      i++, angleInDegrees += step
+    ) {
       children.add(
         _ExpandingIconButton(
           directionInDegrees: angleInDegrees,
@@ -118,11 +119,7 @@ class _ExpandableFABState extends State<ExpandableFAB>
       child: AnimatedContainer(
         curve: const Interval(0, .5, curve: Curves.easeOut),
         duration: const Duration(milliseconds: 300),
-        transform: Matrix4.diagonal3Values(
-          _open ? .7 : 1,
-          _open ? .7 : 1,
-          1,
-        ),
+        transform: .diagonal3Values(_open ? .7 : 1, _open ? .7 : 1, 1),
         transformAlignment: Alignment.center,
         child: AnimatedOpacity(
           curve: const Interval(.25, 1, curve: Curves.easeInOut),
@@ -170,10 +167,7 @@ class _ExpandingIconButton extends StatelessWidget {
           ),
         );
       },
-      child: FadeTransition(
-        opacity: progress,
-        child: child,
-      ),
+      child: FadeTransition(opacity: progress, child: child),
     );
   }
 }
