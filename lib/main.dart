@@ -14,7 +14,7 @@ import 'core/presentation/cubit/app_cubit.dart';
 import 'core/presentation/cubit/user_cubit.dart';
 import 'core/router/app_router.dart';
 import 'core/services/google_sign_in_service.dart';
-import 'core/themes/theme.dart';
+import 'core/themes/app_theme.dart';
 import 'core/utils/app_bloc_observer.dart';
 import 'features/auth/presentation/cubit/auth_cubit.dart';
 import 'features/supplier/presentation/cubit/supplier_cubit.dart';
@@ -80,7 +80,9 @@ class MyApp extends StatelessWidget {
           GlobalCupertinoLocalizations.delegate,
         ],
         title: 'Ship Tracker',
-        theme: theme,
+        theme: AppTheme.light,
+        darkTheme: AppTheme.dark,
+        themeMode: ThemeMode.light,
         routerConfig: AppRouter.router,
         scaffoldMessengerKey: scaffoldMessengerKey,
         supportedLocales: const [Locale('en', 'US'), Locale('id')],
