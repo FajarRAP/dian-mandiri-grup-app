@@ -4,28 +4,26 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/helpers/helpers.dart';
 import '../../../../core/widgets/confirmation_input_dialog.dart';
-import '../cubit/shipment_cubit.dart';
+import '../cubit/shipment_detail/shipment_detail_cubit.dart';
 
 class CheckReceiptStatusFromScannerDialog extends StatelessWidget {
   const CheckReceiptStatusFromScannerDialog({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final shipmentCubit = context.read<ShipmentCubit>();
-
-    return BlocConsumer<ShipmentCubit, ShipmentState>(
-      buildWhen: (previous, current) => current is FetchReceiptStatus,
-      listenWhen: (previous, current) => current is FetchReceiptStatus,
+    return BlocConsumer<ShipmentDetailCubit, ShipmentDetailState>(
       listener: (context, state) {
-        if (state is FetchReceiptStatusLoaded) {
+        if (state is FetchShipmentStatusSuccess) {
           context.pop();
         }
       },
       builder: (context, state) {
         final onAction = switch (state) {
-          FetchReceiptStatusLoading() => null,
-          _ => (String value) async => await shipmentCubit
-              .fetchShipmentByReceiptNumber(receiptNumber: value),
+          FetchShipmentInProgress() => null,
+          _ =>
+            (String value) async => await context
+                .read<ShipmentDetailCubit>()
+                .fetchShipmentStatus(receiptNumber: value),
         };
 
         return ConfirmationInputDialog(
@@ -33,13 +31,12 @@ class CheckReceiptStatusFromScannerDialog extends StatelessWidget {
           actionText: 'Cari',
           body: 'Silakan scan nomor resi menggunakan scanner',
           textFormFieldConfig: TextFormFieldConfig(
-            onFieldSubmitted: (value) => shipmentCubit
-                .fetchShipmentByReceiptNumber(receiptNumber: value),
+            onFieldSubmitted: (value) => context
+                .read<ShipmentDetailCubit>()
+                .fetchShipmentStatus(receiptNumber: value),
             autoFocus: true,
-            decoration: const InputDecoration(
-              labelText: 'Hasil Scan',
-            ),
-            textInputAction: TextInputAction.send,
+            decoration: const InputDecoration(labelText: 'Hasil Scan'),
+            textInputAction: .send,
           ),
           title: 'Cari Resi',
         );
