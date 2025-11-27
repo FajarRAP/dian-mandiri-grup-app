@@ -12,8 +12,8 @@ import '../../../../core/presentation/widgets/sliver_loading_indicator.dart';
 import '../../../../core/router/route_names.dart';
 import '../../../../core/utils/debouncer.dart';
 import '../../../../core/utils/extensions.dart';
-import '../../../../core/widgets/expanded_fab/action_button.dart';
-import '../../../../core/widgets/expanded_fab/expandable_fab.dart';
+import '../../../../core/presentation/widgets/expandable_fab/action_button.dart';
+import '../../../../core/presentation/widgets/expandable_fab/expandable_fab.dart';
 import '../../domain/entities/shipment_entity.dart';
 import '../cubit/shipment_list/shipment_list_cubit.dart';
 import 'cancel_shipment_dialog.dart';
@@ -59,19 +59,19 @@ class _StageLayoutState extends State<StageLayout> {
   Widget build(BuildContext context) {
     return BlocListener<ShipmentListCubit, ShipmentListState>(
       listener: (context, state) async {
-        if (state.status == ShipmentListStatus.actionSuccess) {
+        if (state.actionStatus == ShipmentListActionStatus.success) {
           await _shipmentListCubit.fetchShipments(
             date: _pickedDate,
             stage: widget.stage,
           );
         }
 
-        if (state.status == ShipmentListStatus.actionSuccess) {
+        if (state.actionStatus == ShipmentListActionStatus.success) {
           TopSnackbar.successSnackbar(message: state.message!);
           await _audioPlayer.play(AssetSource(successSound));
         }
 
-        if (state.status == ShipmentListStatus.actionFailure) {
+        if (state.actionStatus == ShipmentListActionStatus.failure) {
           TopSnackbar.dangerSnackbar(message: state.failure!.message);
 
           return switch (state.failure!.statusCode) {
@@ -110,10 +110,10 @@ class _StageLayoutState extends State<StageLayout> {
                 // List
                 BlocBuilder<ShipmentListCubit, ShipmentListState>(
                   buildWhen: (previous, current) =>
-                      previous.shipments != current.shipments,
+                      previous.status != current.status,
                   builder: (context, state) {
                     return switch (state.status) {
-                      ShipmentListStatus.loading =>
+                      ShipmentListStatus.inProgress =>
                         const SliverLoadingIndicator(),
                       ShipmentListStatus.success when state.shipments.isEmpty =>
                         const SliverEmptyData(),

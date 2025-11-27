@@ -14,13 +14,13 @@ class DeleteShipmentDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocConsumer<ShipmentListCubit, ShipmentListState>(
       listener: (context, state) {
-        if (state.status == ShipmentListStatus.actionSuccess) {
+        if (state.actionStatus == ShipmentListActionStatus.success) {
           context.pop();
         }
       },
       builder: (context, state) {
-        final onAction = switch (state.status) {
-          ShipmentListStatus.actionInProgress => null,
+        final onAction = switch (state.actionStatus) {
+          ShipmentListActionStatus.inProgress => null,
           _ => () => context.read<ShipmentListCubit>().deleteShipment(
             shipmentId: shipmentId,
           ),

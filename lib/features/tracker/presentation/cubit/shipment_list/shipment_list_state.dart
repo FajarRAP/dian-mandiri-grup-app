@@ -1,18 +1,13 @@
 part of 'shipment_list_cubit.dart';
 
-enum ShipmentListStatus {
-  initial,
-  loading,
-  success,
-  failure,
-  actionInProgress,
-  actionSuccess,
-  actionFailure,
-}
+enum ShipmentListStatus { initial, inProgress, success, failure }
+
+enum ShipmentListActionStatus { initial, inProgress, success, failure }
 
 class ShipmentListState extends Equatable {
   const ShipmentListState({
     required this.status,
+    required this.actionStatus,
     required this.shipments,
     required this.currentPage,
     required this.hasReachedMax,
@@ -24,6 +19,7 @@ class ShipmentListState extends Equatable {
   factory ShipmentListState.initial() {
     return const ShipmentListState(
       status: ShipmentListStatus.initial,
+      actionStatus: ShipmentListActionStatus.initial,
       shipments: [],
       currentPage: 1,
       hasReachedMax: false,
@@ -32,6 +28,7 @@ class ShipmentListState extends Equatable {
   }
 
   final ShipmentListStatus status;
+  final ShipmentListActionStatus actionStatus;
   final List<ShipmentEntity> shipments;
   final int currentPage;
   final bool hasReachedMax;
@@ -42,6 +39,7 @@ class ShipmentListState extends Equatable {
 
   ShipmentListState copyWith({
     ShipmentListStatus? status,
+    ShipmentListActionStatus? actionStatus,
     List<ShipmentEntity>? shipments,
     int? currentPage,
     bool? hasReachedMax,
@@ -51,6 +49,7 @@ class ShipmentListState extends Equatable {
   }) {
     return ShipmentListState(
       status: status ?? this.status,
+      actionStatus: actionStatus ?? this.actionStatus,
       shipments: shipments ?? this.shipments,
       currentPage: currentPage ?? this.currentPage,
       hasReachedMax: hasReachedMax ?? this.hasReachedMax,
@@ -63,6 +62,7 @@ class ShipmentListState extends Equatable {
   @override
   List<Object?> get props => [
     status,
+    actionStatus,
     shipments,
     hasReachedMax,
     currentPage,

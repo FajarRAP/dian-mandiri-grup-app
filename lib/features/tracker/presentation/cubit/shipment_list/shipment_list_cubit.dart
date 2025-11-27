@@ -29,7 +29,7 @@ class ShipmentListCubit extends Cubit<ShipmentListState> {
     required String stage,
     String? query,
   }) async {
-    emit(state.copyWith(status: ShipmentListStatus.loading));
+    emit(state.copyWith(status: ShipmentListStatus.inProgress));
 
     final params = FetchShipmentsUseCaseParams(
       date: date,
@@ -85,7 +85,7 @@ class ShipmentListCubit extends Cubit<ShipmentListState> {
     required String receiptNumber,
     required String stage,
   }) async {
-    emit(state.copyWith(status: ShipmentListStatus.actionInProgress));
+    emit(state.copyWith(actionStatus: ShipmentListActionStatus.inProgress));
 
     final params = CreateShipmentUseCaseParams(
       receiptNumber: receiptNumber,
@@ -96,13 +96,13 @@ class ShipmentListCubit extends Cubit<ShipmentListState> {
     result.fold(
       (failure) => emit(
         state.copyWith(
-          status: ShipmentListStatus.actionFailure,
+          actionStatus: ShipmentListActionStatus.failure,
           failure: failure,
         ),
       ),
       (message) => emit(
         state.copyWith(
-          status: ShipmentListStatus.actionSuccess,
+          actionStatus: ShipmentListActionStatus.success,
           message: message,
         ),
       ),
@@ -110,7 +110,7 @@ class ShipmentListCubit extends Cubit<ShipmentListState> {
   }
 
   Future<void> deleteShipment({required String shipmentId}) async {
-    emit(state.copyWith(status: ShipmentListStatus.actionInProgress));
+    emit(state.copyWith(actionStatus: ShipmentListActionStatus.inProgress));
 
     final params = DeleteShipmentUseCaseParams(shipmentId: shipmentId);
     final result = await _deleteShipmentUseCase(params);
@@ -118,13 +118,13 @@ class ShipmentListCubit extends Cubit<ShipmentListState> {
     result.fold(
       (failure) => emit(
         state.copyWith(
-          status: ShipmentListStatus.actionFailure,
+          actionStatus: ShipmentListActionStatus.failure,
           failure: failure,
         ),
       ),
       (message) => emit(
         state.copyWith(
-          status: ShipmentListStatus.actionSuccess,
+          actionStatus: ShipmentListActionStatus.success,
           message: message,
         ),
       ),

@@ -83,13 +83,13 @@ class _CreateShipmentFromScannerDialogState
             const Gap(24),
             BlocConsumer<ShipmentListCubit, ShipmentListState>(
               listener: (context, state) {
-                if (state.status == ShipmentListStatus.actionSuccess) {
+                if (state.actionStatus == ShipmentListActionStatus.success) {
                   context.pop();
                 }
               },
               builder: (context, state) {
-                final onPressed = switch (state.status) {
-                  ShipmentListStatus.actionInProgress => null,
+                final onPressed = switch (state.actionStatus) {
+                  ShipmentListActionStatus.inProgress => null,
                   _ => _onSubmit,
                 };
 
