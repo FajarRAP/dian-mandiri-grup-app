@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/helpers/helpers.dart';
+import '../../../../core/helpers/top_snackbar.dart';
 import '../../../../core/widgets/confirmation_input_dialog.dart';
 import '../cubit/shipment_detail/shipment_detail_cubit.dart';
 
@@ -16,6 +16,10 @@ class CheckReceiptStatusFromScannerDialog extends StatelessWidget {
         if (state is FetchShipmentStatusSuccess) {
           context.pop();
         }
+
+        if (state is FetchShipmentFailure) {
+          TopSnackbar.dangerSnackbar(message: state.failure.message);
+        }
       },
       builder: (context, state) {
         final onAction = switch (state) {
@@ -27,17 +31,14 @@ class CheckReceiptStatusFromScannerDialog extends StatelessWidget {
         };
 
         return ConfirmationInputDialog(
-          onAction: onAction,
+          onConfirm: onAction,
+          fieldBuilder: (context, controller) => TextFormField(
+            controller: controller,
+            autofocus: true,
+            decoration: const InputDecoration(labelText: 'Hasil Scan'),
+          ),
           actionText: 'Cari',
           body: 'Silakan scan nomor resi menggunakan scanner',
-          textFormFieldConfig: TextFormFieldConfig(
-            onFieldSubmitted: (value) => context
-                .read<ShipmentDetailCubit>()
-                .fetchShipmentStatus(receiptNumber: value),
-            autoFocus: true,
-            decoration: const InputDecoration(labelText: 'Hasil Scan'),
-            textInputAction: .send,
-          ),
           title: 'Cari Resi',
         );
       },

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/helpers/helpers.dart';
 import '../../../../core/helpers/top_snackbar.dart';
 import '../../../../core/presentation/cubit/user_cubit.dart';
 import '../../../../core/widgets/confirmation_input_dialog.dart';
@@ -35,8 +34,9 @@ class UpdateProfileDialog extends StatelessWidget {
           ),
         };
         return ConfirmationInputDialog(
-          onAction: onAction,
-          textFormFieldConfig: const TextFormFieldConfig().copyWith(
+          onConfirm: onAction,
+          fieldBuilder: (context, controller) => TextFormField(
+            controller: controller,
             decoration: const InputDecoration(labelText: 'Nama Baru'),
           ),
           actionText: 'Ganti nama',
