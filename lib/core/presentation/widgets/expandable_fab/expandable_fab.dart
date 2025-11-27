@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
-import '../../utils/extensions.dart';
+import '../../../utils/extensions.dart';
 
 class ExpandableFAB extends StatefulWidget {
   const ExpandableFAB({
