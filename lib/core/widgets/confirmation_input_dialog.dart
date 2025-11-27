@@ -2,25 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 
-import '../helpers/helpers.dart';
-import '../helpers/validators.dart';
 import '../utils/extensions.dart';
 import 'buttons/primary_button.dart';
 
 class ConfirmationInputDialog extends StatefulWidget {
   const ConfirmationInputDialog({
     super.key,
-    this.onAction,
+    this.onConfirm,
+    required this.fieldBuilder,
     required this.actionText,
     required this.body,
-    this.textFormFieldConfig = const TextFormFieldConfig(),
     required this.title,
   });
 
-  final void Function(String value)? onAction;
+  final void Function(String value)? onConfirm;
+  final Widget Function(BuildContext context, TextEditingController controller)
+  fieldBuilder;
   final String actionText;
   final String body;
-  final TextFormFieldConfig textFormFieldConfig;
   final String title;
 
   @override
@@ -31,13 +30,11 @@ class ConfirmationInputDialog extends StatefulWidget {
 class _ConfirmationInputDialogState extends State<ConfirmationInputDialog> {
   late final TextEditingController _controller;
   late final GlobalKey<FormState> _formKey;
-  late final FocusNode _focusNode;
 
   @override
   void initState() {
     super.initState();
     _controller = TextEditingController();
-    _focusNode = FocusScope.of(context, createDependency: false);
     _formKey = GlobalKey<FormState>();
   }
 
@@ -71,21 +68,12 @@ class _ConfirmationInputDialogState extends State<ConfirmationInputDialog> {
               textAlign: .center,
             ),
             const Gap(24),
-            TextFormField(
-              onFieldSubmitted: (_) => _onSubmit(),
-              onTapOutside: (_) => _focusNode.unfocus(),
-              autofocus: widget.textFormFieldConfig.autoFocus,
-              controller: _controller,
-              decoration: widget.textFormFieldConfig.decoration,
-              keyboardType: widget.textFormFieldConfig.keyboardType,
-              textInputAction: widget.textFormFieldConfig.textInputAction,
-              validator: inputValidator,
-            ),
+            widget.fieldBuilder(context, _controller),
             const Gap(24),
             SizedBox(
               width: .infinity,
               child: PrimaryButton(
-                onPressed: widget.onAction == null ? null : _onSubmit,
+                onPressed: widget.onConfirm == null ? null : _onSubmit,
                 child: Text(widget.actionText),
               ),
             ),
@@ -105,6 +93,6 @@ class _ConfirmationInputDialogState extends State<ConfirmationInputDialog> {
   void _onSubmit() {
     if (!_formKey.currentState!.validate()) return;
 
-    widget.onAction?.call(_controller.text);
+    widget.onConfirm?.call(_controller.text);
   }
 }
