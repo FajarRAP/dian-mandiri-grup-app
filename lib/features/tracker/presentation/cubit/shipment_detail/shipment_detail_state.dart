@@ -22,6 +22,15 @@ class FetchShipmentSuccess extends ShipmentDetailState {
   List<Object> get props => [shipment];
 }
 
+class FetchShipmentStatusSuccess extends ShipmentDetailState {
+  const FetchShipmentStatusSuccess({required this.shipment});
+
+  final ShipmentHistoryEntity shipment;
+
+  @override
+  List<Object> get props => [shipment];
+}
+
 class FetchShipmentFailure extends ShipmentDetailState {
   const FetchShipmentFailure({required this.failure});
 

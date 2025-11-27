@@ -4,6 +4,7 @@ import 'package:equatable/equatable.dart';
 import '../../../../../core/errors/failure.dart';
 import '../../../../../core/usecase/use_case.dart';
 import '../../../domain/entities/shipment_detail_entity.dart';
+import '../../../domain/entities/shipment_history_entity.dart';
 import '../../../domain/usecases/fetch_shipment_status_use_case.dart';
 import '../../../domain/usecases/fetch_shipment_use_case.dart';
 import '../../../domain/usecases/update_shipment_document_use_case.dart';
@@ -53,6 +54,20 @@ class ShipmentDetailCubit extends Cubit<ShipmentDetailState> {
     result.fold(
       (failure) => emit(ActionFailure(failure: failure)),
       (message) => emit(ActionSuccess(message: message)),
+    );
+  }
+
+  Future<void> fetchShipmentStatus({required String receiptNumber}) async {
+    emit(const FetchShipmentInProgress());
+
+    final params = FetchShipmentStatusUseCaseParams(
+      receiptNumber: receiptNumber,
+    );
+    final result = await _fetchShipmentStatusUseCase(params);
+
+    result.fold(
+      (failure) => emit(FetchShipmentFailure(failure: failure)),
+      (shipment) => emit(FetchShipmentStatusSuccess(shipment: shipment)),
     );
   }
 }
