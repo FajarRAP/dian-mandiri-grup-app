@@ -18,7 +18,6 @@ class CreateReportDateRangeDialog extends StatefulWidget {
 }
 
 class _DateRangeDialogState extends State<CreateReportDateRangeDialog> {
-  late final ShipmentReportCubit _shipmentCubit;
   var _dateTimeRange = DateTimeRange(
     start: DateTime.now(),
     end: DateTime.now(),
@@ -27,7 +26,6 @@ class _DateRangeDialogState extends State<CreateReportDateRangeDialog> {
   @override
   void initState() {
     super.initState();
-    _shipmentCubit = context.read<ShipmentReportCubit>();
   }
 
   @override
@@ -46,10 +44,12 @@ class _DateRangeDialogState extends State<CreateReportDateRangeDialog> {
       builder: (context, state) {
         final onConfirm = switch (state.actionStatus) {
           ShipmentReportActionStatus.inProgress => null,
-          _ => (String value) => _shipmentCubit.createShipmentReport(
-            startDate: _dateTimeRange.start,
-            endDate: _dateTimeRange.end,
-          ),
+          _ =>
+            (String value) =>
+                context.read<ShipmentReportCubit>().createShipmentReport(
+                  startDate: _dateTimeRange.start,
+                  endDate: _dateTimeRange.end,
+                ),
         };
         return ConfirmationInputDialog(
           onConfirm: onConfirm,
