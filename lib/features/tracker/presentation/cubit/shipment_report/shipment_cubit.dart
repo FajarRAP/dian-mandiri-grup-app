@@ -1,17 +1,14 @@
 import 'package:bloc/bloc.dart';
+import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
-import '../../../../core/errors/failure.dart';
-import '../../../../core/usecase/use_case.dart';
-import '../../../../main.dart';
-import '../../domain/entities/shipment_detail_entity.dart';
-import '../../domain/entities/shipment_entity.dart';
-import '../../domain/entities/shipment_history_entity.dart';
-import '../../domain/entities/shipment_report_entity.dart';
-import '../../domain/usecases/create_shipment_report_use_case.dart';
-import '../../domain/usecases/download_shipment_report_use_case.dart';
-import '../../domain/usecases/fetch_shipment_reports_use_case.dart';
+import '../../../../../core/usecase/use_case.dart';
+import '../../../../../main.dart';
+import '../../../domain/entities/shipment_report_entity.dart';
+import '../../../domain/usecases/create_shipment_report_use_case.dart';
+import '../../../domain/usecases/download_shipment_report_use_case.dart';
+import '../../../domain/usecases/fetch_shipment_reports_use_case.dart';
 
 part 'shipment_state.dart';
 
@@ -23,7 +20,7 @@ class ShipmentCubit extends Cubit<ShipmentState> {
   }) : _createShipmentReportUseCase = createShipmentReportUseCase,
        _downloadShipmentReportUseCase = downloadShipmentReportUseCase,
        _fetchShipmentReportsUseCase = fetchShipmentReportsUseCase,
-       super(ShipInitial());
+       super(ShipmentInitial());
 
   final CreateShipmentReportUseCase _createShipmentReportUseCase;
   final DownloadShipmentReportUseCase _downloadShipmentReportUseCase;
@@ -103,31 +100,31 @@ class ShipmentCubit extends Cubit<ShipmentState> {
     required DateTime endDate,
     required String status,
   }) async {
-    emit(ListPaginateLoading());
+    // emit(ListPaginateLoading());
 
-    final params = FetchShipmentReportsUseCaseParams(
-      startDate: startDate,
-      endDate: endDate,
-      status: status,
-      paginate: PaginateParams(page: ++_currentPage),
-    );
-    final result = await _fetchShipmentReportsUseCase(params);
+    // final params = FetchShipmentReportsUseCaseParams(
+    //   startDate: startDate,
+    //   endDate: endDate,
+    //   status: status,
+    //   paginate: PaginateParams(page: ++_currentPage),
+    // );
+    // final result = await _fetchShipmentReportsUseCase(params);
 
-    result.fold(
-      (failure) => emit(FetchShipmentReportsError(message: failure.message)),
-      (shipmentReports) {
-        if (shipmentReports.isEmpty) {
-          _currentPage = 1;
-          emit(ListPaginateLast());
-        } else {
-          emit(ListPaginateLoaded());
-          emit(
-            FetchShipmentReportsLoaded(
-              shipmentReports: _shipmentReports..addAll(shipmentReports),
-            ),
-          );
-        }
-      },
-    );
+    // result.fold(
+    //   (failure) => emit(FetchShipmentReportsError(message: failure.message)),
+    //   (shipmentReports) {
+    //     if (shipmentReports.isEmpty) {
+    //       _currentPage = 1;
+    //       emit(ListPaginateLast());
+    //     } else {
+    //       emit(ListPaginateLoaded());
+    //       emit(
+    //         FetchShipmentReportsLoaded(
+    //           shipmentReports: _shipmentReports..addAll(shipmentReports),
+    //         ),
+    //       );
+    //     }
+    //   },
+    // );
   }
 }
