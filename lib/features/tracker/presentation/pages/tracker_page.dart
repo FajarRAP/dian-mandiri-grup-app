@@ -138,4 +138,11 @@ const menus = <_Menu>[
     assetName: AppImages.cancelReceipt,
     permission: AppPermissions.superAdmin,
   ),
+  _Menu(
+    title: 'Status Resi',
+    route: Routes.trackerStatus,
+    color: Colors.deepPurple,
+    assetName: AppImages.checkReceiptStatus,
+    permission: AppPermissions.superAdmin,
+  ),
 ];
