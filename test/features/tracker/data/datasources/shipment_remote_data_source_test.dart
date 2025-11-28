@@ -17,12 +17,17 @@ import '../../../../mocks/mocks.dart';
 void main() {
   const fixtureReader = FixtureReader(domain: 'tracker');
   late MockDio mockDio;
+  late MockFileService mockFileService;
   late ShipmentRemoteDataSourceImpl shipmentRemoteDataSource;
 
   setUp(() async {
     await initializeDateFormatting('id_ID', null);
     mockDio = MockDio();
-    shipmentRemoteDataSource = ShipmentRemoteDataSourceImpl(dio: mockDio);
+    mockFileService = MockFileService();
+    shipmentRemoteDataSource = ShipmentRemoteDataSourceImpl(
+      dio: mockDio,
+      fileService: mockFileService,
+    );
   });
 
   group('fetch shipments remote data sources test', () {
@@ -393,7 +398,9 @@ void main() {
 
     test('should return String when request is successful', () async {
       // arrange
-      final formattedDate = params.createdAt.toLocal().toDMY;
+      when(
+        () => mockFileService.getFullPath(any()),
+      ).thenAnswer((_) async => 'path');
       when(
         () => mockDio.download(any(), any()),
       ).thenAnswer((_) async => Response(requestOptions: RequestOptions()));
@@ -405,17 +412,14 @@ void main() {
 
       // assert
       expect(result, resultMatcher);
-      verify(
-        () => mockDio.download(
-          params.fileUrl,
-          '${params.externalPath}/${params.filename}_$formattedDate.xlsx',
-        ),
-      ).called(1);
+      verify(() => mockDio.download(params.fileUrl, 'path')).called(1);
     });
 
     test('should throw ServerException when API returns 4xx/5xx', () async {
       // arrange
-      final formattedDate = params.createdAt.toLocal().toDMY;
+      when(
+        () => mockFileService.getFullPath(any()),
+      ).thenAnswer((_) async => 'path');
       when(() => mockDio.download(any(), any())).thenThrow(
         DioException(
           requestOptions: RequestOptions(),
@@ -429,12 +433,7 @@ void main() {
 
       // assert
       await expectLater(future, throwsA(isA<ServerException>()));
-      verify(
-        () => mockDio.download(
-          params.fileUrl,
-          '${params.externalPath}/${params.filename}_$formattedDate.xlsx',
-        ),
-      ).called(1);
+      verify(() => mockDio.download(params.fileUrl, 'path')).called(1);
     });
   });
 

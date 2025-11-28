@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 
 import '../../../../core/helpers/helpers.dart';
 import '../../../../core/network/dio_handler_mixin.dart';
+import '../../../../core/services/file_service.dart';
 import '../../domain/entities/shipment_detail_entity.dart';
 import '../../domain/entities/shipment_entity.dart';
 import '../../domain/entities/shipment_history_entity.dart';
@@ -45,9 +46,13 @@ abstract interface class ShipmentRemoteDataSource {
 class ShipmentRemoteDataSourceImpl
     with DioHandlerMixin
     implements ShipmentRemoteDataSource {
-  const ShipmentRemoteDataSourceImpl({required this.dio});
+  const ShipmentRemoteDataSourceImpl({
+    required this.dio,
+    required this.fileService,
+  });
 
   final Dio dio;
+  final FileService fileService;
 
   @override
   Future<List<ShipmentEntity>> fetchShipments(
@@ -157,12 +162,9 @@ class ShipmentRemoteDataSourceImpl
     DownloadShipmentReportUseCaseParams params,
   ) async {
     return await handleDioRequest<String>(() async {
-      final formattedDate = params.createdAt.toLocal().toDMY;
+      final fullPath = await fileService.getFullPath(params.savedFilename);
 
-      await dio.download(
-        params.fileUrl,
-        '${params.externalPath}/${params.filename}_$formattedDate.xlsx',
-      );
+      await dio.download(params.fileUrl, fullPath);
 
       return 'Download completed';
     });
