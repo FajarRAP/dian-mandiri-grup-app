@@ -9,6 +9,7 @@ import '../../../../mocks/mocks.dart';
 
 void main() {
   late MockShipmentRemoteDataSource mockShipmentRemoteDataSource;
+  late MockFileService mockFileService;
   late ShipmentRepositoryImpl shipmentRepository;
 
   setUpAll(() {
@@ -25,8 +26,10 @@ void main() {
 
   setUp(() {
     mockShipmentRemoteDataSource = MockShipmentRemoteDataSource();
+    mockFileService = MockFileService();
     shipmentRepository = ShipmentRepositoryImpl(
       shipmentRemoteDataSource: mockShipmentRemoteDataSource,
+      fileService: mockFileService,
     );
   });
 
@@ -431,6 +434,50 @@ void main() {
           () => mockShipmentRemoteDataSource.updateShipmentDocument(params),
         ).called(1);
         verifyNoMoreInteractions(mockShipmentRemoteDataSource);
+      },
+    );
+  });
+
+  group('check shipment report existence repository test', () {
+    const params = tCheckShipmentExistenceParams;
+    const resultMatcher = tCheckShipmentExistenceSuccess;
+
+    test(
+      'should return Right(bool) when file service is successful',
+      () async {
+        // arrange
+        when(
+          () => mockFileService.isFileExist(params.filename),
+        ).thenAnswer((_) async => tCheckShipmentExistenceSuccess);
+
+        // act
+        final result = await shipmentRepository.checkShipmentReportExistence(
+          params,
+        );
+
+        // assert
+        expect(result, const Right(resultMatcher));
+        verify(() => mockFileService.isFileExist(params.filename)).called(1);
+        verifyNoMoreInteractions(mockFileService);
+      },
+    );
+
+    test(
+      'should return Left(Failure) when file service throws Exception',
+      () async {
+        // arrange
+        when(
+          () => mockFileService.isFileExist(any()),
+        ).thenThrow(tInternalException);
+
+        // act
+        final result = await shipmentRepository.checkShipmentReportExistence(
+          params,
+        );
+        // assert
+        expect(result, const Left(tFailure));
+        verify(() => mockFileService.isFileExist(params.filename)).called(1);
+        verifyNoMoreInteractions(mockFileService);
       },
     );
   });

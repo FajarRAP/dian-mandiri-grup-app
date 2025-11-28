@@ -5,6 +5,7 @@ import '../entities/shipment_detail_entity.dart';
 import '../entities/shipment_entity.dart';
 import '../entities/shipment_history_entity.dart';
 import '../entities/shipment_report_entity.dart';
+import '../usecases/check_shipment_report_existence_use_case.dart';
 import '../usecases/create_shipment_report_use_case.dart';
 import '../usecases/delete_shipment_use_case.dart';
 import '../usecases/download_shipment_report_use_case.dart';
@@ -45,5 +46,8 @@ abstract class ShipmentRepository {
   );
   Future<Either<Failure, List<ShipmentReportEntity>>> fetchShipmentReports(
     FetchShipmentReportsUseCaseParams params,
+  );
+  Future<Either<Failure, bool>> checkShipmentReportExistence(
+    CheckShipmentReportExistenceUseCaseParams params,
   );
 }

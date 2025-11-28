@@ -1,6 +1,8 @@
 import 'package:ship_tracker/core/errors/exceptions.dart';
 import 'package:ship_tracker/core/errors/failure.dart';
 
+const tFailure = Failure(message: 'Internal Error Occured', statusCode: 500);
+
 const tServerFailure = ServerFailure(
   message: 'Server Error Occured',
   statusCode: 500,
@@ -12,6 +14,11 @@ const tNetworkFailure = NetworkFailure(
 const tCacheFailure = CacheFailure(
   message: 'Cache Error Occured',
   statusCode: 500,
+);
+
+const tInternalException = InternalException(
+  message: 'Internal Error Occured',
+  code: 500,
 );
 
 const tServerException = ServerException(

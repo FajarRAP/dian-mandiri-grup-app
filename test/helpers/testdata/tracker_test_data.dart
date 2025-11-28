@@ -10,6 +10,7 @@ import 'package:ship_tracker/features/tracker/domain/entities/shipment_history_e
 import 'package:ship_tracker/features/tracker/domain/entities/shipment_report_entity.dart';
 import 'package:ship_tracker/features/tracker/domain/entities/shipment_user_entity.dart';
 import 'package:ship_tracker/features/tracker/domain/entities/stage_entity.dart';
+import 'package:ship_tracker/features/tracker/domain/usecases/check_shipment_report_existence_use_case.dart';
 import 'package:ship_tracker/features/tracker/domain/usecases/create_shipment_report_use_case.dart';
 import 'package:ship_tracker/features/tracker/domain/usecases/delete_shipment_use_case.dart';
 import 'package:ship_tracker/features/tracker/domain/usecases/download_shipment_report_use_case.dart';
@@ -222,11 +223,9 @@ const tDeleteShipmentParams = DeleteShipmentUseCaseParams(
 );
 const tDeleteShipmentSuccess = 'Success delete shipment!';
 
-final tDownloadShipmentReportParams = DownloadShipmentReportUseCaseParams(
-  externalPath: 'externalPath',
+const tDownloadShipmentReportParams = DownloadShipmentReportUseCaseParams(
   fileUrl: 'fileUrl',
-  filename: 'filename',
-  createdAt: DateTime.now(),
+  savedFilename: 'savedFilename',
 );
 const tDownloadShipmentReportSuccess = 'Download completed';
 
@@ -235,3 +234,8 @@ const tCreateShipmentParams = CreateShipmentUseCaseParams(
   stage: 'stage',
 );
 const tCreateShipmentSuccess = 'Success create or edit shipment!';
+
+const tCheckShipmentExistenceParams = CheckShipmentReportExistenceUseCaseParams(
+  filename: 'filename',
+);
+const tCheckShipmentExistenceSuccess = true;

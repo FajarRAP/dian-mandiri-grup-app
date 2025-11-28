@@ -1,12 +1,14 @@
 import 'package:dartz/dartz.dart';
 
 import '../../../../core/errors/failure.dart';
+import '../../../../core/services/file_service.dart';
 import '../../../../core/utils/respository_handler_mixin.dart';
 import '../../domain/entities/shipment_detail_entity.dart';
 import '../../domain/entities/shipment_entity.dart';
 import '../../domain/entities/shipment_history_entity.dart';
 import '../../domain/entities/shipment_report_entity.dart';
 import '../../domain/repositories/shipment_repository.dart';
+import '../../domain/usecases/check_shipment_report_existence_use_case.dart';
 import '../../domain/usecases/create_shipment_report_use_case.dart';
 import '../../domain/usecases/delete_shipment_use_case.dart';
 import '../../domain/usecases/download_shipment_report_use_case.dart';
@@ -21,9 +23,13 @@ import '../datasources/shipment_remote_data_source.dart';
 class ShipmentRepositoryImpl
     with RepositoryHandlerMixin
     implements ShipmentRepository {
-  const ShipmentRepositoryImpl({required this.shipmentRemoteDataSource});
+  const ShipmentRepositoryImpl({
+    required this.shipmentRemoteDataSource,
+    required this.fileService,
+  });
 
   final ShipmentRemoteDataSource shipmentRemoteDataSource;
+  final FileService fileService;
 
   @override
   Future<Either<Failure, List<ShipmentEntity>>> fetchShipments(
@@ -127,6 +133,17 @@ class ShipmentRepositoryImpl
       final result = await shipmentRemoteDataSource.fetchShipmentReports(
         params,
       );
+
+      return result;
+    });
+  }
+
+  @override
+  Future<Either<Failure, bool>> checkShipmentReportExistence(
+    CheckShipmentReportExistenceUseCaseParams params,
+  ) async {
+    return await handleRepositoryRequest<bool>(() async {
+      final result = await fileService.isFileExist(params.filename);
 
       return result;
     });
