@@ -12,18 +12,20 @@ class ShipmentReportState extends Equatable {
     required this.currentPage,
     required this.hasReachedMax,
     required this.isPaginating,
+    required this.downloadingReportId,
     this.message,
     this.failure,
   });
 
   factory ShipmentReportState.initial() {
     return const ShipmentReportState(
-      status: ShipmentReportStatus.initial,
-      actionStatus: ShipmentReportActionStatus.initial,
+      status: .initial,
+      actionStatus: .initial,
       reports: [],
       currentPage: 1,
       hasReachedMax: false,
       isPaginating: false,
+      downloadingReportId: null,
       message: null,
       failure: null,
     );
@@ -32,21 +34,32 @@ class ShipmentReportState extends Equatable {
   final ShipmentReportStatus status;
   final ShipmentReportActionStatus actionStatus;
 
-  final List<ShipmentReportEntity> reports;
+  final List<ShipmentReportUiModel> reports;
   final int currentPage;
   final bool hasReachedMax;
   final bool isPaginating;
 
+  final String? downloadingReportId;
+
   final String? message;
   final Failure? failure;
+
+  bool shouldRebuild(ShipmentReportState previous) {
+    return previous.status != status ||
+        previous.reports != reports ||
+        previous.downloadingReportId != downloadingReportId ||
+        previous.hasReachedMax != hasReachedMax ||
+        previous.isPaginating != isPaginating;
+  }
 
   ShipmentReportState copyWith({
     ShipmentReportStatus? status,
     ShipmentReportActionStatus? actionStatus,
-    List<ShipmentReportEntity>? reports,
+    List<ShipmentReportUiModel>? reports,
     int? currentPage,
     bool? hasReachedMax,
     bool? isPaginating,
+    String? downloadingReportId,
     String? message,
     Failure? failure,
   }) {
@@ -57,8 +70,9 @@ class ShipmentReportState extends Equatable {
       currentPage: currentPage ?? this.currentPage,
       hasReachedMax: hasReachedMax ?? this.hasReachedMax,
       isPaginating: isPaginating ?? this.isPaginating,
+      downloadingReportId: downloadingReportId,
       message: message ?? this.message,
-      failure: failure ?? this.failure,
+      failure: failure,
     );
   }
 
@@ -70,6 +84,7 @@ class ShipmentReportState extends Equatable {
     currentPage,
     hasReachedMax,
     isPaginating,
+    downloadingReportId,
     message,
     failure,
   ];

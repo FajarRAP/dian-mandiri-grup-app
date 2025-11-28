@@ -3,7 +3,9 @@ import 'package:equatable/equatable.dart';
 
 import '../../../../../core/errors/failure.dart';
 import '../../../../../core/usecase/use_case.dart';
+import '../../../data/models/shipment_report_ui_model.dart';
 import '../../../domain/entities/shipment_report_entity.dart';
+import '../../../domain/usecases/check_shipment_report_existence_use_case.dart';
 import '../../../domain/usecases/create_shipment_report_use_case.dart';
 import '../../../domain/usecases/download_shipment_report_use_case.dart';
 import '../../../domain/usecases/fetch_shipment_reports_use_case.dart';
@@ -14,14 +16,20 @@ class ShipmentReportCubit extends Cubit<ShipmentReportState> {
   ShipmentReportCubit({
     required CreateShipmentReportUseCase createShipmentReportUseCase,
     required DownloadShipmentReportUseCase downloadShipmentReportUseCase,
+    required CheckShipmentReportExistenceUseCase
+    checkShipmentReportExistenceUseCase,
     required FetchShipmentReportsUseCase fetchShipmentReportsUseCase,
   }) : _createShipmentReportUseCase = createShipmentReportUseCase,
        _downloadShipmentReportUseCase = downloadShipmentReportUseCase,
+       _checkShipmentReportExistenceUseCase =
+           checkShipmentReportExistenceUseCase,
        _fetchShipmentReportsUseCase = fetchShipmentReportsUseCase,
        super(ShipmentReportState.initial());
 
   final CreateShipmentReportUseCase _createShipmentReportUseCase;
   final DownloadShipmentReportUseCase _downloadShipmentReportUseCase;
+  final CheckShipmentReportExistenceUseCase
+  _checkShipmentReportExistenceUseCase;
   final FetchShipmentReportsUseCase _fetchShipmentReportsUseCase;
 
   Future<void> createShipmentReport({
@@ -45,24 +53,41 @@ class ShipmentReportCubit extends Cubit<ShipmentReportState> {
   }
 
   Future<void> downloadShipmentReport({
-    required ShipmentReportEntity shipmentReportEntity,
+    required ShipmentReportEntity report,
   }) async {
-    // emit(
-    //   DownloadShipmentReportLoading(shipmentReportId: shipmentReportEntity.id),
-    // );
+    emit(state.copyWith(downloadingReportId: report.id));
 
-    // final params = DownloadShipmentReportUseCaseParams(
-    //   externalPath: externalPath,
-    //   fileUrl: shipmentReportEntity.file,
-    //   filename: shipmentReportEntity.name,
-    //   createdAt: shipmentReportEntity.date,
-    // );
-    // final result = await _downloadShipmentReportUseCase(params);
+    final params = DownloadShipmentReportUseCaseParams(
+      fileUrl: report.file,
+      savedFilename: report.savedFilename,
+    );
+    final result = await _downloadShipmentReportUseCase(params);
 
-    // result.fold(
-    //   (failure) => emit(DownloadShipmentReportError(message: failure.message)),
-    //   (message) => emit(DownloadShipmentReportLoaded(message: message)),
-    // );
+    result.fold(
+      (failure) => emit(
+        state.copyWith(
+          failure: failure,
+          message: failure.message,
+          downloadingReportId: null,
+        ),
+      ),
+      (message) {
+        emit(
+          state.copyWith(
+            failure: null,
+            message: message,
+            reports: state.reports
+                .map(
+                  (reportUi) => reportUi.entity.id == report.id
+                      ? reportUi.copyWith(isDownloaded: true)
+                      : reportUi,
+                )
+                .toList(),
+            downloadingReportId: null,
+          ),
+        );
+      },
+    );
   }
 
   Future<void> fetchShipmentReports({
@@ -70,7 +95,7 @@ class ShipmentReportCubit extends Cubit<ShipmentReportState> {
     required DateTime endDate,
     required String status,
   }) async {
-    emit(state.copyWith(status: .inProgress));
+    emit(state.copyWith(status: .inProgress, actionStatus: .initial));
 
     final params = FetchShipmentReportsUseCaseParams(
       startDate: startDate,
@@ -81,7 +106,19 @@ class ShipmentReportCubit extends Cubit<ShipmentReportState> {
 
     result.fold(
       (failure) => emit(state.copyWith(status: .failure, failure: failure)),
-      (reports) => emit(state.copyWith(status: .success, reports: reports)),
+      (reports) async {
+        final uiModels = await _mapReportsToUiModels(reports);
+
+        emit(
+          state.copyWith(
+            status: .success,
+            reports: uiModels,
+            currentPage: 1,
+            hasReachedMax: reports.isEmpty,
+            isPaginating: false,
+          ),
+        );
+      },
     );
   }
 
@@ -90,7 +127,7 @@ class ShipmentReportCubit extends Cubit<ShipmentReportState> {
     required DateTime endDate,
     required String status,
   }) async {
-    if (state.hasReachedMax) return;
+    if (state.hasReachedMax || state.isPaginating) return;
 
     emit(state.copyWith(isPaginating: true));
 
@@ -103,19 +140,45 @@ class ShipmentReportCubit extends Cubit<ShipmentReportState> {
     final result = await _fetchShipmentReportsUseCase(params);
 
     result.fold(
-      (failure) =>
-          emit(state.copyWith(status: .failure, message: failure.message)),
-      (shipmentReports) {
-        shipmentReports.isEmpty
-            ? emit(state.copyWith(hasReachedMax: true, isPaginating: false))
-            : emit(
-                state.copyWith(
-                  reports: [...state.reports, ...shipmentReports],
-                  currentPage: state.currentPage + 1,
-                  isPaginating: false,
-                ),
-              );
+      (failure) => emit(
+        state.copyWith(status: .failure, failure: failure, isPaginating: false),
+      ),
+      (reports) async {
+        if (reports.isEmpty) {
+          return emit(state.copyWith(hasReachedMax: true, isPaginating: false));
+        }
+
+        final uiModels = await _mapReportsToUiModels(reports);
+
+        emit(
+          state.copyWith(
+            status: .success,
+            reports: [...state.reports, ...uiModels],
+            currentPage: state.currentPage + 1,
+            isPaginating: false,
+          ),
+        );
       },
+    );
+  }
+
+  Future<List<ShipmentReportUiModel>> _mapReportsToUiModels(
+    List<ShipmentReportEntity> reports,
+  ) async {
+    return Future.wait(
+      reports.map((e) async {
+        final checkParams = CheckShipmentReportExistenceUseCaseParams(
+          filename: e.savedFilename,
+        );
+        final isExists = await _checkShipmentReportExistenceUseCase(
+          checkParams,
+        );
+
+        return ShipmentReportUiModel(
+          entity: e,
+          isDownloaded: isExists.getOrElse(() => false),
+        );
+      }),
     );
   }
 }

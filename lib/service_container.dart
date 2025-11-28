@@ -7,6 +7,7 @@ import 'core/common/constants.dart';
 import 'core/network/dio_interceptor.dart';
 import 'core/presentation/cubit/app_cubit.dart';
 import 'core/presentation/cubit/user_cubit.dart';
+import 'core/services/file_service.dart';
 import 'core/services/google_sign_in_service.dart';
 import 'core/services/image_picker_service.dart';
 import 'features/auth/data/datasources/auth_local_data_source.dart';
@@ -34,6 +35,7 @@ import 'features/supplier/presentation/cubit/supplier_cubit.dart';
 import 'features/tracker/data/datasources/shipment_remote_data_source.dart';
 import 'features/tracker/data/repositories/shipment_repository_impl.dart';
 import 'features/tracker/domain/repositories/shipment_repository.dart';
+import 'features/tracker/domain/usecases/check_shipment_report_existence_use_case.dart';
 import 'features/tracker/domain/usecases/create_shipment_report_use_case.dart';
 import 'features/tracker/domain/usecases/delete_shipment_use_case.dart';
 import 'features/tracker/domain/usecases/download_shipment_report_use_case.dart';
@@ -119,10 +121,16 @@ void setup() {
   // Ship
   getIt
     ..registerLazySingleton<ShipmentRemoteDataSource>(
-      () => ShipmentRemoteDataSourceImpl(dio: getIt()),
+      () => ShipmentRemoteDataSourceImpl(
+        dio: getIt(),
+        fileService: const FileService(),
+      ),
     )
     ..registerLazySingleton<ShipmentRepository>(
-      () => ShipmentRepositoryImpl(shipmentRemoteDataSource: getIt()),
+      () => ShipmentRepositoryImpl(
+        shipmentRemoteDataSource: getIt(),
+        fileService: const FileService(),
+      ),
     )
     ..registerSingleton(
       CreateShipmentReportUseCase(shipmentRepository: getIt()),
@@ -138,6 +146,9 @@ void setup() {
       UpdateShipmentDocumentUseCase(shipmentRepository: getIt()),
     )
     ..registerSingleton(CreateShipmentUseCase(shipmentRepository: getIt()))
+    ..registerSingleton(
+      CheckShipmentReportExistenceUseCase(shipmentRepository: getIt()),
+    )
     ..registerSingleton(
       DownloadShipmentReportUseCase(shipmentRepository: getIt()),
     )
@@ -158,8 +169,9 @@ void setup() {
     ..registerFactory(
       () => ShipmentReportCubit(
         createShipmentReportUseCase: getIt(),
-        fetchShipmentReportsUseCase: getIt(),
         downloadShipmentReportUseCase: getIt(),
+        checkShipmentReportExistenceUseCase: getIt(),
+        fetchShipmentReportsUseCase: getIt(),
       ),
     );
 
