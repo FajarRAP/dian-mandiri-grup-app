@@ -13,24 +13,21 @@ class DownloadShipmentReportUseCase
 
   @override
   Future<Either<Failure, String>> execute(
-      DownloadShipmentReportUseCaseParams params) async {
+    DownloadShipmentReportUseCaseParams params,
+  ) async {
     return await shipmentRepository.downloadShipmentReport(params);
   }
 }
 
 class DownloadShipmentReportUseCaseParams extends Equatable {
   const DownloadShipmentReportUseCaseParams({
-    required this.externalPath,
     required this.fileUrl,
-    required this.filename,
-    required this.createdAt,
+    required this.savedFilename,
   });
 
-  final String externalPath;
   final String fileUrl;
-  final String filename;
-  final DateTime createdAt;
+  final String savedFilename;
 
   @override
-  List<Object?> get props => [externalPath, fileUrl, filename, createdAt];
+  List<Object?> get props => [fileUrl, savedFilename];
 }
