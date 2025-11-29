@@ -14,7 +14,8 @@ class UpdateSupplierUseCase
 
   @override
   Future<Either<Failure, String>> execute(
-      UpdateSupplierUseCaseParams params) async {
+    UpdateSupplierUseCaseParams params,
+  ) async {
     return await supplierRepository.updateSupplier(params);
   }
 }

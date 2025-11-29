@@ -101,9 +101,9 @@ void main() {
             queryParameters: {
               'column': params.column,
               'order': params.sort,
-              'search': params.search,
-              'limit': params.limit,
-              'page': params.page,
+              'search': params.search.query,
+              'limit': params.paginate.limit,
+              'page': params.paginate.page,
             },
           ),
         ).called(1);
@@ -134,9 +134,9 @@ void main() {
           queryParameters: {
             'column': params.column,
             'order': params.sort,
-            'search': params.search,
-            'limit': params.limit,
-            'page': params.page,
+            'search': params.search.query,
+            'limit': params.paginate.limit,
+            'page': params.paginate.page,
           },
         ),
       ).called(1);
@@ -179,9 +179,9 @@ void main() {
           () => mockDio.get(
             '/supplier/dropdown',
             queryParameters: {
-              'search': params.search,
-              'limit': params.limit,
-              'page': params.page,
+              'search': params.search.query,
+              'limit': params.paginate.limit,
+              'page': params.paginate.page,
             },
           ),
         ).called(1);
@@ -210,9 +210,9 @@ void main() {
         () => mockDio.get(
           '/supplier/dropdown',
           queryParameters: {
-            'search': params.search,
-            'limit': params.limit,
-            'page': params.page,
+            'search': params.search.query,
+            'limit': params.paginate.limit,
+            'page': params.paginate.page,
           },
         ),
       ).called(1);

@@ -54,9 +54,9 @@ class SupplierRemoteDataSourceImpl
         queryParameters: {
           'column': params.column,
           'order': params.sort,
-          'search': params.search,
-          'limit': params.limit,
-          'page': params.page,
+          'search': params.search.query,
+          'limit': params.paginate.limit,
+          'page': params.paginate.page,
         },
       );
       final contents = List<JsonMap>.from(response.data['data']['content']);
@@ -73,9 +73,9 @@ class SupplierRemoteDataSourceImpl
       final response = await dio.get(
         '/supplier/dropdown',
         queryParameters: {
-          'search': params.search,
-          'limit': params.limit,
-          'page': params.page,
+          'search': params.search.query,
+          'limit': params.paginate.limit,
+          'page': params.paginate.page,
         },
       );
       final contents = List<JsonMap>.from(response.data['data']['content']);

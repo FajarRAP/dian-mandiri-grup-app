@@ -15,22 +15,21 @@ class FetchSuppliersDropdownUseCase
 
   @override
   Future<Either<Failure, List<DropdownEntity>>> execute(
-      FetchSuppliersDropdownUseCaseParams params) async {
+    FetchSuppliersDropdownUseCaseParams params,
+  ) async {
     return await supplierRepository.fetchSuppliersDropdown(params);
   }
 }
 
 class FetchSuppliersDropdownUseCaseParams extends Equatable {
   const FetchSuppliersDropdownUseCaseParams({
-    this.search,
-    this.limit = 10,
-    this.page = 1,
+    this.paginate = const PaginateParams(),
+    this.search = const SearchParams(),
   });
 
-  final String? search;
-  final int limit;
-  final int page;
+  final PaginateParams paginate;
+  final SearchParams search;
 
   @override
-  List<Object?> get props => [search, limit, page];
+  List<Object?> get props => [paginate, search];
 }

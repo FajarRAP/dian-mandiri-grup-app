@@ -13,7 +13,8 @@ class InsertSupplierUseCase
 
   @override
   Future<Either<Failure, String>> execute(
-      InsertSupplierUseCaseParams params) async {
+    InsertSupplierUseCaseParams params,
+  ) async {
     return await supplierRepository.insertSupplier(params);
   }
 }
