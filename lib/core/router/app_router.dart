@@ -6,6 +6,7 @@ import '../../features/auth/presentation/pages/profile_page.dart';
 import '../../features/auth/presentation/pages/sign_in_page.dart';
 import '../../features/home_page.dart';
 import '../../features/staff_management_page.dart';
+import '../../features/supplier/presentation/cubit/supplier/new_supplier_cubit.dart';
 import '../../features/supplier/presentation/pages/add_supplier_page.dart';
 import '../../features/supplier/presentation/pages/edit_supplier_page.dart';
 import '../../features/supplier/presentation/pages/supplier_detail_page.dart';
@@ -84,6 +85,7 @@ class AppRouter {
                 name: Routes.home,
                 builder: (context, state) => const HomePage(),
                 routes: <RouteBase>[
+                  // Tracker
                   GoRoute(
                     path: 'tracker',
                     name: Routes.tracker,
@@ -163,10 +165,14 @@ class AppRouter {
                       ),
                     ],
                   ),
+                  // Supplier
                   GoRoute(
                     path: 'supplier',
                     name: Routes.supplier,
-                    builder: (context, state) => const SupplierPage(),
+                    builder: (context, state) => BlocProvider(
+                      create: (context) => getIt<NewSupplierCubit>(),
+                      child: const SupplierPage(),
+                    ),
                     routes: <RouteBase>[
                       GoRoute(
                         path: 'detail',
