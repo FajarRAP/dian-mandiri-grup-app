@@ -1,7 +1,5 @@
 import 'package:equatable/equatable.dart';
 
-import '../../../../core/helpers/helpers.dart';
-
 class ShipmentReportEntity extends Equatable {
   const ShipmentReportEntity({
     required this.id,
@@ -17,7 +15,7 @@ class ShipmentReportEntity extends Equatable {
   final String status;
   final DateTime date;
 
-  String get savedFilename => '${name}_${date.toLocal().toDMYHMS}.xlsx';
+  String get savedFilename => '$name.xlsx';
 
   @override
   List<Object?> get props => [id, file, name, status, date];
