@@ -1,182 +1,163 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../common/constants/app_enums.dart';
 import '../../../../core/common/constants.dart';
+import '../../../../core/presentation/widgets/pagination_listener.dart';
+import '../../../../core/presentation/widgets/sliver_empty_data.dart';
+import '../../../../core/presentation/widgets/sliver_loading_indicator.dart';
+import '../../../../core/router/route_names.dart';
 import '../../../../core/utils/debouncer.dart';
-import '../../../../core/themes/colors.dart';
-import '../cubit/supplier_cubit.dart';
+import '../../../../core/utils/extensions.dart';
+import '../../domain/entities/supplier_entity.dart';
+import '../cubit/supplier/new_supplier_cubit.dart';
 import '../widgets/supplier_item.dart';
 
-class SupplierPage extends StatelessWidget {
+class SupplierPage extends StatefulWidget {
   const SupplierPage({super.key});
 
   @override
+  State<SupplierPage> createState() => _SupplierPageState();
+}
+
+class _SupplierPageState extends State<SupplierPage> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<NewSupplierCubit>().fetchSuppliers();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final debouncer = Debouncer(delay: const Duration(milliseconds: 500));
-    final supplierCubit = context.read<SupplierCubit>()..fetchSuppliers();
-    final focusNode = FocusScope.of(context, createDependency: false);
-    var column = 'name';
-    var sort = 'asc';
-    String? search;
-
     return Scaffold(
-      body: BlocListener<SupplierCubit, SupplierState>(
-        listener: (context, state) {
-          if (state is InsertSupplierLoaded || state is UpdateSupplierLoaded) {
-            supplierCubit.fetchSuppliers();
-          }
-        },
-        child: RefreshIndicator(
-          onRefresh: supplierCubit.fetchSuppliers,
-          child: NotificationListener<ScrollNotification>(
-            onNotification: (scrollState) {
-              if (scrollState.runtimeType == ScrollEndNotification &&
-                  supplierCubit.state is! ListPaginateLast) {
-                supplierCubit.fetchSuppliersPaginate(
-                    column: column, sort: sort, search: search);
-              }
-
-              return false;
-            },
-            child: CustomScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              slivers: <Widget>[
-                // App Bar
-                SliverAppBar(
-                  actions: <Widget>[
-                    PopupMenuButton(
-                      onSelected: (value) {
-                        final params = value.split(',');
-                        [column, sort] = params;
-                        supplierCubit.fetchSuppliers(
-                          column: column,
-                          sort: sort,
-                          search: search,
-                        );
-                      },
-                      icon: const Icon(Icons.sort),
-                      tooltip: 'Urutkan',
-                      itemBuilder: (context) => <PopupMenuEntry<String>>[
-                        PopupMenuItem(
-                          value: 'name,asc',
-                          child: const Text('Nama Naik'),
-                        ),
-                        PopupMenuItem(
-                          value: 'name,desc',
-                          child: const Text('Nama Turun'),
-                        ),
-                        PopupMenuItem(
-                          value: 'created_at,asc',
-                          child: const Text('Tanggal Ditambahkan Naik'),
-                        ),
-                        PopupMenuItem(
-                          value: 'created_at,desc',
-                          child: const Text('Tanggal Ditambahkan Turun'),
-                        ),
-                      ],
-                    ),
-                  ],
-                  backgroundColor: MaterialColors.surfaceContainerLowest,
-                  expandedHeight: kToolbarHeight + kSpaceBarHeight,
-                  floating: true,
-                  flexibleSpace: FlexibleSpaceBar(
-                    background: Container(
-                      alignment: Alignment.bottomCenter,
-                      padding: const EdgeInsets.all(16),
-                      child: TextFormField(
-                        onChanged: (value) {
-                          search = value;
-                          debouncer.run(() => supplierCubit.fetchSuppliers(
-                              search: search, column: column, sort: sort));
-                        },
-                        onTapOutside: (event) => focusNode.unfocus(),
-                        decoration: InputDecoration(
-                          hintText: 'Cari Supplier',
-                          prefixIcon: const Icon(Icons.search),
-                        ),
-                      ),
-                    ),
-                  ),
-                  pinned: true,
-                  shape: const RoundedRectangleBorder(
-                    side: BorderSide(
-                      color: MaterialColors.outlineVariant,
-                      width: 1,
-                    ),
-                  ),
-                  snap: true,
-                  title: const Text('Supplier'),
-                ),
-                // List
-                BlocBuilder<SupplierCubit, SupplierState>(
-                  bloc: supplierCubit,
-                  buildWhen: (previous, current) => current is FetchSuppliers,
-                  builder: (context, state) {
-                    if (state is FetchSuppliersLoading) {
-                      return const SliverFillRemaining(
-                        child: Center(
-                          child: CircularProgressIndicator.adaptive(),
-                        ),
-                      );
-                    }
-
-                    if (state is FetchSuppliersLoaded) {
-                      if (state.suppliers.isEmpty) {
-                        return const SliverFillRemaining(
-                          child: Center(
-                            child: Text('Belum ada supplier'),
-                          ),
-                        );
-                      }
-
-                      return SliverPadding(
-                        padding: const EdgeInsets.all(16),
-                        sliver: SliverList.separated(
-                          itemBuilder: (context, index) => GestureDetector(
-                            onTap: () => context.push(
-                              supplierDetailRoute,
-                              extra: state.suppliers[index].id,
-                            ),
-                            child:
-                                SupplierItem(supplier: state.suppliers[index]),
-                          ),
-                          separatorBuilder: (context, index) =>
-                              const SizedBox(height: 8),
-                          itemCount: state.suppliers.length,
-                        ),
-                      );
-                    }
-
-                    return const SizedBox();
-                  },
-                ),
-                // Widget when Pagination
-                BlocBuilder<SupplierCubit, SupplierState>(
-                  buildWhen: (previous, current) => current is ListPaginate,
-                  builder: (context, state) {
-                    if (state is ListPaginateLoading) {
-                      return SliverPadding(
-                        padding: const EdgeInsets.all(16),
-                        sliver: const SliverToBoxAdapter(
-                          child: Center(
-                            child: CircularProgressIndicator.adaptive(),
-                          ),
-                        ),
-                      );
-                    }
-
-                    return const SliverToBoxAdapter();
-                  },
-                ),
-              ],
-            ),
+      body: RefreshIndicator(
+        onRefresh: context.read<NewSupplierCubit>().fetchSuppliers,
+        child: PaginationListener(
+          onPaginate: context.read<NewSupplierCubit>().fetchSuppliersPaginate,
+          child: CustomScrollView(
+            slivers: [
+              const _AppBar(),
+              BlocBuilder<NewSupplierCubit, NewSupplierState>(
+                builder: (context, state) {
+                  return switch (state.status) {
+                    .inProgress => const SliverLoadingIndicator(),
+                    .success when (state.suppliers.isEmpty) =>
+                      const SliverEmptyData(),
+                    .success => _SuccessWidget(suppliers: state.suppliers),
+                    _ => const SliverToBoxAdapter(),
+                  };
+                },
+              ),
+            ],
           ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => context.push(addSupplierRoute),
+        onPressed: () => context.pushNamed(Routes.supplierAdd),
         child: const Icon(Icons.add),
+      ),
+    );
+  }
+}
+
+class _AppBar extends StatefulWidget {
+  const _AppBar();
+
+  @override
+  State<_AppBar> createState() => _AppBarState();
+}
+
+class _AppBarState extends State<_AppBar> {
+  late final Debouncer _debouncer;
+  late final NewSupplierCubit _supplierCubit;
+
+  @override
+  void initState() {
+    super.initState();
+    _debouncer = Debouncer(delay: const Duration(milliseconds: 500));
+    _supplierCubit = context.read<NewSupplierCubit>();
+  }
+
+  @override
+  void dispose() {
+    _debouncer.cancel();
+
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SliverAppBar(
+      actions: <Widget>[
+        PopupMenuButton<SortOptions>(
+          onSelected: (value) =>
+              _supplierCubit.fetchSuppliers(sortOption: value),
+          initialValue: context.select<NewSupplierCubit, SortOptions>(
+            (cubit) => cubit.state.sortOptions,
+          ),
+          icon: const Icon(Icons.sort),
+          tooltip: 'Urutkan',
+          itemBuilder: (context) => SortOptions.all
+              .map(
+                (option) => PopupMenuItem<SortOptions>(
+                  value: option,
+                  child: Text(option.label),
+                ),
+              )
+              .toList(),
+        ),
+      ],
+      backgroundColor: context.colorScheme.surfaceContainerLow,
+      expandedHeight: kToolbarHeight + kSpaceBarHeight,
+      floating: true,
+      flexibleSpace: FlexibleSpaceBar(
+        background: Container(
+          alignment: .bottomCenter,
+          padding: const .all(16),
+
+          child: TextFormField(
+            onChanged: (value) => _debouncer.run(
+              () => _supplierCubit.fetchSuppliers(query: value),
+            ),
+            onTapOutside: (_) => FocusScope.of(context).unfocus(),
+            decoration: const InputDecoration(
+              hintText: 'Cari Supplier',
+              prefixIcon: Icon(Icons.search),
+            ),
+          ),
+        ),
+      ),
+      pinned: true,
+      shape: RoundedRectangleBorder(
+        side: BorderSide(color: context.colorScheme.outlineVariant),
+      ),
+      snap: true,
+      title: const Text('Supplier'),
+    );
+  }
+}
+
+class _SuccessWidget extends StatelessWidget {
+  const _SuccessWidget({required this.suppliers});
+
+  final List<SupplierEntity> suppliers;
+
+  @override
+  Widget build(BuildContext context) {
+    return SliverPadding(
+      padding: const .all(16),
+      sliver: SliverList.separated(
+        itemBuilder: (context, index) => GestureDetector(
+          onTap: () => context.pushNamed(
+            Routes.supplierDetail,
+            extra: suppliers[index].id,
+          ),
+          child: SupplierItem(supplier: suppliers[index]),
+        ),
+        separatorBuilder: (context, index) => const Gap(8),
+        itemCount: suppliers.length,
       ),
     );
   }
