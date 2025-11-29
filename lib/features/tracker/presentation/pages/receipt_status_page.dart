@@ -419,11 +419,11 @@ class _CancelButton extends StatelessWidget {
           create: (context) => getIt<ShipmentListCubit>(),
           child: BlocListener<ShipmentListCubit, ShipmentListState>(
             listener: (context, state) {
-              if (state.actionStatus == ShipmentListActionStatus.failure) {
+              if (state.actionStatus == .failure) {
                 TopSnackbar.dangerSnackbar(message: state.failure!.message);
               }
 
-              if (state.actionStatus == ShipmentListActionStatus.success) {
+              if (state.actionStatus == .success) {
                 TopSnackbar.successSnackbar(message: state.message!);
                 context.pop();
               }

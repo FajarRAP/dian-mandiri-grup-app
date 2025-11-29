@@ -18,8 +18,8 @@ class ShipmentListState extends Equatable {
 
   factory ShipmentListState.initial() {
     return const ShipmentListState(
-      status: ShipmentListStatus.initial,
-      actionStatus: ShipmentListActionStatus.initial,
+      status: .initial,
+      actionStatus: .initial,
       shipments: [],
       currentPage: 1,
       hasReachedMax: false,

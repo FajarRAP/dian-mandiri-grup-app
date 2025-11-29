@@ -29,7 +29,7 @@ class ShipmentListCubit extends Cubit<ShipmentListState> {
     required String stage,
     String? query,
   }) async {
-    emit(state.copyWith(status: ShipmentListStatus.inProgress));
+    emit(state.copyWith(status: .inProgress));
 
     final params = FetchShipmentsUseCaseParams(
       date: date,
@@ -39,13 +39,9 @@ class ShipmentListCubit extends Cubit<ShipmentListState> {
     final result = await _fetchShipmentsUseCase(params);
 
     result.fold(
-      (failure) => emit(state.copyWith(status: ShipmentListStatus.failure)),
-      (shipments) => emit(
-        state.copyWith(
-          status: ShipmentListStatus.success,
-          shipments: shipments,
-        ),
-      ),
+      (failure) => emit(state.copyWith(status: .failure)),
+      (shipments) =>
+          emit(state.copyWith(status: .success, shipments: shipments)),
     );
   }
 
@@ -53,28 +49,26 @@ class ShipmentListCubit extends Cubit<ShipmentListState> {
     required DateTime date,
     required String stage,
   }) async {
-    final currentState = state;
-    if (currentState.hasReachedMax) return;
+    if (state.hasReachedMax || state.isPaginating) return;
 
-    emit(currentState.copyWith(isPaginating: true));
+    emit(state.copyWith(isPaginating: true));
 
     final params = FetchShipmentsUseCaseParams(
       date: date,
       stage: stage,
-      paginate: PaginateParams(page: currentState.currentPage + 1),
+      paginate: PaginateParams(page: state.currentPage + 1),
     );
     final result = await _fetchShipmentsUseCase(params);
 
     result.fold(
-      (failure) => emit(state.copyWith(status: ShipmentListStatus.failure)),
+      (failure) => emit(state.copyWith(status: .failure)),
       (shipments) => shipments.isEmpty
-          ? emit(
-              currentState.copyWith(hasReachedMax: true, isPaginating: false),
-            )
+          ? emit(state.copyWith(hasReachedMax: true, isPaginating: false))
           : emit(
-              currentState.copyWith(
-                shipments: [...currentState.shipments, ...shipments],
-                currentPage: currentState.currentPage + 1,
+              state.copyWith(
+                status: .success,
+                shipments: [...state.shipments, ...shipments],
+                currentPage: state.currentPage + 1,
                 isPaginating: false,
               ),
             ),
@@ -85,7 +79,7 @@ class ShipmentListCubit extends Cubit<ShipmentListState> {
     required String receiptNumber,
     required String stage,
   }) async {
-    emit(state.copyWith(actionStatus: ShipmentListActionStatus.inProgress));
+    emit(state.copyWith(actionStatus: .inProgress));
 
     final params = CreateShipmentUseCaseParams(
       receiptNumber: receiptNumber,
@@ -94,40 +88,24 @@ class ShipmentListCubit extends Cubit<ShipmentListState> {
     final result = await _createShipmentUseCase(params);
 
     result.fold(
-      (failure) => emit(
-        state.copyWith(
-          actionStatus: ShipmentListActionStatus.failure,
-          failure: failure,
-        ),
-      ),
-      (message) => emit(
-        state.copyWith(
-          actionStatus: ShipmentListActionStatus.success,
-          message: message,
-        ),
-      ),
+      (failure) =>
+          emit(state.copyWith(actionStatus: .failure, failure: failure)),
+      (message) =>
+          emit(state.copyWith(actionStatus: .success, message: message)),
     );
   }
 
   Future<void> deleteShipment({required String shipmentId}) async {
-    emit(state.copyWith(actionStatus: ShipmentListActionStatus.inProgress));
+    emit(state.copyWith(actionStatus: .inProgress));
 
     final params = DeleteShipmentUseCaseParams(shipmentId: shipmentId);
     final result = await _deleteShipmentUseCase(params);
 
     result.fold(
-      (failure) => emit(
-        state.copyWith(
-          actionStatus: ShipmentListActionStatus.failure,
-          failure: failure,
-        ),
-      ),
-      (message) => emit(
-        state.copyWith(
-          actionStatus: ShipmentListActionStatus.success,
-          message: message,
-        ),
-      ),
+      (failure) =>
+          emit(state.copyWith(actionStatus: .failure, failure: failure)),
+      (message) =>
+          emit(state.copyWith(actionStatus: .success, message: message)),
     );
   }
 }

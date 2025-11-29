@@ -15,13 +15,13 @@ class CancelShipmentDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocConsumer<ShipmentListCubit, ShipmentListState>(
       listener: (context, state) {
-        if (state.actionStatus == ShipmentListActionStatus.success) {
+        if (state.actionStatus == .success) {
           context.pop();
         }
       },
       builder: (context, state) {
         final onAction = switch (state.actionStatus) {
-          ShipmentListActionStatus.inProgress => null,
+          .inProgress => null,
           _ =>
             () async => await context.read<ShipmentListCubit>().createShipment(
               receiptNumber: receiptNumber,
