@@ -7,6 +7,7 @@ import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 import '../../../../core/common/constants.dart';
 import '../../../../core/helpers/helpers.dart';
 import '../../../../core/helpers/top_snackbar.dart';
+import '../../../../core/presentation/widgets/pagination_listener.dart';
 import '../../../../core/presentation/widgets/sliver_empty_data.dart';
 import '../../../../core/presentation/widgets/sliver_loading_indicator.dart';
 import '../../../../core/router/route_names.dart';
@@ -59,19 +60,19 @@ class _StageLayoutState extends State<StageLayout> {
   Widget build(BuildContext context) {
     return BlocListener<ShipmentListCubit, ShipmentListState>(
       listener: (context, state) async {
-        if (state.actionStatus == ShipmentListActionStatus.success) {
+        if (state.actionStatus == .success) {
           await _shipmentListCubit.fetchShipments(
             date: _pickedDate,
             stage: widget.stage,
           );
         }
 
-        if (state.actionStatus == ShipmentListActionStatus.success) {
+        if (state.actionStatus == .success) {
           TopSnackbar.successSnackbar(message: state.message!);
           await _audioPlayer.play(AssetSource(successSound));
         }
 
-        if (state.actionStatus == ShipmentListActionStatus.failure) {
+        if (state.actionStatus == .failure) {
           TopSnackbar.dangerSnackbar(message: state.failure!.message);
 
           return switch (state.failure!.statusCode) {
@@ -82,24 +83,17 @@ class _StageLayoutState extends State<StageLayout> {
         }
       },
       child: Scaffold(
-        body: RefreshIndicator(
-          onRefresh: () async => await _shipmentListCubit.fetchShipments(
+        body: PaginationListener(
+          onPaginate: () => _shipmentListCubit.fetchShipmentsPaginate(
             date: _pickedDate,
             stage: widget.stage,
           ),
-          child: NotificationListener<ScrollNotification>(
-            onNotification: (scrollState) {
-              if (scrollState is ScrollEndNotification) {
-                _shipmentListCubit.fetchShipmentsPaginate(
-                  date: _pickedDate,
-                  stage: widget.stage,
-                );
-              }
-
-              return false;
-            },
+          child: RefreshIndicator(
+            onRefresh: () async => await _shipmentListCubit.fetchShipments(
+              date: _pickedDate,
+              stage: widget.stage,
+            ),
             child: CustomScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
               slivers: <Widget>[
                 // AppBar
                 _AppBar(
@@ -113,13 +107,10 @@ class _StageLayoutState extends State<StageLayout> {
                       previous.status != current.status,
                   builder: (context, state) {
                     return switch (state.status) {
-                      ShipmentListStatus.inProgress =>
-                        const SliverLoadingIndicator(),
-                      ShipmentListStatus.success when state.shipments.isEmpty =>
+                      .inProgress => const SliverLoadingIndicator(),
+                      .success when state.shipments.isEmpty =>
                         const SliverEmptyData(),
-                      ShipmentListStatus.success => _SuccessWidget(
-                        shipments: state.shipments,
-                      ),
+                      .success => _SuccessWidget(shipments: state.shipments),
                       _ => const SliverToBoxAdapter(),
                     };
                   },
