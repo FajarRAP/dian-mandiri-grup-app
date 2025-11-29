@@ -29,7 +29,7 @@ import 'features/supplier/domain/repositories/supplier_repository.dart';
 import 'features/supplier/domain/usecases/fetch_supplier_use_case.dart';
 import 'features/supplier/domain/usecases/fetch_suppliers_dropdown_use_case.dart';
 import 'features/supplier/domain/usecases/fetch_suppliers_use_case.dart';
-import 'features/supplier/domain/usecases/insert_supplier_use_case.dart';
+import 'features/supplier/domain/usecases/create_supplier_use_case.dart';
 import 'features/supplier/domain/usecases/update_supplier_use_case.dart';
 import 'features/supplier/presentation/cubit/supplier_cubit.dart';
 import 'features/tracker/data/datasources/shipment_remote_data_source.dart';
@@ -188,14 +188,14 @@ void setup() {
     ..registerSingleton(
       FetchSuppliersDropdownUseCase(supplierRepository: getIt()),
     )
-    ..registerSingleton(InsertSupplierUseCase(supplierRepository: getIt()))
+    ..registerSingleton(CreateSupplierUseCase(supplierRepository: getIt()))
     ..registerSingleton(UpdateSupplierUseCase(supplierRepository: getIt()))
     ..registerLazySingleton<SupplierCubit>(
       () => SupplierCubit(
         fetchSupplierUseCase: getIt(),
         fetchSuppliersUseCase: getIt(),
         fetchSuppliersDropdownUseCase: getIt(),
-        insertSupplierUseCase: getIt(),
+        createSupplierUseCase: getIt(),
         updateSupplierUseCase: getIt(),
       ),
     );

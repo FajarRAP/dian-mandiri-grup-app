@@ -9,7 +9,7 @@ import '../../domain/entities/supplier_entity.dart';
 import '../../domain/usecases/fetch_supplier_use_case.dart';
 import '../../domain/usecases/fetch_suppliers_dropdown_use_case.dart';
 import '../../domain/usecases/fetch_suppliers_use_case.dart';
-import '../../domain/usecases/insert_supplier_use_case.dart';
+import '../../domain/usecases/create_supplier_use_case.dart';
 import '../../domain/usecases/update_supplier_use_case.dart';
 import '../models/supplier_detail_model.dart';
 import '../models/supplier_model.dart';
@@ -22,7 +22,7 @@ abstract interface class SupplierRemoteDataSource {
   Future<List<DropdownEntity>> fetchSuppliersDropdown(
     FetchSuppliersDropdownUseCaseParams params,
   );
-  Future<String> insertSupplier(InsertSupplierUseCaseParams params);
+  Future<String> insertSupplier(CreateSupplierUseCaseParams params);
   Future<String> updateSupplier(UpdateSupplierUseCaseParams params);
 }
 
@@ -85,7 +85,7 @@ class SupplierRemoteDataSourceImpl
   }
 
   @override
-  Future<String> insertSupplier(InsertSupplierUseCaseParams params) async {
+  Future<String> insertSupplier(CreateSupplierUseCaseParams params) async {
     return handleDioRequest<String>(() async {
       final response = await dio.post(
         '/supplier',

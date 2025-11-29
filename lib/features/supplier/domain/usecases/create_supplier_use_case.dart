@@ -5,22 +5,22 @@ import '../../../../core/errors/failure.dart';
 import '../../../../core/usecase/use_case.dart';
 import '../repositories/supplier_repository.dart';
 
-class InsertSupplierUseCase
-    implements UseCase<String, InsertSupplierUseCaseParams> {
-  const InsertSupplierUseCase({required this.supplierRepository});
+class CreateSupplierUseCase
+    implements UseCase<String, CreateSupplierUseCaseParams> {
+  const CreateSupplierUseCase({required this.supplierRepository});
 
   final SupplierRepository supplierRepository;
 
   @override
   Future<Either<Failure, String>> execute(
-    InsertSupplierUseCaseParams params,
+    CreateSupplierUseCaseParams params,
   ) async {
     return await supplierRepository.insertSupplier(params);
   }
 }
 
-class InsertSupplierUseCaseParams extends Equatable {
-  const InsertSupplierUseCaseParams({
+class CreateSupplierUseCaseParams extends Equatable {
+  const CreateSupplierUseCaseParams({
     this.address,
     this.avatar,
     this.email,

@@ -6,7 +6,7 @@ import 'package:ship_tracker/features/supplier/domain/entities/supplier_detail_e
 import 'package:ship_tracker/features/supplier/domain/usecases/fetch_supplier_use_case.dart';
 import 'package:ship_tracker/features/supplier/domain/usecases/fetch_suppliers_dropdown_use_case.dart';
 import 'package:ship_tracker/features/supplier/domain/usecases/fetch_suppliers_use_case.dart';
-import 'package:ship_tracker/features/supplier/domain/usecases/insert_supplier_use_case.dart';
+import 'package:ship_tracker/features/supplier/domain/usecases/create_supplier_use_case.dart';
 import 'package:ship_tracker/features/supplier/domain/usecases/update_supplier_use_case.dart';
 
 const tSupplierEntity = SupplierEntity(
@@ -43,8 +43,9 @@ const tSupplierDetailModel = SupplierDetailModel(
   email: 'tk.ajib@gmail.com',
 );
 
-const tFetchSupplierParams =
-    FetchSupplierUseCaseParams(supplierId: 'supplierId');
+const tFetchSupplierParams = FetchSupplierUseCaseParams(
+  supplierId: 'supplierId',
+);
 const tFetchSupplierSuccess = SupplierDetailEntity(
   id: '71213ab2-eb64-4873-9732-a77681c9523f',
   name: 'ayyubi',
@@ -71,11 +72,17 @@ const tFetchSuppliersDropdownSuccess = [
   DropdownEntity(key: '71213ab2-eb64-4873-9732-a77681c9523f', value: 'ayyubi'),
 ];
 
-const tCreateSupplierParams =
-    InsertSupplierUseCaseParams(name: 'name', phoneNumber: 'phoneNumber');
+const tCreateSupplierParams = CreateSupplierUseCaseParams(
+  name: 'name',
+  phoneNumber: 'phoneNumber',
+);
 const tCreateSupplierSuccess = 'Supplier created successfully';
 
 const tUpdateSupplierParams = UpdateSupplierUseCaseParams(
-    supplierDetailEntity: SupplierDetailEntity(
-        id: 'id', name: 'name', phoneNumber: 'phoneNumber'));
+  supplierDetailEntity: SupplierDetailEntity(
+    id: 'id',
+    name: 'name',
+    phoneNumber: 'phoneNumber',
+  ),
+);
 const tUpdateSupplierSuccess = 'Success update supplier';

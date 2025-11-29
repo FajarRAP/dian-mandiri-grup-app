@@ -8,7 +8,7 @@ import '../../domain/entities/supplier_entity.dart';
 import '../../domain/usecases/fetch_supplier_use_case.dart';
 import '../../domain/usecases/fetch_suppliers_dropdown_use_case.dart';
 import '../../domain/usecases/fetch_suppliers_use_case.dart';
-import '../../domain/usecases/insert_supplier_use_case.dart';
+import '../../domain/usecases/create_supplier_use_case.dart';
 import '../../domain/usecases/update_supplier_use_case.dart';
 
 part 'supplier_state.dart';
@@ -18,19 +18,19 @@ class SupplierCubit extends Cubit<SupplierState> {
     required FetchSupplierUseCase fetchSupplierUseCase,
     required FetchSuppliersUseCase fetchSuppliersUseCase,
     required FetchSuppliersDropdownUseCase fetchSuppliersDropdownUseCase,
-    required InsertSupplierUseCase insertSupplierUseCase,
+    required CreateSupplierUseCase createSupplierUseCase,
     required UpdateSupplierUseCase updateSupplierUseCase,
   }) : _fetchSupplierUseCase = fetchSupplierUseCase,
        _fetchSuppliersUseCase = fetchSuppliersUseCase,
        _fetchSuppliersDropdownUseCase = fetchSuppliersDropdownUseCase,
-       _insertSupplierUseCase = insertSupplierUseCase,
+       _createSupplierUseCase = createSupplierUseCase,
        _updateSupplierUseCase = updateSupplierUseCase,
        super(SupplierInitial());
 
   final FetchSupplierUseCase _fetchSupplierUseCase;
   final FetchSuppliersUseCase _fetchSuppliersUseCase;
   final FetchSuppliersDropdownUseCase _fetchSuppliersDropdownUseCase;
-  final InsertSupplierUseCase _insertSupplierUseCase;
+  final CreateSupplierUseCase _createSupplierUseCase;
   final UpdateSupplierUseCase _updateSupplierUseCase;
 
   var _currentPage = 1;
@@ -157,12 +157,12 @@ class SupplierCubit extends Cubit<SupplierState> {
     );
   }
 
-  Future<void> insertSupplier({
-    required InsertSupplierUseCaseParams params,
+  Future<void> createSupplier({
+    required CreateSupplierUseCaseParams params,
   }) async {
     emit(InsertSupplierLoading());
 
-    final result = await _insertSupplierUseCase(params);
+    final result = await _createSupplierUseCase(params);
 
     result.fold(
       (failure) => emit(InsertSupplierError(message: failure.message)),
