@@ -152,13 +152,8 @@ class _SuccessWidget extends StatelessWidget {
     return SliverPadding(
       padding: const .all(16),
       sliver: SliverList.separated(
-        itemBuilder: (context, index) => GestureDetector(
-          onTap: () => context.pushNamed(
-            Routes.supplierDetail,
-            extra: suppliers[index].id,
-          ),
-          child: SupplierItem(supplier: suppliers[index]),
-        ),
+        itemBuilder: (context, index) =>
+            SupplierItem(supplier: suppliers[index]),
         separatorBuilder: (context, index) => const Gap(8),
         itemCount: suppliers.length,
       ),

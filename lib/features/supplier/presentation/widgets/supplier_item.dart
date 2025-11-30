@@ -19,6 +19,8 @@ class SupplierItem extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: .circular(10)),
       elevation: 1,
       child: ListTile(
+        onTap: () =>
+            context.pushNamed(Routes.supplierDetail, extra: supplier.id),
         leading: CircleAvatar(
           backgroundImage: const AssetImage(AppImages.app),
           foregroundImage: NetworkImage(supplier.avatarUrl ?? '-'),
