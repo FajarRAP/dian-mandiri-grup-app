@@ -79,10 +79,11 @@ const tCreateSupplierParams = CreateSupplierUseCaseParams(
 const tCreateSupplierSuccess = 'Supplier created successfully';
 
 const tUpdateSupplierParams = UpdateSupplierUseCaseParams(
-  supplierDetailEntity: SupplierDetailEntity(
-    id: 'id',
-    name: 'name',
-    phoneNumber: 'phoneNumber',
-  ),
+  id: 'id',
+  name: 'name',
+  phoneNumber: 'phoneNumber',
+  address: 'address',
+  email: 'email',
+  avatar: 'avatar',
 );
 const tUpdateSupplierSuccess = 'Success update supplier';

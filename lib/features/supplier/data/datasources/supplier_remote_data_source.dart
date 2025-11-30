@@ -105,19 +105,15 @@ class SupplierRemoteDataSourceImpl
   @override
   Future<String> updateSupplier(UpdateSupplierUseCaseParams params) async {
     return handleDioRequest<String>(() async {
-      final supplierDetail = SupplierDetailModel.fromEntity(
-        params.supplierDetailEntity,
-      );
-      final payload = supplierDetail.toJson();
-      final newAvatar = await supplierDetail.avatarUrl.toMultipartFile();
-
-      if (newAvatar != null) {
-        payload['avatar'] = newAvatar;
-      }
-
       final response = await dio.put(
-        '/supplier/${params.supplierDetailEntity.id}',
-        data: FormData.fromMap(payload),
+        '/supplier/${params.id}',
+        data: FormData.fromMap({
+          'name': params.name,
+          'phone': params.phoneNumber,
+          'address': params.address,
+          'email': params.email,
+          'avatar': await params.avatar.toMultipartFile(),
+        }),
       );
 
       return response.data['message'];

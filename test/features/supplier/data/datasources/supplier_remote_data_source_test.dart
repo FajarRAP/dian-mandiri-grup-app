@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -269,6 +270,17 @@ void main() {
   group('update supplier remote data source test', () {
     const params = tUpdateSupplierParams;
     const resultMatcher = tUpdateSupplierSuccess;
+    final file = File(params.avatar ?? '-');
+
+    setUp(() {
+      file.writeAsStringSync('lorem');
+    });
+
+    tearDown(() {
+      if (file.existsSync()) {
+        file.deleteSync();
+      }
+    });
 
     test('should return String message when request is successful', () async {
       // arrange
@@ -288,10 +300,7 @@ void main() {
       // assert
       expect(result, resultMatcher);
       verify(
-        () => mockDio.put(
-          '/supplier/${params.supplierDetailEntity.id}',
-          data: any(named: 'data'),
-        ),
+        () => mockDio.put('/supplier/${params.id}', data: any(named: 'data')),
       ).called(1);
     });
 
@@ -311,10 +320,7 @@ void main() {
       // assert
       await expectLater(() => future, throwsA(isA<ServerException>()));
       verify(
-        () => mockDio.put(
-          '/supplier/${params.supplierDetailEntity.id}',
-          data: any(named: 'data'),
-        ),
+        () => mockDio.put('/supplier/${params.id}', data: any(named: 'data')),
       ).called(1);
     });
   });
