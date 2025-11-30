@@ -184,7 +184,14 @@ class AppRouter {
                       GoRoute(
                         path: 'add',
                         name: Routes.supplierAdd,
-                        builder: (context, state) => const AddSupplierPage(),
+                        builder: (context, state) {
+                          final cubit = state.extra as NewSupplierCubit;
+
+                          return BlocProvider.value(
+                            value: cubit,
+                            child: const AddSupplierPage(),
+                          );
+                        },
                       ),
                       GoRoute(
                         path: 'edit',

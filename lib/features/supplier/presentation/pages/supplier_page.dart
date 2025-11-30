@@ -55,7 +55,10 @@ class _SupplierPageState extends State<SupplierPage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => context.pushNamed(Routes.supplierAdd),
+        onPressed: () => context.pushNamed(
+          Routes.supplierAdd,
+          extra: context.read<NewSupplierCubit>(),
+        ),
         child: const Icon(Icons.add),
       ),
     );
