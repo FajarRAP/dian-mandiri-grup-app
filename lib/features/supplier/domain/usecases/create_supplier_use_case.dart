@@ -15,7 +15,7 @@ class CreateSupplierUseCase
   Future<Either<Failure, String>> execute(
     CreateSupplierUseCaseParams params,
   ) async {
-    return await supplierRepository.insertSupplier(params);
+    return await supplierRepository.createSupplier(params);
   }
 }
 

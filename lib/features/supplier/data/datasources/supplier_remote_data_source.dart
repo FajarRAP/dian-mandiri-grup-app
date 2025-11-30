@@ -22,7 +22,7 @@ abstract interface class SupplierRemoteDataSource {
   Future<List<DropdownEntity>> fetchSuppliersDropdown(
     FetchSuppliersDropdownUseCaseParams params,
   );
-  Future<String> insertSupplier(CreateSupplierUseCaseParams params);
+  Future<String> createSupplier(CreateSupplierUseCaseParams params);
   Future<String> updateSupplier(UpdateSupplierUseCaseParams params);
 }
 
@@ -85,7 +85,7 @@ class SupplierRemoteDataSourceImpl
   }
 
   @override
-  Future<String> insertSupplier(CreateSupplierUseCaseParams params) async {
+  Future<String> createSupplier(CreateSupplierUseCaseParams params) async {
     return handleDioRequest<String>(() async {
       final response = await dio.post(
         '/supplier',
@@ -94,7 +94,7 @@ class SupplierRemoteDataSourceImpl
           'avatar': await params.avatar.toMultipartFile(),
           'email': params.email,
           'name': params.name,
-          'phoneNumber': params.phoneNumber,
+          'phone': params.phoneNumber,
         }),
       );
 

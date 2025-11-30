@@ -30,37 +30,44 @@ void main() {
     const params = tFetchSupplierParams;
     const resultMatcher = tFetchSupplierSuccess;
 
-    test('should return Right(String) when remote call is successful',
-        () async {
-      // arrange
-      when(() => mockSupplierRemoteDataSource.fetchSupplier(any()))
-          .thenAnswer((_) async => resultMatcher);
+    test(
+      'should return Right(String) when remote call is successful',
+      () async {
+        // arrange
+        when(
+          () => mockSupplierRemoteDataSource.fetchSupplier(any()),
+        ).thenAnswer((_) async => resultMatcher);
 
-      // act
-      final result = await supplierRepository.fetchSupplier(params);
-      // assert
-      expect(result, const Right(resultMatcher));
-      verify(() => mockSupplierRemoteDataSource.fetchSupplier(params))
-          .called(1);
-      verifyNoMoreInteractions(mockSupplierRemoteDataSource);
-    });
+        // act
+        final result = await supplierRepository.fetchSupplier(params);
+        // assert
+        expect(result, const Right(resultMatcher));
+        verify(
+          () => mockSupplierRemoteDataSource.fetchSupplier(params),
+        ).called(1);
+        verifyNoMoreInteractions(mockSupplierRemoteDataSource);
+      },
+    );
 
     test(
-        'should return Left(ServerFailure) when remote data source throws ServerException',
-        () async {
-      // arrange
-      when(() => mockSupplierRemoteDataSource.fetchSupplier(any()))
-          .thenThrow(tServerException);
+      'should return Left(ServerFailure) when remote data source throws ServerException',
+      () async {
+        // arrange
+        when(
+          () => mockSupplierRemoteDataSource.fetchSupplier(any()),
+        ).thenThrow(tServerException);
 
-      // act
-      final result = await supplierRepository.fetchSupplier(params);
+        // act
+        final result = await supplierRepository.fetchSupplier(params);
 
-      // assert
-      expect(result, const Left(tServerFailure));
-      verify(() => mockSupplierRemoteDataSource.fetchSupplier(params))
-          .called(1);
-      verifyNoMoreInteractions(mockSupplierRemoteDataSource);
-    });
+        // assert
+        expect(result, const Left(tServerFailure));
+        verify(
+          () => mockSupplierRemoteDataSource.fetchSupplier(params),
+        ).called(1);
+        verifyNoMoreInteractions(mockSupplierRemoteDataSource);
+      },
+    );
   });
 
   group('fetch suppliers repository test', () {
@@ -68,37 +75,43 @@ void main() {
     const resultMatcher = tFetchSuppliersSuccess;
 
     test(
-        'should return Right(List<SupplierEntity>) when remote call is successful',
-        () async {
-      // arrange
-      when(() => mockSupplierRemoteDataSource.fetchSuppliers(any()))
-          .thenAnswer((_) async => resultMatcher);
+      'should return Right(List<SupplierEntity>) when remote call is successful',
+      () async {
+        // arrange
+        when(
+          () => mockSupplierRemoteDataSource.fetchSuppliers(any()),
+        ).thenAnswer((_) async => resultMatcher);
 
-      // act
-      final result = await supplierRepository.fetchSuppliers(params);
-      // assert
-      expect(result, const Right(resultMatcher));
-      verify(() => mockSupplierRemoteDataSource.fetchSuppliers(params))
-          .called(1);
-      verifyNoMoreInteractions(mockSupplierRemoteDataSource);
-    });
+        // act
+        final result = await supplierRepository.fetchSuppliers(params);
+        // assert
+        expect(result, const Right(resultMatcher));
+        verify(
+          () => mockSupplierRemoteDataSource.fetchSuppliers(params),
+        ).called(1);
+        verifyNoMoreInteractions(mockSupplierRemoteDataSource);
+      },
+    );
 
     test(
-        'should return Left(ServerFailure) when remote data source throws ServerException',
-        () async {
-      // arrange
-      when(() => mockSupplierRemoteDataSource.fetchSuppliers(any()))
-          .thenThrow(tServerException);
+      'should return Left(ServerFailure) when remote data source throws ServerException',
+      () async {
+        // arrange
+        when(
+          () => mockSupplierRemoteDataSource.fetchSuppliers(any()),
+        ).thenThrow(tServerException);
 
-      // act
-      final result = await supplierRepository.fetchSuppliers(params);
+        // act
+        final result = await supplierRepository.fetchSuppliers(params);
 
-      // assert
-      expect(result, const Left(tServerFailure));
-      verify(() => mockSupplierRemoteDataSource.fetchSuppliers(params))
-          .called(1);
-      verifyNoMoreInteractions(mockSupplierRemoteDataSource);
-    });
+        // assert
+        expect(result, const Left(tServerFailure));
+        verify(
+          () => mockSupplierRemoteDataSource.fetchSuppliers(params),
+        ).called(1);
+        verifyNoMoreInteractions(mockSupplierRemoteDataSource);
+      },
+    );
   });
 
   group('fetch suppliers dropdown repository test', () {
@@ -106,112 +119,132 @@ void main() {
     const resultMatcher = tFetchSuppliersDropdownSuccess;
 
     test(
-        'should return Right(List<DropdownEntity>) when remote call is successful',
-        () async {
-      // arrange
-      when(() => mockSupplierRemoteDataSource.fetchSuppliersDropdown(any()))
-          .thenAnswer((_) async => resultMatcher);
+      'should return Right(List<DropdownEntity>) when remote call is successful',
+      () async {
+        // arrange
+        when(
+          () => mockSupplierRemoteDataSource.fetchSuppliersDropdown(any()),
+        ).thenAnswer((_) async => resultMatcher);
 
-      // act
-      final result = await supplierRepository.fetchSuppliersDropdown(params);
-      // assert
-      expect(result, const Right(resultMatcher));
-      verify(() => mockSupplierRemoteDataSource.fetchSuppliersDropdown(params))
-          .called(1);
-      verifyNoMoreInteractions(mockSupplierRemoteDataSource);
-    });
+        // act
+        final result = await supplierRepository.fetchSuppliersDropdown(params);
+        // assert
+        expect(result, const Right(resultMatcher));
+        verify(
+          () => mockSupplierRemoteDataSource.fetchSuppliersDropdown(params),
+        ).called(1);
+        verifyNoMoreInteractions(mockSupplierRemoteDataSource);
+      },
+    );
 
     test(
-        'should return Left(ServerFailure) when remote data source throws ServerException',
-        () async {
-      // arrange
-      when(() => mockSupplierRemoteDataSource.fetchSuppliersDropdown(any()))
-          .thenThrow(tServerException);
+      'should return Left(ServerFailure) when remote data source throws ServerException',
+      () async {
+        // arrange
+        when(
+          () => mockSupplierRemoteDataSource.fetchSuppliersDropdown(any()),
+        ).thenThrow(tServerException);
 
-      // act
-      final result = await supplierRepository.fetchSuppliersDropdown(params);
+        // act
+        final result = await supplierRepository.fetchSuppliersDropdown(params);
 
-      // assert
-      expect(result, const Left(tServerFailure));
-      verify(() => mockSupplierRemoteDataSource.fetchSuppliersDropdown(params))
-          .called(1);
-      verifyNoMoreInteractions(mockSupplierRemoteDataSource);
-    });
+        // assert
+        expect(result, const Left(tServerFailure));
+        verify(
+          () => mockSupplierRemoteDataSource.fetchSuppliersDropdown(params),
+        ).called(1);
+        verifyNoMoreInteractions(mockSupplierRemoteDataSource);
+      },
+    );
   });
 
   group('create supplier repository test', () {
     const params = tCreateSupplierParams;
     const resultMatcher = tCreateSupplierSuccess;
 
-    test('should return Right(String) when remote call is successful',
-        () async {
-      // arrange
-      when(() => mockSupplierRemoteDataSource.insertSupplier(any()))
-          .thenAnswer((_) async => resultMatcher);
+    test(
+      'should return Right(String) when remote call is successful',
+      () async {
+        // arrange
+        when(
+          () => mockSupplierRemoteDataSource.createSupplier(any()),
+        ).thenAnswer((_) async => resultMatcher);
 
-      // act
-      final result = await supplierRepository.insertSupplier(params);
+        // act
+        final result = await supplierRepository.createSupplier(params);
 
-      // assert
-      expect(result, const Right(resultMatcher));
-      verify(() => mockSupplierRemoteDataSource.insertSupplier(params))
-          .called(1);
-      verifyNoMoreInteractions(mockSupplierRemoteDataSource);
-    });
+        // assert
+        expect(result, const Right(resultMatcher));
+        verify(
+          () => mockSupplierRemoteDataSource.createSupplier(params),
+        ).called(1);
+        verifyNoMoreInteractions(mockSupplierRemoteDataSource);
+      },
+    );
 
     test(
-        'should return Left(ServerFailure) when remote data source throws ServerException',
-        () async {
-      // arrange
-      when(() => mockSupplierRemoteDataSource.insertSupplier(any()))
-          .thenThrow(tServerException);
+      'should return Left(ServerFailure) when remote data source throws ServerException',
+      () async {
+        // arrange
+        when(
+          () => mockSupplierRemoteDataSource.createSupplier(any()),
+        ).thenThrow(tServerException);
 
-      // act
-      final result = await supplierRepository.insertSupplier(params);
+        // act
+        final result = await supplierRepository.createSupplier(params);
 
-      // assert
-      expect(result, const Left(tServerFailure));
-      verify(() => mockSupplierRemoteDataSource.insertSupplier(params))
-          .called(1);
-      verifyNoMoreInteractions(mockSupplierRemoteDataSource);
-    });
+        // assert
+        expect(result, const Left(tServerFailure));
+        verify(
+          () => mockSupplierRemoteDataSource.createSupplier(params),
+        ).called(1);
+        verifyNoMoreInteractions(mockSupplierRemoteDataSource);
+      },
+    );
   });
 
   group('update supplier repository test', () {
     const params = tUpdateSupplierParams;
     const resultMatcher = tUpdateSupplierSuccess;
 
-    test('should return Right(String) when remote call is successful',
-        () async {
-      // arrange
-      when(() => mockSupplierRemoteDataSource.updateSupplier(any()))
-          .thenAnswer((_) async => resultMatcher);
+    test(
+      'should return Right(String) when remote call is successful',
+      () async {
+        // arrange
+        when(
+          () => mockSupplierRemoteDataSource.updateSupplier(any()),
+        ).thenAnswer((_) async => resultMatcher);
 
-      // act
-      final result = await supplierRepository.updateSupplier(params);
+        // act
+        final result = await supplierRepository.updateSupplier(params);
 
-      // assert
-      expect(result, const Right(resultMatcher));
-      verify(() => mockSupplierRemoteDataSource.updateSupplier(params))
-          .called(1);
-      verifyNoMoreInteractions(mockSupplierRemoteDataSource);
-    });
+        // assert
+        expect(result, const Right(resultMatcher));
+        verify(
+          () => mockSupplierRemoteDataSource.updateSupplier(params),
+        ).called(1);
+        verifyNoMoreInteractions(mockSupplierRemoteDataSource);
+      },
+    );
 
     test(
-        'should return Left(ServerFailure) when remote data source throws ServerException',
-        () async {
-      // arrange
-      when(() => mockSupplierRemoteDataSource.updateSupplier(any()))
-          .thenThrow(tServerException);
+      'should return Left(ServerFailure) when remote data source throws ServerException',
+      () async {
+        // arrange
+        when(
+          () => mockSupplierRemoteDataSource.updateSupplier(any()),
+        ).thenThrow(tServerException);
 
-      // act
-      final result = await supplierRepository.updateSupplier(params);
+        // act
+        final result = await supplierRepository.updateSupplier(params);
 
-      // assert
-      expect(result, const Left(tServerFailure));
-      verify(() => mockSupplierRemoteDataSource.updateSupplier(params))
-          .called(1);
-      verifyNoMoreInteractions(mockSupplierRemoteDataSource);
-    });
+        // assert
+        expect(result, const Left(tServerFailure));
+        verify(
+          () => mockSupplierRemoteDataSource.updateSupplier(params),
+        ).called(1);
+        verifyNoMoreInteractions(mockSupplierRemoteDataSource);
+      },
+    );
   });
 }

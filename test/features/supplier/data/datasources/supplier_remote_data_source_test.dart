@@ -236,7 +236,7 @@ void main() {
       );
 
       // act
-      final result = await supplierRemoteDataSource.insertSupplier(params);
+      final result = await supplierRemoteDataSource.createSupplier(params);
 
       // assert
       expect(result, resultMatcher);
@@ -256,7 +256,7 @@ void main() {
       );
 
       // act
-      final future = supplierRemoteDataSource.insertSupplier(params);
+      final future = supplierRemoteDataSource.createSupplier(params);
 
       // assert
       await expectLater(() => future, throwsA(isA<ServerException>()));

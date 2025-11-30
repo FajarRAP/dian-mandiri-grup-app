@@ -20,7 +20,7 @@ abstract interface class SupplierRepository {
   Future<Either<Failure, List<DropdownEntity>>> fetchSuppliersDropdown(
     FetchSuppliersDropdownUseCaseParams params,
   );
-  Future<Either<Failure, String>> insertSupplier(
+  Future<Either<Failure, String>> createSupplier(
     CreateSupplierUseCaseParams params,
   );
   Future<Either<Failure, String>> updateSupplier(

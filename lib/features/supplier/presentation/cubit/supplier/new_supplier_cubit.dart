@@ -36,6 +36,7 @@ class NewSupplierCubit extends Cubit<NewSupplierState> {
     emit(
       state.copyWith(
         status: .inProgress,
+        actionStatus: .initial,
         query: effectiveQuery,
         sortOptions: effectiveSortOption,
         currentPage: 1,
@@ -94,6 +95,29 @@ class NewSupplierCubit extends Cubit<NewSupplierState> {
           suppliers: [...state.suppliers, ...suppliers],
         ),
       ),
+    );
+  }
+
+  Future<void> createSupplier({
+    required String name,
+    required String phoneNumber,
+    String? address,
+    String? avatar,
+    String? email,
+  }) async {
+    emit(state.copyWith(actionStatus: .inProgress));
+
+    final params = CreateSupplierUseCaseParams(
+      name: name,
+      phoneNumber: phoneNumber,
+    );
+    final result = await _createSupplierUseCase(params);
+
+    result.fold(
+      (failure) =>
+          emit(state.copyWith(actionStatus: .failure, failure: failure)),
+      (message) =>
+          emit(state.copyWith(actionStatus: .success, message: message)),
     );
   }
 }

@@ -2,9 +2,12 @@ part of 'new_supplier_cubit.dart';
 
 enum SupplierStatus { initial, inProgress, success, failure }
 
+enum SupplierActionStatuse { initial, inProgress, success, failure }
+
 class NewSupplierState extends Equatable {
   const NewSupplierState({
     this.status = .initial,
+    this.actionStatus = .initial,
     this.suppliers = const <SupplierEntity>[],
     this.currentPage = 1,
     this.hasReachedMax = false,
@@ -16,6 +19,8 @@ class NewSupplierState extends Equatable {
   });
 
   final SupplierStatus status;
+  final SupplierActionStatuse actionStatus;
+
   final List<SupplierEntity> suppliers;
   final int currentPage;
   final bool hasReachedMax;
@@ -29,6 +34,7 @@ class NewSupplierState extends Equatable {
 
   NewSupplierState copyWith({
     SupplierStatus? status,
+    SupplierActionStatuse? actionStatus,
     List<SupplierEntity>? suppliers,
     int? currentPage,
     bool? hasReachedMax,
@@ -40,6 +46,7 @@ class NewSupplierState extends Equatable {
   }) {
     return NewSupplierState(
       status: status ?? this.status,
+      actionStatus: actionStatus ?? this.actionStatus,
       suppliers: suppliers ?? this.suppliers,
       currentPage: currentPage ?? this.currentPage,
       hasReachedMax: hasReachedMax ?? this.hasReachedMax,
@@ -54,6 +61,7 @@ class NewSupplierState extends Equatable {
   @override
   List<Object?> get props => [
     status,
+    actionStatus,
     suppliers,
     currentPage,
     hasReachedMax,

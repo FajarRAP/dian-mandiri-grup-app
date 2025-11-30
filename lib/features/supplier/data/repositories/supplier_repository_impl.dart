@@ -56,11 +56,11 @@ class SupplierRepositoryImpl
   }
 
   @override
-  Future<Either<Failure, String>> insertSupplier(
+  Future<Either<Failure, String>> createSupplier(
     CreateSupplierUseCaseParams params,
   ) async {
     return await handleRepositoryRequest<String>(() async {
-      final result = await supplierRemoteDataSource.insertSupplier(params);
+      final result = await supplierRemoteDataSource.createSupplier(params);
 
       return result;
     });
