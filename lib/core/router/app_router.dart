@@ -177,9 +177,16 @@ class AppRouter {
                       GoRoute(
                         path: 'detail',
                         name: Routes.supplierDetail,
-                        builder: (context, state) => SupplierDetailPage(
-                          supplierId: state.extra as String,
-                        ),
+                        builder: (context, state) {
+                          final extras = state.extra as Map<String, dynamic>;
+                          final supplierId = extras['supplier_id'] as String;
+                          final cubit = extras['cubit'] as NewSupplierCubit;
+
+                          return BlocProvider.value(
+                            value: cubit,
+                            child: SupplierDetailPage(supplierId: supplierId),
+                          );
+                        },
                       ),
                       GoRoute(
                         path: 'add',
@@ -196,8 +203,16 @@ class AppRouter {
                       GoRoute(
                         path: 'edit',
                         name: Routes.supplierEdit,
-                        builder: (context, state) =>
-                            EditSupplierPage(supplierId: state.extra as String),
+                        builder: (context, state) {
+                          final extras = state.extra as Map<String, dynamic>;
+                          final supplierId = extras['supplier_id'] as String;
+                          final cubit = extras['cubit'] as NewSupplierCubit;
+
+                          return BlocProvider.value(
+                            value: cubit,
+                            child: EditSupplierPage(supplierId: supplierId),
+                          );
+                        },
                       ),
                     ],
                   ),
