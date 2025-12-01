@@ -10,10 +10,23 @@ import '../../domain/entities/supplier_detail_entity.dart';
 import '../cubit/supplier_detail/supplier_detail_cubit.dart';
 import '../widgets/editable_avatar.dart';
 
-class SupplierDetailPage extends StatelessWidget {
+class SupplierDetailPage extends StatefulWidget {
   const SupplierDetailPage({super.key, required this.supplierId});
 
   final String supplierId;
+
+  @override
+  State<SupplierDetailPage> createState() => _SupplierDetailPageState();
+}
+
+class _SupplierDetailPageState extends State<SupplierDetailPage> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<SupplierDetailCubit>().fetchSupplier(
+      supplierId: widget.supplierId,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,9 +39,9 @@ class SupplierDetailPage extends StatelessWidget {
             .success => _SuccessWidget(supplier: state.supplier!),
             .failure => ErrorStateWidget(
               onRetry: () => context.read<SupplierDetailCubit>().fetchSupplier(
-                supplierId: supplierId,
+                supplierId: widget.supplierId,
               ),
-              message: state.failure?.message,
+              failure: state.failure,
             ),
             _ => const SizedBox(),
           };
