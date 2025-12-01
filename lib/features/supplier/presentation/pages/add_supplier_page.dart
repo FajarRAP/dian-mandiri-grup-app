@@ -12,7 +12,7 @@ import '../../../../core/helpers/validators.dart';
 import '../../../../core/utils/extensions.dart';
 import '../../../../core/widgets/buttons/primary_button.dart';
 import '../../../../core/widgets/image_picker_bottom_sheet.dart';
-import '../cubit/supplier/supplier_cubit.dart';
+import '../cubit/create_supplier/create_supplier_cubit.dart';
 import '../widgets/editable_avatar.dart';
 
 class AddSupplierPage extends StatefulWidget {
@@ -121,28 +121,26 @@ class _AddSupplierPageState extends State<AddSupplierPage> {
                     maxLines: 2,
                   ),
                   const Gap(24),
-                  BlocConsumer<SupplierCubit, SupplierState>(
+                  BlocConsumer<CreateSupplierCubit, CreateSupplierState>(
                     listener: (context, state) {
-                      if (state.actionStatus == .failure) {
+                      if (state.status == .failure) {
                         TopSnackbar.dangerSnackbar(
                           message: state.failure!.message,
                         );
                       }
 
-                      if (state.actionStatus == .success) {
+                      if (state.status == .success) {
                         TopSnackbar.successSnackbar(message: state.message!);
-                        context
-                          ..pop()
-                          ..read<SupplierCubit>().fetchSuppliers();
+                        context.pop(true);
                       }
                     },
                     builder: (context, state) {
-                      final onPressed = switch (state.actionStatus) {
+                      final onPressed = switch (state.status) {
                         .inProgress => null,
                         _ => () {
                           if (!_formKey.currentState!.validate()) return;
 
-                          context.read<SupplierCubit>().createSupplier(
+                          context.read<CreateSupplierCubit>().createSupplier(
                             name: _nameController.text,
                             phoneNumber: _phoneController.text,
                             address: _addressController.text,
