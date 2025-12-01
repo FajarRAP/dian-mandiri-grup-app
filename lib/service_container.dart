@@ -32,6 +32,7 @@ import 'features/supplier/domain/usecases/fetch_suppliers_dropdown_use_case.dart
 import 'features/supplier/domain/usecases/fetch_suppliers_use_case.dart';
 import 'features/supplier/domain/usecases/create_supplier_use_case.dart';
 import 'features/supplier/domain/usecases/update_supplier_use_case.dart';
+import 'features/supplier/presentation/cubit/create_supplier/create_supplier_cubit.dart';
 import 'features/supplier/presentation/cubit/supplier/supplier_cubit.dart';
 import 'features/supplier/presentation/cubit/supplier_detail/supplier_detail_cubit.dart';
 import 'features/supplier/presentation/cubit/update_supplier/update_supplier_cubit.dart';
@@ -200,8 +201,9 @@ void setup() {
       ),
     )
     ..registerFactory(() => SupplierDetailCubit(fetchSupplierUseCase: getIt()))
+    ..registerFactory(() => UpdateSupplierCubit(updateSupplierUseCase: getIt()))
     ..registerFactory(
-      () => UpdateSupplierCubit(updateSupplierUseCase: getIt()),
+      () => CreateSupplierCubit(createSupplierUseCase: getIt()),
     );
 
   // Warehouse
