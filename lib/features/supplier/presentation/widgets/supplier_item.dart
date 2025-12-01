@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../common/constants/app_images.dart';
 import '../../../../core/router/route_names.dart';
 import '../../../../core/utils/extensions.dart';
 import '../../domain/entities/supplier_entity.dart';
+import '../cubit/supplier/new_supplier_cubit.dart';
 
 class SupplierItem extends StatelessWidget {
   const SupplierItem({super.key, required this.supplier});
@@ -35,8 +37,18 @@ class SupplierItem extends StatelessWidget {
         tileColor: context.colorScheme.onPrimary,
         title: Text(supplier.name, style: textTheme.bodyMedium),
         trailing: IconButton(
-          onPressed: () =>
-              context.pushNamed(Routes.supplierEdit, extra: supplier.id),
+          onPressed: () async {
+            final result = await context.pushNamed<bool>(
+              Routes.supplierEdit,
+              extra: supplier.id,
+            );
+
+            if (!context.mounted) return;
+
+            if (result == true) {
+              await context.read<NewSupplierCubit>().fetchSuppliers();
+            }
+          },
           icon: const Icon(Icons.edit),
         ),
       ),
