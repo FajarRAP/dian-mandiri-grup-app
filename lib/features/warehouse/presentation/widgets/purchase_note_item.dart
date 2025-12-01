@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 
 import '../../../../core/helpers/helpers.dart';
-import '../../../../core/themes/colors.dart';
+import '../../../../core/utils/extensions.dart';
 import '../../domain/entities/purchase_note_summary_entity.dart';
 
 class PurchaseNoteItem extends StatelessWidget {
@@ -18,61 +19,60 @@ class PurchaseNoteItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final textTheme = theme.textTheme;
+    final textTheme = context.textTheme;
 
     return GestureDetector(
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          border: Border.all(
-            color: Colors.grey.shade300,
+          border: .all(
+            color: context.colorScheme.outline.withValues(alpha: .3),
             width: .5,
           ),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: .circular(12),
           boxShadow: <BoxShadow>[
             BoxShadow(
-              color: MaterialColors.shadow.withValues(alpha: .05),
+              color: context.colorScheme.shadow.withValues(alpha: .05),
               blurRadius: 6,
               offset: const Offset(0, 2),
               spreadRadius: 0,
             ),
           ],
-          color: MaterialColors.onPrimary,
+          color: context.colorScheme.onPrimary,
         ),
-        padding: const EdgeInsets.all(16),
+        padding: const .all(16),
         child: Row(
           children: <Widget>[
             // Item Count
             CircleAvatar(
-              backgroundColor: CustomColors.primaryNormal.withValues(alpha: .1),
+              backgroundColor: context.colorScheme.primary.withValues(
+                alpha: .1,
+              ),
               radius: 24,
               child: Text(
                 '${purchaseNoteSummary.totalItems}',
                 style: textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: CustomColors.primaryNormal,
+                  fontWeight: .w700,
+                  color: context.colorScheme.primary,
                 ),
               ),
             ),
-            const SizedBox(width: 16),
+            const Gap(16),
 
             // Supplier info
             Expanded(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: .start,
                 children: <Widget>[
                   Text(
                     purchaseNoteSummary.supplier.name,
-                    style: textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: textTheme.titleLarge?.copyWith(fontWeight: .w600),
                   ),
-                  const SizedBox(height: 4),
+                  const Gap(4),
                   Text(
                     dateTimeFormat.format(purchaseNoteSummary.date.toLocal()),
                     style: textTheme.bodySmall?.copyWith(
-                      color: MaterialColors.onSurfaceVariant,
+                      color: context.colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ],
@@ -82,9 +82,9 @@ class PurchaseNoteItem extends StatelessWidget {
             // Action button
             IconButton(
               onPressed: onDelete,
-              icon: const Icon(
+              icon: Icon(
                 Icons.delete_outline,
-                color: MaterialColors.error,
+                color: context.colorScheme.error,
               ),
               tooltip: 'Hapus',
             ),
