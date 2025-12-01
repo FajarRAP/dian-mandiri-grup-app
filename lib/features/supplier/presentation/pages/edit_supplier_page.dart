@@ -2,22 +2,24 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:gap/gap.dart';
 
 import '../../../../core/common/shadows.dart';
 import '../../../../core/helpers/top_snackbar.dart';
 import '../../../../core/helpers/validators.dart';
-import '../../../../core/themes/colors.dart';
+import '../../../../core/presentation/widgets/error_state_widget.dart';
+import '../../../../core/presentation/widgets/loading_indicator.dart';
+import '../../../../core/presentation/widgets/pop_result_scope.dart';
+import '../../../../core/utils/extensions.dart';
 import '../../../../core/widgets/buttons/primary_button.dart';
 import '../../../../core/widgets/image_picker_bottom_sheet.dart';
 import '../../domain/entities/supplier_detail_entity.dart';
-import '../cubit/supplier_cubit.dart';
+import '../cubit/supplier_detail_cubit.dart';
+import '../cubit/update_supplier/update_supplier_cubit.dart';
+import '../widgets/editable_avatar.dart';
 
 class EditSupplierPage extends StatefulWidget {
-  const EditSupplierPage({
-    super.key,
-    required this.supplierId,
-  });
+  const EditSupplierPage({super.key, required this.supplierId});
 
   final String supplierId;
 
@@ -26,25 +28,71 @@ class EditSupplierPage extends StatefulWidget {
 }
 
 class _EditSupplierPageState extends State<EditSupplierPage> {
-  late final SupplierCubit _supplierCubit;
+  var _isUpdated = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return PopResultScope<bool>(
+      value: _isUpdated,
+      child: Scaffold(
+        appBar: AppBar(title: const Text('Edit Supplier')),
+        body: BlocBuilder<SupplierDetailCubit, SupplierDetailState>(
+          builder: (context, state) {
+            return switch (state.status) {
+              .inProgress => const LoadingIndicator(),
+              .success => _SuccessWidget(
+                onUpdateSuccess: () => setState(() => _isUpdated = true),
+                supplierId: widget.supplierId,
+                supplier: state.supplier!,
+              ),
+              .failure => ErrorStateWidget(
+                onRetry: () => context
+                    .read<SupplierDetailCubit>()
+                    .fetchSupplier(supplierId: widget.supplierId),
+                failure: state.failure,
+              ),
+              _ => const SizedBox(),
+            };
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class _SuccessWidget extends StatefulWidget {
+  const _SuccessWidget({
+    required this.onUpdateSuccess,
+    required this.supplierId,
+    required this.supplier,
+  });
+
+  final void Function() onUpdateSuccess;
+  final String supplierId;
+  final SupplierDetailEntity supplier;
+
+  @override
+  State<_SuccessWidget> createState() => _SuccessWidgetState();
+}
+
+class _SuccessWidgetState extends State<_SuccessWidget> {
   late final TextEditingController _nameController;
   late final TextEditingController _emailController;
   late final TextEditingController _phoneController;
   late final TextEditingController _addressController;
   late final GlobalKey<FormState> _formKey;
-  late String _avatarUrl;
-  XFile? _pickedImage;
+  String? _avatarUrl;
+  File? _pickedImage;
 
   @override
   initState() {
     super.initState();
-    _supplierCubit = context.read<SupplierCubit>();
-    _nameController = TextEditingController();
-    _emailController = TextEditingController();
-    _phoneController = TextEditingController();
-    _addressController = TextEditingController();
+    _nameController = TextEditingController(text: widget.supplier.name);
+    _emailController = TextEditingController(text: widget.supplier.email);
+    _phoneController = TextEditingController(text: widget.supplier.phoneNumber);
+    _addressController = TextEditingController(text: widget.supplier.address);
+    _avatarUrl = widget.supplier.avatarUrl;
     _formKey = GlobalKey<FormState>();
-    _supplierCubit.fetchSupplier(supplierId: widget.supplierId);
   }
 
   @override
@@ -58,183 +106,101 @@ class _EditSupplierPageState extends State<EditSupplierPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Edit Supplier'),
-      ),
-      body: Center(
-        child: BlocBuilder<SupplierCubit, SupplierState>(
-          buildWhen: (previous, current) => current is FetchSupplier,
-          builder: (context, state) {
-            if (state is FetchSupplierLoading) {
-              return const Center(
-                child: CircularProgressIndicator.adaptive(),
-              );
-            }
-
-            if (state is FetchSupplierLoaded) {
-              _nameController.text = state.supplierDetail.name;
-              _emailController.text = state.supplierDetail.email ?? '';
-              _phoneController.text = state.supplierDetail.phoneNumber;
-              _addressController.text = state.supplierDetail.address ?? '';
-              _avatarUrl = state.supplierDetail.avatarUrl ?? '';
-
-              return Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: cardBoxShadow,
-                  color: MaterialColors.onPrimary,
-                ),
-                margin: const EdgeInsets.all(16),
-                padding: const EdgeInsets.all(24),
-                child: Form(
-                  key: _formKey,
-                  child: ListView(
-                    shrinkWrap: true,
-                    children: <Widget>[
-                      GestureDetector(
-                        onTap: () => showModalBottomSheet(
-                          builder: (context) => ImagePickerBottomSheet(
-                            onPicked: (image) =>
-                                setState(() => _pickedImage = image),
-                          ),
-                          context: context,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.vertical(
-                              top: Radius.circular(16),
-                            ),
-                          ),
-                        ),
-                        child: UnconstrainedBox(
-                          child: Stack(
-                            children: <Widget>[
-                              CircleAvatar(
-                                radius: 50,
-                                backgroundColor: Colors.grey.shade300,
-                                foregroundImage: _pickedImage != null
-                                    ? FileImage(File(_pickedImage!.path))
-                                    : state.supplierDetail.avatarUrl != null
-                                        ? NetworkImage(
-                                            state.supplierDetail.avatarUrl!)
-                                        : null,
-                                child: _pickedImage == null
-                                    ? Icon(
-                                        Icons.person_outline,
-                                        color: Colors.grey.shade400,
-                                        size: 50,
-                                      )
-                                    : null,
-                              ),
-                              Positioned(
-                                right: 0,
-                                bottom: 0,
-                                child: Container(
-                                  decoration: const BoxDecoration(
-                                    color: CustomColors.primaryNormal,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  padding: const EdgeInsets.all(4),
-                                  child: const Icon(
-                                    Icons.edit,
-                                    color: MaterialColors.onPrimary,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      TextFormField(
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                        controller: _nameController,
-                        decoration: InputDecoration(
-                          labelText: 'Nama',
-                        ),
-                        textInputAction: TextInputAction.next,
-                        validator: nullValidator,
-                      ),
-                      const SizedBox(height: 12),
-                      TextFormField(
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                        controller: _emailController,
-                        decoration: InputDecoration(
-                          labelText: 'Email',
-                        ),
-                        keyboardType: TextInputType.emailAddress,
-                        textInputAction: TextInputAction.next,
-                        validator: emailValidator,
-                      ),
-                      const SizedBox(height: 12),
-                      TextFormField(
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                        controller: _phoneController,
-                        decoration: InputDecoration(
-                          labelText: 'Telepon',
-                        ),
-                        keyboardType: TextInputType.phone,
-                        textInputAction: TextInputAction.next,
-                        validator: nullValidator,
-                      ),
-                      const SizedBox(height: 12),
-                      TextFormField(
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                        controller: _addressController,
-                        decoration: InputDecoration(
-                          labelText: 'Alamat',
-                        ),
-                        keyboardType: TextInputType.multiline,
-                        maxLines: 2,
-                        validator: nullValidator,
-                      ),
-                      const SizedBox(height: 24),
-                      BlocConsumer<SupplierCubit, SupplierState>(
-                        listener: (context, state) {
-                          if (state is UpdateSupplierError) {
-                            TopSnackbar.dangerSnackbar(message: state.message);
-                          }
-
-                          if (state is UpdateSupplierLoaded) {
-                            TopSnackbar.successSnackbar(message: state.message);
-                          }
-                        },
-                        buildWhen: (previous, current) =>
-                            current is UpdateSupplier,
-                        builder: (context, state) {
-                          if (state is UpdateSupplierLoading) {
-                            return const PrimaryButton(
-                              child: Text('Simpan'),
-                            );
-                          }
-
-                          return PrimaryButton(
-                            onPressed: () {
-                              if (!_formKey.currentState!.validate()) return;
-
-                              final supplierDetail = SupplierDetailEntity(
-                                id: widget.supplierId,
-                                address: _addressController.text,
-                                avatarUrl: _pickedImage?.path ?? _avatarUrl,
-                                email: _emailController.text,
-                                name: _nameController.text,
-                                phoneNumber: _phoneController.text,
-                              );
-
-                              _supplierCubit.updateSupplier(
-                                  supplierDetailEntity: supplierDetail);
-                            },
-                            child: const Text('Simpan'),
-                          );
-                        },
-                      ),
-                    ],
+    return Center(
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: .circular(20),
+          boxShadow: cardBoxShadow,
+          color: context.colorScheme.onPrimary,
+        ),
+        margin: const .all(16),
+        padding: const .all(24),
+        child: Form(
+          key: _formKey,
+          child: ListView(
+            shrinkWrap: true,
+            children: <Widget>[
+              EditableAvatar(
+                onTap: () => showModalBottomSheet(
+                  builder: (context) => ImagePickerBottomSheet(
+                    onPicked: (image) => setState(() => _pickedImage = image),
                   ),
+                  context: context,
                 ),
-              );
-            }
+                imagePath: _pickedImage?.path ?? _avatarUrl,
+              ),
+              const Gap(24),
+              TextFormField(
+                autovalidateMode: .onUserInteraction,
+                controller: _nameController,
+                decoration: const InputDecoration(labelText: 'Nama'),
+                textInputAction: .next,
+                validator: nullValidator,
+              ),
+              const Gap(12),
+              TextFormField(
+                autovalidateMode: .onUserInteraction,
+                controller: _emailController,
+                decoration: const InputDecoration(labelText: 'Email'),
+                keyboardType: TextInputType.emailAddress,
+                textInputAction: .next,
+                validator: emailValidator,
+              ),
+              const Gap(12),
+              TextFormField(
+                autovalidateMode: .onUserInteraction,
+                controller: _phoneController,
+                decoration: const InputDecoration(labelText: 'Telepon'),
+                keyboardType: TextInputType.phone,
+                textInputAction: .next,
+                validator: nullValidator,
+              ),
+              const Gap(12),
+              TextFormField(
+                autovalidateMode: .onUserInteraction,
+                controller: _addressController,
+                decoration: const InputDecoration(labelText: 'Alamat'),
+                keyboardType: TextInputType.multiline,
+                maxLines: 2,
+                validator: nullValidator,
+              ),
+              const Gap(24),
+              BlocConsumer<UpdateSupplierCubit, UpdateSupplierState>(
+                listener: (context, state) {
+                  if (state.status == .failure) {
+                    TopSnackbar.dangerSnackbar(message: state.failure!.message);
+                  }
 
-            return const SizedBox();
-          },
+                  if (state.status == .success) {
+                    TopSnackbar.successSnackbar(message: state.message!);
+                    widget.onUpdateSuccess();
+                  }
+                },
+                builder: (context, state) {
+                  final onPressed = switch (state.status) {
+                    .inProgress => null,
+                    _ => () {
+                      if (!_formKey.currentState!.validate()) return;
+
+                      context.read<UpdateSupplierCubit>().updateSupplier(
+                        id: widget.supplierId,
+                        address: _addressController.text,
+                        avatar: _pickedImage?.path ?? _avatarUrl,
+                        email: _emailController.text,
+                        name: _nameController.text,
+                        phoneNumber: _phoneController.text,
+                      );
+                    },
+                  };
+
+                  return PrimaryButton(
+                    onPressed: onPressed,
+                    child: const Text('Simpan'),
+                  );
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );

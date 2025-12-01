@@ -7,6 +7,8 @@ import '../../features/auth/presentation/pages/sign_in_page.dart';
 import '../../features/home_page.dart';
 import '../../features/staff_management_page.dart';
 import '../../features/supplier/presentation/cubit/supplier/new_supplier_cubit.dart';
+import '../../features/supplier/presentation/cubit/supplier_detail_cubit.dart';
+import '../../features/supplier/presentation/cubit/update_supplier/update_supplier_cubit.dart';
 import '../../features/supplier/presentation/pages/add_supplier_page.dart';
 import '../../features/supplier/presentation/pages/edit_supplier_page.dart';
 import '../../features/supplier/presentation/pages/supplier_detail_page.dart';
@@ -178,12 +180,12 @@ class AppRouter {
                         path: 'detail',
                         name: Routes.supplierDetail,
                         builder: (context, state) {
-                          final extras = state.extra as Map<String, dynamic>;
-                          final supplierId = extras['supplier_id'] as String;
-                          final cubit = extras['cubit'] as NewSupplierCubit;
+                          final supplierId = state.extra as String;
 
-                          return BlocProvider.value(
-                            value: cubit,
+                          return BlocProvider(
+                            create: (context) =>
+                                getIt<SupplierDetailCubit>()
+                                  ..fetchSupplier(supplierId: supplierId),
                             child: SupplierDetailPage(supplierId: supplierId),
                           );
                         },
@@ -204,12 +206,20 @@ class AppRouter {
                         path: 'edit',
                         name: Routes.supplierEdit,
                         builder: (context, state) {
-                          final extras = state.extra as Map<String, dynamic>;
-                          final supplierId = extras['supplier_id'] as String;
-                          final cubit = extras['cubit'] as NewSupplierCubit;
+                          final supplierId = state.extra as String;
 
-                          return BlocProvider.value(
-                            value: cubit,
+                          return MultiBlocProvider(
+                            providers: [
+                              BlocProvider(
+                                create: (context) =>
+                                    getIt<SupplierDetailCubit>()
+                                      ..fetchSupplier(supplierId: supplierId),
+                              ),
+                              BlocProvider(
+                                create: (context) =>
+                                    getIt<UpdateSupplierCubit>(),
+                              ),
+                            ],
                             child: EditSupplierPage(supplierId: supplierId),
                           );
                         },
