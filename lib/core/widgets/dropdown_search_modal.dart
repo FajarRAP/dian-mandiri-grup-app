@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 
 import '../utils/debouncer.dart';
+import '../utils/extensions.dart';
 
 class DropdownSearchModal extends StatefulWidget {
   const DropdownSearchModal({
@@ -40,23 +42,19 @@ class _DropdownSearchModalState extends State<DropdownSearchModal> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final textTheme = theme.textTheme;
+    final textTheme = context.textTheme;
 
     return Column(
-      mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        const SizedBox(height: 32),
         Text(
           'Pilih ${widget.title}',
-          style: textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: textTheme.titleLarge?.copyWith(fontWeight: .w600),
+          textAlign: .center,
         ),
         const Divider(),
-        const SizedBox(height: 24),
+        const Gap(24),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const .symmetric(horizontal: 16),
           child: TextField(
             onChanged: (value) => _debouncer.run(() => widget.search(value)),
             onTapOutside: (event) => _focusNode.unfocus(),
@@ -67,9 +65,9 @@ class _DropdownSearchModalState extends State<DropdownSearchModal> {
             ),
           ),
         ),
-        const SizedBox(height: 12),
+        const Gap(12),
         widget.child,
-        const SizedBox(height: 12),
+        const Gap(12),
       ],
     );
   }

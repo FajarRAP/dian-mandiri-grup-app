@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../themes/colors.dart';
+import '../utils/extensions.dart';
 
 class DropdownModalItem extends StatelessWidget {
-  const DropdownModalItem({
-    super.key,
-    required this.child,
-  });
+  const DropdownModalItem({super.key, required this.child});
 
   final Widget child;
 
@@ -14,15 +11,12 @@ class DropdownModalItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        border: Border.all(color: MaterialColors.outline),
-        borderRadius: BorderRadius.circular(12),
+        border: .all(color: context.colorScheme.outline),
+        borderRadius: .circular(12),
       ),
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.symmetric(
-        horizontal: 16,
-        vertical: 20,
-      ),
-      width: double.infinity,
+      margin: const .symmetric(horizontal: 16),
+      padding: const .symmetric(horizontal: 16, vertical: 20),
+      width: .infinity,
       child: child,
     );
   }
