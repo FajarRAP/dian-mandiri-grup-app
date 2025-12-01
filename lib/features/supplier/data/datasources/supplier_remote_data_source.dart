@@ -76,6 +76,7 @@ class SupplierRemoteDataSourceImpl
           'search': params.search.query,
           'limit': params.paginate.limit,
           'page': params.paginate.page,
+          'show_all': params.showAll,
         },
       );
       final contents = List<JsonMap>.from(response.data['data']['content']);

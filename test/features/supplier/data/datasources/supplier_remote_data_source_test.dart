@@ -183,6 +183,7 @@ void main() {
               'search': params.search.query,
               'limit': params.paginate.limit,
               'page': params.paginate.page,
+              'show_all': params.showAll,
             },
           ),
         ).called(1);
@@ -214,6 +215,7 @@ void main() {
             'search': params.search.query,
             'limit': params.paginate.limit,
             'page': params.paginate.page,
+            'show_all': params.showAll,
           },
         ),
       ).called(1);
