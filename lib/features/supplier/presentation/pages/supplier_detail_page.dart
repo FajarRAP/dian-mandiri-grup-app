@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 
-import '../../../../common/constants/app_images.dart';
 import '../../../../core/common/shadows.dart';
 import '../../../../core/presentation/widgets/error_state_widget.dart';
 import '../../../../core/presentation/widgets/loading_indicator.dart';
 import '../../../../core/utils/extensions.dart';
 import '../../domain/entities/supplier_detail_entity.dart';
 import '../cubit/supplier_detail_cubit.dart';
+import '../widgets/editable_avatar.dart';
 
 class SupplierDetailPage extends StatelessWidget {
   const SupplierDetailPage({super.key, required this.supplierId});
@@ -45,9 +45,6 @@ class _SuccessWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final hasAvatar =
-        supplier.avatarUrl != null && supplier.avatarUrl!.isNotEmpty;
-
     return Center(
       child: Container(
         decoration: BoxDecoration(
@@ -60,21 +57,7 @@ class _SuccessWidget extends StatelessWidget {
         child: Column(
           mainAxisSize: .min,
           children: <Widget>[
-            CircleAvatar(
-              backgroundColor: Colors.grey.shade300,
-              backgroundImage: const AssetImage(AppImages.app),
-              foregroundImage: hasAvatar
-                  ? NetworkImage(supplier.avatarUrl!)
-                  : null,
-              radius: 50,
-              child: hasAvatar
-                  ? null
-                  : Icon(
-                      Icons.person_outline,
-                      color: Colors.grey.shade400,
-                      size: 50,
-                    ),
-            ),
+            EditableAvatar(imagePath: supplier.avatarUrl),
             const Gap(24),
             TextFormField(
               decoration: const InputDecoration(labelText: 'Nama'),
