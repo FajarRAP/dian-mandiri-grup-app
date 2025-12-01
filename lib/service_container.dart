@@ -64,6 +64,7 @@ import 'features/warehouse/domain/usecases/insert_purchase_note_manual_use_case.
 import 'features/warehouse/domain/usecases/insert_return_cost_use_case.dart';
 import 'features/warehouse/domain/usecases/insert_shipping_fee_use_case.dart';
 import 'features/warehouse/domain/usecases/update_purchase_note_use_case.dart';
+import 'features/warehouse/presentation/cubit/purchase_note_list/purchase_note_list_cubit.dart';
 import 'features/warehouse/presentation/cubit/warehouse_cubit.dart';
 
 final getIt = GetIt.instance;
@@ -236,6 +237,12 @@ void setup() {
         insertShippingFeeUseCase: getIt(),
         updatePurchaseNoteUseCase: getIt(),
         imagePickerService: getIt(),
+      ),
+    )
+    ..registerFactory(
+      () => PurchaseNoteListCubit(
+        fetchPurchaseNotesUseCase: getIt(),
+        deletePurchaseNoteUseCase: getIt(),
       ),
     );
 
