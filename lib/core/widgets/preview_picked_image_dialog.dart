@@ -2,38 +2,30 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 
+import '../utils/extensions.dart';
+
 class PreviewPickedImageDialog extends StatelessWidget {
-  const PreviewPickedImageDialog({
-    super.key,
-    required this.pickedImagePath,
-  });
+  const PreviewPickedImageDialog({super.key, required this.pickedImagePath});
 
   final String? pickedImagePath;
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
+    final textTheme = context.textTheme;
 
     return AlertDialog(
-      alignment: Alignment.center,
-      contentPadding: const EdgeInsets.all(2),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(6),
-      ),
+      alignment: .center,
+      contentPadding: const .all(2),
+      shape: RoundedRectangleBorder(borderRadius: .circular(6)),
       content: ClipRRect(
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: .circular(6),
         child: pickedImagePath == null
             ? Text(
                 'Belum memilih gambar',
-                style: textTheme.bodyLarge?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
-                textAlign: TextAlign.center,
+                style: textTheme.bodyLarge?.copyWith(fontWeight: .w600),
+                textAlign: .center,
               )
-            : Image.file(
-                File(pickedImagePath!),
-                fit: BoxFit.cover,
-              ),
+            : Image.file(File(pickedImagePath!), fit: .cover),
       ),
     );
   }

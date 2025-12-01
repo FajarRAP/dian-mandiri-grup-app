@@ -1,28 +1,22 @@
 import 'package:flutter/material.dart';
 
-import '../themes/colors.dart';
+import '../utils/extensions.dart';
 
 class FABContainer extends StatelessWidget {
-  const FABContainer({
-    super.key,
-    required this.child,
-  });
+  const FABContainer({super.key, required this.child});
 
   final Widget child;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         border: Border(
-          top: BorderSide(
-            color: MaterialColors.outlineVariant,
-            width: 1,
-          ),
+          top: BorderSide(color: context.colorScheme.outlineVariant),
         ),
-        color: MaterialColors.surfaceContainerLowest,
+        color: context.colorScheme.surfaceContainerLowest,
       ),
-      padding: const EdgeInsets.all(16),
+      padding: const .all(16),
       child: child,
     );
   }
