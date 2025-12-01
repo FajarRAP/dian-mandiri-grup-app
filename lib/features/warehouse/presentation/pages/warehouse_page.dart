@@ -191,21 +191,33 @@ class _FAB extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final purchaseNoteListCubit = context.read<PurchaseNoteListCubit>();
+
+    Future<void> refreshPurchaseNotes(Future<bool?> result) async {
+      if (await result == true) {
+        await purchaseNoteListCubit.fetchPurchaseNotes();
+      }
+    }
+
     return ExpandableFAB(
       distance: 100,
       children: <Widget>[
         ActionButton(
-          onPressed: () =>
-              context.pushNamed(Routes.warehouseAddPurchaseNoteManual),
+          onPressed: () => refreshPurchaseNotes(
+            context.pushNamed<bool>(Routes.warehouseAddPurchaseNoteManual),
+          ),
           icon: Icons.add,
         ),
         ActionButton(
-          onPressed: () =>
-              context.pushNamed(Routes.warehouseAddPurchaseNoteFile),
+          onPressed: () => refreshPurchaseNotes(
+            context.pushNamed<bool>(Routes.warehouseAddPurchaseNoteFile),
+          ),
           icon: Icons.folder,
         ),
         ActionButton(
-          onPressed: () => context.pushNamed(Routes.warehouseAddShippingFee),
+          onPressed: () => refreshPurchaseNotes(
+            context.pushNamed<bool>(Routes.warehouseAddShippingFee),
+          ),
           icon: Icons.currency_exchange,
         ),
       ],
