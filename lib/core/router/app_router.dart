@@ -29,6 +29,7 @@ import '../../features/tracker/presentation/pages/stages/send_page.dart';
 import '../../features/tracker/presentation/pages/shipment_detail_page.dart';
 import '../../features/tracker/presentation/pages/tracker_page.dart';
 import '../../features/tracker/presentation/pages/update_shipment_document_page.dart';
+import '../../features/warehouse/presentation/cubit/purchase_note_list/purchase_note_list_cubit.dart';
 import '../../features/warehouse/presentation/pages/add_purchase_note_file_page.dart';
 import '../../features/warehouse/presentation/pages/add_purchase_note_manual_page.dart';
 import '../../features/warehouse/presentation/pages/add_shipping_fee_page.dart';
@@ -213,10 +214,10 @@ class AppRouter {
                       ),
                     ],
                   ),
-                  GoRoute(
+                  _buildRouteWithCubit<PurchaseNoteListCubit>(
                     path: 'warehouse',
                     name: Routes.warehouse,
-                    builder: (context, state) => const WarehousePage(),
+                    child: (state) => const WarehousePage(),
                     routes: <RouteBase>[
                       GoRoute(
                         path: 'detail',
@@ -277,6 +278,7 @@ class AppRouter {
   _buildRouteWithCubit<T extends StateStreamableSource<Object?>>({
     required String path,
     required String name,
+    List<RouteBase> routes = const [],
     required Widget Function(GoRouterState state) child,
   }) {
     return GoRoute(
@@ -284,6 +286,7 @@ class AppRouter {
       name: name,
       builder: (context, state) =>
           BlocProvider<T>(create: (context) => getIt<T>(), child: child(state)),
+      routes: routes,
     );
   }
 }
