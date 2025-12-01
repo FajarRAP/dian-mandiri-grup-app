@@ -4,7 +4,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -17,8 +16,6 @@ import 'core/services/google_sign_in_service.dart';
 import 'core/themes/app_theme.dart';
 import 'core/utils/app_bloc_observer.dart';
 import 'features/auth/presentation/cubit/auth_cubit.dart';
-import 'features/supplier/presentation/cubit/supplier_cubit.dart';
-import 'features/tracker/presentation/cubit/shipment_report/shipment_report_cubit.dart';
 import 'features/warehouse/presentation/cubit/warehouse_cubit.dart';
 import 'firebase_options.dart';
 import 'service_container.dart';
@@ -40,10 +37,6 @@ Future<void> main() async {
 
   await getIt<GoogleSignInService>().initialize();
 
-  final storage = getIt.get<FlutterSecureStorage>();
-  final refreshToken = await storage.read(key: refreshTokenKey);
-  initialLocation = refreshToken != null ? homeRoute : loginRoute;
-
   Bloc.observer = const AppBlocObserver();
 
   runApp(const MyApp());
@@ -59,7 +52,6 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (context) => getIt<UserCubit>()),
         BlocProvider(create: (context) => getIt<AppCubit>()),
         BlocProvider(create: (context) => getIt<AuthCubit>()),
-        BlocProvider(create: (context) => getIt<SupplierCubit>()),
         BlocProvider(create: (context) => getIt<WarehouseCubit>()),
       ],
       child: MaterialApp.router(
