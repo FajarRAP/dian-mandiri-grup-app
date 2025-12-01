@@ -14,7 +14,6 @@ import '../../domain/entities/warehouse_item_entity.dart';
 import '../../domain/usecases/fetch_purchase_note_use_case.dart';
 import '../../domain/usecases/fetch_purchase_notes_dropdown_use_case.dart';
 import '../../domain/usecases/insert_purchase_note_file_use_case.dart';
-import '../../domain/usecases/insert_purchase_note_manual_use_case.dart';
 import '../../domain/usecases/insert_return_cost_use_case.dart';
 import '../../domain/usecases/insert_shipping_fee_use_case.dart';
 import '../../domain/usecases/update_purchase_note_use_case.dart';
@@ -26,7 +25,6 @@ class WarehouseCubit extends Cubit<WarehouseState> {
     required FetchPurchaseNoteUseCase fetchPurchaseNoteUseCase,
     required FetchPurchaseNotesDropdownUseCase
     fetchPurchaseNotesDropdownUseCase,
-    required InsertPurchaseNoteManualUseCase insertPurchaseNoteManualUseCase,
     required InsertPurchaseNoteFileUseCase insertPurchaseNoteFileUseCase,
     required InsertReturnCostUseCase insertReturnCostUseCase,
     required InsertShippingFeeUseCase insertShippingFeeUseCase,
@@ -34,7 +32,6 @@ class WarehouseCubit extends Cubit<WarehouseState> {
     required ImagePickerService imagePickerService,
   }) : _fetchPurchaseNoteUseCase = fetchPurchaseNoteUseCase,
        _fetchPurchaseNotesDropdownUseCase = fetchPurchaseNotesDropdownUseCase,
-       _insertPurchaseNoteManualUseCase = insertPurchaseNoteManualUseCase,
        _insertPurchaseNoteFileUseCase = insertPurchaseNoteFileUseCase,
        _insertReturnCostUseCase = insertReturnCostUseCase,
        _insertShippingFeeUseCase = insertShippingFeeUseCase,
@@ -44,7 +41,6 @@ class WarehouseCubit extends Cubit<WarehouseState> {
 
   final FetchPurchaseNoteUseCase _fetchPurchaseNoteUseCase;
   final FetchPurchaseNotesDropdownUseCase _fetchPurchaseNotesDropdownUseCase;
-  final InsertPurchaseNoteManualUseCase _insertPurchaseNoteManualUseCase;
   final InsertPurchaseNoteFileUseCase _insertPurchaseNoteFileUseCase;
   final InsertReturnCostUseCase _insertReturnCostUseCase;
   final InsertShippingFeeUseCase _insertShippingFeeUseCase;
@@ -118,20 +114,6 @@ class WarehouseCubit extends Cubit<WarehouseState> {
           );
         }
       },
-    );
-  }
-
-  Future<void> insertPurchaseNoteManual({
-    required InsertPurchaseNoteManualUseCaseParams purchaseNote,
-  }) async {
-    emit(InsertPurchaseNoteManualLoading());
-
-    final result = await _insertPurchaseNoteManualUseCase(purchaseNote);
-
-    result.fold(
-      (failure) =>
-          emit(InsertPurchaseNoteManualError(message: failure.message)),
-      (message) => emit(InsertPurchaseNoteManualLoaded(message: message)),
     );
   }
 

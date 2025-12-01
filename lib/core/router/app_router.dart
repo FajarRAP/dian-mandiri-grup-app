@@ -29,6 +29,7 @@ import '../../features/tracker/presentation/pages/stages/send_page.dart';
 import '../../features/tracker/presentation/pages/shipment_detail_page.dart';
 import '../../features/tracker/presentation/pages/tracker_page.dart';
 import '../../features/tracker/presentation/pages/update_shipment_document_page.dart';
+import '../../features/warehouse/presentation/cubit/create_purchase_note/create_purchase_note_cubit.dart';
 import '../../features/warehouse/presentation/cubit/purchase_note_list/purchase_note_list_cubit.dart';
 import '../../features/warehouse/presentation/pages/add_purchase_note_file_page.dart';
 import '../../features/warehouse/presentation/pages/add_purchase_note_manual_page.dart';
@@ -226,11 +227,10 @@ class AppRouter {
                           purchaseNoteId: state.extra as String,
                         ),
                       ),
-                      GoRoute(
+                      _buildRouteWithCubit<CreatePurchaseNoteCubit>(
                         path: 'add-purchase-note-manual',
                         name: Routes.warehouseAddPurchaseNoteManual,
-                        builder: (context, state) =>
-                            const AddPurchaseNoteManualPage(),
+                        child: (state) => const AddPurchaseNoteManualPage(),
                       ),
                       GoRoute(
                         path: 'add-purchase-note-file',

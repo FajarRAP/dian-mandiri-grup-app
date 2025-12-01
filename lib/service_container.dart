@@ -60,10 +60,11 @@ import 'features/warehouse/domain/usecases/fetch_purchase_note_use_case.dart';
 import 'features/warehouse/domain/usecases/fetch_purchase_notes_dropdown_use_case.dart';
 import 'features/warehouse/domain/usecases/fetch_purchase_notes_use_case.dart';
 import 'features/warehouse/domain/usecases/insert_purchase_note_file_use_case.dart';
-import 'features/warehouse/domain/usecases/insert_purchase_note_manual_use_case.dart';
+import 'features/warehouse/domain/usecases/create_purchase_note_use_case.dart';
 import 'features/warehouse/domain/usecases/insert_return_cost_use_case.dart';
 import 'features/warehouse/domain/usecases/insert_shipping_fee_use_case.dart';
 import 'features/warehouse/domain/usecases/update_purchase_note_use_case.dart';
+import 'features/warehouse/presentation/cubit/create_purchase_note/create_purchase_note_cubit.dart';
 import 'features/warehouse/presentation/cubit/purchase_note_list/purchase_note_list_cubit.dart';
 import 'features/warehouse/presentation/cubit/warehouse_cubit.dart';
 
@@ -216,9 +217,7 @@ void setup() {
     ..registerSingleton(
       FetchPurchaseNotesDropdownUseCase(warehouseRepository: getIt()),
     )
-    ..registerSingleton(
-      InsertPurchaseNoteManualUseCase(warehouseRepository: getIt()),
-    )
+    ..registerSingleton(CreatePurchaseNoteUseCase(warehouseRepository: getIt()))
     ..registerSingleton(
       InsertPurchaseNoteFileUseCase(warehouseRepository: getIt()),
     )
@@ -229,7 +228,6 @@ void setup() {
       () => WarehouseCubit(
         fetchPurchaseNoteUseCase: getIt(),
         fetchPurchaseNotesDropdownUseCase: getIt(),
-        insertPurchaseNoteManualUseCase: getIt(),
         insertPurchaseNoteFileUseCase: getIt(),
         insertReturnCostUseCase: getIt(),
         insertShippingFeeUseCase: getIt(),
@@ -242,6 +240,9 @@ void setup() {
         fetchPurchaseNotesUseCase: getIt(),
         deletePurchaseNoteUseCase: getIt(),
       ),
+    )
+    ..registerFactory(
+      () => CreatePurchaseNoteCubit(createPurchaseNoteUseCase: getIt()),
     );
 
   getIt
