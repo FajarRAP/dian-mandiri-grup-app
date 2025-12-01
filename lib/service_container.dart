@@ -197,7 +197,6 @@ void setup() {
       () => NewSupplierCubit(
         fetchSuppliersUseCase: getIt(),
         createSupplierUseCase: getIt(),
-        updateSupplierUseCase: getIt(),
       ),
     )
     ..registerFactory(() => SupplierDetailCubit(fetchSupplierUseCase: getIt()))

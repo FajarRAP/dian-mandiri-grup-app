@@ -6,9 +6,7 @@ import '../../../../../core/errors/failure.dart';
 import '../../../../../core/usecase/use_case.dart';
 import '../../../domain/entities/supplier_entity.dart';
 import '../../../domain/usecases/create_supplier_use_case.dart';
-import '../../../domain/usecases/fetch_supplier_use_case.dart';
 import '../../../domain/usecases/fetch_suppliers_use_case.dart';
-import '../../../domain/usecases/update_supplier_use_case.dart';
 
 part 'new_supplier_state.dart';
 
@@ -16,18 +14,13 @@ class NewSupplierCubit extends Cubit<NewSupplierState> {
   NewSupplierCubit({
     required FetchSuppliersUseCase fetchSuppliersUseCase,
     required CreateSupplierUseCase createSupplierUseCase,
-    required UpdateSupplierUseCase updateSupplierUseCase,
-    required FetchSupplierUseCase fetchSupplierUseCase,
-  }) : _fetchSupplierUseCase = fetchSupplierUseCase,
-       _fetchSuppliersUseCase = fetchSuppliersUseCase,
+  }) : _fetchSuppliersUseCase = fetchSuppliersUseCase,
        _createSupplierUseCase = createSupplierUseCase,
-       _updateSupplierUseCase = updateSupplierUseCase,
+
        super(const NewSupplierState());
 
   final FetchSuppliersUseCase _fetchSuppliersUseCase;
   final CreateSupplierUseCase _createSupplierUseCase;
-  final UpdateSupplierUseCase _updateSupplierUseCase;
-  final FetchSupplierUseCase _fetchSupplierUseCase;
 
   Future<void> fetchSuppliers({SortOptions? sortOption, String? query}) async {
     final effectiveQuery = query ?? state.query;
