@@ -355,9 +355,7 @@ void main() {
         ),
       );
 
-      final result = await warehouseRemoteDataSource.insertPurchaseNoteManual(
-        params,
-      );
+      final result = await warehouseRemoteDataSource.createPurchaseNote(params);
 
       expect(result, resultMatcher);
       verify(
@@ -374,7 +372,7 @@ void main() {
         ),
       );
 
-      final future = warehouseRemoteDataSource.insertPurchaseNoteManual(params);
+      final future = warehouseRemoteDataSource.createPurchaseNote(params);
 
       await expectLater(future, throwsA(isA<ServerException>()));
       verify(

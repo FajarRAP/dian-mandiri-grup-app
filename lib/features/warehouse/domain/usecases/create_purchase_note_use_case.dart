@@ -6,21 +6,22 @@ import '../../../../core/usecase/use_case.dart';
 import '../entities/warehouse_item_entity.dart';
 import '../repositories/warehouse_repository.dart';
 
-class InsertPurchaseNoteManualUseCase
-    implements UseCase<String, InsertPurchaseNoteManualUseCaseParams> {
-  const InsertPurchaseNoteManualUseCase({required this.warehouseRepository});
+class CreatePurchaseNoteUseCase
+    implements UseCase<String, CreatePurchaseNoteUseCaseParams> {
+  const CreatePurchaseNoteUseCase({required this.warehouseRepository});
 
   final WarehouseRepository warehouseRepository;
 
   @override
   Future<Either<Failure, String>> execute(
-      InsertPurchaseNoteManualUseCaseParams params) async {
-    return await warehouseRepository.insertPurchaseNoteManual(params);
+    CreatePurchaseNoteUseCaseParams params,
+  ) async {
+    return await warehouseRepository.createPurchaseNote(params);
   }
 }
 
-class InsertPurchaseNoteManualUseCaseParams extends Equatable {
-  const InsertPurchaseNoteManualUseCaseParams({
+class CreatePurchaseNoteUseCaseParams extends Equatable {
+  const CreatePurchaseNoteUseCaseParams({
     required this.date,
     required this.receipt,
     this.note,
