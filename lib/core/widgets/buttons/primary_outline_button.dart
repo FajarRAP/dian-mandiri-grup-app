@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../themes/colors.dart';
+import '../../utils/extensions.dart';
 
 class PrimaryOutlineButton extends StatelessWidget {
   const PrimaryOutlineButton({
@@ -21,14 +21,11 @@ class PrimaryOutlineButton extends StatelessWidget {
     return ElevatedButton.icon(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        backgroundColor: MaterialColors.onPrimary,
+        backgroundColor: context.colorScheme.onPrimary,
         elevation: 0,
-        foregroundColor: CustomColors.primaryNormal,
+        foregroundColor: context.colorScheme.primary,
         fixedSize: height == null ? null : Size.fromHeight(height!),
-        side: const BorderSide(
-          color: CustomColors.primaryNormal,
-          width: 1.5,
-        ),
+        side: BorderSide(color: context.colorScheme.primary, width: 1.5),
       ),
       icon: icon,
       label: child,
