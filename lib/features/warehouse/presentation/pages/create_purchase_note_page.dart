@@ -21,15 +21,14 @@ import '../cubit/create_purchase_note/create_purchase_note_cubit.dart';
 import '../widgets/purchase_note_item_card.dart';
 import '../widgets/purchase_note_item_dialog.dart';
 
-class AddPurchaseNoteManualPage extends StatefulWidget {
-  const AddPurchaseNoteManualPage({super.key});
+class CreatePurchaseNotePage extends StatefulWidget {
+  const CreatePurchaseNotePage({super.key});
 
   @override
-  State<AddPurchaseNoteManualPage> createState() =>
-      _AddPurchaseNoteManualPageState();
+  State<CreatePurchaseNotePage> createState() => _CreatePurchaseNotePageState();
 }
 
-class _AddPurchaseNoteManualPageState extends State<AddPurchaseNoteManualPage> {
+class _CreatePurchaseNotePageState extends State<CreatePurchaseNotePage> {
   late final TextEditingController _supplierController;
   late final TextEditingController _dateController;
   late final TextEditingController _noteController;

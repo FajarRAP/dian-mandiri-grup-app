@@ -204,7 +204,7 @@ class _FAB extends StatelessWidget {
       children: <Widget>[
         ActionButton(
           onPressed: () => refreshPurchaseNotes(
-            context.pushNamed<bool>(Routes.warehouseAddPurchaseNoteManual),
+            context.pushNamed<bool>(Routes.warehouseCreatePurchaseNote),
           ),
           icon: Icons.add,
         ),

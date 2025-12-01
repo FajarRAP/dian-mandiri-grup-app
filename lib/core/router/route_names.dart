@@ -3,7 +3,7 @@ class Routes {
 
   static const login = 'login';
   static const home = 'home';
-  
+
   // Tracker
   static const tracker = 'tracker';
   static const trackerScan = 'tracker.scan';
@@ -27,8 +27,7 @@ class Routes {
   // Warehouse
   static const warehouse = 'warehouse';
   static const warehouseDetail = 'warehouse.detail';
-  static const warehouseAddPurchaseNoteManual =
-      'warehouse.add_purchase_note_manual';
+  static const warehouseCreatePurchaseNote = 'warehouse.create_purchase_note';
   static const warehouseAddPurchaseNoteFile =
       'warehouse.add_purchase_note_file';
   static const warehouseAddShippingFee = 'warehouse.add_shipping_fee';
