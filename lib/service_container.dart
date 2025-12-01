@@ -227,9 +227,7 @@ void setup() {
     ..registerSingleton(UpdatePurchaseNoteUseCase(warehouseRepository: getIt()))
     ..registerLazySingleton<WarehouseCubit>(
       () => WarehouseCubit(
-        deletePurchaseNoteUseCase: getIt(),
         fetchPurchaseNoteUseCase: getIt(),
-        fetchPurchaseNotesUseCase: getIt(),
         fetchPurchaseNotesDropdownUseCase: getIt(),
         insertPurchaseNoteManualUseCase: getIt(),
         insertPurchaseNoteFileUseCase: getIt(),

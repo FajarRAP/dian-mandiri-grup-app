@@ -11,10 +11,8 @@ import '../../../../core/usecase/use_case.dart';
 import '../../domain/entities/purchase_note_detail_entity.dart';
 import '../../domain/entities/purchase_note_summary_entity.dart';
 import '../../domain/entities/warehouse_item_entity.dart';
-import '../../domain/usecases/delete_purchase_note_use_case.dart';
 import '../../domain/usecases/fetch_purchase_note_use_case.dart';
 import '../../domain/usecases/fetch_purchase_notes_dropdown_use_case.dart';
-import '../../domain/usecases/fetch_purchase_notes_use_case.dart';
 import '../../domain/usecases/insert_purchase_note_file_use_case.dart';
 import '../../domain/usecases/insert_purchase_note_manual_use_case.dart';
 import '../../domain/usecases/insert_return_cost_use_case.dart';
@@ -25,32 +23,26 @@ part 'warehouse_state.dart';
 
 class WarehouseCubit extends Cubit<WarehouseState> {
   WarehouseCubit({
-    required DeletePurchaseNoteUseCase deletePurchaseNoteUseCase,
     required FetchPurchaseNoteUseCase fetchPurchaseNoteUseCase,
-    required FetchPurchaseNotesUseCase fetchPurchaseNotesUseCase,
     required FetchPurchaseNotesDropdownUseCase
-        fetchPurchaseNotesDropdownUseCase,
+    fetchPurchaseNotesDropdownUseCase,
     required InsertPurchaseNoteManualUseCase insertPurchaseNoteManualUseCase,
     required InsertPurchaseNoteFileUseCase insertPurchaseNoteFileUseCase,
     required InsertReturnCostUseCase insertReturnCostUseCase,
     required InsertShippingFeeUseCase insertShippingFeeUseCase,
     required UpdatePurchaseNoteUseCase updatePurchaseNoteUseCase,
     required ImagePickerService imagePickerService,
-  })  : _deletePurchaseNoteUseCase = deletePurchaseNoteUseCase,
-        _fetchPurchaseNoteUseCase = fetchPurchaseNoteUseCase,
-        _fetchPurchaseNotesUseCase = fetchPurchaseNotesUseCase,
-        _fetchPurchaseNotesDropdownUseCase = fetchPurchaseNotesDropdownUseCase,
-        _insertPurchaseNoteManualUseCase = insertPurchaseNoteManualUseCase,
-        _insertPurchaseNoteFileUseCase = insertPurchaseNoteFileUseCase,
-        _insertReturnCostUseCase = insertReturnCostUseCase,
-        _insertShippingFeeUseCase = insertShippingFeeUseCase,
-        _updatePurchaseNoteUseCase = updatePurchaseNoteUseCase,
-        _imagePickerService = imagePickerService,
-        super(WarehouseInitial());
+  }) : _fetchPurchaseNoteUseCase = fetchPurchaseNoteUseCase,
+       _fetchPurchaseNotesDropdownUseCase = fetchPurchaseNotesDropdownUseCase,
+       _insertPurchaseNoteManualUseCase = insertPurchaseNoteManualUseCase,
+       _insertPurchaseNoteFileUseCase = insertPurchaseNoteFileUseCase,
+       _insertReturnCostUseCase = insertReturnCostUseCase,
+       _insertShippingFeeUseCase = insertShippingFeeUseCase,
+       _updatePurchaseNoteUseCase = updatePurchaseNoteUseCase,
+       _imagePickerService = imagePickerService,
+       super(WarehouseInitial());
 
-  final DeletePurchaseNoteUseCase _deletePurchaseNoteUseCase;
   final FetchPurchaseNoteUseCase _fetchPurchaseNoteUseCase;
-  final FetchPurchaseNotesUseCase _fetchPurchaseNotesUseCase;
   final FetchPurchaseNotesDropdownUseCase _fetchPurchaseNotesDropdownUseCase;
   final InsertPurchaseNoteManualUseCase _insertPurchaseNoteManualUseCase;
   final InsertPurchaseNoteFileUseCase _insertPurchaseNoteFileUseCase;
@@ -60,86 +52,20 @@ class WarehouseCubit extends Cubit<WarehouseState> {
   final ImagePickerService _imagePickerService;
 
   var _currentPage = 1;
-  final _purchaseNotes = <PurchaseNoteSummaryEntity>[];
   final _purchaseNotesDropdown = <DropdownEntity>[];
-
-  Future<void> deletePurchaseNote({required String purchaseNoteId}) async {
-    emit(DeletePurchaseNoteLoading());
-
-    final params =
-        DeletePurchaseNoteUseCaseParams(purchaseNoteId: purchaseNoteId);
-    final result = await _deletePurchaseNoteUseCase(params);
-
-    result.fold(
-      (failure) => emit(DeletePurchaseNoteError(message: failure.message)),
-      (message) => emit(DeletePurchaseNoteLoaded(message: message)),
-    );
-  }
 
   Future<void> fetchPurchaseNote({required String purchaseNoteId}) async {
     emit(FetchPurchaseNoteLoading());
 
-    final params =
-        FetchPurchaseNoteUseCaseParams(purchaseNoteId: purchaseNoteId);
+    final params = FetchPurchaseNoteUseCaseParams(
+      purchaseNoteId: purchaseNoteId,
+    );
     final result = await _fetchPurchaseNoteUseCase(params);
 
     result.fold(
       (failure) => emit(FetchPurchaseNoteError(message: failure.message)),
       (purchaseNote) =>
           emit(FetchPurchaseNoteLoaded(purchaseNote: purchaseNote)),
-    );
-  }
-
-  Future<void> fetchPurchaseNotes({
-    String? search,
-    String column = 'created_at',
-    String sort = 'asc',
-  }) async {
-    emit(FetchPurchaseNotesLoading());
-
-    final params = FetchPurchaseNotesUseCaseParams(
-      column: column,
-      search: search,
-      sort: sort,
-      page: _currentPage = 1,
-    );
-    final result = await _fetchPurchaseNotesUseCase(params);
-
-    result.fold(
-      (failure) => emit(FetchPurchaseNotesError(message: failure.message)),
-      (purchaseNotes) => emit(FetchPurchaseNotesLoaded(
-          purchaseNotes: _purchaseNotes
-            ..clear()
-            ..addAll(purchaseNotes))),
-    );
-  }
-
-  Future<void> fetchPurchaseNotesPaginate({
-    String? search,
-    String column = 'created_at',
-    String sort = 'asc',
-  }) async {
-    emit(ListPaginateLoading());
-
-    final params = FetchPurchaseNotesUseCaseParams(
-      column: column,
-      search: search,
-      sort: sort,
-      page: ++_currentPage,
-    );
-    final result = await _fetchPurchaseNotesUseCase(params);
-
-    result.fold(
-      (failure) => emit(FetchPurchaseNotesError(message: failure.message)),
-      (purchaseNotes) {
-        if (purchaseNotes.isEmpty) {
-          emit(ListPaginateLast(_currentPage = 1));
-        } else {
-          emit(ListPaginateLoaded());
-          emit(FetchPurchaseNotesLoaded(
-              purchaseNotes: _purchaseNotes..addAll(purchaseNotes)));
-        }
-      },
     );
   }
 
@@ -157,10 +83,13 @@ class WarehouseCubit extends Cubit<WarehouseState> {
     result.fold(
       (failure) =>
           emit(FetchPurchaseNotesDropdownError(message: failure.message)),
-      (purchaseNotesDropdown) => emit(FetchPurchaseNotesDropdownLoaded(
+      (purchaseNotesDropdown) => emit(
+        FetchPurchaseNotesDropdownLoaded(
           purchaseNotes: _purchaseNotesDropdown
             ..clear()
-            ..addAll(purchaseNotesDropdown))),
+            ..addAll(purchaseNotesDropdown),
+        ),
+      ),
     );
   }
 
@@ -181,16 +110,20 @@ class WarehouseCubit extends Cubit<WarehouseState> {
           emit(ListPaginateLast(_currentPage = 1));
         } else {
           emit(ListPaginateLoaded());
-          emit(FetchPurchaseNotesDropdownLoaded(
+          emit(
+            FetchPurchaseNotesDropdownLoaded(
               purchaseNotes: _purchaseNotesDropdown
-                ..addAll(purchaseNotesDropdown)));
+                ..addAll(purchaseNotesDropdown),
+            ),
+          );
         }
       },
     );
   }
 
-  Future<void> insertPurchaseNoteManual(
-      {required InsertPurchaseNoteManualUseCaseParams purchaseNote}) async {
+  Future<void> insertPurchaseNoteManual({
+    required InsertPurchaseNoteManualUseCaseParams purchaseNote,
+  }) async {
     emit(InsertPurchaseNoteManualLoading());
 
     final result = await _insertPurchaseNoteManualUseCase(purchaseNote);
@@ -202,8 +135,9 @@ class WarehouseCubit extends Cubit<WarehouseState> {
     );
   }
 
-  Future<void> insertPurchaseNoteFile(
-      {required InsertPurchaseNoteFileUseCaseParams purchaseNote}) async {
+  Future<void> insertPurchaseNoteFile({
+    required InsertPurchaseNoteFileUseCaseParams purchaseNote,
+  }) async {
     emit(InsertPurchaseNoteFileLoading());
 
     final result = await _insertPurchaseNoteFileUseCase(purchaseNote);
@@ -214,12 +148,16 @@ class WarehouseCubit extends Cubit<WarehouseState> {
     );
   }
 
-  Future<void> insertReturnCost(
-      {required String purchaseNoteId, required int amount}) async {
+  Future<void> insertReturnCost({
+    required String purchaseNoteId,
+    required int amount,
+  }) async {
     emit(InsertReturnCostLoading());
 
     final params = InsertReturnCostUseCaseParams(
-        purchaseNoteId: purchaseNoteId, amount: amount);
+      purchaseNoteId: purchaseNoteId,
+      amount: amount,
+    );
     final result = await _insertReturnCostUseCase(params);
 
     result.fold(
@@ -235,7 +173,9 @@ class WarehouseCubit extends Cubit<WarehouseState> {
     emit(InsertShippingFeeLoading());
 
     final params = InsertShippingFeeUseCaseParams(
-        price: price, purchaseNoteIds: purchaseNoteIds);
+      price: price,
+      purchaseNoteIds: purchaseNoteIds,
+    );
     final result = await _insertShippingFeeUseCase(params);
 
     result.fold(
@@ -288,11 +228,12 @@ class WarehouseCubit extends Cubit<WarehouseState> {
     if (state is! FetchPurchaseNoteLoaded) return;
     final currentState = state as FetchPurchaseNoteLoaded;
 
-    final newItems =
-        List<WarehouseItemEntity>.from(currentState.purchaseNote.items)
-          ..removeAt(index);
-    final updatedPurchaseNote =
-        currentState.purchaseNote.copyWith(items: newItems);
+    final newItems = List<WarehouseItemEntity>.from(
+      currentState.purchaseNote.items,
+    )..removeAt(index);
+    final updatedPurchaseNote = currentState.purchaseNote.copyWith(
+      items: newItems,
+    );
     emit(currentState.copyWith(purchaseNote: updatedPurchaseNote));
   }
 
@@ -304,8 +245,9 @@ class WarehouseCubit extends Cubit<WarehouseState> {
         List<WarehouseItemEntity>.from(currentState.purchaseNote.items)
           ..removeAt(index)
           ..insert(index, item);
-    final updatedPurchaseNote =
-        currentState.purchaseNote.copyWith(items: newItems);
+    final updatedPurchaseNote = currentState.purchaseNote.copyWith(
+      items: newItems,
+    );
     emit(currentState.copyWith(purchaseNote: updatedPurchaseNote));
   }
 
@@ -324,8 +266,9 @@ class WarehouseCubit extends Cubit<WarehouseState> {
     result.fold(
       (failure) => emit(InsertReturnCostError(message: failure.message)),
       (message) {
-        final updatedPurchaseNote =
-            currentState.purchaseNote.copyWith(returnCost: returnCost);
+        final updatedPurchaseNote = currentState.purchaseNote.copyWith(
+          returnCost: returnCost,
+        );
         emit(InsertReturnCostLoaded(message: message));
         emit(currentState.copyWith(purchaseNote: updatedPurchaseNote));
       },
