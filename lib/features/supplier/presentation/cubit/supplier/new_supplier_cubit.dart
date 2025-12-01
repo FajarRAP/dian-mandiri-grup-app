@@ -75,6 +75,7 @@ class NewSupplierCubit extends Cubit<NewSupplierState> {
     result.fold(
       (failure) => emit(
         state.copyWith(
+          status: .failure,
           hasReachedMax: true,
           isPaginating: false,
           failure: failure,
@@ -82,6 +83,7 @@ class NewSupplierCubit extends Cubit<NewSupplierState> {
       ),
       (suppliers) => emit(
         state.copyWith(
+          status: .success,
           isPaginating: false,
           hasReachedMax: suppliers.isEmpty,
           currentPage: state.currentPage + 1,
