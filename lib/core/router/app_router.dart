@@ -6,6 +6,7 @@ import '../../features/auth/presentation/pages/profile_page.dart';
 import '../../features/auth/presentation/pages/sign_in_page.dart';
 import '../../features/home_page.dart';
 import '../../features/staff_management_page.dart';
+import '../../features/supplier/presentation/cubit/create_supplier/create_supplier_cubit.dart';
 import '../../features/supplier/presentation/cubit/supplier/supplier_cubit.dart';
 import '../../features/supplier/presentation/cubit/supplier_detail/supplier_detail_cubit.dart';
 import '../../features/supplier/presentation/cubit/update_supplier/update_supplier_cubit.dart';
@@ -176,31 +177,17 @@ class AppRouter {
                       child: const SupplierPage(),
                     ),
                     routes: <RouteBase>[
-                      GoRoute(
+                      _buildRouteWithCubit<SupplierDetailCubit>(
                         path: 'detail',
                         name: Routes.supplierDetail,
-                        builder: (context, state) {
-                          final supplierId = state.extra as String;
-
-                          return BlocProvider(
-                            create: (context) =>
-                                getIt<SupplierDetailCubit>()
-                                  ..fetchSupplier(supplierId: supplierId),
-                            child: SupplierDetailPage(supplierId: supplierId),
-                          );
-                        },
+                        child: (state) => SupplierDetailPage(
+                          supplierId: state.extra as String,
+                        ),
                       ),
-                      GoRoute(
+                      _buildRouteWithCubit<CreateSupplierCubit>(
                         path: 'add',
                         name: Routes.supplierAdd,
-                        builder: (context, state) {
-                          final cubit = state.extra as SupplierCubit;
-
-                          return BlocProvider.value(
-                            value: cubit,
-                            child: const AddSupplierPage(),
-                          );
-                        },
+                        child: (state) => const AddSupplierPage(),
                       ),
                       GoRoute(
                         path: 'edit',
