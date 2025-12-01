@@ -194,12 +194,7 @@ void setup() {
     )
     ..registerSingleton(CreateSupplierUseCase(supplierRepository: getIt()))
     ..registerSingleton(UpdateSupplierUseCase(supplierRepository: getIt()))
-    ..registerFactory(
-      () => SupplierCubit(
-        fetchSuppliersUseCase: getIt(),
-        createSupplierUseCase: getIt(),
-      ),
-    )
+    ..registerFactory(() => SupplierCubit(fetchSuppliersUseCase: getIt()))
     ..registerFactory(() => SupplierDetailCubit(fetchSupplierUseCase: getIt()))
     ..registerFactory(() => UpdateSupplierCubit(updateSupplierUseCase: getIt()))
     ..registerFactory(
