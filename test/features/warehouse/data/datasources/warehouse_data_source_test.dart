@@ -150,9 +150,9 @@ void main() {
             queryParameters: {
               'column': params.column,
               'sort': params.sort,
-              'search': params.search,
-              'limit': params.limit,
-              'page': params.page,
+              'search': params.search.query,
+              'limit': params.paginate.limit,
+              'page': params.paginate.page,
             },
           ),
         ).called(1);
@@ -180,9 +180,9 @@ void main() {
           queryParameters: {
             'column': params.column,
             'sort': params.sort,
-            'search': params.search,
-            'limit': params.limit,
-            'page': params.page,
+            'search': params.search.query,
+            'limit': params.paginate.limit,
+            'page': params.paginate.page,
           },
         ),
       ).called(1);

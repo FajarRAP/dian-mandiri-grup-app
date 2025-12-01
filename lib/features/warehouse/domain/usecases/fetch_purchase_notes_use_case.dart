@@ -8,15 +8,18 @@ import '../repositories/warehouse_repository.dart';
 
 class FetchPurchaseNotesUseCase
     implements
-        UseCase<List<PurchaseNoteSummaryEntity>,
-            FetchPurchaseNotesUseCaseParams> {
+        UseCase<
+          List<PurchaseNoteSummaryEntity>,
+          FetchPurchaseNotesUseCaseParams
+        > {
   const FetchPurchaseNotesUseCase({required this.warehouseRepository});
 
   final WarehouseRepository warehouseRepository;
 
   @override
   Future<Either<Failure, List<PurchaseNoteSummaryEntity>>> execute(
-      FetchPurchaseNotesUseCaseParams params) async {
+    FetchPurchaseNotesUseCaseParams params,
+  ) async {
     return await warehouseRepository.fetchPurchaseNotes(params);
   }
 }
@@ -24,18 +27,16 @@ class FetchPurchaseNotesUseCase
 class FetchPurchaseNotesUseCaseParams extends Equatable {
   const FetchPurchaseNotesUseCaseParams({
     this.column = 'name',
-    this.search,
     this.sort = 'asc',
-    this.limit = 10,
-    this.page = 1,
+    this.paginate = const PaginateParams(),
+    this.search = const SearchParams(),
   });
 
   final String column;
-  final String? search;
   final String sort;
-  final int limit;
-  final int page;
+  final PaginateParams paginate;
+  final SearchParams search;
 
   @override
-  List<Object?> get props => [column, search, sort, limit, page];
+  List<Object?> get props => [column, sort, paginate, search];
 }
