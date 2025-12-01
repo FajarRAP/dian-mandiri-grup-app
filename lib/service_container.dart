@@ -34,6 +34,7 @@ import 'features/supplier/domain/usecases/update_supplier_use_case.dart';
 import 'features/supplier/presentation/cubit/supplier/new_supplier_cubit.dart';
 import 'features/supplier/presentation/cubit/supplier_cubit.dart';
 import 'features/supplier/presentation/cubit/supplier_detail_cubit.dart';
+import 'features/supplier/presentation/cubit/update_supplier/update_supplier_cubit.dart';
 import 'features/tracker/data/datasources/shipment_remote_data_source.dart';
 import 'features/tracker/data/repositories/shipment_repository_impl.dart';
 import 'features/tracker/domain/repositories/shipment_repository.dart';
@@ -208,7 +209,10 @@ void setup() {
         updateSupplierUseCase: getIt(),
       ),
     )
-    ..registerFactory(() => SupplierDetailCubit(fetchSupplierUseCase: getIt()));
+    ..registerFactory(() => SupplierDetailCubit(fetchSupplierUseCase: getIt()))
+    ..registerFactory(
+      () => UpdateSupplierCubit(updateSupplierUseCase: getIt()),
+    );
 
   // Warehouse
   getIt
