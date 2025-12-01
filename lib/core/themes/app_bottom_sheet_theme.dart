@@ -7,7 +7,7 @@ class AppBottomSheetTheme {
 
   static BottomSheetThemeData _buildTheme({required ColorScheme colorScheme}) {
     return BottomSheetThemeData(
-      constraints: const BoxConstraints(maxHeight: 550),
+      constraints: const BoxConstraints(maxHeight: 600),
       dragHandleColor: colorScheme.onSurfaceVariant,
       dragHandleSize: const Size(48, 4),
       shape: const RoundedRectangleBorder(
