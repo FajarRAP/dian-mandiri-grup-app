@@ -1,11 +1,11 @@
-part of 'new_supplier_cubit.dart';
+part of 'supplier_cubit.dart';
 
 enum SupplierStatus { initial, inProgress, success, failure }
 
 enum SupplierActionStatuse { initial, inProgress, success, failure }
 
-class NewSupplierState extends Equatable {
-  const NewSupplierState({
+class SupplierState extends Equatable {
+  const SupplierState({
     this.status = .initial,
     this.actionStatus = .initial,
     this.suppliers = const <SupplierEntity>[],
@@ -32,7 +32,7 @@ class NewSupplierState extends Equatable {
   final String? message;
   final Failure? failure;
 
-  NewSupplierState copyWith({
+  SupplierState copyWith({
     SupplierStatus? status,
     SupplierActionStatuse? actionStatus,
     List<SupplierEntity>? suppliers,
@@ -44,7 +44,7 @@ class NewSupplierState extends Equatable {
     String? message,
     Failure? failure,
   }) {
-    return NewSupplierState(
+    return SupplierState(
       status: status ?? this.status,
       actionStatus: actionStatus ?? this.actionStatus,
       suppliers: suppliers ?? this.suppliers,

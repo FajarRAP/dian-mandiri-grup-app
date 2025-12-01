@@ -12,7 +12,7 @@ import '../../../../core/router/route_names.dart';
 import '../../../../core/utils/debouncer.dart';
 import '../../../../core/utils/extensions.dart';
 import '../../domain/entities/supplier_entity.dart';
-import '../cubit/supplier/new_supplier_cubit.dart';
+import '../cubit/supplier/supplier_cubit.dart';
 import '../widgets/supplier_item.dart';
 
 class SupplierPage extends StatefulWidget {
@@ -26,20 +26,20 @@ class _SupplierPageState extends State<SupplierPage> {
   @override
   void initState() {
     super.initState();
-    context.read<NewSupplierCubit>().fetchSuppliers();
+    context.read<SupplierCubit>().fetchSuppliers();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: RefreshIndicator(
-        onRefresh: context.read<NewSupplierCubit>().fetchSuppliers,
+        onRefresh: context.read<SupplierCubit>().fetchSuppliers,
         child: PaginationListener(
-          onPaginate: context.read<NewSupplierCubit>().fetchSuppliersPaginate,
+          onPaginate: context.read<SupplierCubit>().fetchSuppliersPaginate,
           child: CustomScrollView(
             slivers: [
               const _AppBar(),
-              BlocBuilder<NewSupplierCubit, NewSupplierState>(
+              BlocBuilder<SupplierCubit, SupplierState>(
                 builder: (context, state) {
                   return switch (state.status) {
                     .inProgress => const SliverLoadingIndicator(),
@@ -57,7 +57,7 @@ class _SupplierPageState extends State<SupplierPage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () => context.pushNamed(
           Routes.supplierAdd,
-          extra: context.read<NewSupplierCubit>(),
+          extra: context.read<SupplierCubit>(),
         ),
         child: const Icon(Icons.add),
       ),
@@ -74,13 +74,13 @@ class _AppBar extends StatefulWidget {
 
 class _AppBarState extends State<_AppBar> {
   late final Debouncer _debouncer;
-  late final NewSupplierCubit _supplierCubit;
+  late final SupplierCubit _supplierCubit;
 
   @override
   void initState() {
     super.initState();
     _debouncer = Debouncer(delay: const Duration(milliseconds: 500));
-    _supplierCubit = context.read<NewSupplierCubit>();
+    _supplierCubit = context.read<SupplierCubit>();
   }
 
   @override
@@ -97,7 +97,7 @@ class _AppBarState extends State<_AppBar> {
         PopupMenuButton<SortOptions>(
           onSelected: (value) =>
               _supplierCubit.fetchSuppliers(sortOption: value),
-          initialValue: context.select<NewSupplierCubit, SortOptions>(
+          initialValue: context.select<SupplierCubit, SortOptions>(
             (cubit) => cubit.state.sortOptions,
           ),
           icon: const Icon(Icons.sort),

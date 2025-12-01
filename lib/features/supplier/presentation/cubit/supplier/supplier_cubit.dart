@@ -8,16 +8,16 @@ import '../../../domain/entities/supplier_entity.dart';
 import '../../../domain/usecases/create_supplier_use_case.dart';
 import '../../../domain/usecases/fetch_suppliers_use_case.dart';
 
-part 'new_supplier_state.dart';
+part 'supplier_state.dart';
 
-class NewSupplierCubit extends Cubit<NewSupplierState> {
-  NewSupplierCubit({
+class SupplierCubit extends Cubit<SupplierState> {
+  SupplierCubit({
     required FetchSuppliersUseCase fetchSuppliersUseCase,
     required CreateSupplierUseCase createSupplierUseCase,
   }) : _fetchSuppliersUseCase = fetchSuppliersUseCase,
        _createSupplierUseCase = createSupplierUseCase,
 
-       super(const NewSupplierState());
+       super(const SupplierState());
 
   final FetchSuppliersUseCase _fetchSuppliersUseCase;
   final CreateSupplierUseCase _createSupplierUseCase;

@@ -12,7 +12,7 @@ import '../../../../core/helpers/validators.dart';
 import '../../../../core/utils/extensions.dart';
 import '../../../../core/widgets/buttons/primary_button.dart';
 import '../../../../core/widgets/image_picker_bottom_sheet.dart';
-import '../cubit/supplier/new_supplier_cubit.dart';
+import '../cubit/supplier/supplier_cubit.dart';
 import '../widgets/editable_avatar.dart';
 
 class AddSupplierPage extends StatefulWidget {
@@ -121,7 +121,7 @@ class _AddSupplierPageState extends State<AddSupplierPage> {
                     maxLines: 2,
                   ),
                   const Gap(24),
-                  BlocConsumer<NewSupplierCubit, NewSupplierState>(
+                  BlocConsumer<SupplierCubit, SupplierState>(
                     listener: (context, state) {
                       if (state.actionStatus == .failure) {
                         TopSnackbar.dangerSnackbar(
@@ -133,7 +133,7 @@ class _AddSupplierPageState extends State<AddSupplierPage> {
                         TopSnackbar.successSnackbar(message: state.message!);
                         context
                           ..pop()
-                          ..read<NewSupplierCubit>().fetchSuppliers();
+                          ..read<SupplierCubit>().fetchSuppliers();
                       }
                     },
                     builder: (context, state) {
@@ -142,7 +142,7 @@ class _AddSupplierPageState extends State<AddSupplierPage> {
                         _ => () {
                           if (!_formKey.currentState!.validate()) return;
 
-                          context.read<NewSupplierCubit>().createSupplier(
+                          context.read<SupplierCubit>().createSupplier(
                             name: _nameController.text,
                             phoneNumber: _phoneController.text,
                             address: _addressController.text,

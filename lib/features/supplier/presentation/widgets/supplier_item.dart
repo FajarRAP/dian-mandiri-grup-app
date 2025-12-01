@@ -6,7 +6,7 @@ import '../../../../common/constants/app_images.dart';
 import '../../../../core/router/route_names.dart';
 import '../../../../core/utils/extensions.dart';
 import '../../domain/entities/supplier_entity.dart';
-import '../cubit/supplier/new_supplier_cubit.dart';
+import '../cubit/supplier/supplier_cubit.dart';
 
 class SupplierItem extends StatelessWidget {
   const SupplierItem({super.key, required this.supplier});
@@ -46,7 +46,7 @@ class SupplierItem extends StatelessWidget {
             if (!context.mounted) return;
 
             if (result == true) {
-              await context.read<NewSupplierCubit>().fetchSuppliers();
+              await context.read<SupplierCubit>().fetchSuppliers();
             }
           },
           icon: const Icon(Icons.edit),
