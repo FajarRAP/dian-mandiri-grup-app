@@ -6,6 +6,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'core/common/constants.dart';
 import 'core/network/dio_interceptor.dart';
 import 'core/presentation/cubit/app_cubit.dart';
+import 'core/presentation/cubit/dropdown_cubit.dart';
 import 'core/presentation/cubit/user_cubit.dart';
 import 'core/services/file_service.dart';
 import 'core/services/google_sign_in_service.dart';
@@ -32,7 +33,6 @@ import 'features/supplier/domain/usecases/fetch_suppliers_use_case.dart';
 import 'features/supplier/domain/usecases/create_supplier_use_case.dart';
 import 'features/supplier/domain/usecases/update_supplier_use_case.dart';
 import 'features/supplier/presentation/cubit/supplier/new_supplier_cubit.dart';
-import 'features/supplier/presentation/cubit/supplier_cubit.dart';
 import 'features/supplier/presentation/cubit/supplier_detail_cubit.dart';
 import 'features/supplier/presentation/cubit/update_supplier/update_supplier_cubit.dart';
 import 'features/tracker/data/datasources/shipment_remote_data_source.dart';
@@ -193,15 +193,6 @@ void setup() {
     )
     ..registerSingleton(CreateSupplierUseCase(supplierRepository: getIt()))
     ..registerSingleton(UpdateSupplierUseCase(supplierRepository: getIt()))
-    ..registerLazySingleton<SupplierCubit>(
-      () => SupplierCubit(
-        fetchSupplierUseCase: getIt(),
-        fetchSuppliersUseCase: getIt(),
-        fetchSuppliersDropdownUseCase: getIt(),
-        createSupplierUseCase: getIt(),
-        updateSupplierUseCase: getIt(),
-      ),
-    )
     ..registerFactory(
       () => NewSupplierCubit(
         fetchSuppliersUseCase: getIt(),
@@ -265,5 +256,11 @@ void setup() {
         fetchUserFromStorageUseCase: getIt(),
       ),
     )
-    ..registerFactory(() => UpdateProfileCubit(updateProfileUseCase: getIt()));
+    ..registerFactory(() => UpdateProfileCubit(updateProfileUseCase: getIt()))
+    ..registerFactory(
+      () => DropdownCubit(
+        fetchSuppliersDropdownUseCase: getIt(),
+        fetchPurchaseNotesDropdownUseCase: getIt(),
+      ),
+    );
 }
