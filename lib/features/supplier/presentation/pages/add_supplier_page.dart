@@ -77,7 +77,7 @@ class _AddSupplierPageState extends State<AddSupplierPage> {
                       ),
                       context: context,
                     ),
-                    imageFile: _pickedImage,
+                    imagePath: _pickedImage?.path,
                   ),
                   const Gap(24),
                   TextFormField(
