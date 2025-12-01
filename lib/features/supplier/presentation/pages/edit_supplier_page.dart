@@ -14,7 +14,7 @@ import '../../../../core/utils/extensions.dart';
 import '../../../../core/widgets/buttons/primary_button.dart';
 import '../../../../core/widgets/image_picker_bottom_sheet.dart';
 import '../../domain/entities/supplier_detail_entity.dart';
-import '../cubit/supplier_detail_cubit.dart';
+import '../cubit/supplier_detail/supplier_detail_cubit.dart';
 import '../cubit/update_supplier/update_supplier_cubit.dart';
 import '../widgets/editable_avatar.dart';
 

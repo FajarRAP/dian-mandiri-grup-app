@@ -7,7 +7,7 @@ import '../../../../core/presentation/widgets/error_state_widget.dart';
 import '../../../../core/presentation/widgets/loading_indicator.dart';
 import '../../../../core/utils/extensions.dart';
 import '../../domain/entities/supplier_detail_entity.dart';
-import '../cubit/supplier_detail_cubit.dart';
+import '../cubit/supplier_detail/supplier_detail_cubit.dart';
 import '../widgets/editable_avatar.dart';
 
 class SupplierDetailPage extends StatelessWidget {

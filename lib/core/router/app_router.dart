@@ -7,7 +7,7 @@ import '../../features/auth/presentation/pages/sign_in_page.dart';
 import '../../features/home_page.dart';
 import '../../features/staff_management_page.dart';
 import '../../features/supplier/presentation/cubit/supplier/new_supplier_cubit.dart';
-import '../../features/supplier/presentation/cubit/supplier_detail_cubit.dart';
+import '../../features/supplier/presentation/cubit/supplier_detail/supplier_detail_cubit.dart';
 import '../../features/supplier/presentation/cubit/update_supplier/update_supplier_cubit.dart';
 import '../../features/supplier/presentation/pages/add_supplier_page.dart';
 import '../../features/supplier/presentation/pages/edit_supplier_page.dart';

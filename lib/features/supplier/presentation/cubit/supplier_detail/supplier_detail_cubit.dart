@@ -1,10 +1,10 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 
-import '../../../../core/errors/failure.dart';
-import '../../../../core/usecase/use_case.dart';
-import '../../domain/entities/supplier_detail_entity.dart';
-import '../../domain/usecases/fetch_supplier_use_case.dart';
+import '../../../../../core/errors/failure.dart';
+import '../../../../../core/usecase/use_case.dart';
+import '../../../domain/entities/supplier_detail_entity.dart';
+import '../../../domain/usecases/fetch_supplier_use_case.dart';
 
 part 'supplier_detail_state.dart';
 
