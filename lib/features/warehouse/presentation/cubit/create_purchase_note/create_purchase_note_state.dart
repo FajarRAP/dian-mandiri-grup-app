@@ -5,6 +5,7 @@ enum CreatePurchaseNoteStatus { initial, inProgress, success, failure }
 class CreatePurchaseNoteState extends Equatable {
   const CreatePurchaseNoteState({
     this.status = .initial,
+    this.purchaseNoteId,
     this.items = const [],
     this.note,
     this.date,
@@ -18,6 +19,7 @@ class CreatePurchaseNoteState extends Equatable {
   final CreatePurchaseNoteStatus status;
 
   // State Properties
+  final String? purchaseNoteId;
   final List<WarehouseItemEntity> items;
   final String? note;
   final DateTime? date;
@@ -32,9 +34,11 @@ class CreatePurchaseNoteState extends Equatable {
 
   double get totalAmount =>
       items.fold(0.0, (sum, item) => sum + (item.price * item.quantity));
+  bool get isEditMode => purchaseNoteId != null;
 
   CreatePurchaseNoteState copyWith({
     CreatePurchaseNoteStatus? status,
+    String? purchaseNoteId,
     List<WarehouseItemEntity>? items,
     String? note,
     DateTime? date,
@@ -45,6 +49,7 @@ class CreatePurchaseNoteState extends Equatable {
   }) {
     return CreatePurchaseNoteState(
       status: status ?? this.status,
+      purchaseNoteId: purchaseNoteId ?? this.purchaseNoteId,
       items: items ?? this.items,
       note: note ?? this.note,
       date: date ?? this.date,
@@ -58,6 +63,7 @@ class CreatePurchaseNoteState extends Equatable {
   @override
   List<Object?> get props => [
     status,
+    purchaseNoteId,
     items,
     note,
     date,

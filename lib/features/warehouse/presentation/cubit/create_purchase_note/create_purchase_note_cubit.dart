@@ -6,18 +6,42 @@ import 'package:equatable/equatable.dart';
 import '../../../../../core/common/dropdown_entity.dart';
 import '../../../../../core/errors/failure.dart';
 import '../../../../../core/usecase/use_case.dart';
+import '../../../domain/entities/purchase_note_detail_entity.dart';
 import '../../../domain/entities/warehouse_item_entity.dart';
 import '../../../domain/usecases/create_purchase_note_use_case.dart';
+import '../../../domain/usecases/update_purchase_note_use_case.dart';
 
 part 'create_purchase_note_state.dart';
 
 class CreatePurchaseNoteCubit extends Cubit<CreatePurchaseNoteState> {
   CreatePurchaseNoteCubit({
     required CreatePurchaseNoteUseCase createPurchaseNoteUseCase,
+    required UpdatePurchaseNoteUseCase updatePurchaseNoteUseCase,
   }) : _createPurchaseNoteUseCase = createPurchaseNoteUseCase,
+       _updatePurchaseNoteUseCase = updatePurchaseNoteUseCase,
        super(const CreatePurchaseNoteState());
 
   final CreatePurchaseNoteUseCase _createPurchaseNoteUseCase;
+  final UpdatePurchaseNoteUseCase _updatePurchaseNoteUseCase;
+
+  void initializeForEdit(PurchaseNoteDetailEntity data) {
+    emit(
+      state.copyWith(
+        items: data.items,
+        note: data.note,
+        supplier: DropdownEntity(
+          key: data.supplier.id,
+          value: data.supplier.name,
+        ),
+        date: data.date,
+        purchaseNoteId: data.id,
+      ),
+    );
+  }
+
+  Future<void> submit() async => state.isEditMode
+      ? await updatePurchaseNote()
+      : await createPurchaseNote();
 
   Future<void> createPurchaseNote() async {
     if (state.image == null) {
@@ -49,6 +73,7 @@ class CreatePurchaseNoteCubit extends Cubit<CreatePurchaseNoteState> {
       receipt: state.image!.path,
       supplierId: state.supplier!.key,
       items: state.items,
+      note: state.note,
     );
     final result = await _createPurchaseNoteUseCase(params);
 
@@ -56,6 +81,29 @@ class CreatePurchaseNoteCubit extends Cubit<CreatePurchaseNoteState> {
       (failure) => emit(state.copyWith(status: .failure, failure: failure)),
       (message) => emit(state.copyWith(status: .success, message: message)),
     );
+
+    emit(state.copyWith(status: .initial));
+  }
+
+  Future<void> updatePurchaseNote() async {
+    emit(state.copyWith(status: .inProgress));
+
+    final params = UpdatePurchaseNoteUseCaseParams(
+      date: state.date!,
+      receipt: state.image!.path,
+      supplierId: state.supplier!.key,
+      items: state.items,
+      purchaseNoteId: state.purchaseNoteId!,
+      note: state.note,
+    );
+    final result = await _updatePurchaseNoteUseCase(params);
+
+    result.fold(
+      (failure) => emit(state.copyWith(status: .failure, failure: failure)),
+      (message) => emit(state.copyWith(status: .success, message: message)),
+    );
+
+    emit(state.copyWith(status: .initial));
   }
 
   set supplier(DropdownEntity? supplier) =>
