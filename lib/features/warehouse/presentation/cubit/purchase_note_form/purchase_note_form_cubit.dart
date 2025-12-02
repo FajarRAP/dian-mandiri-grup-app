@@ -36,6 +36,7 @@ class PurchaseNoteFormCubit extends Cubit<PurchaseNoteFormState> {
         ),
         date: data.date,
         purchaseNoteId: data.id,
+        receiptUrl: data.receipt,
       ),
     );
   }
@@ -91,7 +92,7 @@ class PurchaseNoteFormCubit extends Cubit<PurchaseNoteFormState> {
 
     final params = UpdatePurchaseNoteUseCaseParams(
       date: state.date!,
-      receipt: state.image!.path,
+      receipt: state.image?.path ?? state.receiptUrl!,
       supplierId: state.supplier!.key,
       items: state.items,
       purchaseNoteId: state.purchaseNoteId!,
