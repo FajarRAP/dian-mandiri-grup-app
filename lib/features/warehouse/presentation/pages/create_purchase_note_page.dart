@@ -283,7 +283,7 @@ class _FAB extends StatelessWidget {
                 children: <Widget>[
                   Text('Total semua harga', style: textTheme.bodyMedium),
                   Text(
-                    idrCurrencyFormat.format(state.totalAmount),
+                    state.totalAmount.toIDRCurrency,
                     style: textTheme.bodyLarge?.copyWith(
                       color: context.colorScheme.primary,
                     ),

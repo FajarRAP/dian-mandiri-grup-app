@@ -117,7 +117,7 @@ class PurchaseNoteItemCard extends StatelessWidget {
               color: context.colorScheme.primary,
               icon: Icons.payments_outlined,
               label: 'Harga per Barang',
-              value: idrCurrencyFormat.format(warehouseItem.price),
+              value: warehouseItem.price.toIDRCurrency,
             ),
             const Gap(4),
             Container(
@@ -139,7 +139,7 @@ class PurchaseNoteItemCard extends StatelessWidget {
             _InfoRow(
               icon: Icons.local_shipping_outlined,
               label: 'Ongkos Kirim',
-              value: idrCurrencyFormat.format(warehouseItem.shipmentFee ?? 0),
+              value: (warehouseItem.shipmentFee ?? 0).toIDRCurrency,
             ),
           ],
         ),

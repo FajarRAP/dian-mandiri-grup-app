@@ -70,7 +70,7 @@ class PurchaseNoteItem extends StatelessWidget {
                   ),
                   const Gap(4),
                   Text(
-                    dateTimeFormat.format(purchaseNoteSummary.date.toLocal()),
+                    purchaseNoteSummary.date.toLocal().toDMYHMS,
                     style: textTheme.bodySmall?.copyWith(
                       color: context.colorScheme.onSurfaceVariant,
                     ),
