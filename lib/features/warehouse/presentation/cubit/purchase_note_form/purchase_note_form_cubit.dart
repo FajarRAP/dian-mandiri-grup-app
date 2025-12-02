@@ -11,15 +11,15 @@ import '../../../domain/entities/warehouse_item_entity.dart';
 import '../../../domain/usecases/create_purchase_note_use_case.dart';
 import '../../../domain/usecases/update_purchase_note_use_case.dart';
 
-part 'create_purchase_note_state.dart';
+part 'purchase_note_form_state.dart';
 
-class CreatePurchaseNoteCubit extends Cubit<CreatePurchaseNoteState> {
-  CreatePurchaseNoteCubit({
+class PurchaseNoteFormCubit extends Cubit<PurchaseNoteFormState> {
+  PurchaseNoteFormCubit({
     required CreatePurchaseNoteUseCase createPurchaseNoteUseCase,
     required UpdatePurchaseNoteUseCase updatePurchaseNoteUseCase,
   }) : _createPurchaseNoteUseCase = createPurchaseNoteUseCase,
        _updatePurchaseNoteUseCase = updatePurchaseNoteUseCase,
-       super(const CreatePurchaseNoteState());
+       super(const PurchaseNoteFormState());
 
   final CreatePurchaseNoteUseCase _createPurchaseNoteUseCase;
   final UpdatePurchaseNoteUseCase _updatePurchaseNoteUseCase;
@@ -40,10 +40,10 @@ class CreatePurchaseNoteCubit extends Cubit<CreatePurchaseNoteState> {
   }
 
   Future<void> submit() async => state.isEditMode
-      ? await updatePurchaseNote()
-      : await createPurchaseNote();
+      ? await _updatePurchaseNote()
+      : await _createPurchaseNote();
 
-  Future<void> createPurchaseNote() async {
+  Future<void> _createPurchaseNote() async {
     if (state.image == null) {
       const message = 'Silakan pilih gambar nota terlebih dahulu';
       emit(
@@ -85,7 +85,7 @@ class CreatePurchaseNoteCubit extends Cubit<CreatePurchaseNoteState> {
     emit(state.copyWith(status: .initial));
   }
 
-  Future<void> updatePurchaseNote() async {
+  Future<void> _updatePurchaseNote() async {
     emit(state.copyWith(status: .inProgress));
 
     final params = UpdatePurchaseNoteUseCaseParams(

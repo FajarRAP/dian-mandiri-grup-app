@@ -15,7 +15,7 @@ import '../../../../core/widgets/buttons/primary_button.dart';
 import '../../../../core/widgets/buttons/primary_outline_button.dart';
 import '../../../../core/widgets/fab_container.dart';
 import '../../domain/entities/warehouse_item_entity.dart';
-import '../cubit/create_purchase_note/create_purchase_note_cubit.dart';
+import '../cubit/purchase_note_form/purchase_note_form_cubit.dart';
 import '../widgets/purchase_note_form/note_form.dart';
 import '../widgets/purchase_note_form/select_date_form.dart';
 import '../widgets/purchase_note_form/select_supplier_form.dart';
@@ -31,7 +31,7 @@ class CreatePurchaseNotePage extends StatefulWidget {
 }
 
 class _CreatePurchaseNotePageState extends State<CreatePurchaseNotePage> {
-  late final CreatePurchaseNoteCubit _createPurchaseNoteCubit;
+  late final PurchaseNoteFormCubit _createPurchaseNoteCubit;
   late final TextEditingController _supplierController;
   late final TextEditingController _dateController;
   late final TextEditingController _noteController;
@@ -40,7 +40,7 @@ class _CreatePurchaseNotePageState extends State<CreatePurchaseNotePage> {
   @override
   void initState() {
     super.initState();
-    _createPurchaseNoteCubit = context.read<CreatePurchaseNoteCubit>();
+    _createPurchaseNoteCubit = context.read<PurchaseNoteFormCubit>();
     _supplierController = TextEditingController();
     _dateController = TextEditingController();
     _noteController = TextEditingController();
@@ -57,17 +57,17 @@ class _CreatePurchaseNotePageState extends State<CreatePurchaseNotePage> {
 
   @override
   Widget build(BuildContext context) {
-    final supplier = context.select<CreatePurchaseNoteCubit, DropdownEntity?>(
+    final supplier = context.select<PurchaseNoteFormCubit, DropdownEntity?>(
       (cubit) => cubit.state.supplier,
     );
-    final date = context.select<CreatePurchaseNoteCubit, DateTime?>(
+    final date = context.select<PurchaseNoteFormCubit, DateTime?>(
       (cubit) => cubit.state.date,
     );
-    final image = context.select<CreatePurchaseNoteCubit, File?>(
+    final image = context.select<PurchaseNoteFormCubit, File?>(
       (cubit) => cubit.state.image,
     );
     final items = context
-        .select<CreatePurchaseNoteCubit, List<WarehouseItemEntity>>(
+        .select<PurchaseNoteFormCubit, List<WarehouseItemEntity>>(
           (cubit) => cubit.state.items,
         );
 
@@ -165,7 +165,7 @@ class _FAB extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = context.textTheme;
 
-    return BlocConsumer<CreatePurchaseNoteCubit, CreatePurchaseNoteState>(
+    return BlocConsumer<PurchaseNoteFormCubit, PurchaseNoteFormState>(
       listener: (context, state) {
         if (state.status == .success) {
           TopSnackbar.successSnackbar(message: state.message!);
@@ -182,7 +182,7 @@ class _FAB extends StatelessWidget {
           _ => () {
             if (!formKey.currentState!.validate()) return;
 
-            context.read<CreatePurchaseNoteCubit>().createPurchaseNote();
+            context.read<PurchaseNoteFormCubit>().submit();
           },
         };
 

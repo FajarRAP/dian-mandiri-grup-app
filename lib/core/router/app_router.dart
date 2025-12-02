@@ -29,7 +29,7 @@ import '../../features/tracker/presentation/pages/stages/send_page.dart';
 import '../../features/tracker/presentation/pages/shipment_detail_page.dart';
 import '../../features/tracker/presentation/pages/tracker_page.dart';
 import '../../features/tracker/presentation/pages/update_shipment_document_page.dart';
-import '../../features/warehouse/presentation/cubit/create_purchase_note/create_purchase_note_cubit.dart';
+import '../../features/warehouse/presentation/cubit/purchase_note_form/purchase_note_form_cubit.dart';
 import '../../features/warehouse/presentation/cubit/import_purchase_note/import_purchase_note_cubit.dart';
 import '../../features/warehouse/presentation/cubit/purchase_note_list/purchase_note_list_cubit.dart';
 import '../../features/warehouse/presentation/pages/import_purchase_note_page.dart';
@@ -228,7 +228,7 @@ class AppRouter {
                           purchaseNoteId: state.extra as String,
                         ),
                       ),
-                      _buildRouteWithCubit<CreatePurchaseNoteCubit>(
+                      _buildRouteWithCubit<PurchaseNoteFormCubit>(
                         path: 'create-purchase-note',
                         name: Routes.warehouseCreatePurchaseNote,
                         child: (state) => const CreatePurchaseNotePage(),

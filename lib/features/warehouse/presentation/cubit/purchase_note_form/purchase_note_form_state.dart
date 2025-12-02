@@ -1,9 +1,9 @@
-part of 'create_purchase_note_cubit.dart';
+part of 'purchase_note_form_cubit.dart';
 
-enum CreatePurchaseNoteStatus { initial, inProgress, success, failure }
+enum PurchaseNoteFormStatus { initial, inProgress, success, failure }
 
-class CreatePurchaseNoteState extends Equatable {
-  const CreatePurchaseNoteState({
+class PurchaseNoteFormState extends Equatable {
+  const PurchaseNoteFormState({
     this.status = .initial,
     this.purchaseNoteId,
     this.items = const [],
@@ -16,7 +16,7 @@ class CreatePurchaseNoteState extends Equatable {
   });
 
   // Status
-  final CreatePurchaseNoteStatus status;
+  final PurchaseNoteFormStatus status;
 
   // State Properties
   final String? purchaseNoteId;
@@ -36,8 +36,8 @@ class CreatePurchaseNoteState extends Equatable {
       items.fold(0.0, (sum, item) => sum + (item.price * item.quantity));
   bool get isEditMode => purchaseNoteId != null;
 
-  CreatePurchaseNoteState copyWith({
-    CreatePurchaseNoteStatus? status,
+  PurchaseNoteFormState copyWith({
+    PurchaseNoteFormStatus? status,
     String? purchaseNoteId,
     List<WarehouseItemEntity>? items,
     String? note,
@@ -47,7 +47,7 @@ class CreatePurchaseNoteState extends Equatable {
     String? message,
     Failure? failure,
   }) {
-    return CreatePurchaseNoteState(
+    return PurchaseNoteFormState(
       status: status ?? this.status,
       purchaseNoteId: purchaseNoteId ?? this.purchaseNoteId,
       items: items ?? this.items,

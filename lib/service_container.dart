@@ -66,7 +66,7 @@ import 'features/warehouse/domain/usecases/create_purchase_note_use_case.dart';
 import 'features/warehouse/domain/usecases/insert_return_cost_use_case.dart';
 import 'features/warehouse/domain/usecases/insert_shipping_fee_use_case.dart';
 import 'features/warehouse/domain/usecases/update_purchase_note_use_case.dart';
-import 'features/warehouse/presentation/cubit/create_purchase_note/create_purchase_note_cubit.dart';
+import 'features/warehouse/presentation/cubit/purchase_note_form/purchase_note_form_cubit.dart';
 import 'features/warehouse/presentation/cubit/import_purchase_note/import_purchase_note_cubit.dart';
 import 'features/warehouse/presentation/cubit/purchase_note_list/purchase_note_list_cubit.dart';
 import 'features/warehouse/presentation/cubit/warehouse_cubit.dart';
@@ -245,7 +245,7 @@ void setup() {
       ),
     )
     ..registerFactory(
-      () => CreatePurchaseNoteCubit(
+      () => PurchaseNoteFormCubit(
         createPurchaseNoteUseCase: getIt(),
         updatePurchaseNoteUseCase: getIt(),
       ),
