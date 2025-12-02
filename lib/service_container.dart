@@ -63,9 +63,11 @@ import 'features/warehouse/domain/usecases/fetch_purchase_notes_dropdown_use_cas
 import 'features/warehouse/domain/usecases/fetch_purchase_notes_use_case.dart';
 import 'features/warehouse/domain/usecases/import_purchase_note_use_case.dart';
 import 'features/warehouse/domain/usecases/create_purchase_note_use_case.dart';
-import 'features/warehouse/domain/usecases/insert_return_cost_use_case.dart';
+import 'features/warehouse/domain/usecases/update_return_cost_use_case.dart';
 import 'features/warehouse/domain/usecases/insert_shipping_fee_use_case.dart';
 import 'features/warehouse/domain/usecases/update_purchase_note_use_case.dart';
+import 'features/warehouse/presentation/cubit/purchase_note_cost/purchase_note_cost_cubit.dart';
+import 'features/warehouse/presentation/cubit/purchase_note_detail/purchase_note_detail_cubit.dart';
 import 'features/warehouse/presentation/cubit/purchase_note_form/purchase_note_form_cubit.dart';
 import 'features/warehouse/presentation/cubit/import_purchase_note/import_purchase_note_cubit.dart';
 import 'features/warehouse/presentation/cubit/purchase_note_list/purchase_note_list_cubit.dart';
@@ -225,14 +227,12 @@ void setup() {
     )
     ..registerSingleton(CreatePurchaseNoteUseCase(warehouseRepository: getIt()))
     ..registerSingleton(ImportPurchaseNoteUseCase(warehouseRepository: getIt()))
-    ..registerSingleton(InsertReturnCostUseCase(warehouseRepository: getIt()))
+    ..registerSingleton(UpdateReturnCostUseCase(warehouseRepository: getIt()))
     ..registerSingleton(InsertShippingFeeUseCase(warehouseRepository: getIt()))
     ..registerSingleton(UpdatePurchaseNoteUseCase(warehouseRepository: getIt()))
     ..registerLazySingleton<WarehouseCubit>(
       () => WarehouseCubit(
-        fetchPurchaseNoteUseCase: getIt(),
         fetchPurchaseNotesDropdownUseCase: getIt(),
-        insertReturnCostUseCase: getIt(),
         insertShippingFeeUseCase: getIt(),
         updatePurchaseNoteUseCase: getIt(),
         imagePickerService: getIt(),
@@ -255,6 +255,12 @@ void setup() {
         importPurchaseNoteUseCase: getIt(),
         fileInteractionService: getIt(),
       ),
+    )
+    ..registerFactory(
+      () => PurchaseNoteCostCubit(updateReturnCostUseCase: getIt()),
+    )
+    ..registerFactory(
+      () => PurchaseNoteDetailCubit(fetchPurchaseNoteUseCase: getIt()),
     );
 
   getIt
