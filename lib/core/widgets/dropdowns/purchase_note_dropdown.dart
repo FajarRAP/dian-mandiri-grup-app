@@ -63,7 +63,6 @@ class _SuccessWidget extends StatelessWidget {
         separatorBuilder: (context, index) => const Gap(12),
         itemCount: purchaseNotes.length,
         padding: const EdgeInsets.symmetric(vertical: 12),
-        shrinkWrap: true,
       ),
     );
   }
