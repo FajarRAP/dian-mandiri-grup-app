@@ -13,7 +13,6 @@ import '../../domain/entities/purchase_note_summary_entity.dart';
 import '../../domain/entities/warehouse_item_entity.dart';
 import '../../domain/usecases/fetch_purchase_note_use_case.dart';
 import '../../domain/usecases/fetch_purchase_notes_dropdown_use_case.dart';
-import '../../domain/usecases/insert_purchase_note_file_use_case.dart';
 import '../../domain/usecases/insert_return_cost_use_case.dart';
 import '../../domain/usecases/insert_shipping_fee_use_case.dart';
 import '../../domain/usecases/update_purchase_note_use_case.dart';
@@ -25,14 +24,12 @@ class WarehouseCubit extends Cubit<WarehouseState> {
     required FetchPurchaseNoteUseCase fetchPurchaseNoteUseCase,
     required FetchPurchaseNotesDropdownUseCase
     fetchPurchaseNotesDropdownUseCase,
-    required InsertPurchaseNoteFileUseCase insertPurchaseNoteFileUseCase,
     required InsertReturnCostUseCase insertReturnCostUseCase,
     required InsertShippingFeeUseCase insertShippingFeeUseCase,
     required UpdatePurchaseNoteUseCase updatePurchaseNoteUseCase,
     required ImagePickerService imagePickerService,
   }) : _fetchPurchaseNoteUseCase = fetchPurchaseNoteUseCase,
        _fetchPurchaseNotesDropdownUseCase = fetchPurchaseNotesDropdownUseCase,
-       _insertPurchaseNoteFileUseCase = insertPurchaseNoteFileUseCase,
        _insertReturnCostUseCase = insertReturnCostUseCase,
        _insertShippingFeeUseCase = insertShippingFeeUseCase,
        _updatePurchaseNoteUseCase = updatePurchaseNoteUseCase,
@@ -41,7 +38,7 @@ class WarehouseCubit extends Cubit<WarehouseState> {
 
   final FetchPurchaseNoteUseCase _fetchPurchaseNoteUseCase;
   final FetchPurchaseNotesDropdownUseCase _fetchPurchaseNotesDropdownUseCase;
-  final InsertPurchaseNoteFileUseCase _insertPurchaseNoteFileUseCase;
+
   final InsertReturnCostUseCase _insertReturnCostUseCase;
   final InsertShippingFeeUseCase _insertShippingFeeUseCase;
   final UpdatePurchaseNoteUseCase _updatePurchaseNoteUseCase;
@@ -114,19 +111,6 @@ class WarehouseCubit extends Cubit<WarehouseState> {
           );
         }
       },
-    );
-  }
-
-  Future<void> insertPurchaseNoteFile({
-    required InsertPurchaseNoteFileUseCaseParams purchaseNote,
-  }) async {
-    emit(InsertPurchaseNoteFileLoading());
-
-    final result = await _insertPurchaseNoteFileUseCase(purchaseNote);
-
-    result.fold(
-      (failure) => emit(InsertPurchaseNoteFileError(failure: failure)),
-      (message) => emit(InsertPurchaseNoteFileLoaded(message: message)),
     );
   }
 

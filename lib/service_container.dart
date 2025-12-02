@@ -232,7 +232,6 @@ void setup() {
       () => WarehouseCubit(
         fetchPurchaseNoteUseCase: getIt(),
         fetchPurchaseNotesDropdownUseCase: getIt(),
-        insertPurchaseNoteFileUseCase: getIt(),
         insertReturnCostUseCase: getIt(),
         insertShippingFeeUseCase: getIt(),
         updatePurchaseNoteUseCase: getIt(),
