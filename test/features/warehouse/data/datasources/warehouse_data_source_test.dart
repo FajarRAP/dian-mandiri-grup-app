@@ -221,9 +221,10 @@ void main() {
           () => mockDio.get(
             '/purchase-note/dropdown',
             queryParameters: {
-              'search': params.search,
-              'limit': params.limit,
-              'page': params.page,
+              'search': params.search.query,
+              'limit': params.paginate.limit,
+              'page': params.paginate.page,
+              'show_all': params.showAll,
             },
           ),
         ).called(1);
@@ -251,9 +252,10 @@ void main() {
         () => mockDio.get(
           '/purchase-note/dropdown',
           queryParameters: {
-            'search': params.search,
-            'limit': params.limit,
-            'page': params.page,
+            'search': params.search.query,
+            'limit': params.paginate.limit,
+            'page': params.paginate.page,
+            'show_all': params.showAll,
           },
         ),
       ).called(1);
