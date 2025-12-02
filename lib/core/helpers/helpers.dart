@@ -1,7 +1,4 @@
-import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
-import '../errors/failure.dart';
 
 extension DateTimeFormatter on DateTime {
   String get toYMD => DateFormat('y-MM-dd', 'id_ID').format(this);
@@ -16,42 +13,4 @@ extension NumberFormatter on num {
     symbol: 'Rp ',
     decimalDigits: 0,
   ).format(this);
-}
-
-final dateFormat = DateFormat('y-MM-dd', 'id_ID');
-final dateTimeFormat = DateFormat('dd-MM-y HH:mm:ss', 'id_ID');
-final dMyFormat = DateFormat('dd-MM-y', 'id_ID');
-final timeFormat = DateFormat('HH:mm:ss', 'id_ID');
-final idrCurrencyFormat = NumberFormat.currency(
-  locale: 'id_ID',
-  symbol: 'Rp ',
-  decimalDigits: 0,
-);
-
-List parseSpreadsheetFailure(SpreadsheetFailure spreadsheetFailure) {
-  DataCell mapCell(el) => DataCell(
-    SizedBox(
-      width: double.infinity,
-      child: Tooltip(
-        triggerMode: TooltipTriggerMode.tap,
-        message: el?['error'] ?? '',
-        child: Text(el?['value'] ?? ''),
-      ),
-    ),
-  );
-
-  final headers = spreadsheetFailure.headers
-      .map((e) => DataColumn(label: Text(e)))
-      .toList();
-  final rows = List.generate(spreadsheetFailure.rows.length, (index) {
-    final row = spreadsheetFailure.rows[index];
-    final color = index % 2 == 0 ? Colors.white : Colors.grey.shade50;
-
-    return DataRow(
-      color: WidgetStateProperty.all(color),
-      cells: row.map(mapCell).toList(),
-    );
-  });
-
-  return [headers, rows];
 }
