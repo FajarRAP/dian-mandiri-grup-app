@@ -16,12 +16,10 @@ class PaginationListener extends StatelessWidget {
   Widget build(BuildContext context) {
     return NotificationListener<ScrollNotification>(
       onNotification: (notification) {
-        if (notification is ScrollUpdateNotification) {
-          final metrics = notification.metrics;
+        final metrics = notification.metrics;
 
-          if (metrics.pixels >= metrics.maxScrollExtent - threshold) {
-            onPaginate();
-          }
+        if (metrics.pixels >= metrics.maxScrollExtent - threshold) {
+          onPaginate();
         }
 
         return false;
