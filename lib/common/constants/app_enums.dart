@@ -18,3 +18,7 @@ enum SortOptions {
   static List<SortOptions> get byDate => [dateAsc, dateDesc];
   static List<SortOptions> get byTotalItems => [totalItemAsc, totalItemDesc];
 }
+
+enum OpenFileStatus { success, failure, noAppToOpen }
+
+enum ShareFileStatus { success, failure, cancelled }
