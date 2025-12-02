@@ -2,12 +2,14 @@ import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:share_plus/share_plus.dart';
 
 import 'core/common/constants.dart';
 import 'core/network/dio_interceptor.dart';
 import 'core/presentation/cubit/app_cubit.dart';
 import 'core/presentation/cubit/dropdown_cubit.dart';
 import 'core/presentation/cubit/user_cubit.dart';
+import 'core/services/file_interaction_service.dart';
 import 'core/services/file_service.dart';
 import 'core/services/google_sign_in_service.dart';
 import 'core/services/image_picker_service.dart';
@@ -59,12 +61,13 @@ import 'features/warehouse/domain/usecases/delete_purchase_note_use_case.dart';
 import 'features/warehouse/domain/usecases/fetch_purchase_note_use_case.dart';
 import 'features/warehouse/domain/usecases/fetch_purchase_notes_dropdown_use_case.dart';
 import 'features/warehouse/domain/usecases/fetch_purchase_notes_use_case.dart';
-import 'features/warehouse/domain/usecases/insert_purchase_note_file_use_case.dart';
+import 'features/warehouse/domain/usecases/import_purchase_note_use_case.dart';
 import 'features/warehouse/domain/usecases/create_purchase_note_use_case.dart';
 import 'features/warehouse/domain/usecases/insert_return_cost_use_case.dart';
 import 'features/warehouse/domain/usecases/insert_shipping_fee_use_case.dart';
 import 'features/warehouse/domain/usecases/update_purchase_note_use_case.dart';
 import 'features/warehouse/presentation/cubit/create_purchase_note/create_purchase_note_cubit.dart';
+import 'features/warehouse/presentation/cubit/import_purchase_note/import_purchase_note_cubit.dart';
 import 'features/warehouse/presentation/cubit/purchase_note_list/purchase_note_list_cubit.dart';
 import 'features/warehouse/presentation/cubit/warehouse_cubit.dart';
 
@@ -86,6 +89,9 @@ void setup() {
       )..interceptors.add(DioInterceptor()),
     )
     ..registerLazySingleton<ImagePickerService>(() => ImagePickerServiceImpl())
+    ..registerLazySingleton<FileInteractionService>(
+      () => FileInteractionServiceImpl(sharePlus: SharePlus.instance),
+    )
     ..registerLazySingleton(
       () => GoogleSignInService(
         serverClientId: const String.fromEnvironment('SERVER_CLIENT_ID'),
@@ -218,9 +224,7 @@ void setup() {
       FetchPurchaseNotesDropdownUseCase(warehouseRepository: getIt()),
     )
     ..registerSingleton(CreatePurchaseNoteUseCase(warehouseRepository: getIt()))
-    ..registerSingleton(
-      InsertPurchaseNoteFileUseCase(warehouseRepository: getIt()),
-    )
+    ..registerSingleton(ImportPurchaseNoteUseCase(warehouseRepository: getIt()))
     ..registerSingleton(InsertReturnCostUseCase(warehouseRepository: getIt()))
     ..registerSingleton(InsertShippingFeeUseCase(warehouseRepository: getIt()))
     ..registerSingleton(UpdatePurchaseNoteUseCase(warehouseRepository: getIt()))
@@ -242,7 +246,16 @@ void setup() {
       ),
     )
     ..registerFactory(
-      () => CreatePurchaseNoteCubit(createPurchaseNoteUseCase: getIt()),
+      () => CreatePurchaseNoteCubit(
+        createPurchaseNoteUseCase: getIt(),
+        updatePurchaseNoteUseCase: getIt(),
+      ),
+    )
+    ..registerFactory(
+      () => ImportPurchaseNoteCubit(
+        importPurchaseNoteUseCase: getIt(),
+        fileInteractionService: getIt(),
+      ),
     );
 
   getIt

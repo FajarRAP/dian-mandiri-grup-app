@@ -12,7 +12,7 @@ import '../../domain/usecases/delete_purchase_note_use_case.dart';
 import '../../domain/usecases/fetch_purchase_note_use_case.dart';
 import '../../domain/usecases/fetch_purchase_notes_dropdown_use_case.dart';
 import '../../domain/usecases/fetch_purchase_notes_use_case.dart';
-import '../../domain/usecases/insert_purchase_note_file_use_case.dart';
+import '../../domain/usecases/import_purchase_note_use_case.dart';
 import '../../domain/usecases/create_purchase_note_use_case.dart';
 import '../../domain/usecases/insert_return_cost_use_case.dart';
 import '../../domain/usecases/insert_shipping_fee_use_case.dart';
@@ -33,9 +33,7 @@ abstract interface class WarehouseRemoteDataSource {
     FetchPurchaseNotesDropdownUseCaseParams params,
   );
   Future<String> createPurchaseNote(CreatePurchaseNoteUseCaseParams params);
-  Future<String> insertPurchaseNoteFile(
-    InsertPurchaseNoteFileUseCaseParams params,
-  );
+  Future<String> importPurchaseNote(ImportPurchaseNoteUseCaseParams params);
   Future<String> insertReturnCost(InsertReturnCostUseCaseParams params);
   Future<String> insertShippingFee(InsertShippingFeeUseCaseParams params);
   Future<String> updatePurchaseNote(UpdatePurchaseNoteUseCaseParams params);
@@ -117,8 +115,8 @@ class WarehouseRemoteDataSourceImpl
   }
 
   @override
-  Future<String> insertPurchaseNoteFile(
-    InsertPurchaseNoteFileUseCaseParams params,
+  Future<String> importPurchaseNote(
+    ImportPurchaseNoteUseCaseParams params,
   ) async {
     return await handleDioRequest<String>(() async {
       final response = await dio.post(

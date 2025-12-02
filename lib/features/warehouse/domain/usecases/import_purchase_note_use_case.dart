@@ -5,20 +5,21 @@ import '../../../../core/errors/failure.dart';
 import '../../../../core/usecase/use_case.dart';
 import '../repositories/warehouse_repository.dart';
 
-class InsertPurchaseNoteFileUseCase
-    implements UseCase<String, InsertPurchaseNoteFileUseCaseParams> {
-  const InsertPurchaseNoteFileUseCase({required this.warehouseRepository});
+class ImportPurchaseNoteUseCase
+    implements UseCase<String, ImportPurchaseNoteUseCaseParams> {
+  const ImportPurchaseNoteUseCase({required this.warehouseRepository});
 
   final WarehouseRepository warehouseRepository;
   @override
   Future<Either<Failure, String>> execute(
-      InsertPurchaseNoteFileUseCaseParams params) async {
-    return await warehouseRepository.insertPurchaseNoteFile(params);
+    ImportPurchaseNoteUseCaseParams params,
+  ) async {
+    return await warehouseRepository.importPurchaseNote(params);
   }
 }
 
-class InsertPurchaseNoteFileUseCaseParams extends Equatable {
-  const InsertPurchaseNoteFileUseCaseParams({
+class ImportPurchaseNoteUseCaseParams extends Equatable {
+  const ImportPurchaseNoteUseCaseParams({
     required this.date,
     required this.receipt,
     this.note,

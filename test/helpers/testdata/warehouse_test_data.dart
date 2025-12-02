@@ -11,7 +11,7 @@ import 'package:ship_tracker/features/warehouse/domain/usecases/fetch_purchase_n
 import 'package:ship_tracker/features/warehouse/domain/usecases/fetch_purchase_notes_use_case.dart';
 import 'package:ship_tracker/features/warehouse/domain/usecases/fetch_purchase_notes_dropdown_use_case.dart';
 import 'package:ship_tracker/features/warehouse/domain/usecases/create_purchase_note_use_case.dart';
-import 'package:ship_tracker/features/warehouse/domain/usecases/insert_purchase_note_file_use_case.dart';
+import 'package:ship_tracker/features/warehouse/domain/usecases/import_purchase_note_use_case.dart';
 import 'package:ship_tracker/features/warehouse/domain/usecases/insert_return_cost_use_case.dart';
 import 'package:ship_tracker/features/warehouse/domain/usecases/insert_shipping_fee_use_case.dart';
 import 'package:ship_tracker/features/warehouse/domain/usecases/update_purchase_note_use_case.dart';
@@ -192,7 +192,7 @@ final tInsertPurchaseNoteManualParams = CreatePurchaseNoteUseCaseParams(
 );
 const tInsertPurchaseNoteManualSuccess = 'Purchase note created successfully';
 
-final tInsertPurchaseNoteFileParams = InsertPurchaseNoteFileUseCaseParams(
+final tInsertPurchaseNoteFileParams = ImportPurchaseNoteUseCaseParams(
   date: DateTime.now(),
   receipt: 'receipt',
   supplierId: 'supplierId',

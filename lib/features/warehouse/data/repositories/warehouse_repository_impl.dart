@@ -10,7 +10,7 @@ import '../../domain/usecases/delete_purchase_note_use_case.dart';
 import '../../domain/usecases/fetch_purchase_note_use_case.dart';
 import '../../domain/usecases/fetch_purchase_notes_dropdown_use_case.dart';
 import '../../domain/usecases/fetch_purchase_notes_use_case.dart';
-import '../../domain/usecases/insert_purchase_note_file_use_case.dart';
+import '../../domain/usecases/import_purchase_note_use_case.dart';
 import '../../domain/usecases/create_purchase_note_use_case.dart';
 import '../../domain/usecases/insert_return_cost_use_case.dart';
 import '../../domain/usecases/insert_shipping_fee_use_case.dart';
@@ -75,12 +75,12 @@ class WarehouseRepositoryImpl
   }
 
   @override
-  Future<Either<Failure, String>> insertPurchaseNoteFile(
-    InsertPurchaseNoteFileUseCaseParams params,
+  Future<Either<Failure, String>> importPurchaseNote(
+    ImportPurchaseNoteUseCaseParams params,
   ) async {
     return await handleRepositoryRequest<String>(
       () async {
-        final result = await warehouseRemoteDataSource.insertPurchaseNoteFile(
+        final result = await warehouseRemoteDataSource.importPurchaseNote(
           params,
         );
 
@@ -103,9 +103,7 @@ class WarehouseRepositoryImpl
     CreatePurchaseNoteUseCaseParams params,
   ) async {
     return await handleRepositoryRequest<String>(() async {
-      final result = await warehouseRemoteDataSource.createPurchaseNote(
-        params,
-      );
+      final result = await warehouseRemoteDataSource.createPurchaseNote(params);
 
       return result;
     });

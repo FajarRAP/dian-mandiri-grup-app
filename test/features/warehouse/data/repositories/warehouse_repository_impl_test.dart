@@ -229,16 +229,16 @@ void main() {
       () async {
         // arrange
         when(
-          () => mockWarehouseRemoteDataSource.insertPurchaseNoteFile(any()),
+          () => mockWarehouseRemoteDataSource.importPurchaseNote(any()),
         ).thenAnswer((_) async => resultMatcher);
 
         // act
-        final result = await warehouseRepository.insertPurchaseNoteFile(params);
+        final result = await warehouseRepository.importPurchaseNote(params);
 
         // assert
         expect(result, const Right(resultMatcher));
         verify(
-          () => mockWarehouseRemoteDataSource.insertPurchaseNoteFile(params),
+          () => mockWarehouseRemoteDataSource.importPurchaseNote(params),
         ).called(1);
         verifyNoMoreInteractions(mockWarehouseRemoteDataSource);
       },
@@ -253,18 +253,18 @@ void main() {
         );
         final json = jsonDecode(jsonString);
         when(
-          () => mockWarehouseRemoteDataSource.insertPurchaseNoteFile(any()),
+          () => mockWarehouseRemoteDataSource.importPurchaseNote(any()),
         ).thenThrow(
           ServerException(code: 400, errors: json, message: 'Bad Request'),
         );
 
         // act
-        final result = await warehouseRepository.insertPurchaseNoteFile(params);
+        final result = await warehouseRepository.importPurchaseNote(params);
 
         // assert
         expect(result, Left(SpreadsheetFailure.fromJson(json)));
         verify(
-          () => mockWarehouseRemoteDataSource.insertPurchaseNoteFile(params),
+          () => mockWarehouseRemoteDataSource.importPurchaseNote(params),
         ).called(1);
         verifyNoMoreInteractions(mockWarehouseRemoteDataSource);
       },
@@ -275,16 +275,16 @@ void main() {
       () async {
         // arrange
         when(
-          () => mockWarehouseRemoteDataSource.insertPurchaseNoteFile(any()),
+          () => mockWarehouseRemoteDataSource.importPurchaseNote(any()),
         ).thenThrow(tServerException);
 
         // act
-        final result = await warehouseRepository.insertPurchaseNoteFile(params);
+        final result = await warehouseRepository.importPurchaseNote(params);
 
         // assert
         expect(result, const Left(tServerFailure));
         verify(
-          () => mockWarehouseRemoteDataSource.insertPurchaseNoteFile(params),
+          () => mockWarehouseRemoteDataSource.importPurchaseNote(params),
         ).called(1);
         verifyNoMoreInteractions(mockWarehouseRemoteDataSource);
       },
