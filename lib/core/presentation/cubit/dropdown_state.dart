@@ -13,14 +13,17 @@ class DropdownState extends Equatable {
     this.failure,
   });
 
+  // Status
   final DropdownStatus status;
+
+  // State Properties
   final List<DropdownEntity> items;
   final int currentPage;
   final bool hasReachedMax;
   final bool isPaginating;
-
   final String? query;
 
+  // Failure
   final Failure? failure;
 
   DropdownState copyWith({
@@ -38,7 +41,7 @@ class DropdownState extends Equatable {
       currentPage: currentPage ?? this.currentPage,
       hasReachedMax: hasReachedMax ?? this.hasReachedMax,
       isPaginating: isPaginating ?? this.isPaginating,
-      query: query ?? '',
+      query: query ?? this.query,
       failure: failure ?? this.failure,
     );
   }

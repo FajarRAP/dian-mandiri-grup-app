@@ -28,6 +28,7 @@ class DropdownCubit extends Cubit<DropdownState> {
         currentPage: 1,
         hasReachedMax: false,
         isPaginating: false,
+        query: query,
       ),
     );
 
@@ -75,57 +76,58 @@ class DropdownCubit extends Cubit<DropdownState> {
     );
   }
 
-  // Future<void> fetchPurchaseNotes({String query = '', bool showAll = false}) async {
-  //   emit(
-  //     state.copyWith(
-  //       status: .inProgress,
-  //       currentPage: 1,
-  //       hasReachedMax: false,
-  //       isPaginating: false,
-  //     ),
-  //   );
+  Future<void> fetchPurchaseNotes({String query = '', bool showAll = false}) async {
+    emit(
+      state.copyWith(
+        status: .inProgress,
+        currentPage: 1,
+        hasReachedMax: false,
+        isPaginating: false,
+        query: query,
+      ),
+    );
 
-  //   final params = FetchSuppliersDropdownUseCaseParams(
-  //     search: SearchParams(query: query),
-  //     showAll: showAll,
-  //   );
-  //   final result = await _fetchPurchaseNotesDropdownUseCase(params);
+    final params = FetchPurchaseNotesDropdownUseCaseParams(
+      search: SearchParams(query: query),
+      showAll: showAll,
+    );
+    final result = await _fetchPurchaseNotesDropdownUseCase(params);
 
-  //   result.fold(
-  //     (failure) => emit(state.copyWith(status: .failure, failure: failure)),
-  //     (suppliers) => emit(state.copyWith(status: .success, items: suppliers)),
-  //   );
-  // }
+    result.fold(
+      (failure) => emit(state.copyWith(status: .failure, failure: failure)),
+      (suppliers) => emit(state.copyWith(status: .success, items: suppliers)),
+    );
+  }
 
-  // Future<void> fetchPurchaseNotesPaginate() async {
-  //   if (state.hasReachedMax || state.isPaginating) return;
+  Future<void> fetchPurchaseNotesPaginate() async {
+    if (state.hasReachedMax || state.isPaginating) return;
 
-  //   emit(state.copyWith(isPaginating: true));
+    emit(state.copyWith(isPaginating: true));
 
-  //   final params = FetchSuppliersDropdownUseCaseParams(
-  //     paginate: PaginateParams(page: state.currentPage + 1),
-  //     search: SearchParams(query: state.query),
-  //   );
-  //   final result = await _fetchPurchaseNotesDropdownUseCase(params);
+    final params = FetchPurchaseNotesDropdownUseCaseParams(
+      paginate: PaginateParams(page: state.currentPage + 1),
+      search: SearchParams(query: state.query),
+    );
+    final result = await _fetchPurchaseNotesDropdownUseCase(params);
 
-  //   result.fold(
-  //     (failure) => emit(
-  //       state.copyWith(
-  //         status: .failure,
-  //         hasReachedMax: true,
-  //         isPaginating: false,
-  //         failure: failure,
-  //       ),
-  //     ),
-  //     (suppliers) => emit(
-  //       state.copyWith(
-  //         status: .success,
-  //         isPaginating: false,
-  //         hasReachedMax: suppliers.isEmpty,
-  //         currentPage: state.currentPage + 1,
-  //         items: [...state.items, ...suppliers],
-  //       ),
-  //     ),
-  //   );
-  // }
+    result.fold(
+      (failure) => emit(
+        state.copyWith(
+          status: .failure,
+          hasReachedMax: true,
+          isPaginating: false,
+          failure: failure,
+        ),
+      ),
+      (suppliers) => emit(
+        state.copyWith(
+          status: .success,
+          isPaginating: false,
+          hasReachedMax: suppliers.isEmpty,
+          currentPage: state.currentPage + 1,
+          items: [...state.items, ...suppliers],
+        ),
+      ),
+    );
+  }
 }
