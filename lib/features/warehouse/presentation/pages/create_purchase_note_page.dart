@@ -7,17 +7,19 @@ import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/common/constants.dart';
+import '../../../../core/common/dropdown_entity.dart';
 import '../../../../core/helpers/helpers.dart';
 import '../../../../core/helpers/top_snackbar.dart';
-import '../../../../core/helpers/validators.dart';
 import '../../../../core/utils/extensions.dart';
 import '../../../../core/widgets/buttons/primary_button.dart';
 import '../../../../core/widgets/buttons/primary_outline_button.dart';
-import '../../../../core/widgets/dropdowns/supplier_dropdown.dart';
 import '../../../../core/widgets/fab_container.dart';
-import '../../../../core/widgets/image_picker_bottom_sheet.dart';
-import '../../../../core/widgets/preview_picked_image_dialog.dart';
+import '../../domain/entities/warehouse_item_entity.dart';
 import '../cubit/create_purchase_note/create_purchase_note_cubit.dart';
+import '../widgets/purchase_note_form/note_form.dart';
+import '../widgets/purchase_note_form/select_date_form.dart';
+import '../widgets/purchase_note_form/select_supplier_form.dart';
+import '../widgets/purchase_note_form/upload_receipt_form.dart';
 import '../widgets/purchase_note_item_card.dart';
 import '../widgets/purchase_note_item_dialog.dart';
 
@@ -29,6 +31,7 @@ class CreatePurchaseNotePage extends StatefulWidget {
 }
 
 class _CreatePurchaseNotePageState extends State<CreatePurchaseNotePage> {
+  late final CreatePurchaseNoteCubit _createPurchaseNoteCubit;
   late final TextEditingController _supplierController;
   late final TextEditingController _dateController;
   late final TextEditingController _noteController;
@@ -37,6 +40,7 @@ class _CreatePurchaseNotePageState extends State<CreatePurchaseNotePage> {
   @override
   void initState() {
     super.initState();
+    _createPurchaseNoteCubit = context.read<CreatePurchaseNoteCubit>();
     _supplierController = TextEditingController();
     _dateController = TextEditingController();
     _noteController = TextEditingController();
@@ -53,20 +57,22 @@ class _CreatePurchaseNotePageState extends State<CreatePurchaseNotePage> {
 
   @override
   Widget build(BuildContext context) {
-    final createPurchaseNoteCubit = context.read<CreatePurchaseNoteCubit>();
-    final textTheme = context.textTheme;
+    final supplier = context.select<CreatePurchaseNoteCubit, DropdownEntity?>(
+      (cubit) => cubit.state.supplier,
+    );
+    final date = context.select<CreatePurchaseNoteCubit, DateTime?>(
+      (cubit) => cubit.state.date,
+    );
+    final image = context.select<CreatePurchaseNoteCubit, File?>(
+      (cubit) => cubit.state.image,
+    );
+    final items = context
+        .select<CreatePurchaseNoteCubit, List<WarehouseItemEntity>>(
+          (cubit) => cubit.state.items,
+        );
 
-    return BlocListener<CreatePurchaseNoteCubit, CreatePurchaseNoteState>(
-      listenWhen: (previous, current) => current.shouldListen(previous),
-      listener: (context, state) {
-        if (state.supplier != null) {
-          _supplierController.text = state.supplier!.value;
-        }
-
-        if (state.date != null) {
-          _dateController.text = state.date!.toDMY;
-        }
-      },
+    return GestureDetector(
+      onTap: FocusScope.of(context).unfocus,
       child: Scaffold(
         appBar: AppBar(title: const Text('Tambah Nota')),
         body: Form(
@@ -74,119 +80,34 @@ class _CreatePurchaseNotePageState extends State<CreatePurchaseNotePage> {
           child: ListView(
             padding: const .all(16),
             children: [
-              Text('Pilih Supplier', style: textTheme.bodyLarge),
-              const Gap(4),
-              TextFormField(
-                onTap: () => showModalBottomSheet(
-                  builder: (context) => SupplierDropdown(
-                    onTap: (supplier) {
-                      createPurchaseNoteCubit.supplier = supplier;
-                      context.pop();
-                    },
-                  ),
-                  context: context,
-                  isScrollControlled: true,
-                ),
-                autovalidateMode: .onUserInteraction,
-                controller: _supplierController,
-                decoration: const InputDecoration(
-                  hintText: 'Pilih Supplier',
-                  suffixIcon: Icon(Icons.arrow_drop_down),
-                ),
-                readOnly: true,
-                validator: nullValidator,
+              SelectSupplierForm(
+                onTap: (supplier) =>
+                    _createPurchaseNoteCubit.supplier = supplier,
+                selectedSupplier: supplier,
               ),
               const Gap(12),
-              Text('Tanggal', style: textTheme.bodyLarge),
-              const Gap(4),
-              TextFormField(
-                onTap: () async {
-                  final pickedDate = await showDatePicker(
-                    context: context,
-                    firstDate: DateTime(2000),
-                    initialDate: DateTime.now(),
-                    lastDate: DateTime.now(),
-                    locale: const Locale('id', 'ID'),
-                  );
-
-                  createPurchaseNoteCubit.date = pickedDate;
-                },
-                autovalidateMode: .onUserInteraction,
-                controller: _dateController,
-                decoration: const InputDecoration(
-                  hintText: 'Tanggal',
-                  suffixIcon: Icon(Icons.date_range),
-                ),
-                readOnly: true,
-                validator: nullValidator,
+              SelectDateForm(
+                onTap: (date) => _createPurchaseNoteCubit.date = date,
+                pickedDate: date,
               ),
               const Gap(12),
-              Text('Unggah Gambar Nota', style: textTheme.bodyLarge),
-              const Gap(4),
-              Column(
-                crossAxisAlignment: .start,
-                children: <Widget>[
-                  SizedBox(
-                    width: 150,
-                    child: PrimaryButton(
-                      onPressed: () => showModalBottomSheet(
-                        builder: (context) => ImagePickerBottomSheet(
-                          onPicked: (image) =>
-                              createPurchaseNoteCubit.image = image,
-                        ),
-                        context: context,
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: .vertical(top: .circular(16)),
-                        ),
-                      ),
-                      child: const Text('Ambil Gambar'),
-                    ),
-                  ),
-                  BlocSelector<
-                    CreatePurchaseNoteCubit,
-                    CreatePurchaseNoteState,
-                    File?
-                  >(
-                    selector: (state) => state.image,
-                    builder: (context, image) {
-                      if (image == null) return const SizedBox();
-
-                      return SizedBox(
-                        width: 150,
-                        child: PrimaryOutlineButton(
-                          onPressed: () => showDialog(
-                            context: context,
-                            builder: (_) => PreviewPickedImageDialog(
-                              pickedImagePath: image.path,
-                            ),
-                          ),
-                          child: const Text('Preview Gambar'),
-                        ),
-                      );
-                    },
-                  ),
-                ],
+              UploadReceiptForm(
+                onPicked: (file) => _createPurchaseNoteCubit.image = file,
+                image: image,
               ),
               const Gap(12),
-              Text('Catatan', style: textTheme.bodyLarge),
-              const Gap(4),
-              TextFormField(
-                onChanged: (value) => createPurchaseNoteCubit.note = value,
-                controller: _noteController,
-                decoration: const InputDecoration(
-                  hintText: 'Tuliskan catatan jika ada',
-                ),
-                maxLines: 3,
+              NoteForm(
+                onChanged: (value) => _createPurchaseNoteCubit.note = value,
               ),
               const Gap(24),
               const Divider(height: 1),
               const Gap(24),
               PrimaryOutlineButton(
                 onPressed: () => showDialog(
-                  builder: (context) => PurchaseNoteItemDialog(
+                  builder: (_) => PurchaseNoteItemDialog(
                     onSave: (item) {
-                      createPurchaseNoteCubit.items = [
-                        ...createPurchaseNoteCubit.state.items,
+                      _createPurchaseNoteCubit.items = [
+                        ..._createPurchaseNoteCubit.state.items,
                         item,
                       ];
                       context.pop();
@@ -197,39 +118,31 @@ class _CreatePurchaseNotePageState extends State<CreatePurchaseNotePage> {
                 ),
                 icon: SvgPicture.asset(
                   boxSvg,
-                  colorFilter: ColorFilter.mode(
-                    context.colorScheme.primary,
-                    .srcIn,
-                  ),
+                  colorFilter: .mode(context.colorScheme.primary, .srcIn),
                 ),
                 child: const Text('Tambah Barang'),
               ),
               const Gap(12),
-              BlocBuilder<CreatePurchaseNoteCubit, CreatePurchaseNoteState>(
-                builder: (context, state) {
-                  return ListView.separated(
-                    itemBuilder: (context, index) => PurchaseNoteItemCard(
-                      onDelete: () =>
-                          createPurchaseNoteCubit.removeItemAt(index),
-                      onEdit: () => showDialog(
-                        context: context,
-                        builder: (context) => PurchaseNoteItemDialog(
-                          onSave: (edited) {
-                            createPurchaseNoteCubit.updateItemAt(index, edited);
-                            context.pop();
-                          },
-                          title: 'Edit Barang',
-                          initialItem: state.items[index],
-                        ),
-                      ),
-                      warehouseItem: state.items[index],
+              ListView.separated(
+                itemBuilder: (context, index) => PurchaseNoteItemCard(
+                  onDelete: () => _createPurchaseNoteCubit.removeItemAt(index),
+                  onEdit: () => showDialog(
+                    context: context,
+                    builder: (_) => PurchaseNoteItemDialog(
+                      onSave: (edited) {
+                        _createPurchaseNoteCubit.updateItemAt(index, edited);
+                        context.pop();
+                      },
+                      title: 'Edit Barang',
+                      initialItem: items[index],
                     ),
-                    separatorBuilder: (context, index) => const Gap(12),
-                    itemCount: state.items.length,
-                    physics: const NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                  );
-                },
+                  ),
+                  warehouseItem: items[index],
+                ),
+                separatorBuilder: (context, index) => const Gap(12),
+                itemCount: items.length,
+                physics: const NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
               ),
               const Gap(144),
             ],
