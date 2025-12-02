@@ -32,7 +32,7 @@ import '../../features/tracker/presentation/pages/update_shipment_document_page.
 import '../../features/warehouse/presentation/cubit/create_purchase_note/create_purchase_note_cubit.dart';
 import '../../features/warehouse/presentation/cubit/import_purchase_note/import_purchase_note_cubit.dart';
 import '../../features/warehouse/presentation/cubit/purchase_note_list/purchase_note_list_cubit.dart';
-import '../../features/warehouse/presentation/pages/add_purchase_note_file_page.dart';
+import '../../features/warehouse/presentation/pages/import_purchase_note_page.dart';
 import '../../features/warehouse/presentation/pages/create_purchase_note_page.dart';
 import '../../features/warehouse/presentation/pages/add_shipping_fee_page.dart';
 import '../../features/warehouse/presentation/pages/purchase_note_detail_page.dart';
@@ -236,7 +236,7 @@ class AppRouter {
                       _buildRouteWithCubit<ImportPurchaseNoteCubit>(
                         path: 'import-purchase-note',
                         name: Routes.warehouseAddPurchaseNoteFile,
-                        child: (state) => const AddPurchaseNoteFilePage(),
+                        child: (state) => const ImportPurchaseNotePage(),
                       ),
                       GoRoute(
                         path: 'add-shipping-fee',

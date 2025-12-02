@@ -19,15 +19,14 @@ import '../widgets/purchase_note_form/select_date_form.dart';
 import '../widgets/purchase_note_form/select_supplier_form.dart';
 import '../widgets/purchase_note_form/upload_receipt_form.dart';
 
-class AddPurchaseNoteFilePage extends StatefulWidget {
-  const AddPurchaseNoteFilePage({super.key});
+class ImportPurchaseNotePage extends StatefulWidget {
+  const ImportPurchaseNotePage({super.key});
 
   @override
-  State<AddPurchaseNoteFilePage> createState() =>
-      _AddPurchaseNoteFilePageState();
+  State<ImportPurchaseNotePage> createState() => _ImportPurchaseNotePageState();
 }
 
-class _AddPurchaseNoteFilePageState extends State<AddPurchaseNoteFilePage> {
+class _ImportPurchaseNotePageState extends State<ImportPurchaseNotePage> {
   late final ImportPurchaseNoteCubit _importPurchaseNoteCubit;
   late final GlobalKey<FormState> _formKey;
 
