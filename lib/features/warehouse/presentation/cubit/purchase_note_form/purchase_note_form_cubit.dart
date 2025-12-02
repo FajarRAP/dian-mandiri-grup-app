@@ -28,6 +28,7 @@ class PurchaseNoteFormCubit extends Cubit<PurchaseNoteFormState> {
     emit(
       state.copyWith(
         items: data.items,
+        returnCost: data.returnCost,
         note: data.note,
         supplier: DropdownEntity(
           key: data.supplier.id,
@@ -114,6 +115,9 @@ class PurchaseNoteFormCubit extends Cubit<PurchaseNoteFormState> {
   set image(File? image) => emit(state.copyWith(image: image));
 
   set note(String? note) => emit(state.copyWith(note: note));
+
+  set returnCost(int? returnCost) =>
+      emit(state.copyWith(returnCost: returnCost));
 
   set items(List<WarehouseItemEntity> items) =>
       emit(state.copyWith(items: items));

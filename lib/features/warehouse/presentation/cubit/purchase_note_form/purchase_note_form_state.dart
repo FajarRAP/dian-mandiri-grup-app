@@ -7,6 +7,7 @@ class PurchaseNoteFormState extends Equatable {
     this.status = .initial,
     this.purchaseNoteId,
     this.items = const [],
+    this.returnCost = 0,
     this.note,
     this.date,
     this.supplier,
@@ -21,6 +22,7 @@ class PurchaseNoteFormState extends Equatable {
   // State Properties
   final String? purchaseNoteId;
   final List<WarehouseItemEntity> items;
+  final int returnCost;
   final String? note;
   final DateTime? date;
   final DropdownEntity? supplier;
@@ -40,6 +42,7 @@ class PurchaseNoteFormState extends Equatable {
     PurchaseNoteFormStatus? status,
     String? purchaseNoteId,
     List<WarehouseItemEntity>? items,
+    int? returnCost,
     String? note,
     DateTime? date,
     DropdownEntity? supplier,
@@ -51,6 +54,7 @@ class PurchaseNoteFormState extends Equatable {
       status: status ?? this.status,
       purchaseNoteId: purchaseNoteId ?? this.purchaseNoteId,
       items: items ?? this.items,
+      returnCost: returnCost ?? this.returnCost,
       note: note ?? this.note,
       date: date ?? this.date,
       supplier: supplier ?? this.supplier,
@@ -65,6 +69,7 @@ class PurchaseNoteFormState extends Equatable {
     status,
     purchaseNoteId,
     items,
+    returnCost,
     note,
     date,
     supplier,
