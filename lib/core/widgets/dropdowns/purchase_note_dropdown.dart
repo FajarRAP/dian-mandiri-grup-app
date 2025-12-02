@@ -1,108 +1,69 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gap/gap.dart';
 
-import '../../../features/warehouse/presentation/cubit/warehouse_cubit.dart';
+import '../../../service_container.dart';
 import '../../common/dropdown_entity.dart';
+import '../../presentation/cubit/dropdown_cubit.dart';
+import '../../presentation/widgets/loading_indicator.dart';
+import '../../presentation/widgets/pagination_listener.dart';
 import '../dropdown_modal_item.dart';
 import '../dropdown_search_modal.dart';
 
-class PurchaseNoteDropdown extends StatefulWidget {
-  const PurchaseNoteDropdown({
-    super.key,
-    required this.onTap,
-  });
+class PurchaseNoteDropdown extends StatelessWidget {
+  const PurchaseNoteDropdown({super.key, required this.onTap});
 
   final void Function(DropdownEntity purchaseNote) onTap;
 
   @override
-  State<PurchaseNoteDropdown> createState() => _PurchaseNoteDropdownState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => getIt<DropdownCubit>()..fetchPurchaseNotes(),
+      child: Padding(
+        padding: .only(bottom: MediaQuery.viewInsetsOf(context).bottom),
+        child: DropdownSearchModal(
+          search: (keyword) =>
+              context.read<DropdownCubit>().fetchPurchaseNotes(query: keyword),
+          title: 'Nota',
+          child: Expanded(
+            child: BlocBuilder<DropdownCubit, DropdownState>(
+              builder: (context, state) {
+                return switch (state.status) {
+                  .inProgress => const LoadingIndicator(),
+                  .success => _SuccessWidget(
+                    onTap: onTap,
+                    purchaseNotes: state.items,
+                  ),
+                  _ => const SizedBox(),
+                };
+              },
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
-class _PurchaseNoteDropdownState extends State<PurchaseNoteDropdown> {
-  late final WarehouseCubit _warehouseCubit;
-  String? _search;
+class _SuccessWidget extends StatelessWidget {
+  const _SuccessWidget({required this.onTap, required this.purchaseNotes});
 
-  @override
-  void initState() {
-    super.initState();
-    _warehouseCubit = context.read<WarehouseCubit>()
-      ..fetchPurchaseNotesDropdown();
-  }
+  final void Function(DropdownEntity purchaseNote) onTap;
+  final List<DropdownEntity> purchaseNotes;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.viewInsetsOf(context).bottom,
-      ),
-      child: DropdownSearchModal(
-        search: (keyword) {
-          _search = keyword;
-          _warehouseCubit.fetchPurchaseNotesDropdown(search: _search);
-        },
-        title: 'Nota',
-        child: BlocBuilder<WarehouseCubit, WarehouseState>(
-          bloc: _warehouseCubit,
-          buildWhen: (previous, current) =>
-              current is FetchPurchaseNotesDropdown,
-          builder: (context, state) {
-            if (state is FetchPurchaseNotesDropdownLoading) {
-              return const Center(
-                child: CircularProgressIndicator.adaptive(),
-              );
-            }
-
-            if (state is FetchPurchaseNotesDropdownLoaded) {
-              return Flexible(
-                child: NotificationListener<ScrollNotification>(
-                  onNotification: (scrollState) {
-                    if (scrollState.runtimeType == ScrollEndNotification &&
-                        _warehouseCubit.state is! ListPaginateLast) {
-                      _warehouseCubit.fetchPurchaseNotesDropdownPaginate(
-                          search: _search);
-                    }
-
-                    return false;
-                  },
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      ListView.separated(
-                        itemBuilder: (context, index) => GestureDetector(
-                          onTap: () => widget.onTap(state.purchaseNotes[index]),
-                          child: DropdownModalItem(
-                            child: Text(state.purchaseNotes[index].value),
-                          ),
-                        ),
-                        separatorBuilder: (context, index) =>
-                            const SizedBox(height: 12),
-                        itemCount: state.purchaseNotes.length,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shrinkWrap: true,
-                      ),
-                      // Widget when Pagination
-                      BlocBuilder<WarehouseCubit, WarehouseState>(
-                        buildWhen: (previous, current) =>
-                            current is ListPaginate,
-                        builder: (context, state) {
-                          if (state is ListPaginateLoading) {
-                            return const Center(
-                              child: CircularProgressIndicator.adaptive(),
-                            );
-                          }
-
-                          return const SizedBox();
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            }
-
-            return const SizedBox();
-          },
+    return PaginationListener(
+      onPaginate: context.read<DropdownCubit>().fetchPurchaseNotesPaginate,
+      child: ListView.separated(
+        itemBuilder: (context, index) => GestureDetector(
+          onTap: () => onTap(purchaseNotes[index]),
+          child: DropdownModalItem(child: Text(purchaseNotes[index].value)),
         ),
+        separatorBuilder: (context, index) => const Gap(12),
+        itemCount: purchaseNotes.length,
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        shrinkWrap: true,
       ),
     );
   }
