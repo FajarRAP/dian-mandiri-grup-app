@@ -30,12 +30,6 @@ class CreatePurchaseNoteState extends Equatable {
   // Failure
   final Failure? failure;
 
-  bool shouldListen(CreatePurchaseNoteState previous) {
-    return previous.supplier != supplier ||
-        previous.date != date ||
-        previous.image != image;
-  }
-
   double get totalAmount =>
       items.fold(0.0, (sum, item) => sum + (item.price * item.quantity));
 
