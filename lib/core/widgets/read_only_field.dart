@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../utils/extensions.dart';
+
 class ReadOnlyField extends StatelessWidget {
   const ReadOnlyField({
     super.key,
@@ -14,23 +16,14 @@ class ReadOnlyField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-    final focusNode = FocusScope.of(context, createDependency: false);
+    final textTheme = context.textTheme;
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: .start,
+      spacing: 4,
       children: <Widget>[
-        Text(
-          title,
-          style: textTheme.bodyLarge,
-        ),
-        const SizedBox(height: 4),
-        TextFormField(
-          onTapOutside: (event) => focusNode.unfocus(),
-          initialValue: value,
-          maxLines: maxLines,
-          readOnly: true,
-        ),
+        Text(title, style: textTheme.bodyLarge),
+        TextFormField(initialValue: value, maxLines: maxLines, readOnly: true),
       ],
     );
   }
