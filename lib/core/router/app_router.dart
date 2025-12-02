@@ -29,6 +29,8 @@ import '../../features/tracker/presentation/pages/stages/send_page.dart';
 import '../../features/tracker/presentation/pages/shipment_detail_page.dart';
 import '../../features/tracker/presentation/pages/tracker_page.dart';
 import '../../features/tracker/presentation/pages/update_shipment_document_page.dart';
+import '../../features/warehouse/presentation/cubit/purchase_note_cost/purchase_note_cost_cubit.dart';
+import '../../features/warehouse/presentation/cubit/purchase_note_detail/purchase_note_detail_cubit.dart';
 import '../../features/warehouse/presentation/cubit/purchase_note_form/purchase_note_form_cubit.dart';
 import '../../features/warehouse/presentation/cubit/import_purchase_note/import_purchase_note_cubit.dart';
 import '../../features/warehouse/presentation/cubit/purchase_note_list/purchase_note_list_cubit.dart';
@@ -224,9 +226,29 @@ class AppRouter {
                       GoRoute(
                         path: 'detail',
                         name: Routes.warehouseDetail,
-                        builder: (context, state) => PurchaseNoteDetailPage(
-                          purchaseNoteId: state.extra as String,
-                        ),
+                        builder: (context, state) {
+                          final purchaseNoteId = state.extra as String;
+
+                          return MultiBlocProvider(
+                            providers: [
+                              BlocProvider(
+                                create: (context) =>
+                                    getIt<PurchaseNoteDetailCubit>(),
+                              ),
+                              BlocProvider(
+                                create: (context) =>
+                                    getIt<PurchaseNoteFormCubit>(),
+                              ),
+                              BlocProvider(
+                                create: (context) =>
+                                    getIt<PurchaseNoteCostCubit>(),
+                              ),
+                            ],
+                            child: PurchaseNoteDetailPage(
+                              purchaseNoteId: purchaseNoteId,
+                            ),
+                          );
+                        },
                       ),
                       _buildRouteWithCubit<PurchaseNoteFormCubit>(
                         path: 'create-purchase-note',
