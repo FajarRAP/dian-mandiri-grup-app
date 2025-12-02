@@ -1,22 +1,23 @@
-import 'package:file_selector/file_selector.dart';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/common/dropdown_entity.dart';
 import '../../../../core/errors/failure.dart';
-import '../../../../core/helpers/helpers.dart';
 import '../../../../core/helpers/top_snackbar.dart';
-import '../../../../core/helpers/validators.dart';
-import '../../../../core/themes/colors.dart';
-import '../../../../core/widgets/dropdowns/supplier_dropdown.dart';
-import '../../../../core/widgets/fab_container.dart';
-import '../../../../core/widgets/image_picker_bottom_sheet.dart';
-import '../../../../core/widgets/preview_picked_image_dialog.dart';
+import '../../../../core/utils/extensions.dart';
+import '../../../../core/utils/typedefs.dart';
 import '../../../../core/widgets/buttons/primary_button.dart';
 import '../../../../core/widgets/buttons/primary_outline_button.dart';
-import '../../domain/usecases/insert_purchase_note_file_use_case.dart';
-import '../cubit/warehouse_cubit.dart';
+import '../../../../core/widgets/fab_container.dart';
+import '../cubit/import_purchase_note/import_purchase_note_cubit.dart';
+import '../widgets/purchase_note_form/note_form.dart';
+import '../widgets/purchase_note_form/select_date_form.dart';
+import '../widgets/purchase_note_form/select_supplier_form.dart';
+import '../widgets/purchase_note_form/upload_receipt_form.dart';
 
 class AddPurchaseNoteFilePage extends StatefulWidget {
   const AddPurchaseNoteFilePage({super.key});
@@ -27,332 +28,268 @@ class AddPurchaseNoteFilePage extends StatefulWidget {
 }
 
 class _AddPurchaseNoteFilePageState extends State<AddPurchaseNoteFilePage> {
-  late final WarehouseCubit _warehouseCubit;
+  late final ImportPurchaseNoteCubit _importPurchaseNoteCubit;
   late final GlobalKey<FormState> _formKey;
-  late final FocusNode _focusNode;
-  late final TextEditingController _dateController;
-  late final TextEditingController _noteController;
-  late final TextEditingController _supplierController;
-  DateTime? _pickedDate;
-  DropdownEntity? _selectedSupplier;
-  XFile? _pickedImage;
-  XFile? _pickedFile;
 
   @override
   void initState() {
     super.initState();
-    _warehouseCubit = context.read<WarehouseCubit>();
-    _focusNode = FocusScope.of(context, createDependency: false);
+    _importPurchaseNoteCubit = context.read<ImportPurchaseNoteCubit>();
     _formKey = GlobalKey<FormState>();
-    _dateController = TextEditingController();
-    _noteController = TextEditingController();
-    _supplierController = TextEditingController();
-  }
-
-  @override
-  void dispose() {
-    _dateController.dispose();
-    _noteController.dispose();
-    _supplierController.dispose();
-    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final textTheme = theme.textTheme;
+    final supplier = context.select<ImportPurchaseNoteCubit, DropdownEntity?>(
+      (value) => value.state.supplier,
+    );
+    final date = context.select<ImportPurchaseNoteCubit, DateTime?>(
+      (value) => value.state.date,
+    );
+    final image = context.select<ImportPurchaseNoteCubit, File?>(
+      (value) => value.state.image,
+    );
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Tambah Nota (Excel)'),
+    return GestureDetector(
+      onTap: FocusScope.of(context).unfocus,
+      child: Scaffold(
+        appBar: AppBar(title: const Text('Tambah Nota (Excel)')),
+        body: Form(
+          key: _formKey,
+          child: ListView(
+            padding: const .all(16),
+            children: <Widget>[
+              SelectSupplierForm(
+                onTap: (supplier) =>
+                    _importPurchaseNoteCubit.supplier = supplier,
+                selectedSupplier: supplier,
+              ),
+              const Gap(12),
+              SelectDateForm(
+                onTap: (date) => _importPurchaseNoteCubit.date = date,
+                pickedDate: date,
+              ),
+              const Gap(12),
+              UploadReceiptForm(
+                onPicked: (file) => _importPurchaseNoteCubit.image = file,
+                image: image,
+              ),
+              const Gap(12),
+              NoteForm(
+                onChanged: (value) => _importPurchaseNoteCubit.note = value,
+              ),
+              const Gap(24),
+              const Divider(height: 1),
+              const Gap(24),
+              BlocSelector<
+                ImportPurchaseNoteCubit,
+                ImportPurchaseNoteState,
+                File?
+              >(
+                selector: (state) => state.file,
+                builder: (context, file) {
+                  final child = file == null
+                      ? const Text('Pilih File Excel')
+                      : Text(file.fileName, overflow: .ellipsis);
+
+                  return PrimaryOutlineButton(
+                    onPressed: _importPurchaseNoteCubit.pickFile,
+                    icon: const Icon(Icons.folder),
+                    child: child,
+                  );
+                },
+              ),
+              const _SpreadsheetFailureResult(),
+              const Gap(144),
+            ],
+          ),
+        ),
+        floatingActionButton: _FAB(formKey: _formKey),
+        floatingActionButtonLocation: .centerDocked,
+        resizeToAvoidBottomInset: false,
       ),
-      body: Form(
-        key: _formKey,
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: <Widget>[
-            Text(
-              'Pilih Supplier',
-              style: textTheme.bodyLarge,
-            ),
-            const SizedBox(height: 4),
-            TextFormField(
-              onTap: () => showModalBottomSheet(
-                builder: (context) => Padding(
-                  padding: EdgeInsets.only(
-                    bottom: MediaQuery.viewInsetsOf(context).bottom,
-                  ),
-                  child: SupplierDropdown(
-                    onTap: (supplier) {
-                      _selectedSupplier = supplier;
-                      _supplierController.text = supplier.value;
-                      context.pop();
-                    },
-                  ),
-                ),
-                constraints: const BoxConstraints(minHeight: 400),
-                context: context,
-                isScrollControlled: true,
-              ),
-              onTapOutside: (event) => _focusNode.unfocus(),
-              autovalidateMode: AutovalidateMode.onUserInteraction,
-              controller: _supplierController,
-              decoration: InputDecoration(
-                hintText: 'Pilih Supplier',
-                suffixIcon: const Icon(Icons.arrow_drop_down),
-              ),
-              readOnly: true,
-              validator: nullValidator,
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'Tanggal',
-              style: textTheme.bodyLarge,
-            ),
-            const SizedBox(height: 4),
-            TextFormField(
-              onTap: () async {
-                final pickedDate = await showDatePicker(
-                  context: context,
-                  firstDate: DateTime(2000),
-                  initialDate: DateTime.now(),
-                  lastDate: DateTime.now(),
-                  locale: const Locale('id', 'ID'),
-                );
+    );
+  }
+}
 
-                if (pickedDate == null) return;
-                _dateController.text = dMyFormat.format(pickedDate);
-                _pickedDate = pickedDate;
-              },
-              onTapOutside: (event) => _focusNode.unfocus(),
-              autovalidateMode: AutovalidateMode.onUserInteraction,
-              controller: _dateController,
-              decoration: InputDecoration(
-                hintText: 'Tanggal',
-                suffixIcon: const Icon(Icons.date_range),
-              ),
-              readOnly: true,
-              validator: nullValidator,
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'Unggah Gambar Nota',
-              style: textTheme.bodyLarge,
-            ),
-            const SizedBox(height: 4),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+class _SpreadsheetFailureResult extends StatelessWidget {
+  const _SpreadsheetFailureResult();
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = context.textTheme;
+
+    return BlocSelector<
+      ImportPurchaseNoteCubit,
+      ImportPurchaseNoteState,
+      Failure?
+    >(
+      selector: (state) => state.failure,
+      builder: (context, state) {
+        if (state == null || state is! SpreadsheetFailure) {
+          return const SizedBox();
+        }
+
+        return Column(
+          crossAxisAlignment: .start,
+          children: <Widget>[
+            const Gap(24),
+            // Information
+            Row(
               children: <Widget>[
-                SizedBox(
-                  width: 150,
-                  child: PrimaryButton(
-                    onPressed: () => showModalBottomSheet(
-                      builder: (context) => ImagePickerBottomSheet(
-                        onPicked: (image) =>
-                            setState(() => _pickedImage = image),
-                      ),
-                      context: context,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.vertical(
-                          top: Radius.circular(16),
-                        ),
-                      ),
+                Icon(
+                  Icons.info_outline,
+                  color: context.colorScheme.primary,
+                  size: 18,
+                ),
+                const Gap(8),
+                Expanded(
+                  child: Text(
+                    'Ketuk data pada setiap kolom untuk melihat detail error',
+                    style: textTheme.bodySmall?.copyWith(
+                      color: Colors.grey.shade700,
                     ),
-                    child: const Text('Ambil Gambar'),
                   ),
                 ),
-                if (_pickedImage != null) ...[
-                  const SizedBox(height: 6),
-                  SizedBox(
-                    width: 150,
-                    child: PrimaryOutlineButton(
-                      onPressed: () => showDialog(
-                        context: context,
-                        builder: (context) => PreviewPickedImageDialog(
-                          pickedImagePath: _pickedImage?.path,
-                        ),
-                      ),
-                      child: const Text('Preview Gambar'),
+              ],
+            ),
+            const Gap(16),
+            // Table
+            SingleChildScrollView(
+              scrollDirection: .horizontal,
+              child: DataTable(
+                border: .all(
+                  borderRadius: .circular(8.0),
+                  color: context.colorScheme.outlineVariant,
+                ),
+                clipBehavior: .antiAlias,
+                columns: _buildHeaders(state.headers),
+                headingRowColor: .all(context.colorScheme.surfaceContainer),
+                rows: _buildRows(context, state.rows),
+              ),
+            ),
+            if (state.hiddenColumnCount > 0) ...[
+              const Gap(16),
+              Row(
+                children: <Widget>[
+                  Icon(
+                    Icons.warning_amber_rounded,
+                    color: context.colorScheme.error,
+                    size: 18,
+                  ),
+                  const Gap(8),
+                  Text(
+                    'Dan ${state.hiddenColumnCount} kolom lainnya tidak ditampilkan',
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: context.colorScheme.error,
+                      fontWeight: .w500,
                     ),
                   ),
                 ],
-              ],
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'Catatan',
-              style: textTheme.bodyLarge,
-            ),
-            const SizedBox(height: 4),
-            TextFormField(
-              onTapOutside: (event) => _focusNode.unfocus(),
-              controller: _noteController,
-              decoration: InputDecoration(
-                hintText: 'Tuliskan catatan jika ada',
               ),
-              maxLines: 3,
-            ),
-            const SizedBox(height: 24),
-            const Divider(),
-            const SizedBox(height: 24),
-            PrimaryOutlineButton(
-              onPressed: () async {
-                final file = await openFile(acceptedTypeGroups: [
-                  XTypeGroup(
-                    label: 'files',
-                    extensions: <String>['xlsx', 'xls', 'csv'],
-                  ),
-                ]);
-
-                if (file == null) return;
-                setState(() => _pickedFile = file);
-              },
-              icon: Icon(Icons.folder),
-              child: _pickedFile == null
-                  ? const Text('Pilih File Excel')
-                  : Text(_pickedFile!.name, overflow: TextOverflow.ellipsis),
-            ),
-            const SizedBox(height: 24),
-            BlocBuilder<WarehouseCubit, WarehouseState>(
-              buildWhen: (previous, current) =>
-                  current is InsertPurchaseNoteFileError,
-              builder: (context, state) {
-                if (state is InsertPurchaseNoteFileError) {
-                  if (state.failure is! SpreadsheetFailure) {
-                    return const SizedBox();
-                  }
-
-                  final spreadsheetFailure =
-                      state.failure as SpreadsheetFailure;
-                  final [headers, rows] =
-                      parseSpreadsheetFailure(spreadsheetFailure);
-
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      // Information
-                      Row(
-                        children: <Widget>[
-                          const Icon(
-                            Icons.info_outline,
-                            color: CustomColors.primaryNormal,
-                            size: 18,
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              'Ketuk data pada setiap kolom untuk melihat detail error',
-                              style: textTheme.bodySmall?.copyWith(
-                                color: Colors.grey.shade700,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      // Table
-                      SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: DataTable(
-                          border: TableBorder.all(
-                            borderRadius: BorderRadius.circular(8.0),
-                            color: MaterialColors.outlineVariant,
-                          ),
-                          clipBehavior: Clip.antiAlias,
-                          columns: headers,
-                          headingRowColor: WidgetStateProperty.all(
-                              MaterialColors.surfaceContainer),
-                          rows: rows,
-                        ),
-                      ),
-                      if (spreadsheetFailure.hiddenColumnCount > 0) ...[
-                        const SizedBox(height: 16),
-                        Row(
-                          children: <Widget>[
-                            const Icon(
-                              Icons.warning_amber_rounded,
-                              color: MaterialColors.error,
-                              size: 18,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              'Dan ${spreadsheetFailure.hiddenColumnCount} kolom lainnya tidak ditampilkan',
-                              style: textTheme.bodyMedium?.copyWith(
-                                color: MaterialColors.error,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ],
-                  );
-                }
-
-                return const SizedBox();
-              },
-            ),
-            const SizedBox(height: 144),
+            ],
           ],
-        ),
-      ),
-      floatingActionButton: SizedBox(
-        width: double.infinity,
-        child: FABContainer(
-          child: BlocConsumer<WarehouseCubit, WarehouseState>(
-            buildWhen: (previous, current) => current is InsertPurchaseNoteFile,
-            listenWhen: (previous, current) =>
-                current is InsertPurchaseNoteFile,
-            listener: (context, state) {
-              if (state is InsertPurchaseNoteFileLoaded) {
-                TopSnackbar.successSnackbar(message: state.message);
-                context.pop();
-              }
-
-              if (state is InsertPurchaseNoteFileError) {
-                TopSnackbar.dangerSnackbar(message: state.failure.message);
-              }
-            },
-            builder: (context, state) {
-              if (state is InsertPurchaseNoteFileLoading) {
-                return const PrimaryButton(
-                  child: Text('Simpan'),
-                );
-              }
-
-              return PrimaryButton(
-                onPressed: () {
-                  if (!_formKey.currentState!.validate()) return;
-
-                  if (_pickedImage == null) {
-                    const message = 'Silakan pilih gambar nota terlebih dahulu';
-                    return TopSnackbar.dangerSnackbar(message: message);
-                  }
-
-                  if (_pickedFile == null) {
-                    const message = 'Silakan pilih file barang terlebih dahulu';
-                    return TopSnackbar.dangerSnackbar(message: message);
-                  }
-
-                  final purchaseNote = InsertPurchaseNoteFileUseCaseParams(
-                    date: _pickedDate!,
-                    note: _noteController.text,
-                    receipt: _pickedImage!.path,
-                    supplierId: _selectedSupplier!.key,
-                    file: _pickedFile!.path,
-                  );
-
-                  _warehouseCubit.insertPurchaseNoteFile(
-                      purchaseNote: purchaseNote);
-                },
-                child: const Text('Simpan'),
-              );
-            },
-          ),
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      resizeToAvoidBottomInset: false,
+        );
+      },
     );
   }
+}
+
+class _FAB extends StatelessWidget {
+  const _FAB({required this.formKey});
+
+  final GlobalKey<FormState> formKey;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: FABContainer(
+        child: BlocConsumer<ImportPurchaseNoteCubit, ImportPurchaseNoteState>(
+          listener: (context, state) {
+            if (state.status == .success) {
+              TopSnackbar.successSnackbar(message: state.message!);
+              context.pop(true);
+            }
+
+            if (state.status == .failure) {
+              TopSnackbar.dangerSnackbar(message: state.failure!.message);
+            }
+          },
+          builder: (context, state) {
+            final onPressed = switch (state.status) {
+              .inProgress => null,
+              _ => () {
+                if (!formKey.currentState!.validate()) return;
+
+                context.read<ImportPurchaseNoteCubit>().importPurchaseNote();
+              },
+            };
+
+            return PrimaryButton(
+              onPressed: onPressed,
+              child: const Text('Simpan'),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+List<DataColumn> _buildHeaders(List<String> headers) {
+  return headers
+      .map((e) => DataColumn(label: Text(e), headingRowAlignment: .center))
+      .toList();
+}
+
+List<DataRow> _buildRows(BuildContext context, List<ListJsonMapNullable> rows) {
+  return List.generate(rows.length, (index) {
+    final row = rows[index];
+    final rowColor = index.isEven ? Colors.white : Colors.grey.shade50;
+
+    return DataRow(
+      color: .all(rowColor),
+      cells: row.map((cell) {
+        final errorText = cell?['error'] as String?;
+        final hasError = errorText != null && errorText.isNotEmpty;
+        final cellValue = cell?['value']?.toString() ?? '-';
+
+        return DataCell(
+          Container(
+            color: hasError ? context.colorScheme.errorContainer : null,
+            padding: const .symmetric(horizontal: 8),
+            width: .infinity,
+            child: Tooltip(
+              triggerMode: .tap,
+              message: errorText ?? '',
+              child: Row(
+                children: [
+                  if (hasError) ...[
+                    Icon(
+                      Icons.warning,
+                      size: 14,
+                      color: context.colorScheme.error,
+                    ),
+                    const Gap(4),
+                  ],
+                  Expanded(
+                    child: Text(
+                      cellValue,
+                      style: TextStyle(
+                        color: hasError ? context.colorScheme.error : null,
+                        fontWeight: hasError ? .w700 : null,
+                      ),
+                      overflow: .ellipsis,
+                      textAlign: .center,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  });
 }
