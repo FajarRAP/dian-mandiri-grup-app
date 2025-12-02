@@ -24,7 +24,7 @@ void main() {
     registerFallbackValue(tFetchPurchaseNotesDropdownParams);
     registerFallbackValue(tInsertPurchaseNoteFileParams);
     registerFallbackValue(tInsertPurchaseNoteManualParams);
-    registerFallbackValue(tInsertReturnCostParams);
+    registerFallbackValue(tUpdateReturnCostParams);
     registerFallbackValue(tInsertShippingFeeParams);
     registerFallbackValue(tUpdatePurchaseNoteParams);
   });
@@ -337,24 +337,24 @@ void main() {
   });
 
   group('insert return cost repository test', () {
-    const params = tInsertReturnCostParams;
-    const resultMatcher = tInsertReturnCostSuccess;
+    const params = tUpdateReturnCostParams;
+    const resultMatcher = tUpdateReturnCostSuccess;
 
     test(
       'should return Right(String) when remote call is successful',
       () async {
         // arrange
         when(
-          () => mockWarehouseRemoteDataSource.insertReturnCost(any()),
+          () => mockWarehouseRemoteDataSource.updateReturnCost(any()),
         ).thenAnswer((_) async => resultMatcher);
 
         // act
-        final result = await warehouseRepository.insertReturnCost(params);
+        final result = await warehouseRepository.updateReturnCost(params);
 
         // assert
         expect(result, const Right(resultMatcher));
         verify(
-          () => mockWarehouseRemoteDataSource.insertReturnCost(params),
+          () => mockWarehouseRemoteDataSource.updateReturnCost(params),
         ).called(1);
         verifyNoMoreInteractions(mockWarehouseRemoteDataSource);
       },
@@ -365,16 +365,16 @@ void main() {
       () async {
         // arrange
         when(
-          () => mockWarehouseRemoteDataSource.insertReturnCost(any()),
+          () => mockWarehouseRemoteDataSource.updateReturnCost(any()),
         ).thenThrow(tServerException);
 
         // act
-        final result = await warehouseRepository.insertReturnCost(params);
+        final result = await warehouseRepository.updateReturnCost(params);
 
         // assert
         expect(result, const Left(tServerFailure));
         verify(
-          () => mockWarehouseRemoteDataSource.insertReturnCost(params),
+          () => mockWarehouseRemoteDataSource.updateReturnCost(params),
         ).called(1);
         verifyNoMoreInteractions(mockWarehouseRemoteDataSource);
       },

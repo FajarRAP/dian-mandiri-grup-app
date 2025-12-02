@@ -379,9 +379,9 @@ void main() {
     });
   });
 
-  group('insert return cost remote data source test', () {
-    const params = tInsertReturnCostParams;
-    const resultMatcher = tInsertReturnCostSuccess;
+  group('update return cost remote data source test', () {
+    const params = tUpdateReturnCostParams;
+    const resultMatcher = tUpdateReturnCostSuccess;
 
     test('should return String when request is successful', () async {
       final jsonString = fixtureReader.dataSource('update_return_cost.json');
@@ -394,7 +394,7 @@ void main() {
         ),
       );
 
-      final result = await warehouseRemoteDataSource.insertReturnCost(params);
+      final result = await warehouseRemoteDataSource.updateReturnCost(params);
 
       expect(result, resultMatcher);
       verify(
@@ -414,7 +414,7 @@ void main() {
         ),
       );
 
-      final future = warehouseRemoteDataSource.insertReturnCost(params);
+      final future = warehouseRemoteDataSource.updateReturnCost(params);
 
       await expectLater(future, throwsA(isA<ServerException>()));
       verify(

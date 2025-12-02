@@ -5,21 +5,22 @@ import '../../../../core/errors/failure.dart';
 import '../../../../core/usecase/use_case.dart';
 import '../repositories/warehouse_repository.dart';
 
-class InsertReturnCostUseCase
-    implements UseCase<String, InsertReturnCostUseCaseParams> {
-  InsertReturnCostUseCase({required this.warehouseRepository});
+class UpdateReturnCostUseCase
+    implements UseCase<String, UpdateReturnCostUseCaseParams> {
+  UpdateReturnCostUseCase({required this.warehouseRepository});
 
   final WarehouseRepository warehouseRepository;
 
   @override
   Future<Either<Failure, String>> execute(
-      InsertReturnCostUseCaseParams params) async {
-    return await warehouseRepository.insertReturnCost(params);
+    UpdateReturnCostUseCaseParams params,
+  ) async {
+    return await warehouseRepository.updateReturnCost(params);
   }
 }
 
-class InsertReturnCostUseCaseParams extends Equatable {
-  const InsertReturnCostUseCaseParams({
+class UpdateReturnCostUseCaseParams extends Equatable {
+  const UpdateReturnCostUseCaseParams({
     required this.purchaseNoteId,
     required this.amount,
   });

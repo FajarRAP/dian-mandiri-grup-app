@@ -12,7 +12,7 @@ import '../../domain/usecases/fetch_purchase_notes_dropdown_use_case.dart';
 import '../../domain/usecases/fetch_purchase_notes_use_case.dart';
 import '../../domain/usecases/import_purchase_note_use_case.dart';
 import '../../domain/usecases/create_purchase_note_use_case.dart';
-import '../../domain/usecases/insert_return_cost_use_case.dart';
+import '../../domain/usecases/update_return_cost_use_case.dart';
 import '../../domain/usecases/insert_shipping_fee_use_case.dart';
 import '../../domain/usecases/update_purchase_note_use_case.dart';
 import '../datasources/warehouse_remote_data_source.dart';
@@ -110,11 +110,11 @@ class WarehouseRepositoryImpl
   }
 
   @override
-  Future<Either<Failure, String>> insertReturnCost(
-    InsertReturnCostUseCaseParams params,
+  Future<Either<Failure, String>> updateReturnCost(
+    UpdateReturnCostUseCaseParams params,
   ) async {
     return await handleRepositoryRequest<String>(() async {
-      final result = await warehouseRemoteDataSource.insertReturnCost(params);
+      final result = await warehouseRemoteDataSource.updateReturnCost(params);
 
       return result;
     });

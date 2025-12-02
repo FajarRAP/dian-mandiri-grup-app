@@ -12,7 +12,7 @@ import 'package:ship_tracker/features/warehouse/domain/usecases/fetch_purchase_n
 import 'package:ship_tracker/features/warehouse/domain/usecases/fetch_purchase_notes_dropdown_use_case.dart';
 import 'package:ship_tracker/features/warehouse/domain/usecases/create_purchase_note_use_case.dart';
 import 'package:ship_tracker/features/warehouse/domain/usecases/import_purchase_note_use_case.dart';
-import 'package:ship_tracker/features/warehouse/domain/usecases/insert_return_cost_use_case.dart';
+import 'package:ship_tracker/features/warehouse/domain/usecases/update_return_cost_use_case.dart';
 import 'package:ship_tracker/features/warehouse/domain/usecases/insert_shipping_fee_use_case.dart';
 import 'package:ship_tracker/features/warehouse/domain/usecases/update_purchase_note_use_case.dart';
 import 'package:ship_tracker/core/common/dropdown_entity.dart';
@@ -200,11 +200,11 @@ final tInsertPurchaseNoteFileParams = ImportPurchaseNoteUseCaseParams(
 );
 const tInsertPurchaseNoteFileSuccess = 'Purchase note created successfully';
 
-const tInsertReturnCostParams = InsertReturnCostUseCaseParams(
+const tUpdateReturnCostParams = UpdateReturnCostUseCaseParams(
   purchaseNoteId: 'purchaseNoteId',
   amount: 10000,
 );
-const tInsertReturnCostSuccess =
+const tUpdateReturnCostSuccess =
     'Purchase note return cost updated successfully';
 
 const tInsertShippingFeeParams = InsertShippingFeeUseCaseParams(
