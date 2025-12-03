@@ -11,7 +11,7 @@ import '../usecases/fetch_purchase_notes_use_case.dart';
 import '../usecases/import_purchase_note_use_case.dart';
 import '../usecases/create_purchase_note_use_case.dart';
 import '../usecases/update_return_cost_use_case.dart';
-import '../usecases/insert_shipping_fee_use_case.dart';
+import '../usecases/add_shipping_fee_use_case.dart';
 import '../usecases/update_purchase_note_use_case.dart';
 
 abstract class WarehouseRepository {
@@ -36,8 +36,8 @@ abstract class WarehouseRepository {
   Future<Either<Failure, String>> updateReturnCost(
     UpdateReturnCostUseCaseParams params,
   );
-  Future<Either<Failure, String>> insertShippingFee(
-    InsertShippingFeeUseCaseParams params,
+  Future<Either<Failure, String>> addShippingFee(
+    AddShippingFeeUseCaseParams params,
   );
   Future<Either<Failure, String>> updatePurchaseNote(
     UpdatePurchaseNoteUseCaseParams params,

@@ -443,7 +443,7 @@ void main() {
         ),
       );
 
-      final result = await warehouseRemoteDataSource.insertShippingFee(params);
+      final result = await warehouseRemoteDataSource.addShippingFee(params);
 
       expect(result, resultMatcher);
       verify(
@@ -463,7 +463,7 @@ void main() {
         ),
       );
 
-      final future = warehouseRemoteDataSource.insertShippingFee(params);
+      final future = warehouseRemoteDataSource.addShippingFee(params);
 
       await expectLater(future, throwsA(isA<ServerException>()));
       verify(

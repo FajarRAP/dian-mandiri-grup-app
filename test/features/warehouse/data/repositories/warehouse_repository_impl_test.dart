@@ -390,16 +390,16 @@ void main() {
       () async {
         // arrange
         when(
-          () => mockWarehouseRemoteDataSource.insertShippingFee(any()),
+          () => mockWarehouseRemoteDataSource.addShippingFee(any()),
         ).thenAnswer((_) async => resultMatcher);
 
         // act
-        final result = await warehouseRepository.insertShippingFee(params);
+        final result = await warehouseRepository.addShippingFee(params);
 
         // assert
         expect(result, const Right(resultMatcher));
         verify(
-          () => mockWarehouseRemoteDataSource.insertShippingFee(params),
+          () => mockWarehouseRemoteDataSource.addShippingFee(params),
         ).called(1);
         verifyNoMoreInteractions(mockWarehouseRemoteDataSource);
       },
@@ -410,16 +410,16 @@ void main() {
       () async {
         // arrange
         when(
-          () => mockWarehouseRemoteDataSource.insertShippingFee(any()),
+          () => mockWarehouseRemoteDataSource.addShippingFee(any()),
         ).thenThrow(tServerException);
 
         // act
-        final result = await warehouseRepository.insertShippingFee(params);
+        final result = await warehouseRepository.addShippingFee(params);
 
         // assert
         expect(result, const Left(tServerFailure));
         verify(
-          () => mockWarehouseRemoteDataSource.insertShippingFee(params),
+          () => mockWarehouseRemoteDataSource.addShippingFee(params),
         ).called(1);
         verifyNoMoreInteractions(mockWarehouseRemoteDataSource);
       },

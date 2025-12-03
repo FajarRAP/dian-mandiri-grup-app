@@ -13,7 +13,7 @@ import 'package:ship_tracker/features/warehouse/domain/usecases/fetch_purchase_n
 import 'package:ship_tracker/features/warehouse/domain/usecases/create_purchase_note_use_case.dart';
 import 'package:ship_tracker/features/warehouse/domain/usecases/import_purchase_note_use_case.dart';
 import 'package:ship_tracker/features/warehouse/domain/usecases/update_return_cost_use_case.dart';
-import 'package:ship_tracker/features/warehouse/domain/usecases/insert_shipping_fee_use_case.dart';
+import 'package:ship_tracker/features/warehouse/domain/usecases/add_shipping_fee_use_case.dart';
 import 'package:ship_tracker/features/warehouse/domain/usecases/update_purchase_note_use_case.dart';
 import 'package:ship_tracker/core/common/dropdown_entity.dart';
 
@@ -207,7 +207,7 @@ const tUpdateReturnCostParams = UpdateReturnCostUseCaseParams(
 const tUpdateReturnCostSuccess =
     'Purchase note return cost updated successfully';
 
-const tInsertShippingFeeParams = InsertShippingFeeUseCaseParams(
+const tInsertShippingFeeParams = AddShippingFeeUseCaseParams(
   price: 5000,
   purchaseNoteIds: ['purchaseNoteId'],
 );
