@@ -3,8 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../common/constants/app_constants.dart';
 import '../../../../common/constants/app_enums.dart';
-import '../../../../core/common/constants.dart';
 import '../../../../core/presentation/widgets/expandable_fab/action_button.dart';
 import '../../../../core/presentation/widgets/expandable_fab/expandable_fab.dart';
 import '../../../../core/presentation/widgets/pagination_listener.dart';
@@ -116,7 +116,7 @@ class __AppBarState extends State<_AppBar> {
         ),
       ],
       backgroundColor: context.colorScheme.surfaceContainerLow,
-      expandedHeight: kToolbarHeight + kSpaceBarHeight,
+      expandedHeight: kToolbarHeight + AppConstants.kSpaceBarHeight,
       floating: true,
       flexibleSpace: FlexibleSpaceBar(
         background: Align(

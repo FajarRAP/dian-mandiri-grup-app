@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 
-import '../../../../core/helpers/validators.dart';
+import '../../../../core/utils/validators.dart';
 import '../../../../core/utils/extensions.dart';
 import '../../../../core/presentation/widgets/buttons/primary_button.dart';
 import '../../../../core/presentation/widgets/required_label.dart';
@@ -112,7 +112,7 @@ class _PurchaseNoteItemDialogState extends State<PurchaseNoteItemDialog> {
                 decoration: const InputDecoration(
                   label: RequiredLabel(label: 'Nama Barang'),
                 ),
-                validator: nullValidator,
+                validator: Validator.nullValidator,
               ),
               const Gap(20),
               TextFormField(
@@ -123,7 +123,7 @@ class _PurchaseNoteItemDialogState extends State<PurchaseNoteItemDialog> {
                   label: RequiredLabel(label: 'Harga per Barang'),
                 ),
                 keyboardType: TextInputType.number,
-                validator: nullValidator,
+                validator: Validator.nullValidator,
               ),
               const Gap(20),
               TextFormField(
@@ -134,7 +134,7 @@ class _PurchaseNoteItemDialogState extends State<PurchaseNoteItemDialog> {
                   suffix: Text('pcs'),
                 ),
                 keyboardType: TextInputType.number,
-                validator: nullValidator,
+                validator: Validator.nullValidator,
               ),
               const Gap(20),
               TextFormField(

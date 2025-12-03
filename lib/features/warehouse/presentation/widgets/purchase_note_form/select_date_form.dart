@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../../core/helpers/helpers.dart';
-import '../../../../../core/helpers/validators.dart';
+import '../../../../../core/utils/validators.dart';
 import '../../../../../core/utils/extensions.dart';
 
 class SelectDateForm extends StatefulWidget {
@@ -72,7 +71,7 @@ class _SelectDateFormState extends State<SelectDateForm> {
             suffixIcon: Icon(Icons.date_range),
           ),
           readOnly: true,
-          validator: nullValidator,
+          validator: Validator.nullValidator,
         ),
       ],
     );

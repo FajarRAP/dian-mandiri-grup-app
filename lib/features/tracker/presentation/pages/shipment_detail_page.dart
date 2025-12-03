@@ -4,8 +4,7 @@ import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../common/constants/app_permissions.dart';
-import '../../../../core/helpers/helpers.dart';
-import '../../../../core/helpers/top_snackbar.dart';
+import '../../../../common/utils/top_snackbar.dart';
 import '../../../../core/presentation/cubit/user_cubit.dart';
 import '../../../../core/presentation/widgets/loading_indicator.dart';
 import '../../../../core/router/route_names.dart';

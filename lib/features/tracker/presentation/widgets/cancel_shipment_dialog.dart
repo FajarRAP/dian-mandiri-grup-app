@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/common/constants.dart';
+import '../../../../common/constants/app_constants.dart';
 import '../../../../core/presentation/widgets/confirmation_dialog.dart';
 import '../cubit/shipment_list/shipment_list_cubit.dart';
 
@@ -25,7 +25,7 @@ class CancelShipmentDialog extends StatelessWidget {
           _ =>
             () async => await context.read<ShipmentListCubit>().createShipment(
               receiptNumber: receiptNumber,
-              stage: cancelStage,
+              stage: AppConstants.cancelStage,
             ),
         };
 

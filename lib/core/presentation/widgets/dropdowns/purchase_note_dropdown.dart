@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 
 import '../../../../service_container.dart';
-import '../../../common/dropdown_entity.dart';
+import '../../../domain/entities/dropdown_entity.dart';
 import '../../cubit/dropdown_cubit.dart';
 import '../loading_indicator.dart';
 import '../pagination_listener.dart';

@@ -3,7 +3,7 @@ import 'package:equatable/equatable.dart';
 
 import '../../../features/supplier/domain/usecases/fetch_suppliers_dropdown_use_case.dart';
 import '../../../features/warehouse/domain/usecases/fetch_purchase_notes_dropdown_use_case.dart';
-import '../../common/dropdown_entity.dart';
+import '../../domain/entities/dropdown_entity.dart';
 import '../../errors/failure.dart';
 import '../../usecase/use_case.dart';
 import '../../utils/typedefs.dart';

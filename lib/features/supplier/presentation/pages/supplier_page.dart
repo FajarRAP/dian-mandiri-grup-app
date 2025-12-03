@@ -3,8 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../common/constants/app_constants.dart';
 import '../../../../common/constants/app_enums.dart';
-import '../../../../core/common/constants.dart';
 import '../../../../core/presentation/widgets/pagination_listener.dart';
 import '../../../../core/presentation/widgets/sliver_empty_data.dart';
 import '../../../../core/presentation/widgets/sliver_loading_indicator.dart';
@@ -121,7 +121,7 @@ class _AppBarState extends State<_AppBar> {
         ),
       ],
       backgroundColor: context.colorScheme.surfaceContainerLow,
-      expandedHeight: kToolbarHeight + kSpaceBarHeight,
+      expandedHeight: kToolbarHeight + AppConstants.kSpaceBarHeight,
       floating: true,
       flexibleSpace: FlexibleSpaceBar(
         background: Container(

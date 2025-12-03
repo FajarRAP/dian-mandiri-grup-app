@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 
-import '../../../../core/common/shadows.dart';
-import '../../../../core/helpers/top_snackbar.dart';
-import '../../../../core/helpers/validators.dart';
+import '../../../../common/utils/shadows.dart';
+import '../../../../common/utils/top_snackbar.dart';
+import '../../../../core/utils/validators.dart';
 import '../../../../core/presentation/widgets/error_state_widget.dart';
 import '../../../../core/presentation/widgets/loading_indicator.dart';
 import '../../../../core/presentation/widgets/pop_result_scope.dart';
@@ -135,7 +135,7 @@ class _SuccessWidgetState extends State<_SuccessWidget> {
                 controller: _nameController,
                 decoration: const InputDecoration(labelText: 'Nama'),
                 textInputAction: .next,
-                validator: nullValidator,
+                validator: Validator.nullValidator,
               ),
               const Gap(12),
               TextFormField(
@@ -144,7 +144,7 @@ class _SuccessWidgetState extends State<_SuccessWidget> {
                 decoration: const InputDecoration(labelText: 'Email'),
                 keyboardType: TextInputType.emailAddress,
                 textInputAction: .next,
-                validator: emailValidator,
+                validator: Validator.emailValidator,
               ),
               const Gap(12),
               TextFormField(
@@ -153,7 +153,7 @@ class _SuccessWidgetState extends State<_SuccessWidget> {
                 decoration: const InputDecoration(labelText: 'Telepon'),
                 keyboardType: TextInputType.phone,
                 textInputAction: .next,
-                validator: nullValidator,
+                validator: Validator.nullValidator,
               ),
               const Gap(12),
               TextFormField(
@@ -162,7 +162,7 @@ class _SuccessWidgetState extends State<_SuccessWidget> {
                 decoration: const InputDecoration(labelText: 'Alamat'),
                 keyboardType: TextInputType.multiline,
                 maxLines: 2,
-                validator: nullValidator,
+                validator: Validator.nullValidator,
               ),
               const Gap(24),
               BlocConsumer<UpdateSupplierCubit, UpdateSupplierState>(

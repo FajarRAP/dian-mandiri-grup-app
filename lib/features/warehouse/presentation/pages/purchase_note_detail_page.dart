@@ -5,8 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/helpers/helpers.dart';
-import '../../../../core/helpers/top_snackbar.dart';
+import '../../../../common/utils/top_snackbar.dart';
 import '../../../../core/presentation/widgets/error_state_widget.dart';
 import '../../../../core/presentation/widgets/loading_indicator.dart';
 import '../../../../core/utils/extensions.dart';

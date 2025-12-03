@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/helpers/top_snackbar.dart';
+import '../../../../common/utils/top_snackbar.dart';
 import '../../../../core/presentation/widgets/confirmation_input_dialog.dart';
 import '../cubit/shipment_detail/shipment_detail_cubit.dart';
 

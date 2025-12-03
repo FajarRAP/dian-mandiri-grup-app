@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 
-import '../../../../core/common/dropdown_entity.dart';
+import '../../../../core/domain/entities/dropdown_entity.dart';
 import '../../../../core/network/dio_handler_mixin.dart';
 import '../../../../core/utils/extensions.dart';
 import '../../../../core/utils/typedefs.dart';

@@ -4,9 +4,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/common/dropdown_entity.dart';
-import '../../../../core/helpers/top_snackbar.dart';
-import '../../../../core/helpers/validators.dart';
+import '../../../../core/domain/entities/dropdown_entity.dart';
+import '../../../../common/utils/top_snackbar.dart';
+import '../../../../core/utils/validators.dart';
 import '../../../../core/presentation/widgets/buttons/primary_button.dart';
 import '../../../../core/presentation/widgets/dropdowns/purchase_note_dropdown.dart';
 import '../../../../core/presentation/widgets/fab_container.dart';
@@ -66,7 +66,7 @@ class _AddShippingFeePageState extends State<AddShippingFeePage> {
                 ),
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 keyboardType: .number,
-                validator: nullValidator,
+                validator: Validator.nullValidator,
               ),
               const Gap(24),
               TextFormField(

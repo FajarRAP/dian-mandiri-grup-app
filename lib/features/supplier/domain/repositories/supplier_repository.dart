@@ -1,6 +1,6 @@
 import 'package:dartz/dartz.dart';
 
-import '../../../../core/common/dropdown_entity.dart';
+import '../../../../core/domain/entities/dropdown_entity.dart';
 import '../../../../core/errors/failure.dart';
 import '../entities/supplier_detail_entity.dart';
 import '../entities/supplier_entity.dart';

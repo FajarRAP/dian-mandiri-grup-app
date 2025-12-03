@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/helpers/validators.dart';
+import '../../../../core/utils/validators.dart';
 import '../../../../core/presentation/cubit/user_cubit.dart';
 import '../../../../core/utils/extensions.dart';
 import '../../../../core/presentation/widgets/buttons/primary_button.dart';
@@ -78,7 +78,7 @@ class _CreateShipmentFromScannerDialogState
               controller: _receiptController,
               decoration: const InputDecoration(labelText: 'Hasil Scan'),
               textInputAction: .send,
-              validator: inputValidator,
+              validator: Validator.inputValidator,
             ),
             const Gap(24),
             BlocConsumer<ShipmentListCubit, ShipmentListState>(

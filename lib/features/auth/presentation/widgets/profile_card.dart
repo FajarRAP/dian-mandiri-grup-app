@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 
-import '../../../../core/common/shadows.dart';
+import '../../../../common/utils/shadows.dart';
 import '../../../../core/utils/extensions.dart';
 
 class ProfileCard extends StatelessWidget {

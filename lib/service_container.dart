@@ -4,7 +4,7 @@ import 'package:get_it/get_it.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:share_plus/share_plus.dart';
 
-import 'core/common/constants.dart';
+import 'common/constants/app_constants.dart';
 import 'core/network/dio_interceptor.dart';
 import 'core/presentation/cubit/app_cubit.dart';
 import 'core/presentation/cubit/dropdown_cubit.dart';
@@ -84,7 +84,7 @@ void setup() {
     ..registerLazySingleton<Dio>(
       () => Dio(
         BaseOptions(
-          baseUrl: apiUrl,
+          baseUrl: AppConstants.apiUrl,
           connectTimeout: const Duration(seconds: 5),
         ),
       )..interceptors.add(DioInterceptor()),

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../../core/common/dropdown_entity.dart';
-import '../../../../../core/helpers/validators.dart';
+import '../../../../../core/domain/entities/dropdown_entity.dart';
+import '../../../../../core/utils/validators.dart';
 import '../../../../../core/utils/extensions.dart';
 import '../../../../../core/presentation/widgets/dropdowns/supplier_dropdown.dart';
 
@@ -79,7 +79,7 @@ class _SelectSupplierFormState extends State<SelectSupplierForm> {
             suffixIcon: Icon(Icons.arrow_drop_down),
           ),
           readOnly: true,
-          validator: nullValidator,
+          validator: Validator.nullValidator,
         ),
       ],
     );

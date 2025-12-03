@@ -7,8 +7,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:path_provider/path_provider.dart';
 
-import 'core/common/constants.dart';
-import 'core/helpers/top_snackbar.dart';
+import 'common/utils/top_snackbar.dart';
 import 'core/presentation/cubit/app_cubit.dart';
 import 'core/presentation/cubit/user_cubit.dart';
 import 'core/router/app_router.dart';
@@ -73,7 +72,6 @@ class MyApp extends StatelessWidget {
         darkTheme: AppTheme.dark,
         themeMode: ThemeMode.light,
         routerConfig: AppRouter.router,
-        scaffoldMessengerKey: scaffoldMessengerKey,
         supportedLocales: const [Locale('en', 'US'), Locale('id')],
       ),
     );

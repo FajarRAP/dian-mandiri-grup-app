@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../core/common/constants.dart';
-import '../../../../core/helpers/helpers.dart';
+import '../../../../common/constants/app_constants.dart';
 import '../../../../core/presentation/widgets/pagination_listener.dart';
 import '../../../../core/presentation/widgets/sliver_empty_data.dart';
 import '../../../../core/presentation/widgets/sliver_loading_indicator.dart';
@@ -25,7 +24,7 @@ class _ReportPageState extends State<ReportPage> {
     start: DateTime.now(),
     end: DateTime.now(),
   );
-  var _status = completedReport;
+  var _status = AppConstants.completedReport;
 
   @override
   void initState() {
@@ -114,7 +113,7 @@ class __AppBarState extends State<_AppBar> {
     start: DateTime.now(),
     end: DateTime.now(),
   );
-  var _status = completedReport;
+  var _status = AppConstants.completedReport;
   var _dateTimeRangePicked = 'Pilih Range Tanggal';
 
   @override
@@ -139,7 +138,7 @@ class __AppBarState extends State<_AppBar> {
         ),
       ],
       backgroundColor: context.colorScheme.surfaceContainerLowest,
-      expandedHeight: kToolbarHeight + kSpaceBarHeight,
+      expandedHeight: kToolbarHeight + AppConstants.kSpaceBarHeight,
       flexibleSpace: FlexibleSpaceBar(
         background: Align(
           alignment: .bottomCenter,
@@ -198,19 +197,19 @@ class __AppBarState extends State<_AppBar> {
                     ),
                     items: const <DropdownMenuItem<String>>[
                       DropdownMenuItem(
-                        value: pendingReport,
+                        value: AppConstants.pendingReport,
                         child: Text('Pending'),
                       ),
                       DropdownMenuItem(
-                        value: processingReport,
+                        value: AppConstants.processingReport,
                         child: Text('Processing'),
                       ),
                       DropdownMenuItem(
-                        value: completedReport,
+                        value: AppConstants.completedReport,
                         child: Text('Compeleted'),
                       ),
                       DropdownMenuItem(
-                        value: failedReport,
+                        value: AppConstants.failedReport,
                         child: Text('Failed'),
                       ),
                     ],

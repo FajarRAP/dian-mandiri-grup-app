@@ -5,17 +5,16 @@ import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 
+import '../../../../common/constants/app_constants.dart';
 import '../../../../common/constants/app_permissions.dart';
-import '../../../../core/common/constants.dart';
-import '../../../../core/common/shadows.dart';
-import '../../../../core/helpers/helpers.dart';
-import '../../../../core/helpers/top_snackbar.dart';
+import '../../../../common/utils/shadows.dart';
+import '../../../../common/utils/top_snackbar.dart';
 import '../../../../core/presentation/cubit/user_cubit.dart';
+import '../../../../core/presentation/widgets/buttons/danger_button.dart';
 import '../../../../core/presentation/widgets/expandable_fab/action_button.dart';
 import '../../../../core/presentation/widgets/expandable_fab/expandable_fab.dart';
 import '../../../../core/presentation/widgets/loading_indicator.dart';
 import '../../../../core/utils/extensions.dart';
-import '../../../../core/presentation/widgets/buttons/danger_button.dart';
 import '../../../../service_container.dart';
 import '../../domain/entities/shipment_history_entity.dart';
 import '../../domain/entities/stage_entity.dart';
@@ -66,7 +65,7 @@ class _SuccessWidget extends StatelessWidget {
       AppPermissions.superAdmin,
     );
     final isCanceled = shipment.stages.any(
-      (stage) => stage.stage == cancelStage,
+      (stage) => stage.stage == AppConstants.cancelStage,
     );
 
     return Center(
@@ -439,19 +438,19 @@ class _CancelButton extends StatelessWidget {
 
 String _evaluateStage(String stage) {
   switch (stage) {
-    case scanStage:
+    case AppConstants.scanStage:
       return 'Scan';
-    case pickUpStage:
+    case AppConstants.pickUpStage:
       return 'Ambil Barang';
-    case checkStage:
+    case AppConstants.checkStage:
       return 'Checker';
-    case packStage:
+    case AppConstants.packStage:
       return 'Packing';
-    case sendStage:
+    case AppConstants.sendStage:
       return 'Kirim';
-    case returnStage:
+    case AppConstants.returnStage:
       return 'Retur';
-    case cancelStage:
+    case AppConstants.cancelStage:
       return 'Cancel';
     default:
       return 'Tidak Diketahui';

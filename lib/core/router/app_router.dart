@@ -17,30 +17,29 @@ import '../../features/supplier/presentation/pages/supplier_page.dart';
 import '../../features/tracker/presentation/cubit/shipment_detail/shipment_detail_cubit.dart';
 import '../../features/tracker/presentation/cubit/shipment_list/shipment_list_cubit.dart';
 import '../../features/tracker/presentation/cubit/shipment_report/shipment_report_cubit.dart';
+import '../../features/tracker/presentation/pages/receipt_status_page.dart';
+import '../../features/tracker/presentation/pages/report_page.dart';
+import '../../features/tracker/presentation/pages/shipment_detail_page.dart';
 import '../../features/tracker/presentation/pages/stages/cancel_page.dart';
 import '../../features/tracker/presentation/pages/stages/check_page.dart';
 import '../../features/tracker/presentation/pages/stages/pack_page.dart';
 import '../../features/tracker/presentation/pages/stages/pick_up_page.dart';
-import '../../features/tracker/presentation/pages/receipt_status_page.dart';
-import '../../features/tracker/presentation/pages/report_page.dart';
 import '../../features/tracker/presentation/pages/stages/return_page.dart';
 import '../../features/tracker/presentation/pages/stages/scan_page.dart';
 import '../../features/tracker/presentation/pages/stages/send_page.dart';
-import '../../features/tracker/presentation/pages/shipment_detail_page.dart';
 import '../../features/tracker/presentation/pages/tracker_page.dart';
 import '../../features/tracker/presentation/pages/update_shipment_document_page.dart';
+import '../../features/warehouse/presentation/cubit/import_purchase_note/import_purchase_note_cubit.dart';
 import '../../features/warehouse/presentation/cubit/purchase_note_cost/purchase_note_cost_cubit.dart';
 import '../../features/warehouse/presentation/cubit/purchase_note_detail/purchase_note_detail_cubit.dart';
 import '../../features/warehouse/presentation/cubit/purchase_note_form/purchase_note_form_cubit.dart';
-import '../../features/warehouse/presentation/cubit/import_purchase_note/import_purchase_note_cubit.dart';
 import '../../features/warehouse/presentation/cubit/purchase_note_list/purchase_note_list_cubit.dart';
-import '../../features/warehouse/presentation/pages/import_purchase_note_page.dart';
-import '../../features/warehouse/presentation/pages/create_purchase_note_page.dart';
 import '../../features/warehouse/presentation/pages/add_shipping_fee_page.dart';
+import '../../features/warehouse/presentation/pages/create_purchase_note_page.dart';
+import '../../features/warehouse/presentation/pages/import_purchase_note_page.dart';
 import '../../features/warehouse/presentation/pages/purchase_note_detail_page.dart';
 import '../../features/warehouse/presentation/pages/warehouse_page.dart';
 import '../../service_container.dart';
-import '../common/constants.dart';
 import '../presentation/pages/splash_page.dart';
 import '../presentation/widgets/scaffold_with_bottom_navigation_bar.dart';
 import 'route_names.dart';
@@ -72,7 +71,7 @@ class AppRouter {
     routes: [
       GoRoute(path: '/splash', builder: (context, state) => const SplashPage()),
       GoRoute(
-        path: loginRoute,
+        path: '/login',
         name: Routes.login,
         pageBuilder: (context, state) => CustomTransitionPage(
           key: state.pageKey,
@@ -89,7 +88,7 @@ class AppRouter {
             navigatorKey: _homeNavigatorKey,
             routes: <RouteBase>[
               GoRoute(
-                path: homeRoute,
+                path: '/home',
                 name: Routes.home,
                 builder: (context, state) => const HomePage(),
                 routes: <RouteBase>[
@@ -152,7 +151,7 @@ class AppRouter {
                         ),
                       ),
                       GoRoute(
-                        path: displayPictureRoute,
+                        path: '/picked-document',
                         name: Routes.trackerPickedDocument,
                         builder: (context, state) {
                           final extras = state.extra as Map<String, dynamic>;
@@ -275,7 +274,7 @@ class AppRouter {
             navigatorKey: _staffManagementNavigatorKey,
             routes: <RouteBase>[
               GoRoute(
-                path: staffManagementRoute,
+                path: '/staff-management',
                 name: Routes.staffManagement,
                 builder: (context, state) => const StaffManagementPage(),
               ),
@@ -285,7 +284,7 @@ class AppRouter {
             navigatorKey: _profileNavigatorKey,
             routes: <RouteBase>[
               GoRoute(
-                path: profileRoute,
+                path: '/profile',
                 name: Routes.profile,
                 builder: (context, state) => const ProfilePage(),
               ),

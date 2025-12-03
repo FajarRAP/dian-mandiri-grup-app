@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
 
-import '../../../../core/helpers/helpers.dart';
 import '../../../../core/network/dio_handler_mixin.dart';
 import '../../../../core/services/file_service.dart';
+import '../../../../core/utils/extensions.dart';
 import '../../domain/entities/shipment_detail_entity.dart';
 import '../../domain/entities/shipment_entity.dart';
 import '../../domain/entities/shipment_history_entity.dart';

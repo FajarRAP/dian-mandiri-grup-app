@@ -5,9 +5,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/common/dropdown_entity.dart';
+import '../../../../core/domain/entities/dropdown_entity.dart';
 import '../../../../core/errors/failure.dart';
-import '../../../../core/helpers/top_snackbar.dart';
+import '../../../../common/utils/top_snackbar.dart';
 import '../../../../core/utils/extensions.dart';
 import '../../../../core/utils/typedefs.dart';
 import '../../../../core/presentation/widgets/buttons/primary_button.dart';

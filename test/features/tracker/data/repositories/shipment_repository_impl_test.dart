@@ -124,7 +124,7 @@ void main() {
   });
 
   group('download shipment report repository test', () {
-    final params = tDownloadShipmentReportParams;
+    const params = tDownloadShipmentReportParams;
     const resultMatcher = tDownloadShipmentReportSuccess;
 
     test(
@@ -442,25 +442,22 @@ void main() {
     const params = tCheckShipmentExistenceParams;
     const resultMatcher = tCheckShipmentExistenceSuccess;
 
-    test(
-      'should return Right(bool) when file service is successful',
-      () async {
-        // arrange
-        when(
-          () => mockFileService.isFileExist(params.filename),
-        ).thenAnswer((_) async => tCheckShipmentExistenceSuccess);
+    test('should return Right(bool) when file service is successful', () async {
+      // arrange
+      when(
+        () => mockFileService.isFileExist(params.filename),
+      ).thenAnswer((_) async => tCheckShipmentExistenceSuccess);
 
-        // act
-        final result = await shipmentRepository.checkShipmentReportExistence(
-          params,
-        );
+      // act
+      final result = await shipmentRepository.checkShipmentReportExistence(
+        params,
+      );
 
-        // assert
-        expect(result, const Right(resultMatcher));
-        verify(() => mockFileService.isFileExist(params.filename)).called(1);
-        verifyNoMoreInteractions(mockFileService);
-      },
-    );
+      // assert
+      expect(result, const Right(resultMatcher));
+      verify(() => mockFileService.isFileExist(params.filename)).called(1);
+      verifyNoMoreInteractions(mockFileService);
+    });
 
     test(
       'should return Left(Failure) when file service throws Exception',

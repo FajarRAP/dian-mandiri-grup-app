@@ -1,7 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 
-import '../../../../../core/common/dropdown_entity.dart';
+import '../../../../../core/domain/entities/dropdown_entity.dart';
 import '../../../../../core/errors/failure.dart';
 import '../../../../../core/usecase/use_case.dart';
 import '../../../domain/usecases/add_shipping_fee_use_case.dart';

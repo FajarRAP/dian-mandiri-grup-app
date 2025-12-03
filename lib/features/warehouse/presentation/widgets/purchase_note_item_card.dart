@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 
-import '../../../../core/helpers/helpers.dart';
 import '../../../../core/utils/extensions.dart';
 import '../../domain/entities/warehouse_item_entity.dart';
 

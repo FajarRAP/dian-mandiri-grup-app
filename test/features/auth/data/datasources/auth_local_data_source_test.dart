@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:ship_tracker/core/common/constants.dart';
+import 'package:ship_tracker/common/constants/app_constants.dart';
 import 'package:ship_tracker/core/errors/exceptions.dart';
 import 'package:ship_tracker/features/auth/data/datasources/auth_local_data_source.dart';
 
@@ -23,33 +23,48 @@ void main() {
 
     test('should be call storage.write when use correct key', () async {
       // arrange
-      when(() => mockStorage.write(
+      when(
+        () => mockStorage.write(
           key: any(named: 'key'),
-          value: any(named: 'value'))).thenAnswer((_) async => {});
-      when(() => mockStorage.write(
+          value: any(named: 'value'),
+        ),
+      ).thenAnswer((_) async => {});
+      when(
+        () => mockStorage.write(
           key: any(named: 'key'),
-          value: any(named: 'value'))).thenAnswer((_) async => {});
+          value: any(named: 'value'),
+        ),
+      ).thenAnswer((_) async => {});
 
       // act
       await authLocalDataSource.cacheTokens(
-          accessToken: token.accessToken, refreshToken: token.refreshToken);
+        accessToken: token.accessToken,
+        refreshToken: token.refreshToken,
+      );
 
       // assert
-      verify(() => mockStorage.write(
-            key: accessTokenKey,
-            value: token.accessToken,
-          )).called(1);
-      verify(() => mockStorage.write(
-            key: refreshTokenKey,
-            value: token.refreshToken,
-          )).called(1);
+      verify(
+        () => mockStorage.write(
+          key: AppConstants.accessTokenKey,
+          value: token.accessToken,
+        ),
+      ).called(1);
+      verify(
+        () => mockStorage.write(
+          key: AppConstants.refreshTokenKey,
+          value: token.refreshToken,
+        ),
+      ).called(1);
     });
 
     test('should throw CacheException when unexpected error occur', () async {
       // arrange
-      when(() => mockStorage.write(
+      when(
+        () => mockStorage.write(
           key: any(named: 'key'),
-          value: any(named: 'value'))).thenThrow(Exception());
+          value: any(named: 'value'),
+        ),
+      ).thenThrow(Exception());
 
       // act
       final future = authLocalDataSource.cacheTokens(
@@ -59,8 +74,12 @@ void main() {
 
       // assert
       await expectLater(future, throwsA(isA<CacheException>()));
-      verifyNever(() =>
-          mockStorage.write(key: refreshTokenKey, value: token.refreshToken));
+      verifyNever(
+        () => mockStorage.write(
+          key: AppConstants.refreshTokenKey,
+          value: token.refreshToken,
+        ),
+      );
     });
   });
 
@@ -69,25 +88,33 @@ void main() {
 
     test('should be call storage.write when use correct key', () async {
       // arrange
-      when(() => mockStorage.write(
+      when(
+        () => mockStorage.write(
           key: any(named: 'key'),
-          value: any(named: 'value'))).thenAnswer((_) async => {});
+          value: any(named: 'value'),
+        ),
+      ).thenAnswer((_) async => {});
 
       // act
       await authLocalDataSource.cacheUser(user: user);
 
       // assert
-      verify(() => mockStorage.write(
-            key: userKey,
-            value: jsonEncode(user.toJson()),
-          )).called(1);
+      verify(
+        () => mockStorage.write(
+          key: AppConstants.userKey,
+          value: jsonEncode(user.toJson()),
+        ),
+      ).called(1);
     });
 
     test('should throw CacheException when unexpected error occur', () async {
       // arrange
-      when(() => mockStorage.write(
+      when(
+        () => mockStorage.write(
           key: any(named: 'key'),
-          value: any(named: 'value'))).thenThrow(Exception());
+          value: any(named: 'value'),
+        ),
+      ).thenThrow(Exception());
 
       // act
       final future = authLocalDataSource.cacheUser(user: user);
@@ -126,21 +153,25 @@ void main() {
 
     test('should be call storage.read when use correct key', () async {
       // arrange
-      when(() => mockStorage.read(key: any(named: 'key')))
-          .thenAnswer((_) async => token.accessToken);
+      when(
+        () => mockStorage.read(key: any(named: 'key')),
+      ).thenAnswer((_) async => token.accessToken);
 
       // act
       final result = await authLocalDataSource.getAccessToken();
 
       // assert
       expect(result, token.accessToken);
-      verify(() => mockStorage.read(key: accessTokenKey)).called(1);
+      verify(
+        () => mockStorage.read(key: AppConstants.accessTokenKey),
+      ).called(1);
     });
 
     test('should throw CacheException when unexpected error occur', () async {
       // arrange
-      when(() => mockStorage.read(key: any(named: 'key')))
-          .thenThrow(Exception());
+      when(
+        () => mockStorage.read(key: any(named: 'key')),
+      ).thenThrow(Exception());
 
       // act
       final future = authLocalDataSource.getAccessToken();
@@ -155,21 +186,25 @@ void main() {
 
     test('should be call storage.read when use correct key', () async {
       // arrange
-      when(() => mockStorage.read(key: any(named: 'key')))
-          .thenAnswer((_) async => token.refreshToken);
+      when(
+        () => mockStorage.read(key: any(named: 'key')),
+      ).thenAnswer((_) async => token.refreshToken);
 
       // act
       final result = await authLocalDataSource.getRefreshToken();
 
       // assert
       expect(result, token.refreshToken);
-      verify(() => mockStorage.read(key: refreshTokenKey)).called(1);
+      verify(
+        () => mockStorage.read(key: AppConstants.refreshTokenKey),
+      ).called(1);
     });
 
     test('should throw CacheException when unexpected error occur', () async {
       // arrange
-      when(() => mockStorage.read(key: any(named: 'key')))
-          .thenThrow(Exception());
+      when(
+        () => mockStorage.read(key: any(named: 'key')),
+      ).thenThrow(Exception());
 
       // act
       final future = authLocalDataSource.getRefreshToken();
@@ -185,34 +220,37 @@ void main() {
 
     test('should be return UserEntity? when successful', () async {
       // arrange
-      when(() => mockStorage.read(key: any(named: 'key')))
-          .thenAnswer((_) async => userString);
+      when(
+        () => mockStorage.read(key: any(named: 'key')),
+      ).thenAnswer((_) async => userString);
 
       // act
       final result = await authLocalDataSource.getUser();
 
       // assert
       expect(result, userEntity);
-      verify(() => mockStorage.read(key: userKey)).called(1);
+      verify(() => mockStorage.read(key: AppConstants.userKey)).called(1);
     });
 
     test('should be return null when no user found in storage', () async {
       // arrange
-      when(() => mockStorage.read(key: any(named: 'key')))
-          .thenAnswer((_) async => null);
+      when(
+        () => mockStorage.read(key: any(named: 'key')),
+      ).thenAnswer((_) async => null);
 
       // act
       final result = await authLocalDataSource.getUser();
 
       // assert
       expect(result, null);
-      verify(() => mockStorage.read(key: userKey)).called(1);
+      verify(() => mockStorage.read(key: AppConstants.userKey)).called(1);
     });
 
     test('should throw CacheException when unexpected error occur', () async {
       // arrange
-      when(() => mockStorage.read(key: any(named: 'key')))
-          .thenThrow(Exception());
+      when(
+        () => mockStorage.read(key: any(named: 'key')),
+      ).thenThrow(Exception());
 
       // act
       final future = authLocalDataSource.getUser();

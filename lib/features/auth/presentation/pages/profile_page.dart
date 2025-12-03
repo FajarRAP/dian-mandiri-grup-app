@@ -3,13 +3,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/common/constants.dart';
-import '../../../../core/helpers/top_snackbar.dart';
+import '../../../../common/utils/top_snackbar.dart';
 import '../../../../core/presentation/cubit/user_cubit.dart';
+import '../../../../core/presentation/widgets/buttons/primary_button.dart';
 import '../../../../core/presentation/widgets/error_state_widget.dart';
 import '../../../../core/presentation/widgets/loading_indicator.dart';
+import '../../../../core/router/route_names.dart';
 import '../../../../core/utils/extensions.dart';
-import '../../../../core/presentation/widgets/buttons/primary_button.dart';
 import '../../../../service_container.dart';
 import '../../domain/entities/user_entity.dart';
 import '../cubit/auth_cubit.dart';
@@ -121,7 +121,7 @@ class _SuccessWidget extends StatelessWidget {
 
                     context
                       ..read<UserCubit>().clearUser()
-                      ..go(loginRoute);
+                      ..goNamed(Routes.login);
                   }
 
                   if (state is SignOutError) {

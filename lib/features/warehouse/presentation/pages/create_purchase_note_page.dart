@@ -6,14 +6,13 @@ import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/common/constants.dart';
-import '../../../../core/common/dropdown_entity.dart';
-import '../../../../core/helpers/helpers.dart';
-import '../../../../core/helpers/top_snackbar.dart';
-import '../../../../core/utils/extensions.dart';
+import '../../../../common/constants/app_svgs.dart';
+import '../../../../core/domain/entities/dropdown_entity.dart';
+import '../../../../common/utils/top_snackbar.dart';
 import '../../../../core/presentation/widgets/buttons/primary_button.dart';
 import '../../../../core/presentation/widgets/buttons/primary_outline_button.dart';
 import '../../../../core/presentation/widgets/fab_container.dart';
+import '../../../../core/utils/extensions.dart';
 import '../../domain/entities/warehouse_item_entity.dart';
 import '../cubit/purchase_note_form/purchase_note_form_cubit.dart';
 import '../widgets/purchase_note_form/note_form.dart';
@@ -117,7 +116,7 @@ class _CreatePurchaseNotePageState extends State<CreatePurchaseNotePage> {
                   context: context,
                 ),
                 icon: SvgPicture.asset(
-                  boxSvg,
+                  AppSvgs.box,
                   colorFilter: .mode(context.colorScheme.primary, .srcIn),
                 ),
                 child: const Text('Tambah Barang'),

@@ -15,7 +15,7 @@ import 'package:ship_tracker/features/warehouse/domain/usecases/import_purchase_
 import 'package:ship_tracker/features/warehouse/domain/usecases/update_return_cost_use_case.dart';
 import 'package:ship_tracker/features/warehouse/domain/usecases/add_shipping_fee_use_case.dart';
 import 'package:ship_tracker/features/warehouse/domain/usecases/update_purchase_note_use_case.dart';
-import 'package:ship_tracker/core/common/dropdown_entity.dart';
+import 'package:ship_tracker/core/domain/entities/dropdown_entity.dart';
 
 const tWarehouseItemEntity = WarehouseItemEntity(
   id: 'c5f50fa8-ec55-4f22-b2d9-b223da930ebd',

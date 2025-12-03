@@ -1,4 +1,4 @@
-import 'package:ship_tracker/core/common/dropdown_entity.dart';
+import 'package:ship_tracker/core/domain/entities/dropdown_entity.dart';
 import 'package:ship_tracker/features/supplier/data/models/supplier_detail_model.dart';
 import 'package:ship_tracker/features/supplier/data/models/supplier_model.dart';
 import 'package:ship_tracker/features/supplier/domain/entities/supplier_entity.dart';

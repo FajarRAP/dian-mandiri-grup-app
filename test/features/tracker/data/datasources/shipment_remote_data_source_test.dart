@@ -6,7 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:ship_tracker/core/errors/exceptions.dart';
-import 'package:ship_tracker/core/helpers/helpers.dart';
+import 'package:ship_tracker/core/utils/extensions.dart';
 import 'package:ship_tracker/features/tracker/data/datasources/shipment_remote_data_source.dart';
 
 import '../../../../core/utils/fixture_reader.dart';
@@ -393,7 +393,7 @@ void main() {
   });
 
   group('download shipment report remote data sources test', () {
-    final params = tDownloadShipmentReportParams;
+    const params = tDownloadShipmentReportParams;
     const resultMatcher = tDownloadShipmentReportSuccess;
 
     test('should return String when request is successful', () async {

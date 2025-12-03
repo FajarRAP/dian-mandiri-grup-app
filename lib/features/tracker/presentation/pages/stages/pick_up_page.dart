@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../../core/common/constants.dart';
+import '../../../../../common/constants/app_constants.dart';
 import '../../widgets/stage_layout.dart';
 
 class PickUpPage extends StatelessWidget {
@@ -10,7 +10,7 @@ class PickUpPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return const StageLayout(
       appBarTitle: 'Scan Ambil Barang',
-      stage: pickUpStage,
+      stage: AppConstants.pickUpStage,
     );
   }
 }

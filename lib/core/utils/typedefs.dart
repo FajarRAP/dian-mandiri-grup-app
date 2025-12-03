@@ -1,6 +1,6 @@
 import 'package:dartz/dartz.dart';
 
-import '../common/dropdown_entity.dart';
+import '../domain/entities/dropdown_entity.dart';
 import '../errors/failure.dart';
 
 typedef JsonMap = Map<String, dynamic>;

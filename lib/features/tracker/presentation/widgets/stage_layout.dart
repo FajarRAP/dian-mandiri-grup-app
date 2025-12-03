@@ -4,17 +4,17 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 
-import '../../../../core/common/constants.dart';
-import '../../../../core/helpers/helpers.dart';
-import '../../../../core/helpers/top_snackbar.dart';
+import '../../../../common/constants/app_assets.dart';
+import '../../../../common/constants/app_constants.dart';
+import '../../../../common/utils/top_snackbar.dart';
+import '../../../../core/presentation/widgets/expandable_fab/action_button.dart';
+import '../../../../core/presentation/widgets/expandable_fab/expandable_fab.dart';
 import '../../../../core/presentation/widgets/pagination_listener.dart';
 import '../../../../core/presentation/widgets/sliver_empty_data.dart';
 import '../../../../core/presentation/widgets/sliver_loading_indicator.dart';
 import '../../../../core/router/route_names.dart';
 import '../../../../core/utils/debouncer.dart';
 import '../../../../core/utils/extensions.dart';
-import '../../../../core/presentation/widgets/expandable_fab/action_button.dart';
-import '../../../../core/presentation/widgets/expandable_fab/expandable_fab.dart';
 import '../../domain/entities/shipment_entity.dart';
 import '../cubit/shipment_list/shipment_list_cubit.dart';
 import 'cancel_shipment_dialog.dart';
@@ -69,15 +69,15 @@ class _StageLayoutState extends State<StageLayout> {
 
         if (state.actionStatus == .success) {
           TopSnackbar.successSnackbar(message: state.message!);
-          await _audioPlayer.play(AssetSource(successSound));
+          await _audioPlayer.play(AssetSource(AppAssets.successSound));
         }
 
         if (state.actionStatus == .failure) {
           TopSnackbar.dangerSnackbar(message: state.failure!.message);
 
           return switch (state.failure!.statusCode) {
-            422 => await _audioPlayer.play(AssetSource(repeatSound)),
-            423 => await _audioPlayer.play(AssetSource(skipSound)),
+            422 => await _audioPlayer.play(AssetSource(AppAssets.repeatSound)),
+            423 => await _audioPlayer.play(AssetSource(AppAssets.skipSound)),
             _ => null,
           };
         }
@@ -157,7 +157,7 @@ class _AppBarState extends State<_AppBar> {
   Widget build(BuildContext context) {
     return SliverAppBar(
       backgroundColor: context.colorScheme.surfaceContainerLowest,
-      expandedHeight: kToolbarHeight + kSpaceBarHeight + 24,
+      expandedHeight: kToolbarHeight + AppConstants.kSpaceBarHeight + 24,
       floating: true,
       flexibleSpace: FlexibleSpaceBar(
         background: Align(

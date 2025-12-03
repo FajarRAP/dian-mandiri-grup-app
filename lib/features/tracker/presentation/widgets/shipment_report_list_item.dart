@@ -5,8 +5,7 @@ import 'package:open_filex/open_filex.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../../common/constants/app_images.dart';
-import '../../../../core/helpers/helpers.dart';
-import '../../../../core/helpers/top_snackbar.dart';
+import '../../../../common/utils/top_snackbar.dart';
 import '../../../../core/presentation/widgets/loading_indicator.dart';
 import '../../../../core/services/file_service.dart';
 import '../../../../core/utils/extensions.dart';

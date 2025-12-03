@@ -1,9 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+import '../../common/constants/app_constants.dart';
 import '../../features/auth/presentation/cubit/auth_cubit.dart';
 import '../../service_container.dart';
-import '../common/constants.dart';
 
 class DioInterceptor implements Interceptor {
   final _storage = getIt.get<FlutterSecureStorage>();
@@ -11,7 +11,9 @@ class DioInterceptor implements Interceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
     if (err.response?.statusCode == 401) {
-      final refreshToken = await _storage.read(key: refreshTokenKey);
+      final refreshToken = await _storage.read(
+        key: AppConstants.refreshTokenKey,
+      );
       final authCubit = getIt.get<AuthCubit>();
 
       if (err.requestOptions.path.endsWith('/refresh')) {
@@ -22,7 +24,9 @@ class DioInterceptor implements Interceptor {
 
       try {
         await authCubit.refreshToken(refreshToken: refreshToken);
-        final newAccessToken = await _storage.read(key: accessTokenKey);
+        final newAccessToken = await _storage.read(
+          key: AppConstants.accessTokenKey,
+        );
         final newOptions = err.requestOptions
           ..headers['Authorization'] = 'Bearer $newAccessToken';
         final response = await Dio().fetch(newOptions);
@@ -41,7 +45,7 @@ class DioInterceptor implements Interceptor {
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
-    final accessToken = await _storage.read(key: accessTokenKey);
+    final accessToken = await _storage.read(key: AppConstants.accessTokenKey);
     final isLogin = options.path.endsWith('/google');
     final isRefresh = options.path.endsWith('/refresh');
 

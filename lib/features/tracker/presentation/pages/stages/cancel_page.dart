@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../../core/common/constants.dart';
+import '../../../../../common/constants/app_constants.dart';
 import '../../widgets/stage_layout.dart';
 
 class CancelPage extends StatelessWidget {
@@ -10,7 +10,7 @@ class CancelPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return const StageLayout(
       appBarTitle: 'Barang Cancel',
-      stage: cancelStage,
+      stage: AppConstants.cancelStage,
     );
   }
 }
