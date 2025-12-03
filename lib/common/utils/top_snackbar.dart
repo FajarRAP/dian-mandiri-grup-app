@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
-import '../themes/colors.dart';
+import '../../core/themes/colors.dart';
 
 class TopSnackbar {
   static late BuildContext _context;

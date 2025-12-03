@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../themes/colors.dart';
+import '../../core/themes/colors.dart';
 
 final cardBoxShadow = <BoxShadow>[
   BoxShadow(
