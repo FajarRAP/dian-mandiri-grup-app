@@ -16,6 +16,7 @@ class FABContainer extends StatelessWidget {
         ),
         color: context.colorScheme.surfaceContainerLowest,
       ),
+      width: .infinity,
       padding: const .all(16),
       child: child,
     );
