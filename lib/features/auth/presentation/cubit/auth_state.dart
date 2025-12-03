@@ -95,3 +95,9 @@ class UpdateProfileError extends UpdateProfile {
 }
 
 class RefreshTokenExpired extends AuthState {}
+
+class Unauthenticated extends AuthState {
+  const Unauthenticated({required this.message});
+
+  final String message;
+}

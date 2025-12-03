@@ -4,8 +4,10 @@ import 'package:get_it/get_it.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:share_plus/share_plus.dart';
 
-import 'common/constants/app_constants.dart';
-import 'core/network/dio_interceptor.dart';
+import 'common/constants/app_configs.dart';
+import 'core/network/auth_interceptor.dart';
+import 'core/network/auth_status_stream.dart';
+import 'core/network/token_refresh_service.dart';
 import 'core/presentation/cubit/app_cubit.dart';
 import 'core/presentation/cubit/dropdown_cubit.dart';
 import 'core/presentation/cubit/user_cubit.dart';
@@ -57,13 +59,13 @@ import 'features/tracker/presentation/cubit/shipment_report/shipment_report_cubi
 import 'features/warehouse/data/datasources/warehouse_remote_data_source.dart';
 import 'features/warehouse/data/repositories/warehouse_repository_impl.dart';
 import 'features/warehouse/domain/repositories/warehouse_repository.dart';
+import 'features/warehouse/domain/usecases/add_shipping_fee_use_case.dart';
 import 'features/warehouse/domain/usecases/create_purchase_note_use_case.dart';
 import 'features/warehouse/domain/usecases/delete_purchase_note_use_case.dart';
 import 'features/warehouse/domain/usecases/fetch_purchase_note_use_case.dart';
 import 'features/warehouse/domain/usecases/fetch_purchase_notes_dropdown_use_case.dart';
 import 'features/warehouse/domain/usecases/fetch_purchase_notes_use_case.dart';
 import 'features/warehouse/domain/usecases/import_purchase_note_use_case.dart';
-import 'features/warehouse/domain/usecases/add_shipping_fee_use_case.dart';
 import 'features/warehouse/domain/usecases/update_purchase_note_use_case.dart';
 import 'features/warehouse/domain/usecases/update_return_cost_use_case.dart';
 import 'features/warehouse/presentation/cubit/import_purchase_note/import_purchase_note_cubit.dart';
@@ -75,33 +77,57 @@ import 'features/warehouse/presentation/cubit/purchase_note_list/purchase_note_l
 final getIt = GetIt.instance;
 
 void setup() {
-  getIt.registerLazySingleton<FlutterSecureStorage>(
-    () => const FlutterSecureStorage(),
+  final dio = Dio(
+    BaseOptions(
+      baseUrl: AppConfigs.apiUrl,
+      connectTimeout: const Duration(
+        milliseconds: AppConfigs.connectionTimeout,
+      ),
+      receiveTimeout: const Duration(milliseconds: AppConfigs.receiveTimeout),
+    ),
   );
+  final copyDio = Dio(
+    BaseOptions(
+      baseUrl: AppConfigs.apiUrl,
+      connectTimeout: const Duration(
+        milliseconds: AppConfigs.connectionTimeout,
+      ),
+      receiveTimeout: const Duration(milliseconds: AppConfigs.receiveTimeout),
+    ),
+  );
+  getIt
+    ..registerSingleton(AuthStatusStream())
+    ..registerSingleton(FlutterSecureStorage(aOptions: _getAndroidOptions()))
+    ..registerSingleton(dio);
 
   // Services
   getIt
-    ..registerLazySingleton<Dio>(
-      () => Dio(
-        BaseOptions(
-          baseUrl: AppConstants.apiUrl,
-          connectTimeout: const Duration(seconds: 5),
-        ),
-      )..interceptors.add(DioInterceptor()),
-    )
+    // ..registerLazySingleton<Dio>(
+    //   () => Dio(
+    //     BaseOptions(
+    //       baseUrl: AppConfigs.apiUrl,
+    //       connectTimeout: const Duration(
+    //         milliseconds: AppConfigs.connectionTimeout,
+    //       ),
+    //       receiveTimeout: const Duration(
+    //         milliseconds: AppConfigs.receiveTimeout,
+    //       ),
+    //     ),
+    //   )..interceptors.add(DioInterceptor()),
+    // )
     ..registerLazySingleton<ImagePickerService>(() => ImagePickerServiceImpl())
     ..registerLazySingleton<FileInteractionService>(
       () => FileInteractionServiceImpl(sharePlus: SharePlus.instance),
-    )
+    );
+
+  // Auth
+  getIt
     ..registerLazySingleton(
       () => GoogleSignInService(
         serverClientId: const String.fromEnvironment('SERVER_CLIENT_ID'),
         googleSignIn: GoogleSignIn.instance,
       ),
-    );
-
-  // Auth
-  getIt
+    )
     ..registerLazySingleton<AuthLocalDataSource>(
       () => AuthLocalDataSourceImpl(storage: getIt()),
     )
@@ -128,6 +154,14 @@ void setup() {
         refreshTokenUseCase: getIt(),
         signInUseCase: getIt(),
         signOutUseCase: getIt(),
+        authStatusStream: getIt(),
+      ),
+    )
+    ..registerLazySingleton(
+      () => TokenRefreshService(
+        cleanDio: copyDio,
+        authLocalDataSource: getIt(),
+        authStatusStream: getIt(),
       ),
     );
 
@@ -257,14 +291,22 @@ void setup() {
       () => PurchaseNoteDetailCubit(fetchPurchaseNoteUseCase: getIt()),
     );
 
+  getIt<Dio>().interceptors.addAll([
+    AuthInterceptor(
+      dio: getIt(),
+      authLocalDataSource: getIt(),
+      tokenRefreshService: getIt(),
+    ),
+  ]);
+
   getIt
-    ..registerLazySingleton(
+    ..registerFactory(
       () => AppCubit(
         getRefreshTokenUseCase: getIt(),
         fetchUserFromStorageUseCase: getIt(),
       ),
     )
-    ..registerLazySingleton(
+    ..registerFactory(
       () => UserCubit(
         fetchUserUseCase: getIt(),
         fetchUserFromStorageUseCase: getIt(),
@@ -278,3 +320,6 @@ void setup() {
       ),
     );
 }
+
+AndroidOptions _getAndroidOptions() =>
+    const AndroidOptions(encryptedSharedPreferences: true);

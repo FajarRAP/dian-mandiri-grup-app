@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 
+import '../../../../core/network/auth_status_stream.dart';
 import '../../../../core/usecase/use_case.dart';
 import '../../domain/entities/user_entity.dart';
 import '../../domain/usecases/fetch_user_from_storage_use_case.dart';
@@ -19,19 +22,24 @@ class AuthCubit extends Cubit<AuthState> {
     required RefreshTokenUseCase refreshTokenUseCase,
     required SignInUseCase signInUseCase,
     required SignOutUseCase signOutUseCase,
+    required AuthStatusStream authStatusStream,
   }) : _fetchUserUseCase = fetchUserUseCase,
        _fetchUserFromStorageUseCase = fetchUserFromStorageUseCase,
        _refreshTokenUseCase = refreshTokenUseCase,
        _signInUseCase = signInUseCase,
        _signOutUseCase = signOutUseCase,
-
-       super(AuthInitial());
+       _authStatusStream = authStatusStream,
+       super(AuthInitial()) {
+    _listenAuthStatus();
+  }
 
   final FetchUserUseCase _fetchUserUseCase;
   final FetchUserFromStorageUseCase _fetchUserFromStorageUseCase;
   final RefreshTokenUseCase _refreshTokenUseCase;
   final SignInUseCase _signInUseCase;
   final SignOutUseCase _signOutUseCase;
+  final AuthStatusStream _authStatusStream;
+  late StreamSubscription<bool> _authStatusSubscription;
 
   Future<void> fetchUser() async {
     emit(FetchUserLoading());
@@ -92,5 +100,19 @@ class AuthCubit extends Cubit<AuthState> {
     );
   }
 
-  void refreshTokenExpired() => emit(RefreshTokenExpired());
+  void _listenAuthStatus() {
+    _authStatusSubscription = _authStatusStream.stream.listen((
+      isAuthenticated,
+    ) {
+      if (!isAuthenticated) {
+        emit(const Unauthenticated(message: 'Session Ended'));
+      }
+    });
+  }
+
+  @override
+  Future<void> close() {
+    _authStatusSubscription.cancel();
+    return super.close();
+  }
 }
