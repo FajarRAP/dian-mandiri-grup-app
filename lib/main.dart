@@ -16,7 +16,6 @@ import 'core/services/google_sign_in_service.dart';
 import 'core/themes/app_theme.dart';
 import 'core/utils/app_bloc_observer.dart';
 import 'features/auth/presentation/cubit/auth_cubit.dart';
-import 'features/warehouse/presentation/cubit/warehouse_cubit.dart';
 import 'firebase_options.dart';
 import 'service_container.dart';
 
@@ -52,7 +51,6 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (context) => getIt<UserCubit>()),
         BlocProvider(create: (context) => getIt<AppCubit>()),
         BlocProvider(create: (context) => getIt<AuthCubit>()),
-        BlocProvider(create: (context) => getIt<WarehouseCubit>()),
       ],
       child: MaterialApp.router(
         builder: (context, child) => Overlay(

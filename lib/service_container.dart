@@ -71,7 +71,6 @@ import 'features/warehouse/presentation/cubit/purchase_note_cost/purchase_note_c
 import 'features/warehouse/presentation/cubit/purchase_note_detail/purchase_note_detail_cubit.dart';
 import 'features/warehouse/presentation/cubit/purchase_note_form/purchase_note_form_cubit.dart';
 import 'features/warehouse/presentation/cubit/purchase_note_list/purchase_note_list_cubit.dart';
-import 'features/warehouse/presentation/cubit/warehouse_cubit.dart';
 
 final getIt = GetIt.instance;
 
@@ -230,12 +229,6 @@ void setup() {
     ..registerSingleton(UpdateReturnCostUseCase(warehouseRepository: getIt()))
     ..registerSingleton(AddShippingFeeUseCase(warehouseRepository: getIt()))
     ..registerSingleton(UpdatePurchaseNoteUseCase(warehouseRepository: getIt()))
-    ..registerLazySingleton<WarehouseCubit>(
-      () => WarehouseCubit(
-        addShippingFeeUseCase: getIt(),
-        imagePickerService: getIt(),
-      ),
-    )
     ..registerFactory(
       () => PurchaseNoteListCubit(
         fetchPurchaseNotesUseCase: getIt(),
