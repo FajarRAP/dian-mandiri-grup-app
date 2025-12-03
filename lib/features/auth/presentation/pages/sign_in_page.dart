@@ -7,15 +7,13 @@ import '../../../../common/utils/top_snackbar.dart';
 import '../../../../core/presentation/cubit/user_cubit.dart';
 import '../../../../core/presentation/widgets/buttons/light_button.dart';
 import '../../../../core/router/route_names.dart';
-import '../cubit/auth_cubit.dart';
+import '../cubit/sign_in/sign_in_cubit.dart';
 
 class SignInPage extends StatelessWidget {
   const SignInPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final authCubit = context.read<AuthCubit>();
-
     return Scaffold(
       appBar: AppBar(title: const Text('Sign In')),
       body: Padding(
@@ -23,23 +21,23 @@ class SignInPage extends StatelessWidget {
         child: Center(
           child: SizedBox(
             width: .infinity,
-            child: BlocConsumer<AuthCubit, AuthState>(
+            child: BlocConsumer<SignInCubit, SignInState>(
               listener: (context, state) {
-                if (state is SignInLoaded) {
+                if (state is SignInSuccess) {
                   TopSnackbar.successSnackbar(message: state.message);
                   context
                     ..read<UserCubit>().setUser = state.user
                     ..goNamed(Routes.home);
                 }
 
-                if (state is SignInError) {
+                if (state is SignInFailure) {
                   TopSnackbar.dangerSnackbar(message: state.message);
                 }
               },
               builder: (context, state) {
                 final onPressed = switch (state) {
-                  SignInLoading() => null,
-                  _ => authCubit.signIn,
+                  SignInInProgress() => null,
+                  _ => context.read<SignInCubit>().signIn,
                 };
 
                 return LightButton(
