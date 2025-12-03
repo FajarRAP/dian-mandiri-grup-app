@@ -42,7 +42,7 @@ import '../../features/warehouse/presentation/pages/warehouse_page.dart';
 import '../../service_container.dart';
 import '../common/constants.dart';
 import '../presentation/pages/splash_page.dart';
-import '../widgets/scaffold_with_bottom_navigation_bar.dart';
+import '../presentation/widgets/scaffold_with_bottom_navigation_bar.dart';
 import 'route_names.dart';
 
 FadeTransition transition(Animation<double> animation, Widget child) =>

@@ -9,7 +9,7 @@ import '../../../../core/presentation/cubit/user_cubit.dart';
 import '../../../../core/presentation/widgets/error_state_widget.dart';
 import '../../../../core/presentation/widgets/loading_indicator.dart';
 import '../../../../core/utils/extensions.dart';
-import '../../../../core/widgets/buttons/primary_button.dart';
+import '../../../../core/presentation/widgets/buttons/primary_button.dart';
 import '../../../../service_container.dart';
 import '../../domain/entities/user_entity.dart';
 import '../cubit/auth_cubit.dart';

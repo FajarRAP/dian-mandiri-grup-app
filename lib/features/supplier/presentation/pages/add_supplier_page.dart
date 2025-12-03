@@ -10,8 +10,8 @@ import '../../../../core/common/shadows.dart';
 import '../../../../core/helpers/top_snackbar.dart';
 import '../../../../core/helpers/validators.dart';
 import '../../../../core/utils/extensions.dart';
-import '../../../../core/widgets/buttons/primary_button.dart';
-import '../../../../core/widgets/image_picker_bottom_sheet.dart';
+import '../../../../core/presentation/widgets/buttons/primary_button.dart';
+import '../../../../core/presentation/widgets/image_picker_bottom_sheet.dart';
 import '../cubit/create_supplier/create_supplier_cubit.dart';
 import '../widgets/editable_avatar.dart';
 

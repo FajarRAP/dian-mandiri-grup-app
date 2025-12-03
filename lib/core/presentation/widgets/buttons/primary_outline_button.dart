@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../utils/extensions.dart';
+import '../../../utils/extensions.dart';
 
 class PrimaryOutlineButton extends StatelessWidget {
   const PrimaryOutlineButton({

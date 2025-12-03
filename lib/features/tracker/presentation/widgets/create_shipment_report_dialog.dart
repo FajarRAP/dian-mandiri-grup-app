@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/helpers/helpers.dart';
 import '../../../../core/helpers/top_snackbar.dart';
 import '../../../../core/helpers/validators.dart';
-import '../../../../core/widgets/confirmation_input_dialog.dart';
+import '../../../../core/presentation/widgets/confirmation_input_dialog.dart';
 import '../cubit/shipment_report/shipment_report_cubit.dart';
 
 class CreateReportDateRangeDialog extends StatefulWidget {

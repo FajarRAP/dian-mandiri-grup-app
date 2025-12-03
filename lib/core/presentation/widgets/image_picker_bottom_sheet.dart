@@ -3,8 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../presentation/mixins/image_picker_mixin.dart';
-import '../utils/extensions.dart';
+import '../mixins/image_picker_mixin.dart';
+import '../../utils/extensions.dart';
 
 class ImagePickerBottomSheet extends StatelessWidget with ImagePickerMixin {
   const ImagePickerBottomSheet({

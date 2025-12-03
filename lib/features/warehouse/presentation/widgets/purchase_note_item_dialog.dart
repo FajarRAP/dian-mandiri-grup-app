@@ -3,8 +3,8 @@ import 'package:gap/gap.dart';
 
 import '../../../../core/helpers/validators.dart';
 import '../../../../core/utils/extensions.dart';
-import '../../../../core/widgets/buttons/primary_button.dart';
-import '../../../../core/widgets/required_label.dart';
+import '../../../../core/presentation/widgets/buttons/primary_button.dart';
+import '../../../../core/presentation/widgets/required_label.dart';
 import '../../domain/entities/warehouse_item_entity.dart';
 
 class PurchaseNoteItemDialog extends StatefulWidget {

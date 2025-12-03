@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 
-import '../utils/extensions.dart';
+import '../../utils/extensions.dart';
 
 class PreviewPickedImageDialog extends StatelessWidget {
   const PreviewPickedImageDialog({super.key, required this.pickedImagePath});

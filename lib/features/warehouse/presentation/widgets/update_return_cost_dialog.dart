@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/helpers/top_snackbar.dart';
-import '../../../../core/widgets/confirmation_input_dialog.dart';
+import '../../../../core/presentation/widgets/confirmation_input_dialog.dart';
 import '../cubit/purchase_note_cost/purchase_note_cost_cubit.dart';
 
 class UpdateReturnCostDialog extends StatelessWidget {

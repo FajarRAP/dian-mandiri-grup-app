@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../utils/extensions.dart';
+import '../../utils/extensions.dart';
 
 class FABContainer extends StatelessWidget {
   const FABContainer({super.key, required this.child});

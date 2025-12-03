@@ -3,10 +3,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 
 import '../../../../../core/utils/extensions.dart';
-import '../../../../../core/widgets/buttons/primary_button.dart';
-import '../../../../../core/widgets/buttons/primary_outline_button.dart';
-import '../../../../../core/widgets/image_picker_bottom_sheet.dart';
-import '../../../../../core/widgets/preview_picked_image_dialog.dart';
+import '../../../../../core/presentation/widgets/buttons/primary_button.dart';
+import '../../../../../core/presentation/widgets/buttons/primary_outline_button.dart';
+import '../../../../../core/presentation/widgets/image_picker_bottom_sheet.dart';
+import '../../../../../core/presentation/widgets/preview_picked_image_dialog.dart';
 
 class UploadReceiptForm extends StatelessWidget {
   const UploadReceiptForm({super.key, this.onPicked, this.image});

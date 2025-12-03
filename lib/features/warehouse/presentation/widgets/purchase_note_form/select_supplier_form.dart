@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../../core/common/dropdown_entity.dart';
 import '../../../../../core/helpers/validators.dart';
 import '../../../../../core/utils/extensions.dart';
-import '../../../../../core/widgets/dropdowns/supplier_dropdown.dart';
+import '../../../../../core/presentation/widgets/dropdowns/supplier_dropdown.dart';
 
 class SelectSupplierForm extends StatefulWidget {
   const SelectSupplierForm({

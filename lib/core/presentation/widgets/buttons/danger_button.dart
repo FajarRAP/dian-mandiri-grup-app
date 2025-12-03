@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../utils/extensions.dart';
+import '../../../utils/extensions.dart';
 
 class DangerButton extends StatelessWidget {
   const DangerButton({

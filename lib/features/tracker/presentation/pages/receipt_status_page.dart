@@ -15,7 +15,7 @@ import '../../../../core/presentation/widgets/expandable_fab/action_button.dart'
 import '../../../../core/presentation/widgets/expandable_fab/expandable_fab.dart';
 import '../../../../core/presentation/widgets/loading_indicator.dart';
 import '../../../../core/utils/extensions.dart';
-import '../../../../core/widgets/buttons/danger_button.dart';
+import '../../../../core/presentation/widgets/buttons/danger_button.dart';
 import '../../../../service_container.dart';
 import '../../domain/entities/shipment_history_entity.dart';
 import '../../domain/entities/stage_entity.dart';

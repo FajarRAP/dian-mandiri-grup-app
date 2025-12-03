@@ -6,7 +6,7 @@ import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/helpers/top_snackbar.dart';
-import '../../../../core/widgets/buttons/primary_button.dart';
+import '../../../../core/presentation/widgets/buttons/primary_button.dart';
 import '../cubit/shipment_detail/shipment_detail_cubit.dart';
 
 class UpdateShipmentDocumentPage extends StatelessWidget {

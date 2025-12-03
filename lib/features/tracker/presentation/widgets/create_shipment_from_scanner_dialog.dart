@@ -6,7 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/helpers/validators.dart';
 import '../../../../core/presentation/cubit/user_cubit.dart';
 import '../../../../core/utils/extensions.dart';
-import '../../../../core/widgets/buttons/primary_button.dart';
+import '../../../../core/presentation/widgets/buttons/primary_button.dart';
 import '../cubit/shipment_list/shipment_list_cubit.dart';
 
 class CreateShipmentFromScannerDialog extends StatefulWidget {

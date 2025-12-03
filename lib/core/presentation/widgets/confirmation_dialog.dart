@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 
-import '../utils/extensions.dart';
+import '../../utils/extensions.dart';
 import 'buttons/primary_button.dart';
 
 class ConfirmationDialog extends StatelessWidget {

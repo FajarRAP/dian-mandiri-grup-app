@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/common/constants.dart';
 import '../../../../core/helpers/top_snackbar.dart';
 import '../../../../core/presentation/cubit/user_cubit.dart';
-import '../../../../core/widgets/buttons/light_button.dart';
+import '../../../../core/presentation/widgets/buttons/light_button.dart';
 import '../cubit/auth_cubit.dart';
 
 class SignInPage extends StatelessWidget {

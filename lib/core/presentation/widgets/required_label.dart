@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../utils/extensions.dart';
+import '../../utils/extensions.dart';
 
 class RequiredLabel extends StatelessWidget {
   const RequiredLabel({super.key, required this.label});

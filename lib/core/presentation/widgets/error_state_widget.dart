@@ -3,7 +3,7 @@ import 'package:gap/gap.dart';
 
 import '../../errors/failure.dart';
 import '../../utils/extensions.dart';
-import '../../widgets/buttons/danger_button.dart';
+import 'buttons/danger_button.dart';
 
 class ErrorStateWidget extends StatelessWidget {
   const ErrorStateWidget({

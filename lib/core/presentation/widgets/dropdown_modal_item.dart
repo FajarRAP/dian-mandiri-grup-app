@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../utils/extensions.dart';
+import '../../utils/extensions.dart';
 
 class DropdownModalItem extends StatelessWidget {
   const DropdownModalItem({super.key, required this.child});

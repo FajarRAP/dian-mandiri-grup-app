@@ -4,12 +4,12 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../common/constants/app_svgs.dart';
-import '../../features/auth/presentation/cubit/auth_cubit.dart';
-import '../../service_container.dart';
-import '../common/constants.dart';
-import '../services/google_sign_in_service.dart';
-import '../utils/extensions.dart';
+import '../../../common/constants/app_svgs.dart';
+import '../../../features/auth/presentation/cubit/auth_cubit.dart';
+import '../../../service_container.dart';
+import '../../common/constants.dart';
+import '../../services/google_sign_in_service.dart';
+import '../../utils/extensions.dart';
 
 class ScaffoldWithBottomNavigationBar extends StatelessWidget {
   const ScaffoldWithBottomNavigationBar({super.key, required this.child});

@@ -7,9 +7,9 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/common/dropdown_entity.dart';
 import '../../../../core/helpers/top_snackbar.dart';
 import '../../../../core/helpers/validators.dart';
-import '../../../../core/widgets/buttons/primary_button.dart';
-import '../../../../core/widgets/dropdowns/purchase_note_dropdown.dart';
-import '../../../../core/widgets/fab_container.dart';
+import '../../../../core/presentation/widgets/buttons/primary_button.dart';
+import '../../../../core/presentation/widgets/dropdowns/purchase_note_dropdown.dart';
+import '../../../../core/presentation/widgets/fab_container.dart';
 import '../cubit/purchase_note_cost/purchase_note_cost_cubit.dart';
 import '../widgets/selected_purchase_note_item.dart';
 
