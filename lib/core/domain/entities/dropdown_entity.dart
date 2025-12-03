@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-import '../utils/typedefs.dart';
+import '../../utils/typedefs.dart';
 
 class DropdownEntity extends Equatable {
   const DropdownEntity({
