@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 
+import '../utils/extensions.dart';
 import 'buttons/primary_button.dart';
 
 class ConfirmationDialog extends StatelessWidget {
@@ -19,39 +21,24 @@ class ConfirmationDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final textTheme = theme.textTheme;
+    final textTheme = context.textTheme;
 
     return AlertDialog(
-      contentPadding: const EdgeInsets.all(24),
+      contentPadding: const .all(24),
       content: Column(
-        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: .stretch,
+        mainAxisSize: .min,
         children: <Widget>[
-          Text(
-            title,
-            style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
-          ),
-          const SizedBox(height: 8),
+          Text(title, style: textTheme.titleLarge?.copyWith(fontWeight: .w700)),
+          const Gap(8),
           Text(
             body,
             style: textTheme.bodyMedium?.copyWith(color: Colors.grey.shade600),
-            textAlign: TextAlign.center,
+            textAlign: .center,
           ),
-          const SizedBox(height: 24),
-          SizedBox(
-            width: double.infinity,
-            child: PrimaryButton(
-              onPressed: onAction,
-              child: Text(actionText),
-            ),
-          ),
-          SizedBox(
-            width: double.infinity,
-            child: TextButton(
-              onPressed: context.pop,
-              child: const Text('Batal'),
-            ),
-          ),
+          const Gap(24),
+          PrimaryButton(onPressed: onAction, child: Text(actionText)),
+          TextButton(onPressed: context.pop, child: const Text('Batal')),
         ],
       ),
     );

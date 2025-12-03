@@ -41,7 +41,7 @@ class ShipmentListItem extends StatelessWidget {
                 color: context.colorScheme.primary,
               ),
             ),
-            const SizedBox(width: 8),
+            const Gap(8),
             Expanded(
               child: Column(
                 crossAxisAlignment: .start,
