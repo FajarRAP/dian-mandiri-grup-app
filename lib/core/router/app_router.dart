@@ -260,10 +260,10 @@ class AppRouter {
                         name: Routes.warehouseAddPurchaseNoteFile,
                         child: (state) => const ImportPurchaseNotePage(),
                       ),
-                      GoRoute(
+                      _buildRouteWithCubit<PurchaseNoteCostCubit>(
                         path: 'add-shipping-fee',
                         name: Routes.warehouseAddShippingFee,
-                        builder: (context, state) => const AddShippingFeePage(),
+                        child: (state) => const AddShippingFeePage(),
                       ),
                     ],
                   ),
