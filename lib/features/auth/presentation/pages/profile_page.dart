@@ -113,10 +113,8 @@ class _SuccessWidget extends StatelessWidget {
               ),
               const Gap(24),
               BlocConsumer<AuthCubit, AuthState>(
-                buildWhen: (previous, current) => current is SignOut,
-                listenWhen: (previous, current) => current is SignOut,
                 listener: (context, state) {
-                  if (state is SignOutLoaded) {
+                  if (state is Unauthenticated) {
                     TopSnackbar.successSnackbar(message: state.message);
 
                     context
@@ -124,13 +122,13 @@ class _SuccessWidget extends StatelessWidget {
                       ..goNamed(Routes.login);
                   }
 
-                  if (state is SignOutError) {
-                    TopSnackbar.dangerSnackbar(message: state.message);
+                  if (state is AuthFailure) {
+                    TopSnackbar.dangerSnackbar(message: state.failure.message);
                   }
                 },
                 builder: (context, state) {
                   final onPressed = switch (state) {
-                    SignOutLoading() => null,
+                    AuthLoading() => null,
                     _ => context.read<AuthCubit>().signOut,
                   };
 
