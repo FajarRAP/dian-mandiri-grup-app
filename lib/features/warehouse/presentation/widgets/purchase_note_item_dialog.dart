@@ -83,7 +83,7 @@ class _PurchaseNoteItemDialogState extends State<PurchaseNoteItemDialog> {
                       color: context.colorScheme.onPrimaryFixed,
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  const Gap(16),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: .start,
