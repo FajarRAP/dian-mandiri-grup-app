@@ -43,11 +43,10 @@ class AuthInterceptor extends QueuedInterceptorsWrapper {
   ) async {
     final response = err.response;
 
-    if (response?.statusCode == 401 &&
-        response?.requestOptions.path != '/auth/refresh') {
-      const unauthenticatedPaths = ['/auth/google'];
+    const excludedPaths = ['/auth/refresh', '/auth/google'];
 
-      if (unauthenticatedPaths.contains(err.requestOptions.path)) {
+    if (response?.statusCode == 401) {
+      if (excludedPaths.contains(err.requestOptions.path)) {
         return handler.next(err);
       }
 
