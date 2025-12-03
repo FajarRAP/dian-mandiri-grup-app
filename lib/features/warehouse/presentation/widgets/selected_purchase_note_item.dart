@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 
-import '../../../../core/themes/colors.dart';
+import '../../../../core/utils/extensions.dart';
 
 class SelectedPurchaseNoteItem extends StatelessWidget {
   const SelectedPurchaseNoteItem({
@@ -14,12 +15,12 @@ class SelectedPurchaseNoteItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final textTheme = theme.textTheme;
+    final textTheme = context.textTheme;
 
     return Container(
+      clipBehavior: .antiAlias,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: .circular(8),
         boxShadow: <BoxShadow>[
           BoxShadow(
             color: Colors.black.withValues(alpha: .05),
@@ -27,29 +28,18 @@ class SelectedPurchaseNoteItem extends StatelessWidget {
             offset: const Offset(0, 2),
           ),
         ],
-        color: MaterialColors.onPrimary,
+        color: context.colorScheme.surfaceContainerLowest,
       ),
       height: 56,
       child: Row(
         children: <Widget>[
-          Container(
-            decoration: BoxDecoration(
-              borderRadius: const BorderRadius.horizontal(
-                left: Radius.circular(12),
-              ),
-              color: CustomColors.primaryNormal,
-            ),
-            height: 56,
-            width: 6,
-          ),
-          const SizedBox(width: 10),
+          Container(color: context.colorScheme.primary, width: 6),
+          const Gap(10),
           Expanded(
             child: Text(
               title,
-              style: textTheme.bodyLarge?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
-              overflow: TextOverflow.ellipsis,
+              style: textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
+              overflow: .ellipsis,
             ),
           ),
           Tooltip(
@@ -57,12 +47,9 @@ class SelectedPurchaseNoteItem extends StatelessWidget {
             child: IconButton(
               onPressed: onDelete,
               style: IconButton.styleFrom(
-                backgroundColor: MaterialColors.error.withValues(alpha: .1),
+                backgroundColor: context.colorScheme.errorContainer,
               ),
-              icon: const Icon(
-                Icons.close,
-                color: MaterialColors.error,
-              ),
+              icon: Icon(Icons.close, color: context.colorScheme.error),
             ),
           ),
         ],
