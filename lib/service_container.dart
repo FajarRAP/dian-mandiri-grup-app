@@ -29,10 +29,10 @@ import 'features/auth/presentation/cubit/update_profile_cubit.dart';
 import 'features/supplier/data/datasources/supplier_remote_data_source.dart';
 import 'features/supplier/data/repositories/supplier_repository_impl.dart';
 import 'features/supplier/domain/repositories/supplier_repository.dart';
+import 'features/supplier/domain/usecases/create_supplier_use_case.dart';
 import 'features/supplier/domain/usecases/fetch_supplier_use_case.dart';
 import 'features/supplier/domain/usecases/fetch_suppliers_dropdown_use_case.dart';
 import 'features/supplier/domain/usecases/fetch_suppliers_use_case.dart';
-import 'features/supplier/domain/usecases/create_supplier_use_case.dart';
 import 'features/supplier/domain/usecases/update_supplier_use_case.dart';
 import 'features/supplier/presentation/cubit/create_supplier/create_supplier_cubit.dart';
 import 'features/supplier/presentation/cubit/supplier/supplier_cubit.dart';
@@ -43,33 +43,33 @@ import 'features/tracker/data/repositories/shipment_repository_impl.dart';
 import 'features/tracker/domain/repositories/shipment_repository.dart';
 import 'features/tracker/domain/usecases/check_shipment_report_existence_use_case.dart';
 import 'features/tracker/domain/usecases/create_shipment_report_use_case.dart';
+import 'features/tracker/domain/usecases/create_shipment_use_case.dart';
 import 'features/tracker/domain/usecases/delete_shipment_use_case.dart';
 import 'features/tracker/domain/usecases/download_shipment_report_use_case.dart';
-import 'features/tracker/domain/usecases/fetch_shipment_use_case.dart';
-import 'features/tracker/domain/usecases/fetch_shipment_status_use_case.dart';
 import 'features/tracker/domain/usecases/fetch_shipment_reports_use_case.dart';
+import 'features/tracker/domain/usecases/fetch_shipment_status_use_case.dart';
+import 'features/tracker/domain/usecases/fetch_shipment_use_case.dart';
 import 'features/tracker/domain/usecases/fetch_shipments_use_case.dart';
 import 'features/tracker/domain/usecases/update_shipment_document_use_case.dart';
-import 'features/tracker/domain/usecases/create_shipment_use_case.dart';
-import 'features/tracker/presentation/cubit/shipment_report/shipment_report_cubit.dart';
 import 'features/tracker/presentation/cubit/shipment_detail/shipment_detail_cubit.dart';
 import 'features/tracker/presentation/cubit/shipment_list/shipment_list_cubit.dart';
+import 'features/tracker/presentation/cubit/shipment_report/shipment_report_cubit.dart';
 import 'features/warehouse/data/datasources/warehouse_remote_data_source.dart';
 import 'features/warehouse/data/repositories/warehouse_repository_impl.dart';
 import 'features/warehouse/domain/repositories/warehouse_repository.dart';
+import 'features/warehouse/domain/usecases/create_purchase_note_use_case.dart';
 import 'features/warehouse/domain/usecases/delete_purchase_note_use_case.dart';
 import 'features/warehouse/domain/usecases/fetch_purchase_note_use_case.dart';
 import 'features/warehouse/domain/usecases/fetch_purchase_notes_dropdown_use_case.dart';
 import 'features/warehouse/domain/usecases/fetch_purchase_notes_use_case.dart';
 import 'features/warehouse/domain/usecases/import_purchase_note_use_case.dart';
-import 'features/warehouse/domain/usecases/create_purchase_note_use_case.dart';
-import 'features/warehouse/domain/usecases/update_return_cost_use_case.dart';
-import 'features/warehouse/domain/usecases/insert_shipping_fee_use_case.dart';
+import 'features/warehouse/domain/usecases/add_shipping_fee_use_case.dart';
 import 'features/warehouse/domain/usecases/update_purchase_note_use_case.dart';
+import 'features/warehouse/domain/usecases/update_return_cost_use_case.dart';
+import 'features/warehouse/presentation/cubit/import_purchase_note/import_purchase_note_cubit.dart';
 import 'features/warehouse/presentation/cubit/purchase_note_cost/purchase_note_cost_cubit.dart';
 import 'features/warehouse/presentation/cubit/purchase_note_detail/purchase_note_detail_cubit.dart';
 import 'features/warehouse/presentation/cubit/purchase_note_form/purchase_note_form_cubit.dart';
-import 'features/warehouse/presentation/cubit/import_purchase_note/import_purchase_note_cubit.dart';
 import 'features/warehouse/presentation/cubit/purchase_note_list/purchase_note_list_cubit.dart';
 import 'features/warehouse/presentation/cubit/warehouse_cubit.dart';
 
@@ -228,13 +228,11 @@ void setup() {
     ..registerSingleton(CreatePurchaseNoteUseCase(warehouseRepository: getIt()))
     ..registerSingleton(ImportPurchaseNoteUseCase(warehouseRepository: getIt()))
     ..registerSingleton(UpdateReturnCostUseCase(warehouseRepository: getIt()))
-    ..registerSingleton(InsertShippingFeeUseCase(warehouseRepository: getIt()))
+    ..registerSingleton(AddShippingFeeUseCase(warehouseRepository: getIt()))
     ..registerSingleton(UpdatePurchaseNoteUseCase(warehouseRepository: getIt()))
     ..registerLazySingleton<WarehouseCubit>(
       () => WarehouseCubit(
-        fetchPurchaseNotesDropdownUseCase: getIt(),
-        insertShippingFeeUseCase: getIt(),
-        updatePurchaseNoteUseCase: getIt(),
+        addShippingFeeUseCase: getIt(),
         imagePickerService: getIt(),
       ),
     )
@@ -257,7 +255,10 @@ void setup() {
       ),
     )
     ..registerFactory(
-      () => PurchaseNoteCostCubit(updateReturnCostUseCase: getIt()),
+      () => PurchaseNoteCostCubit(
+        updateReturnCostUseCase: getIt(),
+        addShippingFeeUseCase: getIt(),
+      ),
     )
     ..registerFactory(
       () => PurchaseNoteDetailCubit(fetchPurchaseNoteUseCase: getIt()),
