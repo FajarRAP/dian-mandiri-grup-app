@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:ship_tracker/common/constants/app_constants.dart';
+import 'package:ship_tracker/common/constants/app_configs.dart';
 import 'package:ship_tracker/core/errors/exceptions.dart';
 import 'package:ship_tracker/features/auth/data/datasources/auth_local_data_source.dart';
 
@@ -45,13 +45,13 @@ void main() {
       // assert
       verify(
         () => mockStorage.write(
-          key: AppConstants.accessTokenKey,
+          key: AppConfigs.accessTokenKey,
           value: token.accessToken,
         ),
       ).called(1);
       verify(
         () => mockStorage.write(
-          key: AppConstants.refreshTokenKey,
+          key: AppConfigs.refreshTokenKey,
           value: token.refreshToken,
         ),
       ).called(1);
@@ -76,7 +76,7 @@ void main() {
       await expectLater(future, throwsA(isA<CacheException>()));
       verifyNever(
         () => mockStorage.write(
-          key: AppConstants.refreshTokenKey,
+          key: AppConfigs.refreshTokenKey,
           value: token.refreshToken,
         ),
       );
@@ -101,7 +101,7 @@ void main() {
       // assert
       verify(
         () => mockStorage.write(
-          key: AppConstants.userKey,
+          key: AppConfigs.userKey,
           value: jsonEncode(user.toJson()),
         ),
       ).called(1);
@@ -162,9 +162,7 @@ void main() {
 
       // assert
       expect(result, token.accessToken);
-      verify(
-        () => mockStorage.read(key: AppConstants.accessTokenKey),
-      ).called(1);
+      verify(() => mockStorage.read(key: AppConfigs.accessTokenKey)).called(1);
     });
 
     test('should throw CacheException when unexpected error occur', () async {
@@ -195,9 +193,7 @@ void main() {
 
       // assert
       expect(result, token.refreshToken);
-      verify(
-        () => mockStorage.read(key: AppConstants.refreshTokenKey),
-      ).called(1);
+      verify(() => mockStorage.read(key: AppConfigs.refreshTokenKey)).called(1);
     });
 
     test('should throw CacheException when unexpected error occur', () async {
@@ -229,7 +225,7 @@ void main() {
 
       // assert
       expect(result, userEntity);
-      verify(() => mockStorage.read(key: AppConstants.userKey)).called(1);
+      verify(() => mockStorage.read(key: AppConfigs.userKey)).called(1);
     });
 
     test('should be return null when no user found in storage', () async {
@@ -243,7 +239,7 @@ void main() {
 
       // assert
       expect(result, null);
-      verify(() => mockStorage.read(key: AppConstants.userKey)).called(1);
+      verify(() => mockStorage.read(key: AppConfigs.userKey)).called(1);
     });
 
     test('should throw CacheException when unexpected error occur', () async {

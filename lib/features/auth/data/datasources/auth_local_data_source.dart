@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-import '../../../../common/constants/app_constants.dart';
+import '../../../../common/constants/app_configs.dart';
 import '../../../../core/utils/local_data_source_handler_mixin.dart';
 import '../../domain/entities/user_entity.dart';
 import '../models/user_model.dart';
@@ -32,11 +32,8 @@ class AuthLocalDataSourceImpl
     required String refreshToken,
   }) async {
     return await handleLocalDataSourceRequest<void>(() async {
-      await storage.write(key: AppConstants.accessTokenKey, value: accessToken);
-      await storage.write(
-        key: AppConstants.refreshTokenKey,
-        value: refreshToken,
-      );
+      await storage.write(key: AppConfigs.accessTokenKey, value: accessToken);
+      await storage.write(key: AppConfigs.refreshTokenKey, value: refreshToken);
     });
   }
 
@@ -44,7 +41,7 @@ class AuthLocalDataSourceImpl
   Future<void> cacheUser({required UserModel user}) async {
     return await handleLocalDataSourceRequest<void>(() async {
       await storage.write(
-        key: AppConstants.userKey,
+        key: AppConfigs.userKey,
         value: jsonEncode(user.toJson()),
       );
     });
@@ -60,21 +57,21 @@ class AuthLocalDataSourceImpl
   @override
   Future<String?> getAccessToken() async {
     return await handleLocalDataSourceRequest<String?>(() async {
-      return await storage.read(key: AppConstants.accessTokenKey);
+      return await storage.read(key: AppConfigs.accessTokenKey);
     });
   }
 
   @override
   Future<String?> getRefreshToken() async {
     return await handleLocalDataSourceRequest<String?>(() async {
-      return await storage.read(key: AppConstants.refreshTokenKey);
+      return await storage.read(key: AppConfigs.refreshTokenKey);
     });
   }
 
   @override
   Future<UserEntity?> getUser() async {
     return await handleLocalDataSourceRequest<UserEntity?>(() async {
-      final user = await storage.read(key: AppConstants.userKey);
+      final user = await storage.read(key: AppConfigs.userKey);
 
       if (user == null) return null;
 
