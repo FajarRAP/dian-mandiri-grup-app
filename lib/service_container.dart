@@ -27,6 +27,7 @@ import 'features/auth/domain/usecases/sign_in_use_case.dart';
 import 'features/auth/domain/usecases/sign_out_use_case.dart';
 import 'features/auth/domain/usecases/update_profile_use_case.dart';
 import 'features/auth/presentation/cubit/auth_cubit.dart';
+import 'features/auth/presentation/cubit/sign_in/sign_in_cubit.dart';
 import 'features/auth/presentation/cubit/update_profile_cubit.dart';
 import 'features/supplier/data/datasources/supplier_remote_data_source.dart';
 import 'features/supplier/data/repositories/supplier_repository_impl.dart';
@@ -148,15 +149,10 @@ void setup() {
     ..registerSingleton(SignOutUseCase(authRepository: getIt()))
     ..registerSingleton(UpdateProfileUseCase(authRepository: getIt()))
     ..registerLazySingleton<AuthCubit>(
-      () => AuthCubit(
-        fetchUserUseCase: getIt(),
-        fetchUserFromStorageUseCase: getIt(),
-        refreshTokenUseCase: getIt(),
-        signInUseCase: getIt(),
-        signOutUseCase: getIt(),
-        authStatusStream: getIt(),
-      ),
+      () => AuthCubit(signOutUseCase: getIt(), authStatusStream: getIt()),
     )
+    ..registerFactory(() => SignInCubit(signInUseCase: getIt()))
+    ..registerFactory(() => UpdateProfileCubit(updateProfileUseCase: getIt()))
     ..registerLazySingleton(
       () => TokenRefreshService(
         cleanDio: copyDio,
@@ -312,7 +308,6 @@ void setup() {
         fetchUserFromStorageUseCase: getIt(),
       ),
     )
-    ..registerFactory(() => UpdateProfileCubit(updateProfileUseCase: getIt()))
     ..registerFactory(
       () => DropdownCubit(
         fetchSuppliersDropdownUseCase: getIt(),
