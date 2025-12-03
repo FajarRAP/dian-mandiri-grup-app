@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 extension StringNullableExtension on String? {
   Future<MultipartFile?> toMultipartFile() async {
@@ -23,4 +24,19 @@ extension BuildContextExtension on BuildContext {
 
 extension FileExtension on File {
   String get fileName => path.split('/').last;
+}
+
+extension DateTimeFormatter on DateTime {
+  String get toYMD => DateFormat('y-MM-dd', 'id_ID').format(this);
+  String get toDMY => DateFormat('dd-MM-y', 'id_ID').format(this);
+  String get toDMYHMS => DateFormat('dd-MM-y HH:mm:ss', 'id_ID').format(this);
+  String get toHMS => DateFormat('HH:mm:ss', 'id_ID').format(this);
+}
+
+extension NumberFormatter on num {
+  String get toIDRCurrency => NumberFormat.currency(
+    locale: 'id_ID',
+    symbol: 'Rp ',
+    decimalDigits: 0,
+  ).format(this);
 }
