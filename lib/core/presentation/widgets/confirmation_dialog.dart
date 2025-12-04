@@ -29,7 +29,11 @@ class ConfirmationDialog extends StatelessWidget {
         crossAxisAlignment: .stretch,
         mainAxisSize: .min,
         children: <Widget>[
-          Text(title, style: textTheme.titleLarge?.copyWith(fontWeight: .w700)),
+          Text(
+            title,
+            style: textTheme.titleLarge?.copyWith(fontWeight: .w700),
+            textAlign: .center,
+          ),
           const Gap(8),
           Text(
             body,
