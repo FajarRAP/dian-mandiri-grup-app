@@ -2,46 +2,38 @@ part of 'shipment_report_cubit.dart';
 
 enum ShipmentReportStatus { initial, inProgress, success, failure }
 
-enum ShipmentReportActionStatus { initial, inProgress, success, failure }
-
 class ShipmentReportState extends Equatable {
   const ShipmentReportState({
-    required this.status,
-    required this.actionStatus,
-    required this.reports,
-    required this.currentPage,
-    required this.hasReachedMax,
-    required this.isPaginating,
-    required this.downloadingReportId,
+    this.status = .initial,
+    this.reports = const [],
+    this.currentPage = 1,
+    this.hasReachedMax = false,
+    this.isPaginating = false,
+    this.downloadingReportId,
+    this.dateTimeRange,
+    this.filterStatus = AppConstants.completedReport,
     this.message,
     this.failure,
   });
 
-  factory ShipmentReportState.initial() {
-    return const ShipmentReportState(
-      status: .initial,
-      actionStatus: .initial,
-      reports: [],
-      currentPage: 1,
-      hasReachedMax: false,
-      isPaginating: false,
-      downloadingReportId: null,
-      message: null,
-      failure: null,
-    );
-  }
-
+  // Status
   final ShipmentReportStatus status;
-  final ShipmentReportActionStatus actionStatus;
 
+  // State Properties
   final List<ShipmentReportUiModel> reports;
   final int currentPage;
   final bool hasReachedMax;
   final bool isPaginating;
-
   final String? downloadingReportId;
 
+  // Filters
+  final DateTimeRange? dateTimeRange;
+  final String filterStatus;
+
+  // Success
   final String? message;
+
+  // Failure
   final Failure? failure;
 
   bool shouldRebuild(ShipmentReportState previous) {
@@ -54,37 +46,40 @@ class ShipmentReportState extends Equatable {
 
   ShipmentReportState copyWith({
     ShipmentReportStatus? status,
-    ShipmentReportActionStatus? actionStatus,
     List<ShipmentReportUiModel>? reports,
     int? currentPage,
     bool? hasReachedMax,
     bool? isPaginating,
     String? downloadingReportId,
+    DateTimeRange? dateTimeRange,
+    String? filterStatus,
     String? message,
     Failure? failure,
   }) {
     return ShipmentReportState(
       status: status ?? this.status,
-      actionStatus: actionStatus ?? this.actionStatus,
       reports: reports ?? this.reports,
       currentPage: currentPage ?? this.currentPage,
       hasReachedMax: hasReachedMax ?? this.hasReachedMax,
       isPaginating: isPaginating ?? this.isPaginating,
-      downloadingReportId: downloadingReportId,
+      downloadingReportId: downloadingReportId ?? this.downloadingReportId,
+      dateTimeRange: dateTimeRange ?? this.dateTimeRange,
+      filterStatus: filterStatus ?? this.filterStatus,
       message: message ?? this.message,
-      failure: failure,
+      failure: failure ?? this.failure,
     );
   }
 
   @override
   List<Object?> get props => [
     status,
-    actionStatus,
     reports,
     currentPage,
     hasReachedMax,
     isPaginating,
     downloadingReportId,
+    dateTimeRange,
+    filterStatus,
     message,
     failure,
   ];

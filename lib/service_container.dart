@@ -105,19 +105,7 @@ void setup() {
 
   // Services
   getIt
-    // ..registerLazySingleton<Dio>(
-    //   () => Dio(
-    //     BaseOptions(
-    //       baseUrl: AppConfigs.apiUrl,
-    //       connectTimeout: const Duration(
-    //         milliseconds: AppConfigs.connectionTimeout,
-    //       ),
-    //       receiveTimeout: const Duration(
-    //         milliseconds: AppConfigs.receiveTimeout,
-    //       ),
-    //     ),
-    //   )..interceptors.add(DioInterceptor()),
-    // )
+    ..registerLazySingleton<FileService>(() => const FileServiceImpl())
     ..registerLazySingleton<ImagePickerService>(() => ImagePickerServiceImpl())
     ..registerLazySingleton<FileInteractionService>(
       () => FileInteractionServiceImpl(sharePlus: SharePlus.instance),
@@ -166,15 +154,12 @@ void setup() {
   // Ship
   getIt
     ..registerLazySingleton<ShipmentRemoteDataSource>(
-      () => ShipmentRemoteDataSourceImpl(
-        dio: getIt(),
-        fileService: const FileService(),
-      ),
+      () => ShipmentRemoteDataSourceImpl(dio: getIt(), fileService: getIt()),
     )
     ..registerLazySingleton<ShipmentRepository>(
       () => ShipmentRepositoryImpl(
         shipmentRemoteDataSource: getIt(),
-        fileService: const FileService(),
+        fileService: getIt(),
       ),
     )
     ..registerSingleton(
@@ -216,6 +201,8 @@ void setup() {
         downloadShipmentReportUseCase: getIt(),
         checkShipmentReportExistenceUseCase: getIt(),
         fetchShipmentReportsUseCase: getIt(),
+        fileInteractionService: getIt(),
+        fileService: getIt(),
       ),
     )
     ..registerFactory(
