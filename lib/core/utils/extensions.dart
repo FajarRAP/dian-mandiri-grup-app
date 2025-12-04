@@ -33,6 +33,10 @@ extension DateTimeFormatter on DateTime {
   String get toHMS => DateFormat('HH:mm:ss', 'id_ID').format(this);
 }
 
+extension DateTimeRangeExtension on DateTimeRange? {
+  bool get isEqual => this?.start.toYMD == this?.end.toYMD;
+}
+
 extension NumberFormatter on num {
   String get toIDRCurrency => NumberFormat.currency(
     locale: 'id_ID',
