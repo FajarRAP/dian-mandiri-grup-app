@@ -33,32 +33,37 @@ class _ReportPageState extends State<ReportPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: PaginationListener(
-        onPaginate: _shipmentReportCubit.fetchShipmentReportsPaginate,
-        child: RefreshIndicator.adaptive(
-          onRefresh: _shipmentReportCubit.fetchShipmentReports,
-          child: CustomScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            slivers: <Widget>[
-              // App Bar
-              const _AppBar(),
-              // List
-              BlocBuilder<ShipmentReportCubit, ShipmentReportState>(
-                buildWhen: (previous, current) =>
-                    current.shouldRebuild(previous),
-                builder: (context, state) {
-                  return switch (state.status) {
-                    .inProgress => const SliverLoadingIndicator(),
-                    .success when state.reports.isEmpty =>
-                      const SliverEmptyData(),
-                    .success => _SuccessWidget(reports: state.reports),
-                    .failure => SliverErrorStateWidget(failure: state.failure),
-                    _ => const SliverToBoxAdapter(),
-                  };
-                },
-              ),
-            ],
+    return GestureDetector(
+      onTap: FocusScope.of(context).unfocus,
+      child: Scaffold(
+        body: PaginationListener(
+          onPaginate: _shipmentReportCubit.fetchShipmentReportsPaginate,
+          child: RefreshIndicator.adaptive(
+            onRefresh: _shipmentReportCubit.fetchShipmentReports,
+            child: CustomScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              slivers: <Widget>[
+                // App Bar
+                const _AppBar(),
+                // List
+                BlocBuilder<ShipmentReportCubit, ShipmentReportState>(
+                  buildWhen: (previous, current) =>
+                      current.shouldRebuild(previous),
+                  builder: (context, state) {
+                    return switch (state.status) {
+                      .inProgress => const SliverLoadingIndicator(),
+                      .success when state.reports.isEmpty =>
+                        const SliverEmptyData(),
+                      .success => _SuccessWidget(reports: state.reports),
+                      .failure => SliverErrorStateWidget(
+                        failure: state.failure,
+                      ),
+                      _ => const SliverToBoxAdapter(),
+                    };
+                  },
+                ),
+              ],
+            ),
           ),
         ),
       ),
