@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../common/utils/top_snackbar.dart';
 import '../../../../core/presentation/widgets/confirmation_dialog.dart';
 import '../cubit/shipment_list/shipment_list_cubit.dart';
 
@@ -15,7 +16,12 @@ class DeleteShipmentDialog extends StatelessWidget {
     return BlocConsumer<ShipmentListCubit, ShipmentListState>(
       listener: (context, state) {
         if (state.actionStatus == .success) {
-          context.pop();
+          TopSnackbar.successSnackbar(message: state.message!);
+          context.pop(true);
+        }
+
+        if (state.actionStatus == .failure) {
+          TopSnackbar.dangerSnackbar(message: state.failure!.message);
         }
       },
       builder: (context, state) {
