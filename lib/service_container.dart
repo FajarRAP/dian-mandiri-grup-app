@@ -55,6 +55,7 @@ import 'features/tracker/domain/usecases/fetch_shipment_use_case.dart';
 import 'features/tracker/domain/usecases/fetch_shipments_use_case.dart';
 import 'features/tracker/domain/usecases/update_shipment_document_use_case.dart';
 import 'features/tracker/presentation/cubit/create_shipment/create_shipment_cubit.dart';
+import 'features/tracker/presentation/cubit/create_shipment_report/create_shipment_report_cubit.dart';
 import 'features/tracker/presentation/cubit/shipment_detail/shipment_detail_cubit.dart';
 import 'features/tracker/presentation/cubit/shipment_list/shipment_list_cubit.dart';
 import 'features/tracker/presentation/cubit/shipment_report/shipment_report_cubit.dart';
@@ -212,11 +213,13 @@ void setup() {
     )
     ..registerFactory(
       () => ShipmentReportCubit(
-        createShipmentReportUseCase: getIt(),
         downloadShipmentReportUseCase: getIt(),
         checkShipmentReportExistenceUseCase: getIt(),
         fetchShipmentReportsUseCase: getIt(),
       ),
+    )
+    ..registerFactory(
+      () => CreateShipmentReportCubit(createShipmentReportUseCase: getIt()),
     );
 
   // Supplier
