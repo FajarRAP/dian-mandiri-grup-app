@@ -6,51 +6,33 @@ import '../../../../common/utils/top_snackbar.dart';
 import '../../../../core/utils/extensions.dart';
 import '../../../../core/utils/validators.dart';
 import '../../../../core/presentation/widgets/confirmation_input_dialog.dart';
-import '../cubit/shipment_report/shipment_report_cubit.dart';
+import '../cubit/create_shipment_report/create_shipment_report_cubit.dart';
 
-class CreateReportDateRangeDialog extends StatefulWidget {
-  const CreateReportDateRangeDialog({super.key, required this.status});
-
-  final String status;
-
-  @override
-  State<CreateReportDateRangeDialog> createState() => _DateRangeDialogState();
-}
-
-class _DateRangeDialogState extends State<CreateReportDateRangeDialog> {
-  var _dateTimeRange = DateTimeRange(
-    start: DateTime.now(),
-    end: DateTime.now(),
-  );
-
-  @override
-  void initState() {
-    super.initState();
-  }
+class CreateShipmentReportDialog extends StatelessWidget {
+  const CreateShipmentReportDialog({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<ShipmentReportCubit, ShipmentReportState>(
+    return BlocConsumer<CreateShipmentReportCubit, CreateShipmentReportState>(
       listener: (context, state) {
-        if (state.actionStatus == ShipmentReportActionStatus.failure) {
-          TopSnackbar.dangerSnackbar(message: state.failure!.message);
+        if (state.status == .success) {
+          TopSnackbar.successSnackbar(message: state.message!);
+          context.pop(true);
         }
 
-        if (state.actionStatus == ShipmentReportActionStatus.success) {
-          TopSnackbar.successSnackbar(message: state.message!);
-          context.pop();
+        if (state.status == .failure) {
+          TopSnackbar.dangerSnackbar(message: state.failure!.message);
         }
       },
       builder: (context, state) {
-        final onConfirm = switch (state.actionStatus) {
-          ShipmentReportActionStatus.inProgress => null,
+        final onConfirm = switch (state.status) {
+          .inProgress => null,
           _ =>
-            (String value) =>
-                context.read<ShipmentReportCubit>().createShipmentReport(
-                  startDate: _dateTimeRange.start,
-                  endDate: _dateTimeRange.end,
-                ),
+            (String value) => context
+                .read<CreateShipmentReportCubit>()
+                .createShipmentReport(),
         };
+
         return ConfirmationInputDialog(
           onConfirm: onConfirm,
           fieldBuilder: (context, controller) => TextFormField(
@@ -62,13 +44,14 @@ class _DateRangeDialogState extends State<CreateReportDateRangeDialog> {
                 locale: const Locale('id'),
               );
 
-              if (dateTimeRangePicked == null) return;
+              if (dateTimeRangePicked == null || !context.mounted) return;
 
-              _dateTimeRange = dateTimeRangePicked;
-              final startDate = _dateTimeRange.start;
-              final endDate = _dateTimeRange.end;
-              controller.text = '${startDate.toDMY} s.d. ${endDate.toDMY}';
+              context.read<CreateShipmentReportCubit>().dateTimeRange =
+                  dateTimeRangePicked;
+              controller.text =
+                  '${dateTimeRangePicked.start.toDMY} s.d. ${dateTimeRangePicked.end.toDMY}';
             },
+            onTapOutside: (_) => FocusScope.of(context).unfocus(),
             controller: controller,
             decoration: const InputDecoration(labelText: 'Rentang Tanggal'),
             readOnly: true,
