@@ -4,9 +4,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../common/constants/app_constants.dart';
 import '../../../../core/presentation/widgets/pagination_listener.dart';
 import '../../../../core/presentation/widgets/sliver_empty_data.dart';
+import '../../../../core/presentation/widgets/sliver_error_state_widget.dart';
 import '../../../../core/presentation/widgets/sliver_loading_indicator.dart';
 import '../../../../core/utils/extensions.dart';
+import '../../../../service_container.dart';
 import '../../data/models/shipment_report_ui_model.dart';
+import '../cubit/create_shipment_report/create_shipment_report_cubit.dart';
 import '../cubit/shipment_report/shipment_report_cubit.dart';
 import '../widgets/create_shipment_report_dialog.dart';
 import '../widgets/shipment_report_list_item.dart';
@@ -20,77 +23,42 @@ class ReportPage extends StatefulWidget {
 
 class _ReportPageState extends State<ReportPage> {
   late final ShipmentReportCubit _shipmentReportCubit;
-  var _dateTimeRange = DateTimeRange(
-    start: DateTime.now(),
-    end: DateTime.now(),
-  );
-  var _status = AppConstants.completedReport;
 
   @override
   void initState() {
     super.initState();
     _shipmentReportCubit = context.read<ShipmentReportCubit>()
-      ..fetchShipmentReports(
-        endDate: _dateTimeRange.end,
-        startDate: _dateTimeRange.start,
-        status: _status,
-      );
+      ..fetchShipmentReports();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BlocListener<ShipmentReportCubit, ShipmentReportState>(
-        listener: (context, state) {
-          if (state.actionStatus == .success) {
-            _shipmentReportCubit.fetchShipmentReports(
-              endDate: _dateTimeRange.end,
-              startDate: _dateTimeRange.start,
-              status: _status,
-            );
-          }
-        },
-        child: PaginationListener(
-          onPaginate: () => _shipmentReportCubit.fetchShipmentReportsPaginate(
-            endDate: _dateTimeRange.end,
-            startDate: _dateTimeRange.start,
-            status: _status,
-          ),
-          child: RefreshIndicator.adaptive(
-            onRefresh: () async =>
-                await _shipmentReportCubit.fetchShipmentReports(
-                  endDate: _dateTimeRange.end,
-                  startDate: _dateTimeRange.start,
-                  status: _status,
-                ),
-            child: CustomScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              slivers: <Widget>[
-                // App Bar
-                _AppBar(
-                  onDatePicked: (dateTimeRange) =>
-                      _dateTimeRange = dateTimeRange,
-                  onStatusChanged: (status) => _status = status,
-                ),
-                // List
-                BlocBuilder<ShipmentReportCubit, ShipmentReportState>(
-                  buildWhen: (previous, current) =>
-                      current.shouldRebuild(previous),
-                  builder: (context, state) {
-                    return switch (state.status) {
-                      ShipmentReportStatus.inProgress =>
-                        const SliverLoadingIndicator(),
-                      ShipmentReportStatus.success when state.reports.isEmpty =>
-                        const SliverEmptyData(),
-                      ShipmentReportStatus.success => _SuccessWidget(
-                        reports: state.reports,
-                      ),
-                      _ => const SliverToBoxAdapter(),
-                    };
-                  },
-                ),
-              ],
-            ),
+      body: PaginationListener(
+        onPaginate: _shipmentReportCubit.fetchShipmentReportsPaginate,
+        child: RefreshIndicator.adaptive(
+          onRefresh: _shipmentReportCubit.fetchShipmentReports,
+          child: CustomScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            slivers: <Widget>[
+              // App Bar
+              const _AppBar(),
+              // List
+              BlocBuilder<ShipmentReportCubit, ShipmentReportState>(
+                buildWhen: (previous, current) =>
+                    current.shouldRebuild(previous),
+                builder: (context, state) {
+                  return switch (state.status) {
+                    .inProgress => const SliverLoadingIndicator(),
+                    .success when state.reports.isEmpty =>
+                      const SliverEmptyData(),
+                    .success => _SuccessWidget(reports: state.reports),
+                    .failure => SliverErrorStateWidget(failure: state.failure),
+                    _ => const SliverToBoxAdapter(),
+                  };
+                },
+              ),
+            ],
           ),
         ),
       ),
@@ -98,40 +66,40 @@ class _ReportPageState extends State<ReportPage> {
   }
 }
 
-class _AppBar extends StatefulWidget {
-  const _AppBar({this.onDatePicked, this.onStatusChanged});
-
-  final void Function(DateTimeRange dateTimeRange)? onDatePicked;
-  final void Function(String status)? onStatusChanged;
-
-  @override
-  State<_AppBar> createState() => __AppBarState();
-}
-
-class __AppBarState extends State<_AppBar> {
-  var _dateTimeRange = DateTimeRange(
-    start: DateTime.now(),
-    end: DateTime.now(),
-  );
-  var _status = AppConstants.completedReport;
-  var _dateTimeRangePicked = 'Pilih Range Tanggal';
+class _AppBar extends StatelessWidget {
+  const _AppBar();
 
   @override
   Widget build(BuildContext context) {
     final shipmentReportCubit = context.read<ShipmentReportCubit>();
+    final dateTimeRange = context.select<ShipmentReportCubit, DateTimeRange?>(
+      (cubit) => cubit.state.dateTimeRange,
+    );
+    final status = context.select<ShipmentReportCubit, String>(
+      (cubit) => cubit.state.filterStatus,
+    );
+    final text = dateTimeRange.isEqual
+        ? '${dateTimeRange?.start.toDMY}'
+        : '${dateTimeRange?.start.toDMY} - ${dateTimeRange?.end.toDMY}';
 
     return SliverAppBar(
       actions: <Widget>[
         PopupMenuButton(
           itemBuilder: (context) => <PopupMenuItem>[
             PopupMenuItem(
-              onTap: () => showDialog(
-                context: context,
-                builder: (_) => BlocProvider.value(
-                  value: context.read<ShipmentReportCubit>(),
-                  child: CreateReportDateRangeDialog(status: _status),
-                ),
-              ),
+              onTap: () async {
+                final result = await showDialog<bool>(
+                  context: context,
+                  builder: (_) => BlocProvider(
+                    create: (context) => getIt<CreateShipmentReportCubit>(),
+                    child: const CreateShipmentReportDialog(),
+                  ),
+                );
+
+                if (result == true && context.mounted) {
+                  await shipmentReportCubit.fetchShipmentReports();
+                }
+              },
               child: const Text('Buat Laporan'),
             ),
           ],
@@ -147,50 +115,38 @@ class __AppBarState extends State<_AppBar> {
             child: Row(
               mainAxisAlignment: .spaceBetween,
               children: <Widget>[
-                TextButton.icon(
-                  onPressed: () async {
-                    final dateTimeRangePicked = await showDateRangePicker(
-                      context: context,
-                      firstDate: DateTime(2000),
-                      lastDate: DateTime.now(),
-                      locale: const Locale('id'),
-                    );
+                Expanded(
+                  flex: 2,
+                  child: TextButton.icon(
+                    onPressed: () async {
+                      final dateTimeRangePicked = await showDateRangePicker(
+                        context: context,
+                        firstDate: DateTime(2000),
+                        lastDate: DateTime.now(),
+                        locale: const Locale('id'),
+                      );
 
-                    if (dateTimeRangePicked == null) return;
+                      if (dateTimeRangePicked == null || !context.mounted) {
+                        return;
+                      }
 
-                    _dateTimeRange = dateTimeRangePicked;
-                    final startDate = _dateTimeRange.start;
-                    final endDate = _dateTimeRange.end;
+                      await shipmentReportCubit.fetchShipmentReports(
+                        dateTimeRange: dateTimeRangePicked,
+                      );
+                    },
 
-                    widget.onDatePicked?.call(_dateTimeRange);
-
-                    setState(
-                      () => _dateTimeRangePicked =
-                          '${startDate.toDMY} s.d.\n${endDate.toDMY}',
-                    );
-
-                    await shipmentReportCubit.fetchShipmentReports(
-                      endDate: endDate,
-                      startDate: startDate,
-                      status: _status,
-                    );
-                  },
-                  icon: const Icon(Icons.calendar_month_rounded),
-                  label: Text(_dateTimeRangePicked),
+                    icon: const Icon(Icons.calendar_month_rounded),
+                    label: Text(text),
+                  ),
                 ),
+                const Spacer(),
                 SizedBox(
                   width: 150,
                   child: DropdownButtonFormField<String>(
                     onChanged: (value) {
                       if (value == null) return;
 
-                      widget.onStatusChanged?.call(value);
-
-                      shipmentReportCubit.fetchShipmentReports(
-                        endDate: _dateTimeRange.end,
-                        startDate: _dateTimeRange.start,
-                        status: _status = value,
-                      );
+                      shipmentReportCubit.fetchShipmentReports(status: value);
                     },
                     style: context.textTheme.bodyMedium?.copyWith(
                       fontWeight: .w500,
@@ -213,7 +169,7 @@ class __AppBarState extends State<_AppBar> {
                         child: Text('Failed'),
                       ),
                     ],
-                    initialValue: _status,
+                    initialValue: status,
                   ),
                 ),
               ],
