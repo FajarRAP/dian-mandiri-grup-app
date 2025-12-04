@@ -11,11 +11,14 @@ import '../../../../core/presentation/widgets/expandable_fab/action_button.dart'
 import '../../../../core/presentation/widgets/expandable_fab/expandable_fab.dart';
 import '../../../../core/presentation/widgets/pagination_listener.dart';
 import '../../../../core/presentation/widgets/sliver_empty_data.dart';
+import '../../../../core/presentation/widgets/sliver_error_state_widget.dart';
 import '../../../../core/presentation/widgets/sliver_loading_indicator.dart';
 import '../../../../core/router/route_names.dart';
 import '../../../../core/utils/debouncer.dart';
 import '../../../../core/utils/extensions.dart';
+import '../../../../service_container.dart';
 import '../../domain/entities/shipment_entity.dart';
+import '../cubit/create_shipment/create_shipment_cubit.dart';
 import '../cubit/shipment_list/shipment_list_cubit.dart';
 import 'cancel_shipment_dialog.dart';
 import 'create_shipment_from_scanner_dialog.dart';
@@ -37,102 +40,56 @@ class StageLayout extends StatefulWidget {
 }
 
 class _StageLayoutState extends State<StageLayout> {
-  late final AudioPlayer _audioPlayer;
   late final ShipmentListCubit _shipmentListCubit;
-  late DateTime _pickedDate;
 
   @override
   void initState() {
     super.initState();
-    _pickedDate = DateTime(2024, 10, 10);
-    _audioPlayer = AudioPlayer();
     _shipmentListCubit = context.read<ShipmentListCubit>()
-      ..fetchShipments(date: _pickedDate, stage: widget.stage);
-  }
-
-  @override
-  void dispose() {
-    _audioPlayer.dispose();
-    super.dispose();
+      ..fetchShipments(stage: widget.stage);
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<ShipmentListCubit, ShipmentListState>(
-      listener: (context, state) async {
-        if (state.actionStatus == .success) {
-          await _shipmentListCubit.fetchShipments(
-            date: _pickedDate,
-            stage: widget.stage,
-          );
-        }
-
-        if (state.actionStatus == .success) {
-          TopSnackbar.successSnackbar(message: state.message!);
-          await _audioPlayer.play(AssetSource(AppAssets.successSound));
-        }
-
-        if (state.actionStatus == .failure) {
-          TopSnackbar.dangerSnackbar(message: state.failure!.message);
-
-          return switch (state.failure!.statusCode) {
-            422 => await _audioPlayer.play(AssetSource(AppAssets.repeatSound)),
-            423 => await _audioPlayer.play(AssetSource(AppAssets.skipSound)),
-            _ => null,
-          };
-        }
-      },
-      child: Scaffold(
-        body: PaginationListener(
-          onPaginate: () => _shipmentListCubit.fetchShipmentsPaginate(
-            date: _pickedDate,
-            stage: widget.stage,
-          ),
-          child: RefreshIndicator(
-            onRefresh: () async => await _shipmentListCubit.fetchShipments(
-              date: _pickedDate,
-              stage: widget.stage,
-            ),
-            child: CustomScrollView(
-              slivers: <Widget>[
-                // AppBar
-                _AppBar(
-                  onDatePicked: (pickedDate) => _pickedDate = pickedDate,
-                  title: widget.appBarTitle,
-                  stage: widget.stage,
-                ),
-                // List
-                BlocBuilder<ShipmentListCubit, ShipmentListState>(
-                  buildWhen: (previous, current) =>
-                      previous.status != current.status,
-                  builder: (context, state) {
-                    return switch (state.status) {
-                      .inProgress => const SliverLoadingIndicator(),
-                      .success when state.shipments.isEmpty =>
-                        const SliverEmptyData(),
-                      .success => _SuccessWidget(shipments: state.shipments),
-                      _ => const SliverToBoxAdapter(),
-                    };
-                  },
-                ),
-              ],
-            ),
+    return Scaffold(
+      body: PaginationListener(
+        onPaginate: _shipmentListCubit.fetchShipmentsPaginate,
+        child: RefreshIndicator(
+          onRefresh: _shipmentListCubit.fetchShipments,
+          child: CustomScrollView(
+            slivers: <Widget>[
+              // AppBar
+              _AppBar(title: widget.appBarTitle, stage: widget.stage),
+              // List
+              BlocBuilder<ShipmentListCubit, ShipmentListState>(
+                buildWhen: (previous, current) =>
+                    previous.status != current.status,
+                builder: (context, state) {
+                  return switch (state.status) {
+                    .inProgress => const SliverLoadingIndicator(),
+                    .success when state.shipments.isEmpty =>
+                      const SliverEmptyData(),
+                    .success => _SuccessWidget(shipments: state.shipments),
+                    .failure => SliverErrorStateWidget(failure: state.failure),
+                    _ => const SliverToBoxAdapter(),
+                  };
+                },
+              ),
+            ],
           ),
         ),
-        floatingActionButton: _FAB(stage: widget.stage),
+      ),
+      floatingActionButton: BlocProvider(
+        create: (context) => getIt<CreateShipmentCubit>(),
+        child: _FAB(stage: widget.stage),
       ),
     );
   }
 }
 
 class _AppBar extends StatefulWidget {
-  const _AppBar({
-    required this.onDatePicked,
-    required this.title,
-    required this.stage,
-  });
+  const _AppBar({required this.title, required this.stage});
 
-  final void Function(DateTime pickedDate) onDatePicked;
   final String title;
   final String stage;
 
@@ -142,19 +99,27 @@ class _AppBar extends StatefulWidget {
 
 class _AppBarState extends State<_AppBar> {
   late final Debouncer _debouncer;
-  late final ShipmentListCubit _shipmentCubit;
-  late DateTime _pickedDate;
+  late final ShipmentListCubit _shipmentListCubit;
 
   @override
   void initState() {
     super.initState();
-    _pickedDate = DateTime(2024, 10, 10);
     _debouncer = Debouncer(delay: const Duration(milliseconds: 500));
-    _shipmentCubit = context.read<ShipmentListCubit>();
+    _shipmentListCubit = context.read<ShipmentListCubit>();
+  }
+
+  @override
+  void dispose() {
+    _debouncer.cancel();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final date = context.select<ShipmentListCubit, DateTime?>(
+      (cubit) => cubit.state.date,
+    )!;
+
     return SliverAppBar(
       backgroundColor: context.colorScheme.surfaceContainerLowest,
       expandedHeight: kToolbarHeight + AppConstants.kSpaceBarHeight + 24,
@@ -170,11 +135,7 @@ class _AppBarState extends State<_AppBar> {
                 padding: const .symmetric(horizontal: 16),
                 child: TextFormField(
                   onChanged: (value) => _debouncer.run(
-                    () => _shipmentCubit.fetchShipments(
-                      date: _pickedDate,
-                      stage: widget.stage,
-                      query: value,
-                    ),
+                    () => _shipmentListCubit.fetchShipments(query: value),
                   ),
                   onTapOutside: (_) => FocusScope.of(context).unfocus(),
                   decoration: const InputDecoration(
@@ -193,21 +154,12 @@ class _AppBarState extends State<_AppBar> {
                     locale: const Locale('id'),
                   );
 
-                  if (datePicked == null) return;
-
-                  setState(() => _pickedDate = datePicked);
-
-                  widget.onDatePicked(datePicked);
-
-                  await _shipmentCubit.fetchShipments(
-                    date: _pickedDate,
-                    stage: widget.stage,
-                  );
+                  await _shipmentListCubit.fetchShipments(date: datePicked);
                 },
                 iconAlignment: .end,
                 icon: const Icon(Icons.calendar_month_outlined),
                 label: Text(
-                  _pickedDate.toDMY,
+                  date.toDMY,
                   style: TextStyle(
                     color: context.colorScheme.primary,
                     fontWeight: .w500,
@@ -244,22 +196,34 @@ class _SuccessWidget extends StatelessWidget {
             extra: shipments[index].id,
           ),
           child: ShipmentListItem(
-            onCancel: () => showDialog(
-              builder: (_) => BlocProvider.value(
-                value: context.read<ShipmentListCubit>(),
-                child: CancelShipmentDialog(
-                  receiptNumber: shipments[index].receiptNumber,
+            onCancel: () async {
+              final result = await showDialog<bool>(
+                builder: (_) => BlocProvider(
+                  create: (context) => getIt<CreateShipmentCubit>(),
+                  child: CancelShipmentDialog(
+                    receiptNumber: shipments[index].receiptNumber,
+                  ),
                 ),
-              ),
-              context: context,
-            ),
-            onDelete: () => showDialog(
-              builder: (_) => BlocProvider.value(
-                value: context.read<ShipmentListCubit>(),
-                child: DeleteShipmentDialog(shipmentId: shipments[index].id),
-              ),
-              context: context,
-            ),
+                context: context,
+              );
+
+              if (result == true && context.mounted) {
+                await context.read<ShipmentListCubit>().fetchShipments();
+              }
+            },
+            onDelete: () async {
+              final result = await showDialog<bool>(
+                builder: (_) => BlocProvider(
+                  create: (context) => getIt<ShipmentListCubit>(),
+                  child: DeleteShipmentDialog(shipmentId: shipments[index].id),
+                ),
+                context: context,
+              );
+
+              if (result == true && context.mounted) {
+                await context.read<ShipmentListCubit>().fetchShipments();
+              }
+            },
             shipment: shipments[index],
           ),
         ),
@@ -269,47 +233,83 @@ class _SuccessWidget extends StatelessWidget {
   }
 }
 
-class _FAB extends StatelessWidget {
+class _FAB extends StatefulWidget {
   const _FAB({required this.stage});
 
   final String stage;
 
   @override
+  State<_FAB> createState() => _FABState();
+}
+
+class _FABState extends State<_FAB> {
+  late final AudioPlayer _audioPlayer;
+
+  @override
+  void initState() {
+    super.initState();
+    _audioPlayer = AudioPlayer();
+  }
+
+  @override
+  void dispose() {
+    _audioPlayer.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final shipmentListCubit = context.read<ShipmentListCubit>();
+    return BlocListener<CreateShipmentCubit, CreateShipmentState>(
+      listener: (context, state) async {
+        if (state.status == .success) {
+          TopSnackbar.successSnackbar(message: state.message!);
+          await context.read<ShipmentListCubit>().fetchShipments();
+          await _audioPlayer.play(AssetSource(AppAssets.successSound));
+        }
 
-    return ExpandableFAB(
-      distance: 90,
-      children: <Widget>[
-        ActionButton(
-          onPressed: () async {
-            final receiptCamera = await SimpleBarcodeScanner.scanBarcode(
-              context,
-              cameraFace: .back,
-              cancelButtonText: 'Batal',
-              isShowFlashIcon: true,
-            );
+        if (state.status == .failure) {
+          TopSnackbar.dangerSnackbar(message: state.failure!.message);
 
-            if (receiptCamera == null) return;
+          return switch (state.failure!.statusCode) {
+            422 => await _audioPlayer.play(AssetSource(AppAssets.repeatSound)),
+            423 => await _audioPlayer.play(AssetSource(AppAssets.skipSound)),
+            _ => null,
+          };
+        }
+      },
+      child: ExpandableFAB(
+        distance: 90,
+        children: <Widget>[
+          ActionButton(
+            onPressed: () async {
+              final receiptCamera = await SimpleBarcodeScanner.scanBarcode(
+                context,
+                cameraFace: .back,
+                cancelButtonText: 'Batal',
+                isShowFlashIcon: true,
+              );
 
-            await shipmentListCubit.createShipment(
-              receiptNumber: receiptCamera,
-              stage: stage,
-            );
-          },
-          icon: Icons.document_scanner_rounded,
-        ),
-        ActionButton(
-          onPressed: () => showDialog(
-            builder: (_) => BlocProvider.value(
-              value: context.read<ShipmentListCubit>(),
-              child: CreateShipmentFromScannerDialog(stage: stage),
-            ),
-            context: context,
+              if (receiptCamera == null || !context.mounted) return;
+
+              await context.read<CreateShipmentCubit>().createShipment(
+                receiptNumber: receiptCamera,
+                stage: widget.stage,
+              );
+            },
+            icon: Icons.document_scanner_rounded,
           ),
-          icon: Icons.barcode_reader,
-        ),
-      ],
+          ActionButton(
+            onPressed: () => showDialog(
+              builder: (_) => BlocProvider.value(
+                value: context.read<CreateShipmentCubit>(),
+                child: CreateShipmentFromScannerDialog(stage: widget.stage),
+              ),
+              context: context,
+            ),
+            icon: Icons.barcode_reader,
+          ),
+        ],
+      ),
     );
   }
 }
