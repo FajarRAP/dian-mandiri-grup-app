@@ -13,7 +13,7 @@ import '../../../../core/utils/extensions.dart';
 import '../../../../service_container.dart';
 import '../../domain/entities/user_entity.dart';
 import '../cubit/auth_cubit.dart';
-import '../cubit/update_profile_cubit.dart';
+import '../cubit/update_profile/update_profile_cubit.dart';
 import '../widgets/profile_card.dart';
 import '../widgets/update_profile_dialog.dart';
 

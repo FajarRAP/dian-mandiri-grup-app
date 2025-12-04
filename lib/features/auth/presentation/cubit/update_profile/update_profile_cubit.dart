@@ -1,9 +1,9 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 
-import '../../../../core/errors/failure.dart';
-import '../../../../core/usecase/use_case.dart';
-import '../../domain/usecases/update_profile_use_case.dart';
+import '../../../../../core/errors/failure.dart';
+import '../../../../../core/usecase/use_case.dart';
+import '../../../domain/usecases/update_profile_use_case.dart';
 
 part 'update_profile_state.dart';
 

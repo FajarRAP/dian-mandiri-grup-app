@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../common/utils/top_snackbar.dart';
 import '../../../../core/presentation/cubit/user_cubit.dart';
 import '../../../../core/presentation/widgets/confirmation_input_dialog.dart';
-import '../cubit/update_profile_cubit.dart';
+import '../cubit/update_profile/update_profile_cubit.dart';
 
 class UpdateProfileDialog extends StatelessWidget {
   const UpdateProfileDialog({super.key});

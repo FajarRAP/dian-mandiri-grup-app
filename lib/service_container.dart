@@ -28,7 +28,7 @@ import 'features/auth/domain/usecases/sign_out_use_case.dart';
 import 'features/auth/domain/usecases/update_profile_use_case.dart';
 import 'features/auth/presentation/cubit/auth_cubit.dart';
 import 'features/auth/presentation/cubit/sign_in/sign_in_cubit.dart';
-import 'features/auth/presentation/cubit/update_profile_cubit.dart';
+import 'features/auth/presentation/cubit/update_profile/update_profile_cubit.dart';
 import 'features/supplier/data/datasources/supplier_remote_data_source.dart';
 import 'features/supplier/data/repositories/supplier_repository_impl.dart';
 import 'features/supplier/domain/repositories/supplier_repository.dart';
