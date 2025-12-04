@@ -2,8 +2,13 @@ import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
 
-class FileService {
-  const FileService();
+abstract interface class FileService {
+  Future<bool> isFileExist(String filename);
+  Future<String> getFullPath(String filename);
+}
+
+class FileServiceImpl implements FileService {
+  const FileServiceImpl();
 
   Future<String> _getExternalPath() async {
     final dir = await getExternalStorageDirectory();
@@ -11,6 +16,7 @@ class FileService {
     return '${dir?.path}';
   }
 
+  @override
   Future<bool> isFileExist(String filename) async {
     final externalPath = await _getExternalPath();
     final filePath = '$externalPath/$filename';
@@ -19,6 +25,7 @@ class FileService {
     return await file.exists();
   }
 
+  @override
   Future<String> getFullPath(String filename) async {
     final externalPath = await _getExternalPath();
 
