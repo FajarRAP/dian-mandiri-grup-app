@@ -6,35 +6,37 @@ enum ShipmentListActionStatus { initial, inProgress, success, failure }
 
 class ShipmentListState extends Equatable {
   const ShipmentListState({
-    required this.status,
-    required this.actionStatus,
-    required this.shipments,
-    required this.currentPage,
-    required this.hasReachedMax,
-    required this.isPaginating,
+    this.status = .initial,
+    this.actionStatus = .initial,
+    this.shipments = const [],
+    this.currentPage = 1,
+    this.hasReachedMax = false,
+    this.isPaginating = false,
+    this.stage,
+    this.query,
+    this.date,
     this.message,
     this.failure,
   });
 
-  factory ShipmentListState.initial() {
-    return const ShipmentListState(
-      status: .initial,
-      actionStatus: .initial,
-      shipments: [],
-      currentPage: 1,
-      hasReachedMax: false,
-      isPaginating: false,
-    );
-  }
-
+  // Status
   final ShipmentListStatus status;
   final ShipmentListActionStatus actionStatus;
+
+  // States Properties
   final List<ShipmentEntity> shipments;
   final int currentPage;
   final bool hasReachedMax;
   final bool isPaginating;
+  // Filters
+  final String? stage;
+  final String? query;
+  final DateTime? date;
 
+  // Success
   final String? message;
+
+  // Failure
   final Failure? failure;
 
   ShipmentListState copyWith({
@@ -44,6 +46,9 @@ class ShipmentListState extends Equatable {
     int? currentPage,
     bool? hasReachedMax,
     bool? isPaginating,
+    String? stage,
+    String? query,
+    DateTime? date,
     String? message,
     Failure? failure,
   }) {
@@ -54,6 +59,9 @@ class ShipmentListState extends Equatable {
       currentPage: currentPage ?? this.currentPage,
       hasReachedMax: hasReachedMax ?? this.hasReachedMax,
       isPaginating: isPaginating ?? this.isPaginating,
+      stage: stage ?? this.stage,
+      query: query ?? this.query,
+      date: date ?? this.date,
       message: message ?? this.message,
       failure: failure ?? this.failure,
     );
@@ -67,6 +75,9 @@ class ShipmentListState extends Equatable {
     hasReachedMax,
     currentPage,
     isPaginating,
+    stage,
+    query,
+    date,
     message,
     failure,
   ];
