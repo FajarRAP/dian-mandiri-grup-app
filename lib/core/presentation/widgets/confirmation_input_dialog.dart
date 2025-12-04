@@ -11,8 +11,9 @@ class ConfirmationInputDialog extends StatefulWidget {
     this.onConfirm,
     required this.fieldBuilder,
     required this.actionText,
-    required this.body,
+    this.body = '',
     required this.title,
+    this.bodyContent,
   });
 
   final void Function(String value)? onConfirm;
@@ -21,6 +22,7 @@ class ConfirmationInputDialog extends StatefulWidget {
   final String actionText;
   final String body;
   final String title;
+  final Widget? bodyContent;
 
   @override
   State<ConfirmationInputDialog> createState() =>
@@ -53,37 +55,31 @@ class _ConfirmationInputDialogState extends State<ConfirmationInputDialog> {
       content: Form(
         key: _formKey,
         child: Column(
+          crossAxisAlignment: .stretch,
           mainAxisSize: .min,
           children: <Widget>[
             Text(
               widget.title,
               style: textTheme.titleLarge?.copyWith(fontWeight: .w700),
-            ),
-            const Gap(8),
-            Text(
-              widget.body,
-              style: textTheme.bodyMedium?.copyWith(
-                color: context.colorScheme.onSurfaceVariant,
-              ),
               textAlign: .center,
             ),
+            const Gap(8),
+            widget.bodyContent ??
+                Text(
+                  widget.body,
+                  style: textTheme.bodyMedium?.copyWith(
+                    color: context.colorScheme.onSurfaceVariant,
+                  ),
+                  textAlign: .center,
+                ),
             const Gap(24),
             widget.fieldBuilder(context, _controller),
             const Gap(24),
-            SizedBox(
-              width: .infinity,
-              child: PrimaryButton(
-                onPressed: widget.onConfirm == null ? null : _onSubmit,
-                child: Text(widget.actionText),
-              ),
+            PrimaryButton(
+              onPressed: widget.onConfirm == null ? null : _onSubmit,
+              child: Text(widget.actionText),
             ),
-            SizedBox(
-              width: .infinity,
-              child: TextButton(
-                onPressed: context.pop,
-                child: const Text('Batal'),
-              ),
-            ),
+            TextButton(onPressed: context.pop, child: const Text('Batal')),
           ],
         ),
       ),
