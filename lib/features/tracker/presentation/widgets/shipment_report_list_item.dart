@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
-import 'package:open_filex/open_filex.dart';
-import 'package:share_plus/share_plus.dart';
 
 import '../../../../common/constants/app_images.dart';
 import '../../../../common/utils/top_snackbar.dart';
 import '../../../../core/presentation/widgets/loading_indicator.dart';
-import '../../../../core/services/file_service.dart';
 import '../../../../core/utils/extensions.dart';
 import '../../data/models/shipment_report_ui_model.dart';
 import '../cubit/shipment_report/shipment_report_cubit.dart';
@@ -19,7 +16,6 @@ class ShipmentReportListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const fileservice = FileService();
     final textTheme = context.textTheme;
     final entity = shipmentReport.entity;
     final isDownloading = context.select<ShipmentReportCubit, bool>(
@@ -30,7 +26,7 @@ class ShipmentReportListItem extends StatelessWidget {
       listenWhen: (previous, current) {
         final isDownloadFinished =
             previous.downloadingReportId != null &&
-            current.downloadingReportId == null;
+            current.downloadingReportId == '1';
 
         return isDownloadFinished && current.message != null;
       },
@@ -93,19 +89,16 @@ class ShipmentReportListItem extends StatelessWidget {
                     color: context.colorScheme.onSurfaceVariant,
                   ),
                   onSelected: (value) async {
-                    final fullpath = await fileservice.getFullPath(
-                      entity.savedFilename,
-                    );
                     switch (value) {
                       case 'open':
-                        await OpenFilex.open(fullpath);
+                        await context.read<ShipmentReportCubit>().openReport(
+                          entity.savedFilename,
+                        );
                         break;
                       case 'share':
-                        final shareParams = ShareParams(
-                          text: 'Laporan Pengiriman: ${entity.name}',
-                          files: [XFile(fullpath)],
-                        );
-                        await SharePlus.instance.share(shareParams);
+                        await context.read<ShipmentReportCubit>().shareReport([
+                          entity.savedFilename,
+                        ]);
                         break;
                     }
                   },
