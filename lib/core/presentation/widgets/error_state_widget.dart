@@ -8,15 +8,15 @@ import 'buttons/danger_button.dart';
 class ErrorStateWidget extends StatelessWidget {
   const ErrorStateWidget({
     super.key,
+    this.onRetry,
     this.failure,
     this.message,
-    this.onRetry,
     this.compact = false,
   });
 
+  final void Function()? onRetry;
   final Failure? failure;
   final String? message;
-  final VoidCallback? onRetry;
   final bool compact;
 
   @override
