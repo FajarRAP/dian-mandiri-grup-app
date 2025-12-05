@@ -22,17 +22,17 @@ class FetchShipmentReportsUseCase
 
 class FetchShipmentReportsUseCaseParams extends Equatable {
   const FetchShipmentReportsUseCaseParams({
-    this.page = 1,
+    this.paginate = const PaginateParams(),
     required this.status,
     required this.startDate,
     required this.endDate,
   });
 
-  final int page;
+  final PaginateParams paginate;
   final String status;
   final DateTime startDate;
   final DateTime endDate;
 
   @override
-  List<Object?> get props => [page, status, startDate, endDate];
+  List<Object?> get props => [paginate, status, startDate, endDate];
 }

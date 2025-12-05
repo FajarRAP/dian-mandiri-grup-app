@@ -1,7 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
 
-import '../../../../core/common/dropdown_entity.dart';
+import '../../../../core/domain/entities/dropdown_entity.dart';
 import '../../../../core/errors/failure.dart';
 import '../../../../core/usecase/use_case.dart';
 import '../repositories/warehouse_repository.dart';
@@ -15,22 +15,23 @@ class FetchPurchaseNotesDropdownUseCase
 
   @override
   Future<Either<Failure, List<DropdownEntity>>> execute(
-      FetchPurchaseNotesDropdownUseCaseParams params) async {
+    FetchPurchaseNotesDropdownUseCaseParams params,
+  ) async {
     return await warehouseRepository.fetchPurchaseNotesDropdown(params);
   }
 }
 
 class FetchPurchaseNotesDropdownUseCaseParams extends Equatable {
   const FetchPurchaseNotesDropdownUseCaseParams({
-    this.search,
-    this.limit = 10,
-    this.page = 1,
+    this.paginate = const PaginateParams(),
+    this.search = const SearchParams(),
+    this.showAll = false,
   });
 
-  final String? search;
-  final int limit;
-  final int page;
+  final PaginateParams paginate;
+  final SearchParams search;
+  final bool showAll;
 
   @override
-  List<Object?> get props => [search, limit, page];
+  List<Object?> get props => [paginate, search, showAll];
 }

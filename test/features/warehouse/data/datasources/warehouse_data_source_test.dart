@@ -43,8 +43,9 @@ void main() {
 
       // assert
       expect(result, resultMatcher);
-      verify(() => mockDio.delete('/v1/purchase-note/${params.purchaseNoteId}'))
-          .called(1);
+      verify(
+        () => mockDio.delete('/purchase-note/${params.purchaseNoteId}'),
+      ).called(1);
     });
 
     test('should throw ServerException when API returns 4xx/5xx', () async {
@@ -62,8 +63,9 @@ void main() {
 
       // assert
       await expectLater(future, throwsA(isA<ServerException>()));
-      verify(() => mockDio.delete('/v1/purchase-note/${params.purchaseNoteId}'))
-          .called(1);
+      verify(
+        () => mockDio.delete('/purchase-note/${params.purchaseNoteId}'),
+      ).called(1);
     });
   });
 
@@ -71,24 +73,29 @@ void main() {
     final params = tFetchPurchaseNoteParams;
     final resultMatcher = tFetchPurchaseNoteSuccess;
 
-    test('should return PurchaseNoteDetailEntity when request is successful',
-        () async {
-      final jsonString = fixtureReader.dataSource('fetch_purchase_note.json');
-      final json = jsonDecode(jsonString);
-      when(() => mockDio.get(any())).thenAnswer(
-        (_) async => Response(
-          requestOptions: RequestOptions(),
-          data: json,
-          statusCode: 200,
-        ),
-      );
+    test(
+      'should return PurchaseNoteDetailEntity when request is successful',
+      () async {
+        final jsonString = fixtureReader.dataSource('fetch_purchase_note.json');
+        final json = jsonDecode(jsonString);
+        when(() => mockDio.get(any())).thenAnswer(
+          (_) async => Response(
+            requestOptions: RequestOptions(),
+            data: json,
+            statusCode: 200,
+          ),
+        );
 
-      final result = await warehouseRemoteDataSource.fetchPurchaseNote(params);
+        final result = await warehouseRemoteDataSource.fetchPurchaseNote(
+          params,
+        );
 
-      expect(result, resultMatcher);
-      verify(() => mockDio.get('/v1/purchase-note/${params.purchaseNoteId}'))
-          .called(1);
-    });
+        expect(result, resultMatcher);
+        verify(
+          () => mockDio.get('/purchase-note/${params.purchaseNoteId}'),
+        ).called(1);
+      },
+    );
 
     test('should throw ServerException when API returns 4xx/5xx', () async {
       when(() => mockDio.get(any())).thenThrow(
@@ -102,8 +109,9 @@ void main() {
       final future = warehouseRemoteDataSource.fetchPurchaseNote(params);
 
       await expectLater(future, throwsA(isA<ServerException>()));
-      verify(() => mockDio.get('/v1/purchase-note/${params.purchaseNoteId}'))
-          .called(1);
+      verify(
+        () => mockDio.get('/purchase-note/${params.purchaseNoteId}'),
+      ).called(1);
     });
   });
 
@@ -112,37 +120,50 @@ void main() {
     final resultMatcher = tFetchPurchaseNotesSuccess;
 
     test(
-        'should return List<PurchaseNoteSummaryEntity> when request is successful',
-        () async {
-      final jsonString = fixtureReader.dataSource('fetch_purchase_notes.json');
-      final json = jsonDecode(jsonString);
-      when(() => mockDio.get(any(),
-          queryParameters: any(named: 'queryParameters'))).thenAnswer(
-        (_) async => Response(
-          requestOptions: RequestOptions(),
-          data: json,
-          statusCode: 200,
-        ),
-      );
+      'should return List<PurchaseNoteSummaryEntity> when request is successful',
+      () async {
+        final jsonString = fixtureReader.dataSource(
+          'fetch_purchase_notes.json',
+        );
+        final json = jsonDecode(jsonString);
+        when(
+          () => mockDio.get(
+            any(),
+            queryParameters: any(named: 'queryParameters'),
+          ),
+        ).thenAnswer(
+          (_) async => Response(
+            requestOptions: RequestOptions(),
+            data: json,
+            statusCode: 200,
+          ),
+        );
 
-      final result = await warehouseRemoteDataSource.fetchPurchaseNotes(params);
+        final result = await warehouseRemoteDataSource.fetchPurchaseNotes(
+          params,
+        );
 
-      expect(result, resultMatcher);
-      verify(() => mockDio.get(
-            '/v1/purchase-note',
+        expect(result, resultMatcher);
+        verify(
+          () => mockDio.get(
+            '/purchase-note',
             queryParameters: {
               'column': params.column,
               'sort': params.sort,
-              'search': params.search,
-              'limit': params.limit,
-              'page': params.page,
+              'search': params.search.query,
+              'limit': params.paginate.limit,
+              'page': params.paginate.page,
             },
-          )).called(1);
-    });
+          ),
+        ).called(1);
+      },
+    );
 
     test('should throw ServerException when API returns 4xx/5xx', () async {
-      when(() => mockDio.get(any(),
-          queryParameters: any(named: 'queryParameters'))).thenThrow(
+      when(
+        () =>
+            mockDio.get(any(), queryParameters: any(named: 'queryParameters')),
+      ).thenThrow(
         DioException(
           requestOptions: RequestOptions(),
           error: tServerException,
@@ -153,16 +174,18 @@ void main() {
       final future = warehouseRemoteDataSource.fetchPurchaseNotes(params);
 
       await expectLater(future, throwsA(isA<ServerException>()));
-      verify(() => mockDio.get(
-            '/v1/purchase-note',
-            queryParameters: {
-              'column': params.column,
-              'sort': params.sort,
-              'search': params.search,
-              'limit': params.limit,
-              'page': params.page,
-            },
-          )).called(1);
+      verify(
+        () => mockDio.get(
+          '/purchase-note',
+          queryParameters: {
+            'column': params.column,
+            'sort': params.sort,
+            'search': params.search.query,
+            'limit': params.paginate.limit,
+            'page': params.paginate.page,
+          },
+        ),
+      ).called(1);
     });
   });
 
@@ -170,37 +193,49 @@ void main() {
     const params = tFetchPurchaseNotesDropdownParams;
     const resultMatcher = tFetchPurchaseNotesDropdownSuccess;
 
-    test('should return List<DropdownEntity> when request is successful',
-        () async {
-      final jsonString =
-          fixtureReader.dataSource('fetch_purchase_notes_dropdown.json');
-      final json = jsonDecode(jsonString);
-      when(() => mockDio.get(any(),
-          queryParameters: any(named: 'queryParameters'))).thenAnswer(
-        (_) async => Response(
-          requestOptions: RequestOptions(),
-          data: json,
-          statusCode: 200,
-        ),
-      );
+    test(
+      'should return List<DropdownEntity> when request is successful',
+      () async {
+        final jsonString = fixtureReader.dataSource(
+          'fetch_purchase_notes_dropdown.json',
+        );
+        final json = jsonDecode(jsonString);
+        when(
+          () => mockDio.get(
+            any(),
+            queryParameters: any(named: 'queryParameters'),
+          ),
+        ).thenAnswer(
+          (_) async => Response(
+            requestOptions: RequestOptions(),
+            data: json,
+            statusCode: 200,
+          ),
+        );
 
-      final result =
-          await warehouseRemoteDataSource.fetchPurchaseNotesDropdown(params);
+        final result = await warehouseRemoteDataSource
+            .fetchPurchaseNotesDropdown(params);
 
-      expect(result, resultMatcher);
-      verify(() => mockDio.get(
-            '/v1/purchase-note/dropdown',
+        expect(result, resultMatcher);
+        verify(
+          () => mockDio.get(
+            '/purchase-note/dropdown',
             queryParameters: {
-              'search': params.search,
-              'limit': params.limit,
-              'page': params.page,
+              'search': params.search.query,
+              'limit': params.paginate.limit,
+              'page': params.paginate.page,
+              'show_all': params.showAll,
             },
-          )).called(1);
-    });
+          ),
+        ).called(1);
+      },
+    );
 
     test('should throw ServerException when API returns 4xx/5xx', () async {
-      when(() => mockDio.get(any(),
-          queryParameters: any(named: 'queryParameters'))).thenThrow(
+      when(
+        () =>
+            mockDio.get(any(), queryParameters: any(named: 'queryParameters')),
+      ).thenThrow(
         DioException(
           requestOptions: RequestOptions(),
           error: tServerException,
@@ -208,18 +243,22 @@ void main() {
         ),
       );
 
-      final future =
-          warehouseRemoteDataSource.fetchPurchaseNotesDropdown(params);
+      final future = warehouseRemoteDataSource.fetchPurchaseNotesDropdown(
+        params,
+      );
 
       await expectLater(future, throwsA(isA<ServerException>()));
-      verify(() => mockDio.get(
-            '/v1/purchase-note/dropdown',
-            queryParameters: {
-              'search': params.search,
-              'limit': params.limit,
-              'page': params.page,
-            },
-          )).called(1);
+      verify(
+        () => mockDio.get(
+          '/purchase-note/dropdown',
+          queryParameters: {
+            'search': params.search.query,
+            'limit': params.paginate.limit,
+            'page': params.paginate.page,
+            'show_all': params.showAll,
+          },
+        ),
+      ).called(1);
     });
   });
 
@@ -244,8 +283,9 @@ void main() {
     });
 
     test('should return String when request is successful', () async {
-      final jsonString =
-          fixtureReader.dataSource('create_purchaes_note_file.json');
+      final jsonString = fixtureReader.dataSource(
+        'create_purchaes_note_file.json',
+      );
       final json = jsonDecode(jsonString);
       when(() => mockDio.post(any(), data: any(named: 'data'))).thenAnswer(
         (_) async => Response(
@@ -255,12 +295,15 @@ void main() {
         ),
       );
 
-      final result =
-          await warehouseRemoteDataSource.insertPurchaseNoteFile(params);
+      final result = await warehouseRemoteDataSource.importPurchaseNote(params);
 
       expect(result, resultMatcher);
-      verify(() => mockDio.post('/v1/purchase-note/spreadsheet',
-          data: any(named: 'data'))).called(1);
+      verify(
+        () => mockDio.post(
+          '/purchase-note/spreadsheet',
+          data: any(named: 'data'),
+        ),
+      ).called(1);
     });
 
     test('should throw ServerException when API returns 4xx/5xx', () async {
@@ -272,11 +315,15 @@ void main() {
         ),
       );
 
-      final future = warehouseRemoteDataSource.insertPurchaseNoteFile(params);
+      final future = warehouseRemoteDataSource.importPurchaseNote(params);
 
       await expectLater(future, throwsA(isA<ServerException>()));
-      verify(() => mockDio.post('/v1/purchase-note/spreadsheet',
-          data: any(named: 'data'))).called(1);
+      verify(
+        () => mockDio.post(
+          '/purchase-note/spreadsheet',
+          data: any(named: 'data'),
+        ),
+      ).called(1);
     });
   });
 
@@ -296,8 +343,9 @@ void main() {
     });
 
     test('should return String when request is successful', () async {
-      final jsonString =
-          fixtureReader.dataSource('create_purchase_note_manual.json');
+      final jsonString = fixtureReader.dataSource(
+        'create_purchase_note_manual.json',
+      );
       final json = jsonDecode(jsonString);
       when(() => mockDio.post(any(), data: any(named: 'data'))).thenAnswer(
         (_) async => Response(
@@ -307,12 +355,12 @@ void main() {
         ),
       );
 
-      final result =
-          await warehouseRemoteDataSource.insertPurchaseNoteManual(params);
+      final result = await warehouseRemoteDataSource.createPurchaseNote(params);
 
       expect(result, resultMatcher);
-      verify(() => mockDio.post('/v1/purchase-note', data: any(named: 'data')))
-          .called(1);
+      verify(
+        () => mockDio.post('/purchase-note', data: any(named: 'data')),
+      ).called(1);
     });
 
     test('should throw ServerException when API returns 4xx/5xx', () async {
@@ -324,17 +372,18 @@ void main() {
         ),
       );
 
-      final future = warehouseRemoteDataSource.insertPurchaseNoteManual(params);
+      final future = warehouseRemoteDataSource.createPurchaseNote(params);
 
       await expectLater(future, throwsA(isA<ServerException>()));
-      verify(() => mockDio.post('/v1/purchase-note', data: any(named: 'data')))
-          .called(1);
+      verify(
+        () => mockDio.post('/purchase-note', data: any(named: 'data')),
+      ).called(1);
     });
   });
 
-  group('insert return cost remote data source test', () {
-    const params = tInsertReturnCostParams;
-    const resultMatcher = tInsertReturnCostSuccess;
+  group('update return cost remote data source test', () {
+    const params = tUpdateReturnCostParams;
+    const resultMatcher = tUpdateReturnCostSuccess;
 
     test('should return String when request is successful', () async {
       final jsonString = fixtureReader.dataSource('update_return_cost.json');
@@ -347,13 +396,15 @@ void main() {
         ),
       );
 
-      final result = await warehouseRemoteDataSource.insertReturnCost(params);
+      final result = await warehouseRemoteDataSource.updateReturnCost(params);
 
       expect(result, resultMatcher);
-      verify(() => mockDio.patch(
-            '/v1/purchase-note/${params.purchaseNoteId}/return-cost',
-            data: {'amount': params.amount},
-          )).called(1);
+      verify(
+        () => mockDio.patch(
+          '/purchase-note/${params.purchaseNoteId}/return-cost',
+          data: {'amount': params.amount},
+        ),
+      ).called(1);
     });
 
     test('should throw ServerException when API returns 4xx/5xx', () async {
@@ -365,13 +416,15 @@ void main() {
         ),
       );
 
-      final future = warehouseRemoteDataSource.insertReturnCost(params);
+      final future = warehouseRemoteDataSource.updateReturnCost(params);
 
       await expectLater(future, throwsA(isA<ServerException>()));
-      verify(() => mockDio.patch(
-            '/v1/purchase-note/${params.purchaseNoteId}/return-cost',
-            data: {'amount': params.amount},
-          )).called(1);
+      verify(
+        () => mockDio.patch(
+          '/purchase-note/${params.purchaseNoteId}/return-cost',
+          data: {'amount': params.amount},
+        ),
+      ).called(1);
     });
   });
 
@@ -390,11 +443,15 @@ void main() {
         ),
       );
 
-      final result = await warehouseRemoteDataSource.insertShippingFee(params);
+      final result = await warehouseRemoteDataSource.addShippingFee(params);
 
       expect(result, resultMatcher);
-      verify(() => mockDio.post('/v1/purchase-note/shipment-price',
-          data: any(named: 'data'))).called(1);
+      verify(
+        () => mockDio.post(
+          '/purchase-note/shipment-price',
+          data: any(named: 'data'),
+        ),
+      ).called(1);
     });
 
     test('should throw ServerException when API returns 4xx/5xx', () async {
@@ -406,11 +463,15 @@ void main() {
         ),
       );
 
-      final future = warehouseRemoteDataSource.insertShippingFee(params);
+      final future = warehouseRemoteDataSource.addShippingFee(params);
 
       await expectLater(future, throwsA(isA<ServerException>()));
-      verify(() => mockDio.post('/v1/purchase-note/shipment-price',
-          data: any(named: 'data'))).called(1);
+      verify(
+        () => mockDio.post(
+          '/purchase-note/shipment-price',
+          data: any(named: 'data'),
+        ),
+      ).called(1);
     });
   });
 
@@ -432,8 +493,12 @@ void main() {
       final result = await warehouseRemoteDataSource.updatePurchaseNote(params);
 
       expect(result, resultMatcher);
-      verify(() => mockDio.put('/v1/purchase-note/${params.purchaseNoteId}',
-          data: any(named: 'data'))).called(1);
+      verify(
+        () => mockDio.put(
+          '/purchase-note/${params.purchaseNoteId}',
+          data: any(named: 'data'),
+        ),
+      ).called(1);
     });
 
     test('should throw ServerException when API returns 4xx/5xx', () async {
@@ -448,8 +513,12 @@ void main() {
       final future = warehouseRemoteDataSource.updatePurchaseNote(params);
 
       await expectLater(future, throwsA(isA<ServerException>()));
-      verify(() => mockDio.put('/v1/purchase-note/${params.purchaseNoteId}',
-          data: any(named: 'data'))).called(1);
+      verify(
+        () => mockDio.put(
+          '/purchase-note/${params.purchaseNoteId}',
+          data: any(named: 'data'),
+        ),
+      ).called(1);
     });
   });
 }

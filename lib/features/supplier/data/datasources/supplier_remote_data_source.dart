@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 
-import '../../../../core/common/dropdown_entity.dart';
+import '../../../../core/domain/entities/dropdown_entity.dart';
 import '../../../../core/network/dio_handler_mixin.dart';
 import '../../../../core/utils/extensions.dart';
 import '../../../../core/utils/typedefs.dart';
@@ -9,7 +9,7 @@ import '../../domain/entities/supplier_entity.dart';
 import '../../domain/usecases/fetch_supplier_use_case.dart';
 import '../../domain/usecases/fetch_suppliers_dropdown_use_case.dart';
 import '../../domain/usecases/fetch_suppliers_use_case.dart';
-import '../../domain/usecases/insert_supplier_use_case.dart';
+import '../../domain/usecases/create_supplier_use_case.dart';
 import '../../domain/usecases/update_supplier_use_case.dart';
 import '../models/supplier_detail_model.dart';
 import '../models/supplier_model.dart';
@@ -17,10 +17,12 @@ import '../models/supplier_model.dart';
 abstract interface class SupplierRemoteDataSource {
   Future<SupplierDetailEntity> fetchSupplier(FetchSupplierUseCaseParams params);
   Future<List<SupplierEntity>> fetchSuppliers(
-      FetchSuppliersUseCaseParams params);
+    FetchSuppliersUseCaseParams params,
+  );
   Future<List<DropdownEntity>> fetchSuppliersDropdown(
-      FetchSuppliersDropdownUseCaseParams params);
-  Future<String> insertSupplier(InsertSupplierUseCaseParams params);
+    FetchSuppliersDropdownUseCaseParams params,
+  );
+  Future<String> createSupplier(CreateSupplierUseCaseParams params);
   Future<String> updateSupplier(UpdateSupplierUseCaseParams params);
 }
 
@@ -33,9 +35,10 @@ class SupplierRemoteDataSourceImpl
 
   @override
   Future<SupplierDetailEntity> fetchSupplier(
-      FetchSupplierUseCaseParams params) async {
+    FetchSupplierUseCaseParams params,
+  ) async {
     return handleDioRequest<SupplierDetailEntity>(() async {
-      final response = await dio.get('v1/supplier/${params.supplierId}');
+      final response = await dio.get('/supplier/${params.supplierId}');
 
       return SupplierDetailModel.fromJson(response.data['data']).toEntity();
     });
@@ -43,16 +46,17 @@ class SupplierRemoteDataSourceImpl
 
   @override
   Future<List<SupplierEntity>> fetchSuppliers(
-      FetchSuppliersUseCaseParams params) async {
+    FetchSuppliersUseCaseParams params,
+  ) async {
     return handleDioRequest<List<SupplierEntity>>(() async {
       final response = await dio.get(
-        'v1/supplier',
+        '/supplier',
         queryParameters: {
           'column': params.column,
           'order': params.sort,
-          'search': params.search,
-          'limit': params.limit,
-          'page': params.page,
+          'search': params.search.query,
+          'limit': params.paginate.limit,
+          'page': params.paginate.page,
         },
       );
       final contents = List<JsonMap>.from(response.data['data']['content']);
@@ -63,14 +67,16 @@ class SupplierRemoteDataSourceImpl
 
   @override
   Future<List<DropdownEntity>> fetchSuppliersDropdown(
-      FetchSuppliersDropdownUseCaseParams params) async {
+    FetchSuppliersDropdownUseCaseParams params,
+  ) async {
     return handleDioRequest<List<DropdownEntity>>(() async {
       final response = await dio.get(
-        'v1/supplier/dropdown',
+        '/supplier/dropdown',
         queryParameters: {
-          'search': params.search,
-          'limit': params.limit,
-          'page': params.page,
+          'search': params.search.query,
+          'limit': params.paginate.limit,
+          'page': params.paginate.page,
+          'show_all': params.showAll,
         },
       );
       final contents = List<JsonMap>.from(response.data['data']['content']);
@@ -80,16 +86,16 @@ class SupplierRemoteDataSourceImpl
   }
 
   @override
-  Future<String> insertSupplier(InsertSupplierUseCaseParams params) async {
+  Future<String> createSupplier(CreateSupplierUseCaseParams params) async {
     return handleDioRequest<String>(() async {
       final response = await dio.post(
-        'v1/supplier',
+        '/supplier',
         data: FormData.fromMap({
           'address': params.address,
           'avatar': await params.avatar.toMultipartFile(),
           'email': params.email,
           'name': params.name,
-          'phoneNumber': params.phoneNumber,
+          'phone': params.phoneNumber,
         }),
       );
 
@@ -100,18 +106,15 @@ class SupplierRemoteDataSourceImpl
   @override
   Future<String> updateSupplier(UpdateSupplierUseCaseParams params) async {
     return handleDioRequest<String>(() async {
-      final supplierDetail =
-          SupplierDetailModel.fromEntity(params.supplierDetailEntity);
-      final payload = supplierDetail.toJson();
-      final newAvatar = await supplierDetail.avatarUrl.toMultipartFile();
-
-      if (newAvatar != null) {
-        payload['avatar'] = newAvatar;
-      }
-
       final response = await dio.put(
-        'v1/supplier/${params.supplierDetailEntity.id}',
-        data: FormData.fromMap(payload),
+        '/supplier/${params.id}',
+        data: FormData.fromMap({
+          'name': params.name,
+          'phone': params.phoneNumber,
+          'address': params.address,
+          'email': params.email,
+          'avatar': await params.avatar.toMultipartFile(),
+        }),
       );
 
       return response.data['message'];

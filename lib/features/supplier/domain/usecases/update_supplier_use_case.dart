@@ -3,7 +3,6 @@ import 'package:equatable/equatable.dart';
 
 import '../../../../core/errors/failure.dart';
 import '../../../../core/usecase/use_case.dart';
-import '../entities/supplier_detail_entity.dart';
 import '../repositories/supplier_repository.dart';
 
 class UpdateSupplierUseCase
@@ -14,16 +13,29 @@ class UpdateSupplierUseCase
 
   @override
   Future<Either<Failure, String>> execute(
-      UpdateSupplierUseCaseParams params) async {
+    UpdateSupplierUseCaseParams params,
+  ) async {
     return await supplierRepository.updateSupplier(params);
   }
 }
 
 class UpdateSupplierUseCaseParams extends Equatable {
-  const UpdateSupplierUseCaseParams({required this.supplierDetailEntity});
+  const UpdateSupplierUseCaseParams({
+    required this.id,
+    required this.name,
+    required this.phoneNumber,
+    this.address,
+    this.avatar,
+    this.email,
+  });
 
-  final SupplierDetailEntity supplierDetailEntity;
+  final String id;
+  final String name;
+  final String phoneNumber;
+  final String? address;
+  final String? avatar;
+  final String? email;
 
   @override
-  List<Object?> get props => [supplierDetailEntity];
+  List<Object?> get props => [id, name, phoneNumber, address, avatar, email];
 }

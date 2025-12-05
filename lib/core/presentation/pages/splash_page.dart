@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../common/constants/app_images.dart';
 import '../../router/route_names.dart';
 import '../cubit/app_cubit.dart';
+import '../cubit/user_cubit.dart';
 
 class SplashPage extends StatelessWidget {
   const SplashPage({super.key});
@@ -15,7 +16,9 @@ class SplashPage extends StatelessWidget {
       bloc: context.read<AppCubit>()..initializeApp(),
       listener: (context, state) {
         if (state is AppSuccess) {
-          context.goNamed(Routes.home);
+          context
+            ..read<UserCubit>().setUser = state.user
+            ..goNamed(Routes.home);
         }
 
         if (state is NavigateToLogin) {
@@ -28,7 +31,7 @@ class SplashPage extends StatelessWidget {
             alignment: .center,
             decoration: const BoxDecoration(
               image: DecorationImage(
-                image: AssetImage(AppImages.appIcon),
+                image: AssetImage(AppImages.app),
                 fit: .contain,
               ),
               shape: .circle,

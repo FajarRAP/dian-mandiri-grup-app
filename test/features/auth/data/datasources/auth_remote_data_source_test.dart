@@ -32,30 +32,38 @@ void main() {
       // arrange
       final jsonString = fixtureReader.dataSource('fetch_user.json');
       final json = jsonDecode(jsonString);
-      when(() => mockDio.get(any())).thenAnswer((_) async => Response(
-          requestOptions: RequestOptions(), data: json, statusCode: 200));
+      when(() => mockDio.get(any())).thenAnswer(
+        (_) async => Response(
+          requestOptions: RequestOptions(),
+          data: json,
+          statusCode: 200,
+        ),
+      );
 
       // act
       final result = await authRemoteDataSource.fetchUser();
 
       // assert
       expect(result, userEntity);
-      verify(() => mockDio.get('v1/auth/me')).called(1);
+      verify(() => mockDio.get('/auth/me')).called(1);
     });
 
     test('should throw ServerException when API returns 4xx/5xx', () async {
       // arrange
-      when(() => mockDio.get(any())).thenThrow(DioException(
+      when(() => mockDio.get(any())).thenThrow(
+        DioException(
           requestOptions: RequestOptions(),
           error: tServerException,
-          type: DioExceptionType.badResponse));
+          type: DioExceptionType.badResponse,
+        ),
+      );
 
       // act
       final future = authRemoteDataSource.fetchUser();
 
       // assert
       await expectLater(future, throwsA(isA<Exception>()));
-      verify(() => mockDio.get('v1/auth/me')).called(1);
+      verify(() => mockDio.get('/auth/me')).called(1);
     });
   });
 
@@ -63,33 +71,43 @@ void main() {
     const googleAccessToken = tGoogleAccessToken;
     const loginResponseModel = tSignInResponseModel;
 
-    test('should be return LoginResponseModel when request is successful',
-        () async {
-      // arrange
-      final jsonString = fixtureReader.dataSource('sign_in.json');
-      final json = jsonDecode(jsonString);
-      when(() => mockGoogleSignInService.authenticate())
-          .thenAnswer((_) async => googleAccessToken);
-      when(() => mockDio.post(any(), data: any(named: 'data'))).thenAnswer(
+    test(
+      'should be return LoginResponseModel when request is successful',
+      () async {
+        // arrange
+        final jsonString = fixtureReader.dataSource('sign_in.json');
+        final json = jsonDecode(jsonString);
+        when(
+          () => mockGoogleSignInService.authenticate(),
+        ).thenAnswer((_) async => googleAccessToken);
+        when(() => mockDio.post(any(), data: any(named: 'data'))).thenAnswer(
           (_) async => Response(
-              requestOptions: RequestOptions(), data: json, statusCode: 200));
+            requestOptions: RequestOptions(),
+            data: json,
+            statusCode: 200,
+          ),
+        );
 
-      // act
-      final result = await authRemoteDataSource.signIn();
+        // act
+        final result = await authRemoteDataSource.signIn();
 
-      // assert
-      expect(result, loginResponseModel);
-      verify(() => mockGoogleSignInService.authenticate()).called(1);
-      verify(() => mockDio.post(
-            'v1/auth/google',
+        // assert
+        expect(result, loginResponseModel);
+        verify(() => mockGoogleSignInService.authenticate()).called(1);
+        verify(
+          () => mockDio.post(
+            '/auth/google',
             data: {'access_token': googleAccessToken},
-          )).called(1);
-    });
+          ),
+        ).called(1);
+      },
+    );
 
     test('should throw Exception when Google Sign-In fails', () async {
       // arrange
-      when(() => mockGoogleSignInService.authenticate())
-          .thenThrow(Exception('Google Sign-In failed'));
+      when(
+        () => mockGoogleSignInService.authenticate(),
+      ).thenThrow(Exception('Google Sign-In failed'));
 
       // act
       final future = authRemoteDataSource.signIn();
@@ -108,8 +126,13 @@ void main() {
       // arrange
       final jsonString = fixtureReader.dataSource('sign_out.json');
       final json = jsonDecode(jsonString);
-      when(() => mockDio.post(any())).thenAnswer((_) async => Response(
-          requestOptions: RequestOptions(), data: json, statusCode: 200));
+      when(() => mockDio.post(any())).thenAnswer(
+        (_) async => Response(
+          requestOptions: RequestOptions(),
+          data: json,
+          statusCode: 200,
+        ),
+      );
       when(() => mockGoogleSignInService.signOut()).thenAnswer((_) async => {});
 
       // act
@@ -117,23 +140,26 @@ void main() {
 
       // assert
       expect(result, resultMatcher);
-      verify(() => mockDio.post('v1/auth/logout')).called(1);
+      verify(() => mockDio.post('/auth/logout')).called(1);
       verify(() => mockGoogleSignInService.signOut()).called(1);
     });
 
     test('should throw Exception when request is unsuccessful', () async {
       // arrange
-      when(() => mockDio.post(any())).thenThrow(DioException(
+      when(() => mockDio.post(any())).thenThrow(
+        DioException(
           requestOptions: RequestOptions(),
           error: tServerException,
-          type: DioExceptionType.badResponse));
+          type: DioExceptionType.badResponse,
+        ),
+      );
 
       // act
       final future = authRemoteDataSource.signOut();
 
       // assert
       await expectLater(future, throwsA(isA<Exception>()));
-      verify(() => mockDio.post('v1/auth/logout')).called(1);
+      verify(() => mockDio.post('/auth/logout')).called(1);
       verifyNever(() => mockGoogleSignInService.signOut());
     });
   });
@@ -147,37 +173,41 @@ void main() {
       final jsonString = fixtureReader.dataSource('update_profile.json');
       final json = jsonDecode(jsonString);
       when(() => mockDio.put(any(), data: any(named: 'data'))).thenAnswer(
-          (_) async => Response(
-              requestOptions: RequestOptions(), data: json, statusCode: 200));
+        (_) async => Response(
+          requestOptions: RequestOptions(),
+          data: json,
+          statusCode: 200,
+        ),
+      );
 
       // act
       final result = await authRemoteDataSource.updateProfile(params);
 
       // assert
       expect(result, resultMatcher);
-      verify(() => mockDio.put(
-            'v1/auth/profile',
-            data: {'name': params.name},
-          )).called(1);
+      verify(
+        () => mockDio.put('/auth/profile', data: {'name': params.name}),
+      ).called(1);
     });
 
     test('should throw Exception when request is unsuccessful', () async {
       // arrange
       when(() => mockDio.put(any(), data: any(named: 'data'))).thenThrow(
-          DioException(
-              requestOptions: RequestOptions(),
-              error: tServerException,
-              type: DioExceptionType.badResponse));
+        DioException(
+          requestOptions: RequestOptions(),
+          error: tServerException,
+          type: DioExceptionType.badResponse,
+        ),
+      );
 
       // act
       final future = authRemoteDataSource.updateProfile(params);
 
       // assert
       await expectLater(future, throwsA(isA<Exception>()));
-      verify(() => mockDio.put(
-            'v1/auth/profile',
-            data: {'name': params.name},
-          )).called(1);
+      verify(
+        () => mockDio.put('/auth/profile', data: {'name': params.name}),
+      ).called(1);
     });
   });
 
@@ -190,12 +220,17 @@ void main() {
       final jsonString = fixtureReader.dataSource('refresh_token.json');
       final json = jsonDecode(jsonString);
       when(() => mockDio.post(any(), data: any(named: 'data'))).thenAnswer(
-          (_) async => Response(
-              requestOptions: RequestOptions(), data: json, statusCode: 200));
+        (_) async => Response(
+          requestOptions: RequestOptions(),
+          data: json,
+          statusCode: 200,
+        ),
+      );
 
       // act
-      final result =
-          await authRemoteDataSource.refreshToken(refreshTokenParams);
+      final result = await authRemoteDataSource.refreshToken(
+        refreshTokenParams,
+      );
 
       // assert
       expect(result, tokenModel);
@@ -204,10 +239,12 @@ void main() {
     test('should throw Exception when request is unsuccessful', () async {
       // arrange
       when(() => mockDio.post(any(), data: any(named: 'data'))).thenThrow(
-          DioException(
-              requestOptions: RequestOptions(),
-              error: tServerException,
-              type: DioExceptionType.badResponse));
+        DioException(
+          requestOptions: RequestOptions(),
+          error: tServerException,
+          type: DioExceptionType.badResponse,
+        ),
+      );
 
       // act
       final future = authRemoteDataSource.refreshToken(refreshTokenParams);

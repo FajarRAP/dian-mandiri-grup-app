@@ -14,7 +14,8 @@ class FetchSuppliersUseCase
 
   @override
   Future<Either<Failure, List<SupplierEntity>>> execute(
-      FetchSuppliersUseCaseParams params) async {
+    FetchSuppliersUseCaseParams params,
+  ) async {
     return await supplierRepository.fetchSuppliers(params);
   }
 }
@@ -23,17 +24,15 @@ class FetchSuppliersUseCaseParams extends Equatable {
   const FetchSuppliersUseCaseParams({
     this.column = 'name',
     this.sort = 'asc',
-    this.search,
-    this.limit = 10,
-    this.page = 1,
+    this.paginate = const PaginateParams(),
+    this.search = const SearchParams(),
   });
 
   final String column;
   final String sort;
-  final String? search;
-  final int limit;
-  final int page;
+  final PaginateParams paginate;
+  final SearchParams search;
 
   @override
-  List<Object?> get props => [column, sort, search, limit, page];
+  List<Object?> get props => [column, sort, paginate, search];
 }

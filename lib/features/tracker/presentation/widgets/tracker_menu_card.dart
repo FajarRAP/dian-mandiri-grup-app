@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
+
+import '../../../../core/utils/extensions.dart';
 
 class TrackerMenuCard extends StatelessWidget {
   const TrackerMenuCard({
@@ -19,36 +22,30 @@ class TrackerMenuCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
+    final textTheme = context.textTheme;
 
     return GestureDetector(
-      onTap: () => context.push(route),
+      onTap: () => context.pushNamed(route),
       child: Card(
         child: SizedBox(
           height: size,
           width: size,
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: .center,
+            mainAxisSize: .min,
             children: <Widget>[
               Container(
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: .circular(8),
                   color: color.shade100,
                 ),
-                padding: const EdgeInsets.all(6),
-                child: Image.asset(
-                  assetName,
-                  height: 72,
-                  width: 72,
-                ),
+                padding: const .all(6),
+                child: Image.asset(assetName, height: 72, width: 72),
               ),
-              const SizedBox(height: 14),
+              const Gap(14),
               Text(
                 title,
-                style: textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+                style: textTheme.titleMedium?.copyWith(fontWeight: .w600),
               ),
             ],
           ),

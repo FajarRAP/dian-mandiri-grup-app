@@ -1,39 +1,36 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/common/dropdown_entity.dart';
-import '../../../../core/helpers/top_snackbar.dart';
-import '../../../../core/helpers/validators.dart';
-import '../../../../core/widgets/dropdowns/purchase_note_dropdown.dart';
-import '../../../../core/widgets/fab_container.dart';
-import '../../../../core/widgets/buttons/primary_button.dart';
-import '../cubit/warehouse_cubit.dart';
+import '../../../../core/domain/entities/dropdown_entity.dart';
+import '../../../../common/utils/top_snackbar.dart';
+import '../../../../core/utils/validators.dart';
+import '../../../../core/presentation/widgets/buttons/primary_button.dart';
+import '../../../../core/presentation/widgets/dropdowns/purchase_note_dropdown.dart';
+import '../../../../core/presentation/widgets/fab_container.dart';
+import '../cubit/purchase_note_cost/purchase_note_cost_cubit.dart';
 import '../widgets/selected_purchase_note_item.dart';
 
 class AddShippingFeePage extends StatefulWidget {
-  const AddShippingFeePage({
-    super.key,
-  });
+  const AddShippingFeePage({super.key});
 
   @override
   State<AddShippingFeePage> createState() => _AddShippingFeePageState();
 }
 
 class _AddShippingFeePageState extends State<AddShippingFeePage> {
-  late final FocusNode _focusNode;
-  late final GlobalKey<FormState> _formKey;
+  late final PurchaseNoteCostCubit _purchaseNoteCostCubit;
   late final TextEditingController _shippingFeeController;
-  late final WarehouseCubit _warehouseCubit;
-  final _selectedPurchaseNote = <DropdownEntity>[];
+  late final GlobalKey<FormState> _formKey;
 
   @override
   void initState() {
     super.initState();
-    _focusNode = FocusScope.of(context, createDependency: false);
-    _formKey = GlobalKey<FormState>();
+    _purchaseNoteCostCubit = context.read<PurchaseNoteCostCubit>();
     _shippingFeeController = TextEditingController();
-    _warehouseCubit = context.read<WarehouseCubit>();
+    _formKey = GlobalKey<FormState>();
   }
 
   @override
@@ -44,117 +41,102 @@ class _AddShippingFeePageState extends State<AddShippingFeePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Tambah Ongkos Kirim'),
-      ),
-      body: Form(
-        key: _formKey,
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: <Widget>[
-            TextFormField(
-              onTapOutside: (event) => _focusNode.unfocus(),
-              autovalidateMode: AutovalidateMode.onUserInteraction,
-              controller: _shippingFeeController,
-              decoration: const InputDecoration(
-                labelText: 'Harga Ongkos Kirim',
-                prefixText: 'Rp. ',
-              ),
-              keyboardType: TextInputType.number,
-              validator: nullValidator,
-            ),
-            const SizedBox(height: 24),
-            TextFormField(
-              onTap: () => showModalBottomSheet(
-                builder: (context) => PurchaseNoteDropdown(
-                  onTap: (purchaseNote) {
-                    final isSelected = _selectedPurchaseNote
-                        .any((e) => e.key == purchaseNote.key);
-                    if (isSelected) {
-                      const message = 'Nota sudah dipilih';
-                      return TopSnackbar.dangerSnackbar(message: message);
-                    }
+    final purchaseNotes = context
+        .select<PurchaseNoteCostCubit, List<DropdownEntity>>(
+          (cubit) => cubit.state.purchaseNotes,
+        );
 
-                    setState(() => _selectedPurchaseNote.add(purchaseNote));
-                    context.pop();
-                  },
+    return GestureDetector(
+      onTap: FocusScope.of(context).unfocus,
+      child: Scaffold(
+        appBar: AppBar(title: const Text('Tambah Ongkos Kirim')),
+        body: Form(
+          key: _formKey,
+          child: ListView(
+            padding: const EdgeInsets.all(16),
+            children: <Widget>[
+              TextFormField(
+                onChanged: (value) =>
+                    _purchaseNoteCostCubit.shippingFee = int.parse(value),
+                autovalidateMode: .onUserInteraction,
+                controller: _shippingFeeController,
+                decoration: const InputDecoration(
+                  labelText: 'Harga Ongkos Kirim',
+                  prefixText: 'Rp. ',
                 ),
-                constraints: const BoxConstraints(minHeight: 400),
-                context: context,
-                isScrollControlled: true,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                keyboardType: .number,
+                validator: Validator.nullValidator,
               ),
-              onTapOutside: (event) => _focusNode.unfocus(),
-              decoration: InputDecoration(
-                hintText: 'Pilih Nota',
-                suffixIcon: const Icon(Icons.arrow_drop_down),
-              ),
-              readOnly: true,
-            ),
-            if (_selectedPurchaseNote.isNotEmpty) ...[
-              const SizedBox(height: 24),
-              const Divider(),
-              const SizedBox(height: 24),
-              ListView.separated(
-                itemBuilder: (context, index) => SelectedPurchaseNoteItem(
-                  onDelete: () =>
-                      setState(() => _selectedPurchaseNote.removeAt(index)),
-                  title: _selectedPurchaseNote[index].value,
+              const Gap(24),
+              TextFormField(
+                onTap: () => showModalBottomSheet(
+                  builder: (context) => PurchaseNoteDropdown(
+                    onTap: (purchaseNote) {
+                      _purchaseNoteCostCubit.addPurchaseNote(purchaseNote);
+                      context.pop();
+                    },
+                  ),
+                  context: context,
+                  isScrollControlled: true,
                 ),
-                separatorBuilder: (context, index) =>
-                    const SizedBox(height: 12),
-                itemCount: _selectedPurchaseNote.length,
-                physics: const NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
+                decoration: const InputDecoration(
+                  hintText: 'Pilih Nota',
+                  suffixIcon: Icon(Icons.arrow_drop_down),
+                ),
+                readOnly: true,
               ),
+              if (purchaseNotes.isNotEmpty) ...[
+                const Gap(24),
+                const Divider(height: 1),
+                const Gap(24),
+                ListView.separated(
+                  itemBuilder: (context, index) => SelectedPurchaseNoteItem(
+                    onDelete: () =>
+                        _purchaseNoteCostCubit.removePurchaseNoteAt(index),
+                    title: purchaseNotes[index].value,
+                  ),
+                  separatorBuilder: (context, index) => const Gap(12),
+                  itemCount: purchaseNotes.length,
+                  physics: const NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                ),
+              ],
             ],
-          ],
+          ),
         ),
-      ),
-      floatingActionButton: FABContainer(
-        child: SizedBox(
-          width: double.infinity,
-          child: BlocConsumer<WarehouseCubit, WarehouseState>(
-            buildWhen: (previous, current) => current is InsertShippingFee,
-            listenWhen: (previous, current) => current is InsertShippingFee,
+        floatingActionButton: FABContainer(
+          child: BlocConsumer<PurchaseNoteCostCubit, PurchaseNoteCostState>(
             listener: (context, state) {
-              if (state is InsertShippingFeeLoaded) {
-                TopSnackbar.successSnackbar(message: state.message);
-                context.pop();
+              if (state.status == .success) {
+                TopSnackbar.successSnackbar(message: state.message!);
+                context.pop(true);
               }
 
-              if (state is InsertShippingFeeError) {
-                TopSnackbar.dangerSnackbar(message: state.message);
+              if (state.status == .failure) {
+                TopSnackbar.dangerSnackbar(message: state.failure!.message);
               }
             },
             builder: (context, state) {
-              if (state is InsertShippingFeeLoading) {
-                return const PrimaryButton(child: Text('Simpan'));
-              }
-
-              return PrimaryButton(
-                onPressed: () async {
+              final onPressed = switch (state.status) {
+                .inProgress => null,
+                _ => () async {
                   if (!_formKey.currentState!.validate()) return;
 
-                  if (_selectedPurchaseNote.isEmpty) {
-                    const message = 'Pilih minimal 1 nota';
-                    return TopSnackbar.dangerSnackbar(message: message);
-                  }
-
-                  _warehouseCubit.insertShippingFee(
-                    price: int.parse(_shippingFeeController.text),
-                    purchaseNoteIds:
-                        _selectedPurchaseNote.map((e) => e.key).toList(),
-                  );
+                  await _purchaseNoteCostCubit.addShippingFee();
                 },
+              };
+
+              return PrimaryButton(
+                onPressed: onPressed,
                 child: const Text('Simpan'),
               );
             },
           ),
         ),
+        floatingActionButtonLocation: .centerDocked,
+        resizeToAvoidBottomInset: false,
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      resizeToAvoidBottomInset: false,
     );
   }
 }

@@ -9,6 +9,7 @@ import '../../../../mocks/mocks.dart';
 
 void main() {
   late MockShipmentRemoteDataSource mockShipmentRemoteDataSource;
+  late MockFileService mockFileService;
   late ShipmentRepositoryImpl shipmentRepository;
 
   setUpAll(() {
@@ -25,8 +26,10 @@ void main() {
 
   setUp(() {
     mockShipmentRemoteDataSource = MockShipmentRemoteDataSource();
+    mockFileService = MockFileService();
     shipmentRepository = ShipmentRepositoryImpl(
       shipmentRemoteDataSource: mockShipmentRemoteDataSource,
+      fileService: mockFileService,
     );
   });
 
@@ -34,198 +37,225 @@ void main() {
     final params = tCreateShipmentReportParams;
     const resultMatcher = tCreateShipmentReportSuccess;
 
-    test('should return Right(String) when remote call is successful',
-        () async {
-      // arrange
-      when(() => mockShipmentRemoteDataSource.createShipmentReport(any()))
-          .thenAnswer((_) async => tCreateShipmentReportSuccess);
+    test(
+      'should return Right(String) when remote call is successful',
+      () async {
+        // arrange
+        when(
+          () => mockShipmentRemoteDataSource.createShipmentReport(any()),
+        ).thenAnswer((_) async => tCreateShipmentReportSuccess);
 
-      // act
-      final result = await shipmentRepository.createShipmentReport(params);
+        // act
+        final result = await shipmentRepository.createShipmentReport(params);
 
-      // assert
-      expect(result, const Right(resultMatcher));
-      verify(() => mockShipmentRemoteDataSource.createShipmentReport(params))
-          .called(1);
-      verifyNoMoreInteractions(mockShipmentRemoteDataSource);
-    });
+        // assert
+        expect(result, const Right(resultMatcher));
+        verify(
+          () => mockShipmentRemoteDataSource.createShipmentReport(params),
+        ).called(1);
+        verifyNoMoreInteractions(mockShipmentRemoteDataSource);
+      },
+    );
 
     test(
-        'should return Left(ServerFailure) when remote data source throws ServerException',
-        () async {
-      // arrange
-      when(() => mockShipmentRemoteDataSource.createShipmentReport(any()))
-          .thenThrow(tServerException);
+      'should return Left(ServerFailure) when remote data source throws ServerException',
+      () async {
+        // arrange
+        when(
+          () => mockShipmentRemoteDataSource.createShipmentReport(any()),
+        ).thenThrow(tServerException);
 
-      // act
-      final result = await shipmentRepository.createShipmentReport(params);
+        // act
+        final result = await shipmentRepository.createShipmentReport(params);
 
-      // assert
-      expect(result, const Left(tServerFailure));
-      verify(() => mockShipmentRemoteDataSource.createShipmentReport(params))
-          .called(1);
-      verifyNoMoreInteractions(mockShipmentRemoteDataSource);
-    });
+        // assert
+        expect(result, const Left(tServerFailure));
+        verify(
+          () => mockShipmentRemoteDataSource.createShipmentReport(params),
+        ).called(1);
+        verifyNoMoreInteractions(mockShipmentRemoteDataSource);
+      },
+    );
   });
 
   group('delete shipment repository test', () {
     const params = tDeleteShipmentParams;
     const resultMatcher = tDeleteShipmentSuccess;
 
-    test('should return Right(String) when remote call is successful',
-        () async {
-      // arrange
-      when(() => mockShipmentRemoteDataSource.deleteShipment(any()))
-          .thenAnswer((_) async => tDeleteShipmentSuccess);
+    test(
+      'should return Right(String) when remote call is successful',
+      () async {
+        // arrange
+        when(
+          () => mockShipmentRemoteDataSource.deleteShipment(any()),
+        ).thenAnswer((_) async => tDeleteShipmentSuccess);
 
-      // act
-      final result = await shipmentRepository.deleteShipment(params);
+        // act
+        final result = await shipmentRepository.deleteShipment(params);
 
-      // assert
-      expect(result, const Right(resultMatcher));
-      verify(() => mockShipmentRemoteDataSource.deleteShipment(params))
-          .called(1);
-      verifyNoMoreInteractions(mockShipmentRemoteDataSource);
-    });
+        // assert
+        expect(result, const Right(resultMatcher));
+        verify(
+          () => mockShipmentRemoteDataSource.deleteShipment(params),
+        ).called(1);
+        verifyNoMoreInteractions(mockShipmentRemoteDataSource);
+      },
+    );
 
     test(
-        'should return Left(ServerFailure) when remote data source throws ServerException',
-        () async {
-      // arrange
-      when(() => mockShipmentRemoteDataSource.deleteShipment(any()))
-          .thenThrow(tServerException);
+      'should return Left(ServerFailure) when remote data source throws ServerException',
+      () async {
+        // arrange
+        when(
+          () => mockShipmentRemoteDataSource.deleteShipment(any()),
+        ).thenThrow(tServerException);
 
-      // act
-      final result = await shipmentRepository.deleteShipment(params);
+        // act
+        final result = await shipmentRepository.deleteShipment(params);
 
-      // assert
-      expect(result, const Left(tServerFailure));
-      verify(() => mockShipmentRemoteDataSource.deleteShipment(params))
-          .called(1);
-      verifyNoMoreInteractions(mockShipmentRemoteDataSource);
-    });
+        // assert
+        expect(result, const Left(tServerFailure));
+        verify(
+          () => mockShipmentRemoteDataSource.deleteShipment(params),
+        ).called(1);
+        verifyNoMoreInteractions(mockShipmentRemoteDataSource);
+      },
+    );
   });
 
   group('download shipment report repository test', () {
-    final params = tDownloadShipmentReportParams;
+    const params = tDownloadShipmentReportParams;
     const resultMatcher = tDownloadShipmentReportSuccess;
 
-    test('should return Right(String) when remote call is successful',
-        () async {
-      // arrange
-      when(() => mockShipmentRemoteDataSource.downloadShipmentReport(any()))
-          .thenAnswer((_) async => tDownloadShipmentReportSuccess);
+    test(
+      'should return Right(String) when remote call is successful',
+      () async {
+        // arrange
+        when(
+          () => mockShipmentRemoteDataSource.downloadShipmentReport(any()),
+        ).thenAnswer((_) async => tDownloadShipmentReportSuccess);
 
-      // act
-      final result = await shipmentRepository.downloadShipmentReport(params);
+        // act
+        final result = await shipmentRepository.downloadShipmentReport(params);
 
-      // assert
-      expect(result, const Right(resultMatcher));
-      verify(() => mockShipmentRemoteDataSource.downloadShipmentReport(params))
-          .called(1);
-      verifyNoMoreInteractions(mockShipmentRemoteDataSource);
-    });
+        // assert
+        expect(result, const Right(resultMatcher));
+        verify(
+          () => mockShipmentRemoteDataSource.downloadShipmentReport(params),
+        ).called(1);
+        verifyNoMoreInteractions(mockShipmentRemoteDataSource);
+      },
+    );
 
     test(
-        'should return Left(ServerFailure) when remote data source throws ServerException',
-        () async {
-      // arrange
-      when(() => mockShipmentRemoteDataSource.downloadShipmentReport(any()))
-          .thenThrow(tServerException);
+      'should return Left(ServerFailure) when remote data source throws ServerException',
+      () async {
+        // arrange
+        when(
+          () => mockShipmentRemoteDataSource.downloadShipmentReport(any()),
+        ).thenThrow(tServerException);
 
-      // act
-      final result = await shipmentRepository.downloadShipmentReport(params);
+        // act
+        final result = await shipmentRepository.downloadShipmentReport(params);
 
-      // assert
-      expect(result, const Left(tServerFailure));
-      verify(() => mockShipmentRemoteDataSource.downloadShipmentReport(params))
-          .called(1);
-      verifyNoMoreInteractions(mockShipmentRemoteDataSource);
-    });
+        // assert
+        expect(result, const Left(tServerFailure));
+        verify(
+          () => mockShipmentRemoteDataSource.downloadShipmentReport(params),
+        ).called(1);
+        verifyNoMoreInteractions(mockShipmentRemoteDataSource);
+      },
+    );
   });
 
-  group('fetch shipment by id repository test', () {
+  group('fetch shipment repository test', () {
     const params = tFetchShipmentParams;
     final resultMatcher = tFetchShipmentSuccess;
 
     test(
-        'should return Right(ShipmentDetailEntity) when remote call is successful',
-        () async {
-      // arrange
-      when(() => mockShipmentRemoteDataSource.fetchShipmentById(any()))
-          .thenAnswer((_) async => tFetchShipmentSuccess);
+      'should return Right(ShipmentDetailEntity) when remote call is successful',
+      () async {
+        // arrange
+        when(
+          () => mockShipmentRemoteDataSource.fetchShipment(any()),
+        ).thenAnswer((_) async => tFetchShipmentSuccess);
 
-      // act
-      final result = await shipmentRepository.fetchShipmentById(params);
+        // act
+        final result = await shipmentRepository.fetchShipment(params);
 
-      // assert
-      expect(result, Right(resultMatcher));
-      verify(() => mockShipmentRemoteDataSource.fetchShipmentById(params))
-          .called(1);
-      verifyNoMoreInteractions(mockShipmentRemoteDataSource);
-    });
+        // assert
+        expect(result, Right(resultMatcher));
+        verify(
+          () => mockShipmentRemoteDataSource.fetchShipment(params),
+        ).called(1);
+        verifyNoMoreInteractions(mockShipmentRemoteDataSource);
+      },
+    );
 
     test(
-        'should return Left(ServerFailure) when remote data source throws ServerException',
-        () async {
-      // arrange
-      when(() => mockShipmentRemoteDataSource.fetchShipmentById(any()))
-          .thenThrow(tServerException);
+      'should return Left(ServerFailure) when remote data source throws ServerException',
+      () async {
+        // arrange
+        when(
+          () => mockShipmentRemoteDataSource.fetchShipment(any()),
+        ).thenThrow(tServerException);
 
-      // act
-      final result = await shipmentRepository.fetchShipmentById(params);
+        // act
+        final result = await shipmentRepository.fetchShipment(params);
 
-      // assert
-      expect(result, const Left(tServerFailure));
-      verify(() => mockShipmentRemoteDataSource.fetchShipmentById(params))
-          .called(1);
-      verifyNoMoreInteractions(mockShipmentRemoteDataSource);
-    });
+        // assert
+        expect(result, const Left(tServerFailure));
+        verify(
+          () => mockShipmentRemoteDataSource.fetchShipment(params),
+        ).called(1);
+        verifyNoMoreInteractions(mockShipmentRemoteDataSource);
+      },
+    );
   });
 
-  group('fetch shipment by receipt number repository test', () {
+  group('fetch shipment status repository test', () {
     const params = tFetchShipmentHistoryParams;
     final resultMatcher = tFetchShipmentHistorySuccess;
 
     test(
-        'should return Right(ShipmentHistoryEntity) when remote call is successful',
-        () async {
-      // arrange
-      when(() =>
-              mockShipmentRemoteDataSource.fetchShipmentByReceiptNumber(any()))
-          .thenAnswer((_) async => tFetchShipmentHistorySuccess);
+      'should return Right(ShipmentHistoryEntity) when remote call is successful',
+      () async {
+        // arrange
+        when(
+          () => mockShipmentRemoteDataSource.fetchShipmentStatus(any()),
+        ).thenAnswer((_) async => tFetchShipmentHistorySuccess);
 
-      // act
-      final result =
-          await shipmentRepository.fetchShipmentByReceiptNumber(params);
+        // act
+        final result = await shipmentRepository.fetchShipmentStatus(params);
 
-      // assert
-      expect(result, Right(resultMatcher));
-      verify(() =>
-              mockShipmentRemoteDataSource.fetchShipmentByReceiptNumber(params))
-          .called(1);
-      verifyNoMoreInteractions(mockShipmentRemoteDataSource);
-    });
+        // assert
+        expect(result, Right(resultMatcher));
+        verify(
+          () => mockShipmentRemoteDataSource.fetchShipmentStatus(params),
+        ).called(1);
+        verifyNoMoreInteractions(mockShipmentRemoteDataSource);
+      },
+    );
 
     test(
-        'should return Left(ServerFailure) when remote data source throws ServerException',
-        () async {
-      // arrange
-      when(() =>
-              mockShipmentRemoteDataSource.fetchShipmentByReceiptNumber(any()))
-          .thenThrow(tServerException);
+      'should return Left(ServerFailure) when remote data source throws ServerException',
+      () async {
+        // arrange
+        when(
+          () => mockShipmentRemoteDataSource.fetchShipmentStatus(any()),
+        ).thenThrow(tServerException);
 
-      // act
-      final result =
-          await shipmentRepository.fetchShipmentByReceiptNumber(params);
+        // act
+        final result = await shipmentRepository.fetchShipmentStatus(params);
 
-      // assert
-      expect(result, const Left(tServerFailure));
-      verify(() =>
-              mockShipmentRemoteDataSource.fetchShipmentByReceiptNumber(params))
-          .called(1);
-      verifyNoMoreInteractions(mockShipmentRemoteDataSource);
-    });
+        // assert
+        expect(result, const Left(tServerFailure));
+        verify(
+          () => mockShipmentRemoteDataSource.fetchShipmentStatus(params),
+        ).called(1);
+        verifyNoMoreInteractions(mockShipmentRemoteDataSource);
+      },
+    );
   });
 
   group('fetch shipment reports repository test', () {
@@ -233,38 +263,44 @@ void main() {
     final resultMatcher = tFetchShipmentReportsSuccess;
 
     test(
-        'should return Right(List<ShipmentReportEntity>) when remote call is successful',
-        () async {
-      // arrange
-      when(() => mockShipmentRemoteDataSource.fetchShipmentReports(any()))
-          .thenAnswer((_) async => tFetchShipmentReportsSuccess);
+      'should return Right(List<ShipmentReportEntity>) when remote call is successful',
+      () async {
+        // arrange
+        when(
+          () => mockShipmentRemoteDataSource.fetchShipmentReports(any()),
+        ).thenAnswer((_) async => tFetchShipmentReportsSuccess);
 
-      // act
-      final result = await shipmentRepository.fetchShipmentReports(params);
+        // act
+        final result = await shipmentRepository.fetchShipmentReports(params);
 
-      // assert
-      expect(result, Right(resultMatcher));
-      verify(() => mockShipmentRemoteDataSource.fetchShipmentReports(params))
-          .called(1);
-      verifyNoMoreInteractions(mockShipmentRemoteDataSource);
-    });
+        // assert
+        expect(result, Right(resultMatcher));
+        verify(
+          () => mockShipmentRemoteDataSource.fetchShipmentReports(params),
+        ).called(1);
+        verifyNoMoreInteractions(mockShipmentRemoteDataSource);
+      },
+    );
 
     test(
-        'should return Left(ServerFailure) when remote data source throws ServerException',
-        () async {
-      // arrange
-      when(() => mockShipmentRemoteDataSource.fetchShipmentReports(any()))
-          .thenThrow(tServerException);
+      'should return Left(ServerFailure) when remote data source throws ServerException',
+      () async {
+        // arrange
+        when(
+          () => mockShipmentRemoteDataSource.fetchShipmentReports(any()),
+        ).thenThrow(tServerException);
 
-      // act
-      final result = await shipmentRepository.fetchShipmentReports(params);
+        // act
+        final result = await shipmentRepository.fetchShipmentReports(params);
 
-      // assert
-      expect(result, const Left(tServerFailure));
-      verify(() => mockShipmentRemoteDataSource.fetchShipmentReports(params))
-          .called(1);
-      verifyNoMoreInteractions(mockShipmentRemoteDataSource);
-    });
+        // assert
+        expect(result, const Left(tServerFailure));
+        verify(
+          () => mockShipmentRemoteDataSource.fetchShipmentReports(params),
+        ).called(1);
+        verifyNoMoreInteractions(mockShipmentRemoteDataSource);
+      },
+    );
   });
 
   group('fetch shipments repository test', () {
@@ -272,113 +308,174 @@ void main() {
     final resultMatcher = tFetchShipmentsSuccess;
 
     test(
-        'should return Right(List<ShipmentEntity>) when remote call is successful',
-        () async {
-      // arrange
-      when(() => mockShipmentRemoteDataSource.fetchShipments(any()))
-          .thenAnswer((_) async => tFetchShipmentsSuccess);
+      'should return Right(List<ShipmentEntity>) when remote call is successful',
+      () async {
+        // arrange
+        when(
+          () => mockShipmentRemoteDataSource.fetchShipments(any()),
+        ).thenAnswer((_) async => tFetchShipmentsSuccess);
 
-      // act
-      final result = await shipmentRepository.fetchShipments(params);
+        // act
+        final result = await shipmentRepository.fetchShipments(params);
 
-      // assert
-      expect(result, Right(resultMatcher));
-      verify(() => mockShipmentRemoteDataSource.fetchShipments(params))
-          .called(1);
-      verifyNoMoreInteractions(mockShipmentRemoteDataSource);
-    });
+        // assert
+        expect(result, Right(resultMatcher));
+        verify(
+          () => mockShipmentRemoteDataSource.fetchShipments(params),
+        ).called(1);
+        verifyNoMoreInteractions(mockShipmentRemoteDataSource);
+      },
+    );
 
     test(
-        'should return Left(ServerFailure) when remote data source throws ServerException',
-        () async {
-      // arrange
-      when(() => mockShipmentRemoteDataSource.fetchShipments(any()))
-          .thenThrow(tServerException);
+      'should return Left(ServerFailure) when remote data source throws ServerException',
+      () async {
+        // arrange
+        when(
+          () => mockShipmentRemoteDataSource.fetchShipments(any()),
+        ).thenThrow(tServerException);
 
-      // act
-      final result = await shipmentRepository.fetchShipments(params);
+        // act
+        final result = await shipmentRepository.fetchShipments(params);
 
-      // assert
-      expect(result, const Left(tServerFailure));
-      verify(() => mockShipmentRemoteDataSource.fetchShipments(params))
-          .called(1);
-      verifyNoMoreInteractions(mockShipmentRemoteDataSource);
-    });
+        // assert
+        expect(result, const Left(tServerFailure));
+        verify(
+          () => mockShipmentRemoteDataSource.fetchShipments(params),
+        ).called(1);
+        verifyNoMoreInteractions(mockShipmentRemoteDataSource);
+      },
+    );
   });
 
-  group('insert shipment repository test', () {
+  group('create shipment repository test', () {
     const params = tCreateShipmentParams;
     const resultMatcher = tCreateShipmentSuccess;
 
-    test('should return Right(String) when remote call is successful',
-        () async {
-      // arrange
-      when(() => mockShipmentRemoteDataSource.insertShipment(any()))
-          .thenAnswer((_) async => tCreateShipmentSuccess);
+    test(
+      'should return Right(String) when remote call is successful',
+      () async {
+        // arrange
+        when(
+          () => mockShipmentRemoteDataSource.createShipment(any()),
+        ).thenAnswer((_) async => tCreateShipmentSuccess);
 
-      // act
-      final result = await shipmentRepository.insertShipment(params);
+        // act
+        final result = await shipmentRepository.createShipment(params);
 
-      // assert
-      expect(result, const Right(resultMatcher));
-      verify(() => mockShipmentRemoteDataSource.insertShipment(params))
-          .called(1);
-      verifyNoMoreInteractions(mockShipmentRemoteDataSource);
-    });
+        // assert
+        expect(result, const Right(resultMatcher));
+        verify(
+          () => mockShipmentRemoteDataSource.createShipment(params),
+        ).called(1);
+        verifyNoMoreInteractions(mockShipmentRemoteDataSource);
+      },
+    );
 
     test(
-        'should return Left(ServerFailure) when remote data source throws ServerException',
-        () async {
-      // arrange
-      when(() => mockShipmentRemoteDataSource.insertShipment(any()))
-          .thenThrow(tServerException);
+      'should return Left(ServerFailure) when remote data source throws ServerException',
+      () async {
+        // arrange
+        when(
+          () => mockShipmentRemoteDataSource.createShipment(any()),
+        ).thenThrow(tServerException);
 
-      // act
-      final result = await shipmentRepository.insertShipment(params);
+        // act
+        final result = await shipmentRepository.createShipment(params);
 
-      // assert
-      expect(result, const Left(tServerFailure));
-      verify(() => mockShipmentRemoteDataSource.insertShipment(params))
-          .called(1);
-      verifyNoMoreInteractions(mockShipmentRemoteDataSource);
-    });
+        // assert
+        expect(result, const Left(tServerFailure));
+        verify(
+          () => mockShipmentRemoteDataSource.createShipment(params),
+        ).called(1);
+        verifyNoMoreInteractions(mockShipmentRemoteDataSource);
+      },
+    );
   });
 
-  group('insert shipment document repository test', () {
+  group('update shipment document repository test', () {
     const params = tUpdateShipmentDocumentParams;
     const resultMatcher = tUpdateShipmentDocumentSuccess;
 
-    test('should return Right(String) when remote call is successful',
-        () async {
+    test(
+      'should return Right(String) when remote call is successful',
+      () async {
+        // arrange
+        when(
+          () => mockShipmentRemoteDataSource.updateShipmentDocument(any()),
+        ).thenAnswer((_) async => tUpdateShipmentDocumentSuccess);
+
+        // act
+        final result = await shipmentRepository.updateShipmentDocument(params);
+
+        // assert
+        expect(result, const Right(resultMatcher));
+        verify(
+          () => mockShipmentRemoteDataSource.updateShipmentDocument(params),
+        ).called(1);
+        verifyNoMoreInteractions(mockShipmentRemoteDataSource);
+      },
+    );
+
+    test(
+      'should return Left(ServerFailure) when remote data source throws ServerException',
+      () async {
+        // arrange
+        when(
+          () => mockShipmentRemoteDataSource.updateShipmentDocument(any()),
+        ).thenThrow(tServerException);
+
+        // act
+        final result = await shipmentRepository.updateShipmentDocument(params);
+
+        // assert
+        expect(result, const Left(tServerFailure));
+        verify(
+          () => mockShipmentRemoteDataSource.updateShipmentDocument(params),
+        ).called(1);
+        verifyNoMoreInteractions(mockShipmentRemoteDataSource);
+      },
+    );
+  });
+
+  group('check shipment report existence repository test', () {
+    const params = tCheckShipmentExistenceParams;
+    const resultMatcher = tCheckShipmentExistenceSuccess;
+
+    test('should return Right(bool) when file service is successful', () async {
       // arrange
-      when(() => mockShipmentRemoteDataSource.insertShipmentDocument(any()))
-          .thenAnswer((_) async => tUpdateShipmentDocumentSuccess);
+      when(
+        () => mockFileService.isFileExist(params.filename),
+      ).thenAnswer((_) async => tCheckShipmentExistenceSuccess);
 
       // act
-      final result = await shipmentRepository.insertShipmentDocument(params);
+      final result = await shipmentRepository.checkShipmentReportExistence(
+        params,
+      );
 
       // assert
       expect(result, const Right(resultMatcher));
-      verify(() => mockShipmentRemoteDataSource.insertShipmentDocument(params))
-          .called(1);
-      verifyNoMoreInteractions(mockShipmentRemoteDataSource);
+      verify(() => mockFileService.isFileExist(params.filename)).called(1);
+      verifyNoMoreInteractions(mockFileService);
     });
 
     test(
-        'should return Left(ServerFailure) when remote data source throws ServerException',
-        () async {
-      // arrange
-      when(() => mockShipmentRemoteDataSource.insertShipmentDocument(any()))
-          .thenThrow(tServerException);
+      'should return Left(Failure) when file service throws Exception',
+      () async {
+        // arrange
+        when(
+          () => mockFileService.isFileExist(any()),
+        ).thenThrow(tInternalException);
 
-      // act
-      final result = await shipmentRepository.insertShipmentDocument(params);
-
-      // assert
-      expect(result, const Left(tServerFailure));
-      verify(() => mockShipmentRemoteDataSource.insertShipmentDocument(params))
-          .called(1);
-      verifyNoMoreInteractions(mockShipmentRemoteDataSource);
-    });
+        // act
+        final result = await shipmentRepository.checkShipmentReportExistence(
+          params,
+        );
+        // assert
+        expect(result, const Left(tFailure));
+        verify(() => mockFileService.isFileExist(params.filename)).called(1);
+        verifyNoMoreInteractions(mockFileService);
+      },
+    );
   });
 }

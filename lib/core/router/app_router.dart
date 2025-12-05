@@ -1,34 +1,48 @@
 import 'package:flutter/widgets.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/auth/presentation/cubit/sign_in/sign_in_cubit.dart';
 import '../../features/auth/presentation/pages/profile_page.dart';
 import '../../features/auth/presentation/pages/sign_in_page.dart';
 import '../../features/home_page.dart';
 import '../../features/staff_management_page.dart';
+import '../../features/supplier/presentation/cubit/create_supplier/create_supplier_cubit.dart';
+import '../../features/supplier/presentation/cubit/supplier/supplier_cubit.dart';
+import '../../features/supplier/presentation/cubit/supplier_detail/supplier_detail_cubit.dart';
+import '../../features/supplier/presentation/cubit/update_supplier/update_supplier_cubit.dart';
 import '../../features/supplier/presentation/pages/add_supplier_page.dart';
 import '../../features/supplier/presentation/pages/edit_supplier_page.dart';
 import '../../features/supplier/presentation/pages/supplier_detail_page.dart';
 import '../../features/supplier/presentation/pages/supplier_page.dart';
-import '../../features/tracker/presentation/pages/cancel_page.dart';
-import '../../features/tracker/presentation/pages/check_page.dart';
-import '../../features/tracker/presentation/pages/pack_page.dart';
-import '../../features/tracker/presentation/pages/pick_up_page.dart';
+import '../../features/tracker/presentation/cubit/shipment_detail/shipment_detail_cubit.dart';
+import '../../features/tracker/presentation/cubit/shipment_list/shipment_list_cubit.dart';
+import '../../features/tracker/presentation/cubit/shipment_report/shipment_report_cubit.dart';
 import '../../features/tracker/presentation/pages/receipt_status_page.dart';
 import '../../features/tracker/presentation/pages/report_page.dart';
-import '../../features/tracker/presentation/pages/return_page.dart';
-import '../../features/tracker/presentation/pages/scan_page.dart';
-import '../../features/tracker/presentation/pages/send_page.dart';
 import '../../features/tracker/presentation/pages/shipment_detail_page.dart';
+import '../../features/tracker/presentation/pages/stages/cancel_page.dart';
+import '../../features/tracker/presentation/pages/stages/check_page.dart';
+import '../../features/tracker/presentation/pages/stages/pack_page.dart';
+import '../../features/tracker/presentation/pages/stages/pick_up_page.dart';
+import '../../features/tracker/presentation/pages/stages/return_page.dart';
+import '../../features/tracker/presentation/pages/stages/scan_page.dart';
+import '../../features/tracker/presentation/pages/stages/send_page.dart';
 import '../../features/tracker/presentation/pages/tracker_page.dart';
-import '../../features/tracker/presentation/pages/upload_page.dart';
-import '../../features/warehouse/presentation/pages/add_purchase_note_file_page.dart';
-import '../../features/warehouse/presentation/pages/add_purchase_note_manual_page.dart';
+import '../../features/tracker/presentation/pages/update_shipment_document_page.dart';
+import '../../features/warehouse/presentation/cubit/import_purchase_note/import_purchase_note_cubit.dart';
+import '../../features/warehouse/presentation/cubit/purchase_note_cost/purchase_note_cost_cubit.dart';
+import '../../features/warehouse/presentation/cubit/purchase_note_detail/purchase_note_detail_cubit.dart';
+import '../../features/warehouse/presentation/cubit/purchase_note_form/purchase_note_form_cubit.dart';
+import '../../features/warehouse/presentation/cubit/purchase_note_list/purchase_note_list_cubit.dart';
 import '../../features/warehouse/presentation/pages/add_shipping_fee_page.dart';
+import '../../features/warehouse/presentation/pages/create_purchase_note_page.dart';
+import '../../features/warehouse/presentation/pages/import_purchase_note_page.dart';
 import '../../features/warehouse/presentation/pages/purchase_note_detail_page.dart';
 import '../../features/warehouse/presentation/pages/warehouse_page.dart';
-import '../common/constants.dart';
+import '../../service_container.dart';
 import '../presentation/pages/splash_page.dart';
-import '../widgets/scaffold_with_bottom_navigation_bar.dart';
+import '../presentation/widgets/scaffold_with_bottom_navigation_bar.dart';
 import 'route_names.dart';
 
 FadeTransition transition(Animation<double> animation, Widget child) =>
@@ -57,30 +71,10 @@ class AppRouter {
     initialLocation: '/splash',
     routes: [
       GoRoute(path: '/splash', builder: (context, state) => const SplashPage()),
-      GoRoute(
-        path: loginRoute,
+      _buildRouteWithCubit<SignInCubit>(
+        path: '/login',
         name: Routes.login,
-        pageBuilder: (context, state) => CustomTransitionPage(
-          key: state.pageKey,
-          child: const SignInPage(),
-          transitionsBuilder: transitionsBuilder,
-        ),
-      ),
-      GoRoute(
-        path: displayPictureRoute,
-        pageBuilder: (context, state) {
-          final params = state.extra as Map<String, dynamic>;
-
-          return CustomTransitionPage(
-            key: state.pageKey,
-            child: UploadPage(
-              imagePath: '${params['image_path']}',
-              shipmentId: '${params['shipment_id']}',
-              stage: '${params['stage']}',
-            ),
-            transitionsBuilder: transitionsBuilder,
-          );
-        },
+        child: (state) => const SignInPage(),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) =>
@@ -90,122 +84,181 @@ class AppRouter {
             navigatorKey: _homeNavigatorKey,
             routes: <RouteBase>[
               GoRoute(
-                path: homeRoute,
+                path: '/home',
                 name: Routes.home,
                 builder: (context, state) => const HomePage(),
                 routes: <RouteBase>[
+                  // Tracker
                   GoRoute(
                     path: 'tracker',
                     name: Routes.tracker,
                     builder: (context, state) => const TrackerPage(),
                     routes: <RouteBase>[
-                      GoRoute(
+                      _buildRouteWithCubit<ShipmentListCubit>(
                         path: 'scan',
                         name: Routes.trackerScan,
-                        builder: (context, state) => const ScanPage(),
+                        child: (state) => const ScanPage(),
                       ),
-                      GoRoute(
+                      _buildRouteWithCubit<ShipmentListCubit>(
                         path: 'pick-up',
                         name: Routes.trackerPickUp,
-                        builder: (context, state) => const PickUpPage(),
+                        child: (state) => const PickUpPage(),
                       ),
-                      GoRoute(
+                      _buildRouteWithCubit<ShipmentListCubit>(
                         path: 'check',
                         name: Routes.trackerCheck,
-                        builder: (context, state) => const CheckPage(),
+                        child: (state) => const CheckPage(),
                       ),
-                      GoRoute(
+                      _buildRouteWithCubit<ShipmentListCubit>(
                         path: 'pack',
                         name: Routes.trackerPack,
-                        builder: (context, state) => const PackPage(),
+                        child: (state) => const PackPage(),
                       ),
-                      GoRoute(
+                      _buildRouteWithCubit<ShipmentListCubit>(
                         path: 'send',
                         name: Routes.trackerSend,
-                        builder: (context, state) => const SendPage(),
+                        child: (state) => const SendPage(),
                       ),
-                      GoRoute(
+                      _buildRouteWithCubit<ShipmentListCubit>(
                         path: 'return',
                         name: Routes.trackerReturn,
-                        builder: (context, state) => const ReturnPage(),
+                        child: (state) => const ReturnPage(),
                       ),
-                      GoRoute(
+                      _buildRouteWithCubit<ShipmentListCubit>(
                         path: 'cancel',
                         name: Routes.trackerCancel,
-                        builder: (context, state) => const CancelPage(),
+                        child: (state) => const CancelPage(),
                       ),
-                      GoRoute(
+                      _buildRouteWithCubit<ShipmentReportCubit>(
                         path: 'report',
                         name: Routes.trackerReport,
-                        builder: (context, state) => const ReportPage(),
+                        child: (state) => const ReportPage(),
                       ),
-                      GoRoute(
+                      _buildRouteWithCubit<ShipmentDetailCubit>(
                         path: 'status',
                         name: Routes.trackerStatus,
-                        builder: (context, state) => const ReceiptStatusPage(),
+                        child: (state) => const ReceiptStatusPage(),
                       ),
-                      GoRoute(
+                      _buildRouteWithCubit<ShipmentDetailCubit>(
                         path: 'detail',
                         name: Routes.trackerDetail,
-                        builder: (context, state) => ShipmentDetailPage(
+                        child: (state) => ShipmentDetailPage(
                           shipmentId: state.extra as String,
                         ),
                       ),
+                      GoRoute(
+                        path: '/picked-document',
+                        name: Routes.trackerPickedDocument,
+                        builder: (context, state) {
+                          final extras = state.extra as Map<String, dynamic>;
+                          final imagePath = extras['image_path'] as String;
+                          final shipmentId = extras['shipment_id'] as String;
+                          final stage = extras['stage'] as String;
+                          final cubit = extras['cubit'] as ShipmentDetailCubit;
+
+                          return BlocProvider.value(
+                            value: cubit,
+                            child: UpdateShipmentDocumentPage(
+                              imagePath: imagePath,
+                              shipmentId: shipmentId,
+                              stage: stage,
+                            ),
+                          );
+                        },
+                      ),
                     ],
                   ),
+                  // Supplier
                   GoRoute(
                     path: 'supplier',
                     name: Routes.supplier,
-                    builder: (context, state) => const SupplierPage(),
+                    builder: (context, state) => BlocProvider(
+                      create: (context) => getIt<SupplierCubit>(),
+                      child: const SupplierPage(),
+                    ),
                     routes: <RouteBase>[
-                      GoRoute(
+                      _buildRouteWithCubit<SupplierDetailCubit>(
                         path: 'detail',
                         name: Routes.supplierDetail,
-                        builder: (context, state) => SupplierDetailPage(
+                        child: (state) => SupplierDetailPage(
                           supplierId: state.extra as String,
                         ),
                       ),
-                      GoRoute(
+                      _buildRouteWithCubit<CreateSupplierCubit>(
                         path: 'add',
                         name: Routes.supplierAdd,
-                        builder: (context, state) => const AddSupplierPage(),
+                        child: (state) => const AddSupplierPage(),
                       ),
                       GoRoute(
                         path: 'edit',
                         name: Routes.supplierEdit,
-                        builder: (context, state) =>
-                            EditSupplierPage(supplierId: state.extra as String),
+                        builder: (context, state) {
+                          final supplierId = state.extra as String;
+
+                          return MultiBlocProvider(
+                            providers: [
+                              BlocProvider(
+                                create: (context) =>
+                                    getIt<SupplierDetailCubit>()
+                                      ..fetchSupplier(supplierId: supplierId),
+                              ),
+                              BlocProvider(
+                                create: (context) =>
+                                    getIt<UpdateSupplierCubit>(),
+                              ),
+                            ],
+                            child: EditSupplierPage(supplierId: supplierId),
+                          );
+                        },
                       ),
                     ],
                   ),
-                  GoRoute(
+                  _buildRouteWithCubit<PurchaseNoteListCubit>(
                     path: 'warehouse',
                     name: Routes.warehouse,
-                    builder: (context, state) => const WarehousePage(),
+                    child: (state) => const WarehousePage(),
                     routes: <RouteBase>[
                       GoRoute(
                         path: 'detail',
                         name: Routes.warehouseDetail,
-                        builder: (context, state) => PurchaseNoteDetailPage(
-                          purchaseNoteId: state.extra as String,
-                        ),
+                        builder: (context, state) {
+                          final purchaseNoteId = state.extra as String;
+
+                          return MultiBlocProvider(
+                            providers: [
+                              BlocProvider(
+                                create: (context) =>
+                                    getIt<PurchaseNoteDetailCubit>(),
+                              ),
+                              BlocProvider(
+                                create: (context) =>
+                                    getIt<PurchaseNoteFormCubit>(),
+                              ),
+                              BlocProvider(
+                                create: (context) =>
+                                    getIt<PurchaseNoteCostCubit>(),
+                              ),
+                            ],
+                            child: PurchaseNoteDetailPage(
+                              purchaseNoteId: purchaseNoteId,
+                            ),
+                          );
+                        },
                       ),
-                      GoRoute(
-                        path: 'add-purchase-note-manual',
-                        name: Routes.warehouseAddPurchaseNoteManual,
-                        builder: (context, state) =>
-                            const AddPurchaseNoteManualPage(),
+                      _buildRouteWithCubit<PurchaseNoteFormCubit>(
+                        path: 'create-purchase-note',
+                        name: Routes.warehouseCreatePurchaseNote,
+                        child: (state) => const CreatePurchaseNotePage(),
                       ),
-                      GoRoute(
-                        path: 'add-purchase-note-file',
+                      _buildRouteWithCubit<ImportPurchaseNoteCubit>(
+                        path: 'import-purchase-note',
                         name: Routes.warehouseAddPurchaseNoteFile,
-                        builder: (context, state) =>
-                            const AddPurchaseNoteFilePage(),
+                        child: (state) => const ImportPurchaseNotePage(),
                       ),
-                      GoRoute(
+                      _buildRouteWithCubit<PurchaseNoteCostCubit>(
                         path: 'add-shipping-fee',
                         name: Routes.warehouseAddShippingFee,
-                        builder: (context, state) => const AddShippingFeePage(),
+                        child: (state) => const AddShippingFeePage(),
                       ),
                     ],
                   ),
@@ -217,7 +270,7 @@ class AppRouter {
             navigatorKey: _staffManagementNavigatorKey,
             routes: <RouteBase>[
               GoRoute(
-                path: staffManagementRoute,
+                path: '/staff-management',
                 name: Routes.staffManagement,
                 builder: (context, state) => const StaffManagementPage(),
               ),
@@ -227,7 +280,7 @@ class AppRouter {
             navigatorKey: _profileNavigatorKey,
             routes: <RouteBase>[
               GoRoute(
-                path: profileRoute,
+                path: '/profile',
                 name: Routes.profile,
                 builder: (context, state) => const ProfilePage(),
               ),
@@ -237,4 +290,20 @@ class AppRouter {
       ),
     ],
   );
+
+  static GoRoute
+  _buildRouteWithCubit<T extends StateStreamableSource<Object?>>({
+    required String path,
+    required String name,
+    List<RouteBase> routes = const [],
+    required Widget Function(GoRouterState state) child,
+  }) {
+    return GoRoute(
+      path: path,
+      name: name,
+      builder: (context, state) =>
+          BlocProvider<T>(create: (context) => getIt<T>(), child: child(state)),
+      routes: routes,
+    );
+  }
 }

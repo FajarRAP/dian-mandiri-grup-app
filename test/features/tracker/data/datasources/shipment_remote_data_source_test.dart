@@ -6,7 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:ship_tracker/core/errors/exceptions.dart';
-import 'package:ship_tracker/core/helpers/helpers.dart';
+import 'package:ship_tracker/core/utils/extensions.dart';
 import 'package:ship_tracker/features/tracker/data/datasources/shipment_remote_data_source.dart';
 
 import '../../../../core/utils/fixture_reader.dart';
@@ -17,52 +17,68 @@ import '../../../../mocks/mocks.dart';
 void main() {
   const fixtureReader = FixtureReader(domain: 'tracker');
   late MockDio mockDio;
+  late MockFileService mockFileService;
   late ShipmentRemoteDataSourceImpl shipmentRemoteDataSource;
 
   setUp(() async {
     await initializeDateFormatting('id_ID', null);
     mockDio = MockDio();
-    shipmentRemoteDataSource = ShipmentRemoteDataSourceImpl(dio: mockDio);
+    mockFileService = MockFileService();
+    shipmentRemoteDataSource = ShipmentRemoteDataSourceImpl(
+      dio: mockDio,
+      fileService: mockFileService,
+    );
   });
 
   group('fetch shipments remote data sources test', () {
     final params = tFetchShipmentsParams;
     final resultMatcher = tFetchShipmentsSuccess;
 
-    test('should return List<ShipmentEntity> when request is successful',
-        () async {
-      // arrange
-      final jsonString = fixtureReader.dataSource('fetch_shipments.json');
-      final json = jsonDecode(jsonString);
-      when(() => mockDio.get(any(),
-          queryParameters: any(named: 'queryParameters'))).thenAnswer(
-        (_) async => Response(
-          requestOptions: RequestOptions(),
-          data: json,
-          statusCode: 200,
-        ),
-      );
+    test(
+      'should return List<ShipmentEntity> when request is successful',
+      () async {
+        // arrange
+        final jsonString = fixtureReader.dataSource('fetch_shipments.json');
+        final json = jsonDecode(jsonString);
+        when(
+          () => mockDio.get(
+            any(),
+            queryParameters: any(named: 'queryParameters'),
+          ),
+        ).thenAnswer(
+          (_) async => Response(
+            requestOptions: RequestOptions(),
+            data: json,
+            statusCode: 200,
+          ),
+        );
 
-      // act
-      final result = await shipmentRemoteDataSource.fetchShipments(params);
+        // act
+        final result = await shipmentRemoteDataSource.fetchShipments(params);
 
-      // assert
-      expect(result, resultMatcher);
-      verify(() => mockDio.get(
-            '/v1/shipment',
+        // assert
+        expect(result, resultMatcher);
+        verify(
+          () => mockDio.get(
+            '/shipment',
             queryParameters: {
               'date': params.date.toYMD,
               'stage': params.stage,
-              'search': params.keyword,
-              'page': params.page
+              'search': params.search.query,
+              'page': params.paginate.page,
+              'limit': params.paginate.limit,
             },
-          )).called(1);
-    });
+          ),
+        ).called(1);
+      },
+    );
 
     test('should throw ServerException when API returns 4xx/5xx', () async {
       // arrange
-      when(() => mockDio.get(any(),
-          queryParameters: any(named: 'queryParameters'))).thenThrow(
+      when(
+        () =>
+            mockDio.get(any(), queryParameters: any(named: 'queryParameters')),
+      ).thenThrow(
         DioException(
           requestOptions: RequestOptions(),
           error: tServerException,
@@ -75,42 +91,47 @@ void main() {
 
       // assert
       await expectLater(future, throwsA(isA<ServerException>()));
-      verify(() => mockDio.get(
-            '/v1/shipment',
-            queryParameters: {
-              'date': params.date.toYMD,
-              'stage': params.stage,
-              'search': params.keyword,
-              'page': params.page
-            },
-          )).called(1);
+      verify(
+        () => mockDio.get(
+          '/shipment',
+          queryParameters: {
+            'date': params.date.toYMD,
+            'stage': params.stage,
+            'search': params.search.query,
+            'page': params.paginate.page,
+            'limit': params.paginate.limit,
+          },
+        ),
+      ).called(1);
     });
   });
 
-  group('fetch shipment by id remote data sources test', () {
+  group('fetch shipment remote data sources test', () {
     const params = tFetchShipmentParams;
     final resultMatcher = tFetchShipmentSuccess;
 
-    test('should return ShipmentDetailEntity when request is successful',
-        () async {
-      // arrange
-      final jsonString = fixtureReader.dataSource('fetch_shipment.json');
-      final json = jsonDecode(jsonString);
-      when(() => mockDio.get(any())).thenAnswer(
-        (_) async => Response(
-          requestOptions: RequestOptions(),
-          data: json,
-          statusCode: 200,
-        ),
-      );
+    test(
+      'should return ShipmentDetailEntity when request is successful',
+      () async {
+        // arrange
+        final jsonString = fixtureReader.dataSource('fetch_shipment.json');
+        final json = jsonDecode(jsonString);
+        when(() => mockDio.get(any())).thenAnswer(
+          (_) async => Response(
+            requestOptions: RequestOptions(),
+            data: json,
+            statusCode: 200,
+          ),
+        );
 
-      // act
-      final result = await shipmentRemoteDataSource.fetchShipmentById(params);
+        // act
+        final result = await shipmentRemoteDataSource.fetchShipment(params);
 
-      // assert
-      expect(result, resultMatcher);
-      verify(() => mockDio.get('/v1/shipment/${params.shipmentId}')).called(1);
-    });
+        // assert
+        expect(result, resultMatcher);
+        verify(() => mockDio.get('/shipment/${params.shipmentId}')).called(1);
+      },
+    );
 
     test('should throw ServerException when API returns 4xx/5xx', () async {
       // arrange
@@ -123,41 +144,46 @@ void main() {
       );
 
       // act
-      final future = shipmentRemoteDataSource.fetchShipmentById(params);
+      final future = shipmentRemoteDataSource.fetchShipment(params);
 
       // assert
       await expectLater(future, throwsA(isA<ServerException>()));
-      verify(() => mockDio.get('/v1/shipment/${params.shipmentId}')).called(1);
+      verify(() => mockDio.get('/shipment/${params.shipmentId}')).called(1);
     });
   });
 
-  group('fetch shipment by receipt number remote data sources test', () {
+  group('fetch shipment status remote data sources test', () {
     const params = tFetchShipmentHistoryParams;
     final resultMatcher = tFetchShipmentHistorySuccess;
 
-    test('should return ShipmentHistoryEntity when request is successful',
-        () async {
-      // arrange
-      final jsonString =
-          fixtureReader.dataSource('fetch_shipment_history.json');
-      final json = jsonDecode(jsonString);
-      when(() => mockDio.get(any())).thenAnswer(
-        (_) async => Response(
-          requestOptions: RequestOptions(),
-          data: json,
-          statusCode: 200,
-        ),
-      );
+    test(
+      'should return ShipmentHistoryEntity when request is successful',
+      () async {
+        // arrange
+        final jsonString = fixtureReader.dataSource(
+          'fetch_shipment_history.json',
+        );
+        final json = jsonDecode(jsonString);
+        when(() => mockDio.get(any())).thenAnswer(
+          (_) async => Response(
+            requestOptions: RequestOptions(),
+            data: json,
+            statusCode: 200,
+          ),
+        );
 
-      // act
-      final result =
-          await shipmentRemoteDataSource.fetchShipmentByReceiptNumber(params);
+        // act
+        final result = await shipmentRemoteDataSource.fetchShipmentStatus(
+          params,
+        );
 
-      // assert
-      expect(result, resultMatcher);
-      verify(() => mockDio.get('/v1/shipment/status/${params.receiptNumber}'))
-          .called(1);
-    });
+        // assert
+        expect(result, resultMatcher);
+        verify(
+          () => mockDio.get('/shipment/status/${params.receiptNumber}'),
+        ).called(1);
+      },
+    );
 
     test('should throw ServerException when API returns 4xx/5xx', () async {
       // arrange
@@ -170,13 +196,13 @@ void main() {
       );
 
       // act
-      final future =
-          shipmentRemoteDataSource.fetchShipmentByReceiptNumber(params);
+      final future = shipmentRemoteDataSource.fetchShipmentStatus(params);
 
       // assert
       await expectLater(future, throwsA(isA<ServerException>()));
-      verify(() => mockDio.get('/v1/shipment/status/${params.receiptNumber}'))
-          .called(1);
+      verify(
+        () => mockDio.get('/shipment/status/${params.receiptNumber}'),
+      ).called(1);
     });
   });
 
@@ -184,42 +210,55 @@ void main() {
     final params = tFetchShipmentReportsParams;
     final resultMatcher = tFetchShipmentReportsSuccess;
 
-    test('should return List<ShipmentReportEntity> when request is successful',
-        () async {
-      // arrange
-      final jsonString =
-          fixtureReader.dataSource('fetch_shipment_reports.json');
-      final json = jsonDecode(jsonString);
-      when(() => mockDio.get(any(),
-          queryParameters: any(named: 'queryParameters'))).thenAnswer(
-        (_) async => Response(
-          requestOptions: RequestOptions(),
-          data: json,
-          statusCode: 200,
-        ),
-      );
+    test(
+      'should return List<ShipmentReportEntity> when request is successful',
+      () async {
+        // arrange
+        final jsonString = fixtureReader.dataSource(
+          'fetch_shipment_reports.json',
+        );
+        final json = jsonDecode(jsonString);
+        when(
+          () => mockDio.get(
+            any(),
+            queryParameters: any(named: 'queryParameters'),
+          ),
+        ).thenAnswer(
+          (_) async => Response(
+            requestOptions: RequestOptions(),
+            data: json,
+            statusCode: 200,
+          ),
+        );
 
-      // act
-      final result =
-          await shipmentRemoteDataSource.fetchShipmentReports(params);
+        // act
+        final result = await shipmentRemoteDataSource.fetchShipmentReports(
+          params,
+        );
 
-      // assert
-      expect(result, resultMatcher);
-      verify(() => mockDio.get(
-            '/v1/shipment/report',
+        // assert
+        expect(result, resultMatcher);
+        verify(
+          () => mockDio.get(
+            '/shipment/report',
             queryParameters: {
               'start_date': params.startDate.toYMD,
               'end_date': params.endDate.toYMD,
               'status': params.status,
-              'page': params.page,
+              'page': params.paginate.page,
+              'limit': params.paginate.limit,
             },
-          )).called(1);
-    });
+          ),
+        ).called(1);
+      },
+    );
 
     test('should throw ServerException when API returns 4xx/5xx', () async {
       // arrange
-      when(() => mockDio.get(any(),
-          queryParameters: any(named: 'queryParameters'))).thenThrow(
+      when(
+        () =>
+            mockDio.get(any(), queryParameters: any(named: 'queryParameters')),
+      ).thenThrow(
         DioException(
           requestOptions: RequestOptions(),
           error: tServerException,
@@ -232,15 +271,18 @@ void main() {
 
       // assert
       await expectLater(future, throwsA(isA<ServerException>()));
-      verify(() => mockDio.get(
-            '/v1/shipment/report',
-            queryParameters: {
-              'start_date': params.startDate.toYMD,
-              'end_date': params.endDate.toYMD,
-              'status': params.status,
-              'page': params.page,
-            },
-          )).called(1);
+      verify(
+        () => mockDio.get(
+          '/shipment/report',
+          queryParameters: {
+            'start_date': params.startDate.toYMD,
+            'end_date': params.endDate.toYMD,
+            'status': params.status,
+            'page': params.paginate.page,
+            'limit': params.paginate.limit,
+          },
+        ),
+      ).called(1);
     });
   });
 
@@ -250,24 +292,34 @@ void main() {
 
     test('should return String when request is successful', () async {
       // arrange
-      final jsonString =
-          fixtureReader.dataSource('create_shipment_report.json');
+      final jsonString = fixtureReader.dataSource(
+        'create_shipment_report.json',
+      );
       final json = jsonDecode(jsonString);
       when(() => mockDio.post(any(), data: any(named: 'data'))).thenAnswer(
         (_) async => Response(
-            requestOptions: RequestOptions(), data: json, statusCode: 200),
+          requestOptions: RequestOptions(),
+          data: json,
+          statusCode: 200,
+        ),
       );
 
       // act
-      final result =
-          await shipmentRemoteDataSource.createShipmentReport(params);
+      final result = await shipmentRemoteDataSource.createShipmentReport(
+        params,
+      );
 
       // assert
       expect(result, resultMatcher);
-      verify(() => mockDio.post('/v1/shipment/report', data: {
+      verify(
+        () => mockDio.post(
+          '/shipment/report',
+          data: {
             'start_date': params.startDate.toYMD,
             'end_date': params.endDate.toYMD,
-          })).called(1);
+          },
+        ),
+      ).called(1);
     });
 
     test('should throw ServerException when API returns 4xx/5xx', () async {
@@ -285,10 +337,15 @@ void main() {
 
       // assert
       await expectLater(future, throwsA(isA<ServerException>()));
-      verify(() => mockDio.post('/v1/shipment/report', data: {
+      verify(
+        () => mockDio.post(
+          '/shipment/report',
+          data: {
             'start_date': params.startDate.toYMD,
             'end_date': params.endDate.toYMD,
-          })).called(1);
+          },
+        ),
+      ).called(1);
     });
   });
 
@@ -302,7 +359,10 @@ void main() {
       final json = jsonDecode(jsonString);
       when(() => mockDio.delete(any())).thenAnswer(
         (_) async => Response(
-            requestOptions: RequestOptions(), data: json, statusCode: 200),
+          requestOptions: RequestOptions(),
+          data: json,
+          statusCode: 200,
+        ),
       );
 
       // act
@@ -310,8 +370,7 @@ void main() {
 
       // assert
       expect(result, resultMatcher);
-      verify(() => mockDio.delete('/v1/shipment/${params.shipmentId}'))
-          .called(1);
+      verify(() => mockDio.delete('/shipment/${params.shipmentId}')).called(1);
     });
 
     test('should throw ServerException when API returns 4xx/5xx', () async {
@@ -329,36 +388,38 @@ void main() {
 
       // assert
       await expectLater(future, throwsA(isA<ServerException>()));
-      verify(() => mockDio.delete('/v1/shipment/${params.shipmentId}'))
-          .called(1);
+      verify(() => mockDio.delete('/shipment/${params.shipmentId}')).called(1);
     });
   });
 
   group('download shipment report remote data sources test', () {
-    final params = tDownloadShipmentReportParams;
+    const params = tDownloadShipmentReportParams;
     const resultMatcher = tDownloadShipmentReportSuccess;
 
     test('should return String when request is successful', () async {
       // arrange
-      final formattedDate = params.createdAt.toLocal().toDMY;
-      when(() => mockDio.download(any(), any())).thenAnswer(
-        (_) async => Response(requestOptions: RequestOptions()),
-      );
+      when(
+        () => mockFileService.getFullPath(any()),
+      ).thenAnswer((_) async => 'path');
+      when(
+        () => mockDio.download(any(), any()),
+      ).thenAnswer((_) async => Response(requestOptions: RequestOptions()));
 
       // act
-      final result =
-          await shipmentRemoteDataSource.downloadShipmentReport(params);
+      final result = await shipmentRemoteDataSource.downloadShipmentReport(
+        params,
+      );
 
       // assert
       expect(result, resultMatcher);
-      verify(() => mockDio.download(params.fileUrl,
-              '${params.externalPath}/${params.filename}_$formattedDate.xlsx'))
-          .called(1);
+      verify(() => mockDio.download(params.fileUrl, 'path')).called(1);
     });
 
     test('should throw ServerException when API returns 4xx/5xx', () async {
       // arrange
-      final formattedDate = params.createdAt.toLocal().toDMY;
+      when(
+        () => mockFileService.getFullPath(any()),
+      ).thenAnswer((_) async => 'path');
       when(() => mockDio.download(any(), any())).thenThrow(
         DioException(
           requestOptions: RequestOptions(),
@@ -372,13 +433,11 @@ void main() {
 
       // assert
       await expectLater(future, throwsA(isA<ServerException>()));
-      verify(() => mockDio.download(params.fileUrl,
-              '${params.externalPath}/${params.filename}_$formattedDate.xlsx'))
-          .called(1);
+      verify(() => mockDio.download(params.fileUrl, 'path')).called(1);
     });
   });
 
-  group('insert shipment remote data sources test', () {
+  group('create shipment remote data sources test', () {
     const params = tCreateShipmentParams;
     const resultMatcher = tCreateShipmentSuccess;
 
@@ -388,18 +447,23 @@ void main() {
       final json = jsonDecode(jsonString);
       when(() => mockDio.post(any(), data: any(named: 'data'))).thenAnswer(
         (_) async => Response(
-            requestOptions: RequestOptions(), data: json, statusCode: 200),
+          requestOptions: RequestOptions(),
+          data: json,
+          statusCode: 200,
+        ),
       );
 
       // act
-      final result = await shipmentRemoteDataSource.insertShipment(params);
+      final result = await shipmentRemoteDataSource.createShipment(params);
 
       // assert
       expect(result, resultMatcher);
-      verify(() => mockDio.post('/v1/shipment', data: {
-            'receipt_number': params.receiptNumber,
-            'stage': params.stage,
-          })).called(1);
+      verify(
+        () => mockDio.post(
+          '/shipment',
+          data: {'receipt_number': params.receiptNumber, 'stage': params.stage},
+        ),
+      ).called(1);
     });
 
     test('should throw ServerException when API returns 4xx/5xx', () async {
@@ -413,18 +477,20 @@ void main() {
       );
 
       // act
-      final future = shipmentRemoteDataSource.insertShipment(params);
+      final future = shipmentRemoteDataSource.createShipment(params);
 
       // assert
       await expectLater(future, throwsA(isA<ServerException>()));
-      verify(() => mockDio.post('/v1/shipment', data: {
-            'receipt_number': params.receiptNumber,
-            'stage': params.stage,
-          })).called(1);
+      verify(
+        () => mockDio.post(
+          '/shipment',
+          data: {'receipt_number': params.receiptNumber, 'stage': params.stage},
+        ),
+      ).called(1);
     });
   });
 
-  group('insert shipment document remote data sources test', () {
+  group('update shipment document remote data sources test', () {
     const params = tUpdateShipmentDocumentParams;
     const resultMatcher = tUpdateShipmentDocumentSuccess;
     final file = File(params.documentPath);
@@ -441,24 +507,31 @@ void main() {
 
     test('should return String when request is successful', () async {
       // arrange
-      final jsonString =
-          fixtureReader.dataSource('update_shipment_document.json');
+      final jsonString = fixtureReader.dataSource(
+        'update_shipment_document.json',
+      );
       final json = jsonDecode(jsonString);
       when(() => mockDio.post(any(), data: any(named: 'data'))).thenAnswer(
         (_) async => Response(
-            requestOptions: RequestOptions(), data: json, statusCode: 200),
+          requestOptions: RequestOptions(),
+          data: json,
+          statusCode: 200,
+        ),
       );
 
       // act
-      final result =
-          await shipmentRemoteDataSource.insertShipmentDocument(params);
+      final result = await shipmentRemoteDataSource.updateShipmentDocument(
+        params,
+      );
 
       // assert
       expect(result, resultMatcher);
-      verify(() => mockDio.post(
-            '/v1/shipment/${params.shipmentId}/document',
-            data: any(named: 'data'),
-          )).called(1);
+      verify(
+        () => mockDio.post(
+          '/shipment/${params.shipmentId}/document',
+          data: any(named: 'data'),
+        ),
+      ).called(1);
     });
 
     test('should throw ServerException when API returns 4xx/5xx', () async {
@@ -472,14 +545,16 @@ void main() {
       );
 
       // act
-      final result = shipmentRemoteDataSource.insertShipmentDocument(params);
+      final result = shipmentRemoteDataSource.updateShipmentDocument(params);
 
       // assert
       await expectLater(result, throwsA(isA<ServerException>()));
-      verify(() => mockDio.post(
-            '/v1/shipment/${params.shipmentId}/document',
-            data: any(named: 'data'),
-          )).called(1);
+      verify(
+        () => mockDio.post(
+          '/shipment/${params.shipmentId}/document',
+          data: any(named: 'data'),
+        ),
+      ).called(1);
     });
   });
 }

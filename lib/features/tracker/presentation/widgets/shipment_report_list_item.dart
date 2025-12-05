@@ -1,150 +1,134 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:open_filex/open_filex.dart';
-import 'package:share_plus/share_plus.dart';
+import 'package:gap/gap.dart';
 
-import '../../../../core/common/constants.dart';
-import '../../../../core/helpers/helpers.dart';
-import '../../../../core/helpers/top_snackbar.dart';
-import '../../../../core/themes/colors.dart';
-import '../../../../main.dart';
-import '../../domain/entities/shipment_report_entity.dart';
-import '../cubit/shipment_cubit.dart';
+import '../../../../common/constants/app_images.dart';
+import '../../../../common/utils/top_snackbar.dart';
+import '../../../../core/presentation/widgets/loading_indicator.dart';
+import '../../../../core/utils/extensions.dart';
+import '../../data/models/shipment_report_ui_model.dart';
+import '../cubit/shipment_report/shipment_report_cubit.dart';
 
 class ShipmentReportListItem extends StatelessWidget {
-  const ShipmentReportListItem({
-    super.key,
-    required this.shipmentReport,
-  });
+  const ShipmentReportListItem({super.key, required this.shipmentReport});
 
-  final ShipmentReportEntity shipmentReport;
+  final ShipmentReportUiModel shipmentReport;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final textTheme = theme.textTheme;
-    final shipmentCubit = context.read<ShipmentCubit>();
-    final formattedDate = shipmentReport.date.toLocal().toDMY;
-    final savedFilename = '${shipmentReport.name}_$formattedDate.xlsx';
+    final textTheme = context.textTheme;
+    final entity = shipmentReport.entity;
+    final isDownloading = context.select<ShipmentReportCubit, bool>(
+      (cubit) => cubit.state.downloadingReportId == entity.id,
+    );
 
-    return BlocConsumer<ShipmentCubit, ShipmentState>(
-      bloc: shipmentCubit,
+    return BlocListener<ShipmentReportCubit, ShipmentReportState>(
+      listenWhen: (previous, current) {
+        final isDownloadFinished =
+            previous.downloadingReportId != null &&
+            current.downloadingReportId == '1';
+
+        return isDownloadFinished && current.message != null;
+      },
       listener: (context, state) {
-        if (state is DownloadShipmentReportLoaded) {
-          TopSnackbar.successSnackbar(message: state.message);
-        }
-
-        if (state is DownloadShipmentReportError) {
-          TopSnackbar.dangerSnackbar(message: state.message);
+        if (state.failure != null) {
+          TopSnackbar.dangerSnackbar(message: state.failure!.message);
+        } else if (state.message != null) {
+          TopSnackbar.successSnackbar(message: state.message!);
         }
       },
-      builder: (context, state) {
-        final file = File('$externalPath/$savedFilename');
-        final isFileDownloaded = file.existsSync();
-
-        return Card(
-          color: MaterialColors.surfaceContainerLowest,
-          elevation: 2,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 8,
-              vertical: 12,
-            ),
-            child: Row(
-              children: <Widget>[
-                CircleAvatar(
-                  backgroundColor: Colors.green.shade100,
-                  child: Image.asset(
-                    spreadsheetIcon,
-                    width: 24,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(
-                        shipmentReport.name,
-                        style: textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.w700,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Dibuat pada: $formattedDate',
-                        style: textTheme.bodySmall?.copyWith(
-                          color: Colors.grey.shade600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 8),
-                if (!isFileDownloaded)
-                  IconButton(
-                    onPressed: () async =>
-                        await shipmentCubit.downloadShipmentReport(
-                      shipmentReportEntity: shipmentReport,
+      child: Card(
+        color: context.colorScheme.surfaceContainerLowest,
+        elevation: 2,
+        shape: RoundedRectangleBorder(borderRadius: .circular(12)),
+        child: Padding(
+          padding: const .symmetric(horizontal: 8, vertical: 12),
+          child: Row(
+            children: <Widget>[
+              CircleAvatar(
+                backgroundColor: Colors.green.shade100,
+                child: Image.asset(AppImages.spreadsheet, width: 24),
+              ),
+              const Gap(12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: .start,
+                  children: <Widget>[
+                    Text(
+                      entity.name,
+                      style: textTheme.titleSmall?.copyWith(fontWeight: .w700),
+                      maxLines: 2,
+                      overflow: .ellipsis,
                     ),
-                    icon: state is DownloadShipmentReportLoading &&
-                            state.shipmentReportId == shipmentReport.id
-                        ? const CircularProgressIndicator.adaptive()
-                        : const Icon(Icons.download_for_offline_outlined),
-                    color: CustomColors.primaryNormal,
-                    tooltip: 'Unduh Laporan',
-                  )
-                else
-                  PopupMenuButton<String>(
-                    icon: const Icon(Icons.more_vert, color: Colors.grey),
-                    onSelected: (value) async {
-                      switch (value) {
-                        case 'open':
-                          await OpenFilex.open(file.path);
-                          break;
-                        case 'share':
-                          await Share.shareXFiles(
-                            <XFile>[XFile(file.path)],
-                            text: 'Laporan Pengiriman: ${shipmentReport.name}',
-                          );
-                          break;
-                      }
-                    },
-                    itemBuilder: (context) => <PopupMenuItem<String>>[
-                      const PopupMenuItem(
-                        value: 'open',
-                        child: Row(
-                          children: <Widget>[
-                            Icon(Icons.open_in_new_outlined, size: 20),
-                            SizedBox(width: 8),
-                            Text('Buka'),
-                          ],
-                        ),
+                    const Gap(4),
+                    Text(
+                      'Dibuat pada: ${entity.date.toLocal().toDMY}',
+                      style: textTheme.bodySmall?.copyWith(
+                        color: context.colorScheme.onSurfaceVariant,
                       ),
-                      const PopupMenuItem(
-                        value: 'share',
-                        child: Row(
-                          children: <Widget>[
-                            Icon(Icons.share_outlined, size: 20),
-                            SizedBox(width: 8),
-                            Text('Bagikan'),
-                          ],
-                        ),
-                      ),
-                    ],
+                    ),
+                  ],
+                ),
+              ),
+              const Gap(8),
+              if (!shipmentReport.isDownloaded)
+                IconButton(
+                  onPressed: () async => await context
+                      .read<ShipmentReportCubit>()
+                      .downloadShipmentReport(report: entity),
+                  icon: isDownloading
+                      ? const LoadingIndicator()
+                      : const Icon(Icons.download_for_offline_outlined),
+                  color: context.colorScheme.primary,
+                  tooltip: 'Unduh Laporan',
+                )
+              else
+                PopupMenuButton<String>(
+                  icon: Icon(
+                    Icons.more_vert,
+                    color: context.colorScheme.onSurfaceVariant,
                   ),
-              ],
-            ),
+                  onSelected: (value) async {
+                    switch (value) {
+                      case 'open':
+                        await context.read<ShipmentReportCubit>().openReport(
+                          entity.savedFilename,
+                        );
+                        break;
+                      case 'share':
+                        await context.read<ShipmentReportCubit>().shareReport([
+                          entity.savedFilename,
+                        ]);
+                        break;
+                    }
+                  },
+                  itemBuilder: (context) => <PopupMenuItem<String>>[
+                    const PopupMenuItem(
+                      value: 'open',
+                      child: Row(
+                        children: <Widget>[
+                          Icon(Icons.open_in_new_outlined, size: 20),
+                          Gap(8),
+                          Text('Buka'),
+                        ],
+                      ),
+                    ),
+                    const PopupMenuItem(
+                      value: 'share',
+                      child: Row(
+                        children: <Widget>[
+                          Icon(Icons.share_outlined, size: 20),
+                          Gap(8),
+                          Text('Bagikan'),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+            ],
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 }

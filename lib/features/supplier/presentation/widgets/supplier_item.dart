@@ -1,54 +1,54 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/common/constants.dart';
-import '../../../../core/themes/colors.dart';
+import '../../../../common/constants/app_images.dart';
+import '../../../../core/router/route_names.dart';
+import '../../../../core/utils/extensions.dart';
 import '../../domain/entities/supplier_entity.dart';
+import '../cubit/supplier/supplier_cubit.dart';
 
 class SupplierItem extends StatelessWidget {
-  const SupplierItem({
-    super.key,
-    required this.supplier,
-  });
+  const SupplierItem({super.key, required this.supplier});
 
   final SupplierEntity supplier;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final textTheme = theme.textTheme;
+    final textTheme = context.textTheme;
 
     return Material(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: .circular(10)),
       elevation: 1,
       child: ListTile(
+        onTap: () =>
+            context.pushNamed(Routes.supplierDetail, extra: supplier.id),
         leading: CircleAvatar(
-          backgroundImage: AssetImage(appIcon),
-          foregroundImage: supplier.avatarUrl != null
-              ? NetworkImage(supplier.avatarUrl!)
-              : null,
+          backgroundImage: const AssetImage(AppImages.app),
+          foregroundImage: NetworkImage(supplier.avatarUrl ?? '-'),
         ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: .circular(10)),
         subtitle: Text(
           supplier.phoneNumber,
           style: textTheme.bodySmall?.copyWith(
-            color: MaterialColors.onSurfaceVariant,
+            color: context.colorScheme.onSurfaceVariant,
           ),
         ),
-        tileColor: MaterialColors.onPrimary,
-        title: Text(
-          supplier.name,
-          style: textTheme.bodyMedium,
-        ),
+        tileColor: context.colorScheme.onPrimary,
+        title: Text(supplier.name, style: textTheme.bodyMedium),
         trailing: IconButton(
-          onPressed: () => context.push(
-            editSupplierRoute,
-            extra: supplier.id,
-          ),
+          onPressed: () async {
+            final result = await context.pushNamed<bool>(
+              Routes.supplierEdit,
+              extra: supplier.id,
+            );
+
+            if (!context.mounted) return;
+
+            if (result == true) {
+              await context.read<SupplierCubit>().fetchSuppliers();
+            }
+          },
           icon: const Icon(Icons.edit),
         ),
       ),

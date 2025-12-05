@@ -17,6 +17,8 @@ class WarehouseItemEntity extends Equatable {
   final int rejectQuantity;
   final num price;
 
+  num get totalPrice => price * quantity;
+
   @override
   List<Object?> get props =>
       [id, shipmentFee, name, quantity, rejectQuantity, price];

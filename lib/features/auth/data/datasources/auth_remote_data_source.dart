@@ -31,7 +31,7 @@ class AuthRemoteDataSourceImpl
   @override
   Future<UserEntity> fetchUser() async {
     return await handleDioRequest<UserEntity>(() async {
-      final response = await dio.get('v1/auth/me');
+      final response = await dio.get('/auth/me');
 
       return UserModel.fromJson(response.data['data']).toEntity();
     });
@@ -41,7 +41,7 @@ class AuthRemoteDataSourceImpl
   Future<TokenModel> refreshToken(RefreshTokenUseCaseParams params) async {
     return await handleDioRequest<TokenModel>(() async {
       final response = await dio.post(
-        'v1/auth/refresh',
+        '/auth/refresh',
         data: {'refresh_token': params.refreshToken},
       );
 
@@ -54,7 +54,7 @@ class AuthRemoteDataSourceImpl
     return await handleDioRequest<SignInResponseModel>(() async {
       final googleAccessToken = await googleSignIn.authenticate();
       final response = await dio.post(
-        'v1/auth/google',
+        '/auth/google',
         data: {'access_token': googleAccessToken},
       );
 
@@ -65,7 +65,7 @@ class AuthRemoteDataSourceImpl
   @override
   Future<String> signOut() async {
     return await handleDioRequest<String>(() async {
-      final response = await dio.post('v1/auth/logout');
+      final response = await dio.post('/auth/logout');
       await googleSignIn.signOut();
 
       return response.data['message'];
@@ -76,7 +76,7 @@ class AuthRemoteDataSourceImpl
   Future<String> updateProfile(UpdateProfileUseCaseParams params) async {
     return await handleDioRequest<String>(() async {
       final response = await dio.put(
-        'v1/auth/profile',
+        '/auth/profile',
         data: {'name': params.name},
       );
 

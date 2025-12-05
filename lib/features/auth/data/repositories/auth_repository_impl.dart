@@ -2,6 +2,7 @@ import 'package:dartz/dartz.dart';
 
 import '../../../../core/errors/failure.dart';
 import '../../../../core/utils/respository_handler_mixin.dart';
+import '../../domain/entities/sign_in_entity.dart';
 import '../../domain/entities/user_entity.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../../domain/usecases/refresh_token_use_case.dart';
@@ -38,7 +39,8 @@ class AuthRepositoryImpl with RepositoryHandlerMixin implements AuthRepository {
 
   @override
   Future<Either<Failure, String>> refreshToken(
-      RefreshTokenUseCaseParams params) async {
+    RefreshTokenUseCaseParams params,
+  ) async {
     return await handleRepositoryRequest<String>(() async {
       final result = await authRemoteDataSource.refreshToken(params);
       await authLocalDataSource.cacheTokens(
@@ -51,14 +53,19 @@ class AuthRepositoryImpl with RepositoryHandlerMixin implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, String>> signIn() async {
-    return await handleRepositoryRequest<String>(() async {
+  Future<Either<Failure, SignInEntity>> signIn() async {
+    return await handleRepositoryRequest<SignInEntity>(() async {
       final result = await authRemoteDataSource.signIn();
       await authLocalDataSource.cacheUser(user: result.user);
       await authLocalDataSource.cacheTokens(
-          accessToken: result.accessToken, refreshToken: result.refreshToken);
+        accessToken: result.accessToken,
+        refreshToken: result.refreshToken,
+      );
 
-      return result.message;
+      return SignInEntity(
+        message: result.message,
+        user: result.user.toEntity(),
+      );
     });
   }
 
@@ -74,7 +81,8 @@ class AuthRepositoryImpl with RepositoryHandlerMixin implements AuthRepository {
 
   @override
   Future<Either<Failure, String>> updateProfile(
-      UpdateProfileUseCaseParams params) async {
+    UpdateProfileUseCaseParams params,
+  ) async {
     return await handleRepositoryRequest<String>(() async {
       final result = await authRemoteDataSource.updateProfile(params);
 

@@ -1,110 +1,102 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gap/gap.dart';
 
-import '../../../../core/common/constants.dart';
-import '../../../../core/common/shadows.dart';
-import '../../../../core/themes/colors.dart';
-import '../cubit/supplier_cubit.dart';
+import '../../../../common/utils/shadows.dart';
+import '../../../../core/presentation/widgets/error_state_widget.dart';
+import '../../../../core/presentation/widgets/loading_indicator.dart';
+import '../../../../core/utils/extensions.dart';
+import '../../domain/entities/supplier_detail_entity.dart';
+import '../cubit/supplier_detail/supplier_detail_cubit.dart';
+import '../widgets/editable_avatar.dart';
 
-class SupplierDetailPage extends StatelessWidget {
-  const SupplierDetailPage({
-    super.key,
-    required this.supplierId,
-  });
+class SupplierDetailPage extends StatefulWidget {
+  const SupplierDetailPage({super.key, required this.supplierId});
 
   final String supplierId;
 
   @override
+  State<SupplierDetailPage> createState() => _SupplierDetailPageState();
+}
+
+class _SupplierDetailPageState extends State<SupplierDetailPage> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<SupplierDetailCubit>().fetchSupplier(
+      supplierId: widget.supplierId,
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final supplierCubit = context.read<SupplierCubit>();
-    final focusNode = FocusScope.of(context, createDependency: false);
-
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Detail Supplier'),
-      ),
-      body: BlocBuilder<SupplierCubit, SupplierState>(
-        bloc: supplierCubit..fetchSupplier(supplierId: supplierId),
-        buildWhen: (previous, current) => current is FetchSupplier,
+      appBar: AppBar(title: const Text('Detail Supplier')),
+      body: BlocBuilder<SupplierDetailCubit, SupplierDetailState>(
         builder: (context, state) {
-          if (state is FetchSupplierLoading) {
-            return const Center(
-              child: CircularProgressIndicator.adaptive(),
-            );
-          }
-
-          if (state is FetchSupplierLoaded) {
-            return Center(
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: cardBoxShadow,
-                  color: MaterialColors.onPrimary,
-                ),
-                margin: const EdgeInsets.all(16),
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    CircleAvatar(
-                      backgroundColor: Colors.grey.shade300,
-                      backgroundImage: AssetImage(appIcon),
-                      foregroundImage: state.supplierDetail.avatarUrl != null
-                          ? NetworkImage(state.supplierDetail.avatarUrl!)
-                          : null,
-                      radius: 50,
-                      child: state.supplierDetail.avatarUrl == null
-                          ? Icon(
-                              Icons.person_outline,
-                              color: Colors.grey.shade400,
-                              size: 50,
-                            )
-                          : null,
-                    ),
-                    const SizedBox(height: 24),
-                    TextFormField(
-                      onTapOutside: (event) => focusNode.unfocus(),
-                      decoration: InputDecoration(
-                        labelText: 'Nama',
-                      ),
-                      initialValue: state.supplierDetail.name,
-                      readOnly: true,
-                    ),
-                    const SizedBox(height: 12),
-                    TextFormField(
-                      onTapOutside: (event) => focusNode.unfocus(),
-                      decoration: InputDecoration(
-                        labelText: 'Email',
-                      ),
-                      initialValue: state.supplierDetail.email,
-                      readOnly: true,
-                    ),
-                    const SizedBox(height: 12),
-                    TextFormField(
-                      onTapOutside: (event) => focusNode.unfocus(),
-                      decoration: InputDecoration(
-                        labelText: 'Telepon',
-                      ),
-                      initialValue: state.supplierDetail.phoneNumber,
-                      readOnly: true,
-                    ),
-                    const SizedBox(height: 12),
-                    TextFormField(
-                      onTapOutside: (event) => focusNode.unfocus(),
-                      decoration: InputDecoration(
-                        labelText: 'Alamat',
-                      ),
-                      initialValue: state.supplierDetail.address,
-                      readOnly: true,
-                    ),
-                  ],
-                ),
+          return switch (state.status) {
+            .inProgress => const LoadingIndicator(),
+            .success => _SuccessWidget(supplier: state.supplier!),
+            .failure => ErrorStateWidget(
+              onRetry: () => context.read<SupplierDetailCubit>().fetchSupplier(
+                supplierId: widget.supplierId,
               ),
-            );
-          }
-
-          return const SizedBox();
+              failure: state.failure,
+            ),
+            _ => const SizedBox(),
+          };
         },
+      ),
+    );
+  }
+}
+
+class _SuccessWidget extends StatelessWidget {
+  const _SuccessWidget({required this.supplier});
+
+  final SupplierDetailEntity supplier;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: .circular(20),
+          boxShadow: cardBoxShadow,
+          color: context.colorScheme.onPrimary,
+        ),
+        margin: const .all(16),
+        padding: const .all(24),
+        child: Column(
+          mainAxisSize: .min,
+          children: <Widget>[
+            EditableAvatar(imagePath: supplier.avatarUrl),
+            const Gap(24),
+            TextFormField(
+              decoration: const InputDecoration(labelText: 'Nama'),
+              initialValue: supplier.name,
+              readOnly: true,
+            ),
+            const Gap(12),
+            TextFormField(
+              decoration: const InputDecoration(labelText: 'Email'),
+              initialValue: supplier.email,
+              readOnly: true,
+            ),
+            const Gap(12),
+            TextFormField(
+              decoration: const InputDecoration(labelText: 'Telepon'),
+              initialValue: supplier.phoneNumber,
+              readOnly: true,
+            ),
+            const Gap(12),
+            TextFormField(
+              decoration: const InputDecoration(labelText: 'Alamat'),
+              initialValue: supplier.address,
+              readOnly: true,
+            ),
+          ],
+        ),
       ),
     );
   }

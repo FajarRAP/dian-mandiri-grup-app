@@ -2,41 +2,38 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/common/constants.dart';
-import '../../../../core/helpers/top_snackbar.dart';
-import '../../../../core/widgets/confirmation_dialog.dart';
-import '../cubit/shipment_cubit.dart';
+import '../../../../common/constants/app_constants.dart';
+import '../../../../common/utils/top_snackbar.dart';
+import '../../../../core/presentation/widgets/confirmation_dialog.dart';
+import '../cubit/create_shipment/create_shipment_cubit.dart';
 
 class CancelShipmentDialog extends StatelessWidget {
-  const CancelShipmentDialog({
-    super.key,
-    required this.receiptNumber,
-  });
+  const CancelShipmentDialog({super.key, required this.receiptNumber});
 
   final String receiptNumber;
 
   @override
   Widget build(BuildContext context) {
-    final shipmentCubit = context.read<ShipmentCubit>();
-    return BlocConsumer<ShipmentCubit, ShipmentState>(
-      bloc: shipmentCubit,
-      buildWhen: (previous, current) => current is InsertShipment,
-      listenWhen: (previous, current) => current is InsertShipment,
+    return BlocConsumer<CreateShipmentCubit, CreateShipmentState>(
       listener: (context, state) {
-        if (state is InsertShipmentLoaded) {
-          TopSnackbar.successSnackbar(message: state.message);
-          context.pop();
+        if (state.status == .success) {
+          TopSnackbar.successSnackbar(message: state.message!);
+          context.pop(true);
         }
 
-        if (state is InsertShipmentError) {
-          TopSnackbar.dangerSnackbar(message: state.failure.message);
+        if (state.status == .failure) {
+          TopSnackbar.dangerSnackbar(message: state.failure!.message);
         }
       },
       builder: (context, state) {
-        final onAction = switch (state) {
-          InsertShipmentLoading() => null,
-          _ => () async => await shipmentCubit.insertShipment(
-              receiptNumber: receiptNumber, stage: cancelStage),
+        final onAction = switch (state.status) {
+          .inProgress => null,
+          _ =>
+            () async =>
+                await context.read<CreateShipmentCubit>().createShipment(
+                  receiptNumber: receiptNumber,
+                  stage: AppConstants.cancelStage,
+                ),
         };
 
         return ConfirmationDialog(

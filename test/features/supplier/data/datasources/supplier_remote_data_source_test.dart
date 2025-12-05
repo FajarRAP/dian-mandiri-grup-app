@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -25,35 +26,45 @@ void main() {
     const params = tFetchSupplierParams;
     const resultMatcher = tFetchSupplierSuccess;
 
-    test('should return SupplierDetailEntity when request is successful',
-        () async {
-      // arrange
-      final jsonString = fixtureReader.dataSource('fetch_supplier.json');
-      final json = jsonDecode(jsonString);
-      when(() => mockDio.get(any())).thenAnswer((_) async => Response(
-          requestOptions: RequestOptions(), data: json, statusCode: 200));
+    test(
+      'should return SupplierDetailEntity when request is successful',
+      () async {
+        // arrange
+        final jsonString = fixtureReader.dataSource('fetch_supplier.json');
+        final json = jsonDecode(jsonString);
+        when(() => mockDio.get(any())).thenAnswer(
+          (_) async => Response(
+            requestOptions: RequestOptions(),
+            data: json,
+            statusCode: 200,
+          ),
+        );
 
-      // act
-      final result = await supplierRemoteDataSource.fetchSupplier(params);
+        // act
+        final result = await supplierRemoteDataSource.fetchSupplier(params);
 
-      // assert
-      expect(result, resultMatcher);
-      verify(() => mockDio.get('v1/supplier/${params.supplierId}')).called(1);
-    });
+        // assert
+        expect(result, resultMatcher);
+        verify(() => mockDio.get('/supplier/${params.supplierId}')).called(1);
+      },
+    );
 
     test('should throw ServerException when API returns 4xx/5xx', () async {
       // arrange
-      when(() => mockDio.get(any())).thenThrow(DioException(
+      when(() => mockDio.get(any())).thenThrow(
+        DioException(
           requestOptions: RequestOptions(),
           error: tServerException,
-          type: DioExceptionType.badResponse));
+          type: DioExceptionType.badResponse,
+        ),
+      );
 
       // act
       final future = supplierRemoteDataSource.fetchSupplier(params);
 
       // assert
       await expectLater(() => future, throwsA(isA<ServerException>()));
-      verify(() => mockDio.get('v1/supplier/${params.supplierId}')).called(1);
+      verify(() => mockDio.get('/supplier/${params.supplierId}')).called(1);
     });
   });
 
@@ -61,57 +72,75 @@ void main() {
     const params = tFetchSuppliersParams;
     const resultMatcher = tFetchSuppliersSuccess;
 
-    test('should return List<SupplierEntity> when request is successful',
-        () async {
-      // arrange
-      final jsonString = fixtureReader.dataSource('fetch_suppliers.json');
-      final json = jsonDecode(jsonString);
-      when(() => mockDio.get(any(),
-              queryParameters: any(named: 'queryParameters')))
-          .thenAnswer((_) async => Response(
-              requestOptions: RequestOptions(), data: json, statusCode: 200));
+    test(
+      'should return List<SupplierEntity> when request is successful',
+      () async {
+        // arrange
+        final jsonString = fixtureReader.dataSource('fetch_suppliers.json');
+        final json = jsonDecode(jsonString);
+        when(
+          () => mockDio.get(
+            any(),
+            queryParameters: any(named: 'queryParameters'),
+          ),
+        ).thenAnswer(
+          (_) async => Response(
+            requestOptions: RequestOptions(),
+            data: json,
+            statusCode: 200,
+          ),
+        );
 
-      // act
-      final result = await supplierRemoteDataSource.fetchSuppliers(params);
+        // act
+        final result = await supplierRemoteDataSource.fetchSuppliers(params);
 
-      // assert
-      expect(result, resultMatcher);
-      verify(() => mockDio.get(
-            'v1/supplier',
+        // assert
+        expect(result, resultMatcher);
+        verify(
+          () => mockDio.get(
+            '/supplier',
             queryParameters: {
               'column': params.column,
               'order': params.sort,
-              'search': params.search,
-              'limit': params.limit,
-              'page': params.page,
+              'search': params.search.query,
+              'limit': params.paginate.limit,
+              'page': params.paginate.page,
             },
-          )).called(1);
-    });
+          ),
+        ).called(1);
+      },
+    );
 
     test('should throw ServerException when API returns 4xx/5xx', () async {
       // arrange
-      when(() => mockDio.get(any(),
-              queryParameters: any(named: 'queryParameters')))
-          .thenThrow(DioException(
-              requestOptions: RequestOptions(),
-              error: tServerException,
-              type: DioExceptionType.badResponse));
+      when(
+        () =>
+            mockDio.get(any(), queryParameters: any(named: 'queryParameters')),
+      ).thenThrow(
+        DioException(
+          requestOptions: RequestOptions(),
+          error: tServerException,
+          type: DioExceptionType.badResponse,
+        ),
+      );
 
       // act
       final future = supplierRemoteDataSource.fetchSuppliers(params);
 
       // assert
       await expectLater(() => future, throwsA(isA<ServerException>()));
-      verify(() => mockDio.get(
-            'v1/supplier',
-            queryParameters: {
-              'column': params.column,
-              'order': params.sort,
-              'search': params.search,
-              'limit': params.limit,
-              'page': params.page,
-            },
-          )).called(1);
+      verify(
+        () => mockDio.get(
+          '/supplier',
+          queryParameters: {
+            'column': params.column,
+            'order': params.sort,
+            'search': params.search.query,
+            'limit': params.paginate.limit,
+            'page': params.paginate.page,
+          },
+        ),
+      ).called(1);
     });
   });
 
@@ -119,55 +148,77 @@ void main() {
     const params = tFetchSuppliersDropdownParams;
     const resultMatcher = tFetchSuppliersDropdownSuccess;
 
-    test('should return List<DropdownEntity> when request is successful',
-        () async {
-      // arrange
-      final jsonString =
-          fixtureReader.dataSource('fetch_suppliers_dropdown.json');
-      final json = jsonDecode(jsonString);
-      when(() => mockDio.get(any(),
-              queryParameters: any(named: 'queryParameters')))
-          .thenAnswer((_) async => Response(
-              requestOptions: RequestOptions(), data: json, statusCode: 200));
+    test(
+      'should return List<DropdownEntity> when request is successful',
+      () async {
+        // arrange
+        final jsonString = fixtureReader.dataSource(
+          'fetch_suppliers_dropdown.json',
+        );
+        final json = jsonDecode(jsonString);
+        when(
+          () => mockDio.get(
+            any(),
+            queryParameters: any(named: 'queryParameters'),
+          ),
+        ).thenAnswer(
+          (_) async => Response(
+            requestOptions: RequestOptions(),
+            data: json,
+            statusCode: 200,
+          ),
+        );
 
-      // act
-      final result =
-          await supplierRemoteDataSource.fetchSuppliersDropdown(params);
+        // act
+        final result = await supplierRemoteDataSource.fetchSuppliersDropdown(
+          params,
+        );
 
-      // assert
-      expect(result, resultMatcher);
-      verify(() => mockDio.get(
-            'v1/supplier/dropdown',
+        // assert
+        expect(result, resultMatcher);
+        verify(
+          () => mockDio.get(
+            '/supplier/dropdown',
             queryParameters: {
-              'search': params.search,
-              'limit': params.limit,
-              'page': params.page,
+              'search': params.search.query,
+              'limit': params.paginate.limit,
+              'page': params.paginate.page,
+              'show_all': params.showAll,
             },
-          )).called(1);
-    });
+          ),
+        ).called(1);
+      },
+    );
 
     test('should throw ServerException when API returns 4xx/5xx', () async {
       // arrange
-      when(() => mockDio.get(any(),
-              queryParameters: any(named: 'queryParameters')))
-          .thenThrow(DioException(
-              requestOptions: RequestOptions(),
-              error: tServerException,
-              type: DioExceptionType.badResponse));
+      when(
+        () =>
+            mockDio.get(any(), queryParameters: any(named: 'queryParameters')),
+      ).thenThrow(
+        DioException(
+          requestOptions: RequestOptions(),
+          error: tServerException,
+          type: DioExceptionType.badResponse,
+        ),
+      );
 
       // act
       final future = supplierRemoteDataSource.fetchSuppliersDropdown(params);
 
       // assert
       await expectLater(() => future, throwsA(isA<ServerException>()));
-      verify(() => mockDio.get(
-            'v1/supplier/dropdown',
-            queryParameters: {
-              'search': params.search,
-              'limit': params.limit,
-              'page': params.page,
-            },
-          )).called(1);
+      verify(
+        () => mockDio.get(
+          '/supplier/dropdown',
+          queryParameters: {
+            'search': params.search.query,
+            'limit': params.paginate.limit,
+            'page': params.paginate.page,
+            'show_all': params.showAll,
+          },
+        ),
+      ).called(1);
     });
   });
 
@@ -180,72 +231,99 @@ void main() {
       final jsonString = fixtureReader.dataSource('create_supplier.json');
       final json = jsonDecode(jsonString);
       when(() => mockDio.post(any(), data: any(named: 'data'))).thenAnswer(
-          (_) async => Response(
-              requestOptions: RequestOptions(), data: json, statusCode: 200));
+        (_) async => Response(
+          requestOptions: RequestOptions(),
+          data: json,
+          statusCode: 200,
+        ),
+      );
 
       // act
-      final result = await supplierRemoteDataSource.insertSupplier(params);
+      final result = await supplierRemoteDataSource.createSupplier(params);
 
       // assert
       expect(result, resultMatcher);
-      verify(() => mockDio.post('v1/supplier', data: any(named: 'data')))
-          .called(1);
+      verify(
+        () => mockDio.post('/supplier', data: any(named: 'data')),
+      ).called(1);
     });
 
     test('should throw ServerException when API returns 4xx/5xx', () async {
       // arrange
       when(() => mockDio.post(any(), data: any(named: 'data'))).thenThrow(
-          DioException(
-              requestOptions: RequestOptions(),
-              error: tServerException,
-              type: DioExceptionType.badResponse));
+        DioException(
+          requestOptions: RequestOptions(),
+          error: tServerException,
+          type: DioExceptionType.badResponse,
+        ),
+      );
 
       // act
-      final future = supplierRemoteDataSource.insertSupplier(params);
+      final future = supplierRemoteDataSource.createSupplier(params);
 
       // assert
       await expectLater(() => future, throwsA(isA<ServerException>()));
-      verify(() => mockDio.post('v1/supplier', data: any(named: 'data')))
-          .called(1);
+      verify(
+        () => mockDio.post('/supplier', data: any(named: 'data')),
+      ).called(1);
     });
   });
 
   group('update supplier remote data source test', () {
     const params = tUpdateSupplierParams;
     const resultMatcher = tUpdateSupplierSuccess;
+    final file = File(params.avatar ?? '-');
+
+    setUp(() {
+      file.writeAsStringSync('lorem');
+    });
+
+    tearDown(() {
+      if (file.existsSync()) {
+        file.deleteSync();
+      }
+    });
 
     test('should return String message when request is successful', () async {
       // arrange
       final jsonString = fixtureReader.dataSource('update_supplier.json');
       final json = jsonDecode(jsonString);
       when(() => mockDio.put(any(), data: any(named: 'data'))).thenAnswer(
-          (_) async => Response(
-              requestOptions: RequestOptions(), data: json, statusCode: 200));
+        (_) async => Response(
+          requestOptions: RequestOptions(),
+          data: json,
+          statusCode: 200,
+        ),
+      );
 
       // act
       final result = await supplierRemoteDataSource.updateSupplier(params);
 
       // assert
       expect(result, resultMatcher);
-      verify(() => mockDio.put('v1/supplier/${params.supplierDetailEntity.id}',
-          data: any(named: 'data'))).called(1);
+      verify(
+        () => mockDio.put('/supplier/${params.id}', data: any(named: 'data')),
+      ).called(1);
     });
 
     test('should throw ServerException when API returns 4xx/5xx', () async {
       // arrange
       when(() => mockDio.put(any(), data: any(named: 'data'))).thenThrow(
-          DioException(
-              requestOptions: RequestOptions(),
-              error: tServerException,
-              type: DioExceptionType.badResponse));
+        DioException(
+          requestOptions: RequestOptions(),
+          error: tServerException,
+          type: DioExceptionType.badResponse,
+        ),
+      );
 
       // act
       final future = supplierRemoteDataSource.updateSupplier(params);
 
       // assert
       await expectLater(() => future, throwsA(isA<ServerException>()));
-      verify(() => mockDio.put('v1/supplier/${params.supplierDetailEntity.id}',
-          data: any(named: 'data'))).called(1);
+      verify(
+        () => mockDio.put('/supplier/${params.id}', data: any(named: 'data')),
+      ).called(1);
     });
   });
 }

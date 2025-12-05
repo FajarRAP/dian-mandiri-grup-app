@@ -15,6 +15,8 @@ class ShipmentReportEntity extends Equatable {
   final String status;
   final DateTime date;
 
+  String get savedFilename => '$name.xlsx';
+
   @override
   List<Object?> get props => [id, file, name, status, date];
 }

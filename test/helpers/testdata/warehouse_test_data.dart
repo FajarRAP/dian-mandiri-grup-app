@@ -10,12 +10,12 @@ import 'package:ship_tracker/features/warehouse/domain/usecases/delete_purchase_
 import 'package:ship_tracker/features/warehouse/domain/usecases/fetch_purchase_note_use_case.dart';
 import 'package:ship_tracker/features/warehouse/domain/usecases/fetch_purchase_notes_use_case.dart';
 import 'package:ship_tracker/features/warehouse/domain/usecases/fetch_purchase_notes_dropdown_use_case.dart';
-import 'package:ship_tracker/features/warehouse/domain/usecases/insert_purchase_note_manual_use_case.dart';
-import 'package:ship_tracker/features/warehouse/domain/usecases/insert_purchase_note_file_use_case.dart';
-import 'package:ship_tracker/features/warehouse/domain/usecases/insert_return_cost_use_case.dart';
-import 'package:ship_tracker/features/warehouse/domain/usecases/insert_shipping_fee_use_case.dart';
+import 'package:ship_tracker/features/warehouse/domain/usecases/create_purchase_note_use_case.dart';
+import 'package:ship_tracker/features/warehouse/domain/usecases/import_purchase_note_use_case.dart';
+import 'package:ship_tracker/features/warehouse/domain/usecases/update_return_cost_use_case.dart';
+import 'package:ship_tracker/features/warehouse/domain/usecases/add_shipping_fee_use_case.dart';
 import 'package:ship_tracker/features/warehouse/domain/usecases/update_purchase_note_use_case.dart';
-import 'package:ship_tracker/core/common/dropdown_entity.dart';
+import 'package:ship_tracker/core/domain/entities/dropdown_entity.dart';
 
 const tWarehouseItemEntity = WarehouseItemEntity(
   id: 'c5f50fa8-ec55-4f22-b2d9-b223da930ebd',
@@ -37,22 +37,24 @@ const tWarehouseItemModel = WarehouseItemModel(
 final tPurchaseNoteSummaryEntity = PurchaseNoteSummaryEntity(
   id: '83881607-18c5-4135-acb5-86f45892bd3c',
   supplier: const SupplierEntity(
-      id: '71213ab2-eb64-4873-9732-a77681c9523f',
-      name: 'Ayubi',
-      phoneNumber: '087885020053',
-      avatarUrl:
-          'https://storage.dianmandirigrup.id/staging-app/supplier/avatar/f23d2884-66ac-4fe7-b1db-7f260014befa.jpg'),
+    id: '71213ab2-eb64-4873-9732-a77681c9523f',
+    name: 'Ayubi',
+    phoneNumber: '087885020053',
+    avatarUrl:
+        'https://storage.dianmandirigrup.id/staging-app/supplier/avatar/f23d2884-66ac-4fe7-b1db-7f260014befa.jpg',
+  ),
   totalItems: 1,
   date: DateTime.parse('2025-09-27T17:00:00Z'),
 );
 final tPurchaseNoteSummaryModel = PurchaseNoteSummaryModel(
   id: '83881607-18c5-4135-acb5-86f45892bd3c',
   supplier: const SupplierModel(
-      id: '71213ab2-eb64-4873-9732-a77681c9523f',
-      name: 'Ayubi',
-      phoneNumber: '087885020053',
-      avatarUrl:
-          'https://storage.dianmandirigrup.id/staging-app/supplier/avatar/f23d2884-66ac-4fe7-b1db-7f260014befa.jpg'),
+    id: '71213ab2-eb64-4873-9732-a77681c9523f',
+    name: 'Ayubi',
+    phoneNumber: '087885020053',
+    avatarUrl:
+        'https://storage.dianmandirigrup.id/staging-app/supplier/avatar/f23d2884-66ac-4fe7-b1db-7f260014befa.jpg',
+  ),
   totalItems: 1,
   date: DateTime.parse('2025-09-27T17:00:00Z'),
 );
@@ -81,7 +83,7 @@ final tPurchaseNoteDetailEntity = PurchaseNoteDetailEntity(
       rejectQuantity: 0,
       price: 20000,
       shipmentFee: 20000,
-    )
+    ),
   ],
 );
 final tPurchaseNoteDetailModel = PurchaseNoteDetailModel(
@@ -108,16 +110,18 @@ final tPurchaseNoteDetailModel = PurchaseNoteDetailModel(
       rejectQuantity: 0,
       price: 20000,
       shipmentFee: 20000,
-    )
+    ),
   ],
 );
 
-const tDeletePurchaseNoteParams =
-    DeletePurchaseNoteUseCaseParams(purchaseNoteId: 'purchaseNoteId');
+const tDeletePurchaseNoteParams = DeletePurchaseNoteUseCaseParams(
+  purchaseNoteId: 'purchaseNoteId',
+);
 const tDeletePurchaseNoteSuccess = 'Success delete purchase note!';
 
 final tFetchPurchaseNoteParams = FetchPurchaseNoteUseCaseParams(
-    purchaseNoteId: tPurchaseNoteDetailEntity.id);
+  purchaseNoteId: tPurchaseNoteDetailEntity.id,
+);
 final tFetchPurchaseNoteSuccess = PurchaseNoteDetailEntity(
   id: '83881607-18c5-4135-acb5-86f45892bd3c',
   date: DateTime.parse('2025-09-27T17:00:00Z'),
@@ -142,7 +146,7 @@ final tFetchPurchaseNoteSuccess = PurchaseNoteDetailEntity(
       rejectQuantity: 0,
       price: 20000,
       shipmentFee: 20000,
-    )
+    ),
   ],
 );
 
@@ -151,24 +155,27 @@ final tFetchPurchaseNotesSuccess = [
   PurchaseNoteSummaryEntity(
     id: '83881607-18c5-4135-acb5-86f45892bd3c',
     supplier: const SupplierEntity(
-        id: '71213ab2-eb64-4873-9732-a77681c9523f',
-        name: 'Ayubi',
-        phoneNumber: '087885020053',
-        avatarUrl:
-            'https://storage.dianmandirigrup.id/staging-app/supplier/avatar/f23d2884-66ac-4fe7-b1db-7f260014befa.jpg'),
+      id: '71213ab2-eb64-4873-9732-a77681c9523f',
+      name: 'Ayubi',
+      phoneNumber: '087885020053',
+      avatarUrl:
+          'https://storage.dianmandirigrup.id/staging-app/supplier/avatar/f23d2884-66ac-4fe7-b1db-7f260014befa.jpg',
+    ),
     totalItems: 1,
     date: DateTime.parse('2025-09-27T17:00:00Z'),
-  )
+  ),
 ];
 
 const tFetchPurchaseNotesDropdownParams =
     FetchPurchaseNotesDropdownUseCaseParams();
 const tFetchPurchaseNotesDropdownSuccess = [
   DropdownEntity(
-      key: '83881607-18c5-4135-acb5-86f45892bd3c', value: '2025-09-27 - Ayubi')
+    key: '83881607-18c5-4135-acb5-86f45892bd3c',
+    value: '2025-09-27 - Ayubi',
+  ),
 ];
 
-final tInsertPurchaseNoteManualParams = InsertPurchaseNoteManualUseCaseParams(
+final tInsertPurchaseNoteManualParams = CreatePurchaseNoteUseCaseParams(
   date: DateTime.now(),
   receipt: 'receipt',
   supplierId: 'supplierId',
@@ -180,12 +187,12 @@ final tInsertPurchaseNoteManualParams = InsertPurchaseNoteManualUseCaseParams(
       rejectQuantity: 0,
       price: 20000,
       shipmentFee: 20000,
-    )
+    ),
   ],
 );
 const tInsertPurchaseNoteManualSuccess = 'Purchase note created successfully';
 
-final tInsertPurchaseNoteFileParams = InsertPurchaseNoteFileUseCaseParams(
+final tInsertPurchaseNoteFileParams = ImportPurchaseNoteUseCaseParams(
   date: DateTime.now(),
   receipt: 'receipt',
   supplierId: 'supplierId',
@@ -193,14 +200,14 @@ final tInsertPurchaseNoteFileParams = InsertPurchaseNoteFileUseCaseParams(
 );
 const tInsertPurchaseNoteFileSuccess = 'Purchase note created successfully';
 
-const tInsertReturnCostParams = InsertReturnCostUseCaseParams(
+const tUpdateReturnCostParams = UpdateReturnCostUseCaseParams(
   purchaseNoteId: 'purchaseNoteId',
   amount: 10000,
 );
-const tInsertReturnCostSuccess =
+const tUpdateReturnCostSuccess =
     'Purchase note return cost updated successfully';
 
-const tInsertShippingFeeParams = InsertShippingFeeUseCaseParams(
+const tInsertShippingFeeParams = AddShippingFeeUseCaseParams(
   price: 5000,
   purchaseNoteIds: ['purchaseNoteId'],
 );
@@ -219,7 +226,7 @@ final tUpdatePurchaseNoteParams = UpdatePurchaseNoteUseCaseParams(
       rejectQuantity: 0,
       price: 20000,
       shipmentFee: 20000,
-    )
+    ),
   ],
 );
 const tUpdatePurchaseNoteSuccess = 'Purchase note updated successfully';

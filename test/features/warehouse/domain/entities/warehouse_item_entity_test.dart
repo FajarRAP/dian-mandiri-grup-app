@@ -11,5 +11,16 @@ void main() {
       // assert
       expect(warehouseItem, warehouseItemMatcher);
     });
+
+    test('should return correct total price', () {
+      // arrange
+      const matcher = 40000; // price 20000 * quantity 2
+
+      // act
+      final totalPrice = warehouseItem.totalPrice;
+
+      // assert
+      expect(totalPrice, matcher);
+    });
   });
 }
